@@ -1,4 +1,5 @@
-#include "shader.h"
+#include "shader.hpp"
+#include "light.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -8,13 +9,9 @@
 #include <string>
 #include <vector>
 
-#include <glutil/Shader.h>
-#include <glload/gll.hpp>
-#include <glload/gl_3_3.h>
+#include <GL/glew.h>
 
 #define PP_INCLUDE "#include"
-
-Shader::globals_t Shader::globals;
 
 void Shader::load_file(const std::string &filename, std::stringstream &shaderData, std::string included_from) {
 	std::ifstream shaderFile(filename.c_str());
@@ -27,9 +24,14 @@ void Shader::load_file(const std::string &filename, std::stringstream &shaderDat
 	}
 	shaderData << shaderFile.rdbuf();
 	shaderFile.close();
+	printf("Loaded %s\n", filename.c_str());
 }
 
-std::string Shader::parse_shader(const std::string &filename, std::set<std::string> included_files, std::string included_from) {
+std::string Shader::parse_shader(
+			const std::string &filename,
+			std::set<std::string> included_files, 
+			std::string included_from
+		) {
 	char buffer[2048];
 
 	std::pair<std::set<std::string>::iterator, bool> ret = included_files.insert(filename);
@@ -73,32 +75,58 @@ std::string Shader::parse_shader(const std::string &filename, std::set<std::stri
 }
 
 GLuint Shader::load_shader(GLenum eShaderType, const std::string &strFilename) {
+	GLint gl_tmp;
+
 	std::string source = parse_shader(strFilename);
-	try {
-		return glutil::CompileShader(eShaderType, source);
-	} catch(glutil::ShaderException &e) {
-		fprintf(stderr, "Shader compile error (%s). Preproccessed source: \n", strFilename.c_str());
+
+	GLuint shader = glCreateShader(eShaderType);
+
+	const char * source_ptr = source.c_str();
+
+	glShaderSource(shader, 1,&source_ptr , NULL);
+	glCompileShader(shader);
+
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &gl_tmp);
+
+	if(!gl_tmp) {
 		char buffer[2048];
+
+		fprintf(stderr, "Shader compile error (%s). Preproccessed source: \n", strFilename.c_str());
 		std::stringstream code(source);
 		int linenr=0;
 		while(!code.eof()) {
 			code.getline(buffer, 2048);
 			fprintf(stderr, "%d %s\n", ++linenr, buffer);
 		}
-		fprintf(stderr, "Error in shader %s: %s\n",strFilename.c_str(),  e.what());
-		throw;
-	}
+		glGetShaderInfoLog(shader, 2048, NULL, buffer);
+		fprintf(stderr, "Error in shader %s: %s\n",strFilename.c_str(),  buffer);
+		exit(2);
+	} 
+	return shader;
 }
 
-GLuint Shader::create_program(const std::vector<GLuint> &shaderList) {
-	try {
-		return glutil::LinkProgram(shaderList);
-	} catch(glutil::ShaderException &e) {
-		fprintf(stderr, "%s\n", e.what());
-		throw;
+GLuint Shader::create_program(const std::string &shader_name, const std::vector<GLuint> &shaderList) {
+	GLint gl_tmp;
+	GLuint program = glCreateProgram();	
+
+	for(GLuint shader : shaderList) {
+		glAttachShader(program, shader);
 	}
 
+	glLinkProgram(program);
+	
 	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
+
+	glGetProgramiv(program, GL_LINK_STATUS, &gl_tmp);
+
+	if(!gl_tmp) {
+		char buffer[2048];
+		glGetProgramInfoLog(program, 2048, NULL, buffer);
+		fprintf(stderr, "Link error in shader %s: %s\n", shader_name.c_str(), buffer);
+		exit(2);
+	}
+	return program;
+
 }
 
 Shader Shader::create_shader(std::string base_name) {
@@ -109,9 +137,14 @@ Shader Shader::create_shader(std::string base_name) {
 	std::vector<GLuint> shader_list;
 	//Load shaders:
 	shader_list.push_back(load_shader(GL_VERTEX_SHADER, SHADER_PATH+base_name+VERT_SHADER_EXTENTION));
+	//Check if geometry shader exists:
+	std::string geom_shader = SHADER_PATH+base_name+GEOM_SHADER_EXTENTION;
+	std::ifstream file(geom_shader.c_str());
+	if(file)
+		shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, geom_shader));
 	shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, SHADER_PATH+base_name+FRAG_SHADER_EXTENTION));
 	
-	shader.program = create_program(shader_list);
+	shader.program = create_program(base_name, shader_list);
 
 	std::for_each(shader_list.begin(), shader_list.end(), glDeleteShader);
 

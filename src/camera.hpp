@@ -1,6 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-	#include "movable_object.h"
+	#include "movable_object.hpp"
 	#include <glm/glm.hpp>
 
 	class Camera : public MovableObject {
