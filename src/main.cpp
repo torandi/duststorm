@@ -3,6 +3,7 @@
 #endif
 
 #include "rendertarget.hpp"
+#include "utils.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -16,15 +17,11 @@
 
 static volatile bool running = true;
 static bool paused = false;       /* tell if engine is paused */
-static struct timeval time;       /* current time */
+struct timeval time = {0,0};      /* current time */
 static int time_scale = 100;      /* how fast time is flowing in percent*/
 static int time_step = 0;         /* single-step */
 static glm::mat4 ortho;
 static RenderTarget* test = nullptr;
-
-float get_time() {
-	return (float)time.tv_sec + (float)time.tv_usec / 1000000;
-}
 
 static void handle_sigint(int signum){
 	if ( !running ){
