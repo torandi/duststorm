@@ -3,6 +3,8 @@
 #endif
 
 #include "rendertarget.hpp"
+#include "utils.hpp"
+#include <glm/gtc/type_ptr.hpp>
 #include <cstdio>
 
 RenderTarget* RenderTarget::stack = nullptr;
@@ -77,4 +79,39 @@ GLuint RenderTarget::texture() const {
 void RenderTarget::clear(const Color& color) const {
 	glClearColor(color.r, color.g, color.b, color.a);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+}
+
+void RenderTarget::draw(){
+	draw(glm::ivec2(0,0), size);
+}
+
+void RenderTarget::draw(const glm::ivec2& pos){
+	draw(pos, size);
+}
+
+void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
+	static const float vertices[][5] = { /* x,y,z,u,v */
+		{0, 0, 0, 0, 0},
+		{1, 0, 0, 1, 0},
+		{1, 1, 0, 1, 1},
+		{0, 1, 0, 0, 1},
+	};
+	static const unsigned int indices[4] = {0,1,2,3};
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glLoadMatrixf(glm::value_ptr(screen_ortho));
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glScalef(size.x, size.y, 1.0f);
+	glTranslatef(pos.x, pos.y, 0.0f);
+
+	glColor4f(1,1,1,1);
+	glBindTexture(GL_TEXTURE_2D, texture());
+	glVertexPointer  (3, GL_FLOAT, sizeof(float)*5, &vertices[0][0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[0][3]);
+	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
 }

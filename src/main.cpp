@@ -15,12 +15,14 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+struct timeval time = {0,0};      /* current time */
+glm::ivec2 resolution;            /* current resolution */
+glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
+
 static volatile bool running = true;
 static bool paused = false;       /* tell if engine is paused */
-struct timeval time = {0,0};      /* current time */
 static int time_scale = 100;      /* how fast time is flowing in percent*/
 static int time_step = 0;         /* single-step */
-static glm::mat4 ortho;
 static RenderTarget* test = nullptr;
 
 static void handle_sigint(int signum){
@@ -40,6 +42,8 @@ static void init(){
 
 	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
 	if ( !vi ){ fprintf(stderr, "SDL_GetVideoInfo() failed\n"); abort(); }
+	resolution.x = vi->current_w;
+	resolution.y = vi->current_h;
 
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	SDL_SetVideoMode(vi->current_w, vi->current_h, 0, SDL_OPENGL|SDL_DOUBLEBUF|SDL_FULLSCREEN);
@@ -61,11 +65,11 @@ static void init(){
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	ortho = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
-	ortho = glm::scale(ortho, glm::vec3(1.0f, -1.0f, 1.0f));
-	ortho = glm::translate(ortho, glm::vec3(0.0f, -600.0f, 0.0f));
+	screen_ortho = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
+	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -600.0f, 0.0f));
 
-	test = new RenderTarget(glm::ivec2(100,100), false);
+	test = new RenderTarget(glm::ivec2(400,100), false);
 }
 
 static void cleanup(){
@@ -132,26 +136,7 @@ static void render(){
 	test->clear((x++ % 2 == 0) ? Color::green : Color::blue);
 	test->unbind();
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	glLoadMatrixf(glm::value_ptr(ortho));
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glColor4f(1,1,1,1);
-	glBindTexture(GL_TEXTURE_2D, test->texture());
-	static const float vertices[][5] = { /* x,y,z,u,v */
-		{-100, -100, 0, 0, 0},
-		{ 100, -100, 0, 1, 0},
-		{ 100,  100, 0, 1, 1},
-		{-100,  100, 0, 0, 1},
-	};
-	static const unsigned int indices[4] = {0,1,2,3};
-	glVertexPointer  (3, GL_FLOAT, sizeof(float)*5, &vertices[0][0]);
-	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[0][3]);
-	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
+	test->draw();
 
 	SDL_GL_SwapBuffers();
 }
