@@ -1,3 +1,4 @@
+
 #include "render_object.h"
 #include <string>
 #include <cstdio>
@@ -6,9 +7,6 @@
 #include <assimp/aiScene.h>
 #include <assimp/aiPostProcess.h>
 #include <glm/glm.hpp>
-
-#define aisgl_min(x,y) ( x < y ? x : y )
-#define aisgl_max(x,y) ( y > x ? y : x )
 
 void RenderObject::color4_to_vec4(const struct aiColor4D *c, glm::vec4 &target) {
 	target.x = c->r;
@@ -49,8 +47,8 @@ RenderObject::RenderObject(std::string model, Renderer::shader_program_t shader_
 		glutil::MatrixStack normMatrix;
 		if(normalize_scale) {
 			glm::vec3 size = scene_max - scene_min;
-			float tmp = aisgl_max(size.x, size.y);
-			tmp = aisgl_max(tmp, size.z);
+			float tmp = std::max(size.x, size.y);
+			tmp = std::max(tmp, size.z);
 			normMatrix.Scale(1.f/tmp);
 		}
 		normMatrix.Translate(-scene_center.x, -scene_center.y, -scene_center.z);
@@ -166,7 +164,7 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 
 		for(unsigned int n = 0; n<mesh->mNumVertices; ++n) {
 			const aiVector3D* pos = &(mesh->mVertices[n]);
-			const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][n]) : &zero_3d;
+			const aiVector3D* texCoord = mesh->HasTextureCoords(0)   &(mesh->mTextureCoords[0][n]) : &zero_3d;
 			const aiVector3D* normal = &(mesh->mNormals[n]);
 			const aiVector3D* tangent, *bitangent;
 			if(mesh->HasTangentsAndBitangents()) {
@@ -323,13 +321,13 @@ void RenderObject::get_bounding_box_for_node (const struct aiNode* nd,
 			struct aiVector3D tmp = mesh->mVertices[t];
 			aiTransformVecByMatrix4(&tmp,trafo);
 
-			min->x = aisgl_min(min->x,tmp.x);
-			min->y = aisgl_min(min->y,tmp.y);
-			min->z = aisgl_min(min->z,tmp.z);
+			min->x = std::min(min->x,tmp.x);
+			min->y = std::min(min->y,tmp.y);
+			min->z = std::min(min->z,tmp.z);
 
-			max->x = aisgl_max(max->x,tmp.x);
-			max->y = aisgl_max(max->y,tmp.y);
-			max->z = aisgl_max(max->z,tmp.z);
+			max->x = std::max(max->x,tmp.x);
+			max->y = std::max(max->y,tmp.y);
+			max->z = std::max(max->z,tmp.z);
 		}
 	}
 
