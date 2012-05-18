@@ -2,13 +2,21 @@
 #include "config.h"
 #endif
 
+#include "rendertarget.hpp"
+
 #include <cstdio>
 #include <cstdlib>
 #include <signal.h>
 #include <SDL/SDL.h>
 #include <GL/glew.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <unistd.h>
 
 static volatile bool running = true;
+
+static glm::mat4 ortho;
+static RenderTarget* test = nullptr;
 
 void handle_sigint(int signum){
 	if ( !running ){
@@ -36,11 +44,21 @@ static void init(){
 		exit(1);
 	}
 
-	glClearColor(1,0,1,1);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	ortho = glm::ortho(0, 600, 0, 800);
+
+	test = new RenderTarget(glm::ivec2(100,100), false);
 }
 
 static void cleanup(){
-
+	delete test;
 }
 
 static void poll(){
@@ -63,13 +81,47 @@ static void poll(){
 }
 
 static void render(){
+	glClearColor(1,0,1,1);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+	static int x = 0;
+
+	test->bind();
+	test->clear((x++ % 2 == 0) ? Color::green : Color::blue);
+	test->unbind();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, 800, 0, 600, -1.0, 1.0);
+	glScalef(1, -1.0, 1);
+	glTranslatef(0, -(float)600, 0);
+
+	//glLoadMatrixf(glm::value_ptr(ortho));
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glColor4f(1,1,1,1);
+	glBindTexture(GL_TEXTURE_2D, test->texture());
+	static const float vertices[][5] = { /* x,y,z,u,v */
+		{-100, -100, 0, 0, 0},
+		{ 100, -100, 0, 1, 0},
+		{ 100,  100, 0, 1, 1},
+		{-100,  100, 0, 0, 1},
+	};
+	static const unsigned int indices[4] = {0,1,2,3};
+	glVertexPointer  (3, GL_FLOAT, sizeof(float)*5, &vertices[0][0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[0][3]);
+	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
+
+	SDL_GL_SwapBuffers();
 }
 
 static void magic_stuff(){
 	while ( running ){
 		poll();
 		render();
+
+		usleep(500000);
 	}
 }
 
