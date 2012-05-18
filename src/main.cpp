@@ -52,7 +52,9 @@ static void init(){
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	ortho = glm::ortho(0, 600, 0, 800);
+	ortho = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+	ortho = glm::scale(ortho, glm::vec3(1.0f, -1.0f, 1.0f));
+	ortho = glm::translate(ortho, glm::vec3(0.0f, -600.0f, 0.0f));
 
 	test = new RenderTarget(glm::ivec2(100,100), false);
 }
@@ -92,11 +94,9 @@ static void render(){
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 800, 0, 600, -1.0, 1.0);
-	glScalef(1, -1.0, 1);
-	glTranslatef(0, -(float)600, 0);
 
-	//glLoadMatrixf(glm::value_ptr(ortho));
+	glLoadMatrixf(glm::value_ptr(ortho));
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
