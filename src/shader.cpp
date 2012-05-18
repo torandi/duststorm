@@ -204,14 +204,16 @@ void Shader::upload_camera(const Camera &camera) const {
 	glUniform3fv(uniform_locations_[CAMERA_POS], 1, glm::value_ptr(camera.position()));
 }
 
-void Shader::upload_matrices(
-		const glm::mat4 &model,
-		const glm::mat4 &view,
-		const glm::mat4 &projection
+void Shader::upload_projection_view_matrices(
+		const glm::mat4 &projection,
+		const glm::mat4 &view
 	) const {
-		glUniform4fv(uniform_locations_[MODEL_MATRIX], 1, glm::value_ptr(model));	
 		glUniform4fv(uniform_locations_[VIEW_MATRIX], 1, glm::value_ptr(view));	
 		glUniform4fv(uniform_locations_[PROJECTION_MATRIX], 1, glm::value_ptr(projection));	
 		glUniform4fv(uniform_locations_[PROJECTION_VIEW_MATRIX], 1, glm::value_ptr(view * projection));
-		glUniform4fv(uniform_locations_[NORMAL_MATRIX],1 , glm::value_ptr(glm::transpose(glm::inverse(model))));
+}
+
+void Shader::upload_model_matrix(const glm::mat4 &model) const {
+	glUniform4fv(uniform_locations_[MODEL_MATRIX], 1, glm::value_ptr(model));	
+	glUniform4fv(uniform_locations_[NORMAL_MATRIX],1 , glm::value_ptr(glm::transpose(glm::inverse(model))));
 }

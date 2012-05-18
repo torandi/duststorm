@@ -1,6 +1,9 @@
 #ifndef RENDER_OBJECT_H
 #define RENDER_OBJECT_H
 
+#include "shader.hpp"
+#include "movable_object.hpp"
+
 #include <string>
 #include <assimp/assimp.h>
 #include <assimp/aiScene.h>
@@ -9,9 +12,7 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 
-#include "render_group.h"
-
-class RenderObject {
+class RenderObject :MovableObject {
 
 	glm::mat4 normalization_matrix_;
 
@@ -19,10 +20,14 @@ class RenderObject {
 	void get_bounding_box (struct aiVector3D* min, struct aiVector3D* max);
 	void color4_to_vec4(const struct aiColor4D *c, glm::vec4 &target);
 
-	Renderer::shader_program_t shader_program_;
-
 	//Trims path and loads texture
 	static GLuint load_texture(std::string path);
+
+	void pre_render();
+	void recursive_pre_render(const aiNode* node);
+
+	void recursive_render(const aiNode* node, double dt, const Shader &shader, const glm::mat4 &matrix);
+
 public:
 	const aiScene* scene;
 	glm::vec3 scene_min, scene_max, scene_center;
@@ -62,12 +67,12 @@ public:
 		Shader::material_t attr;
 		bool two_sided;
 
-		void activate(Renderer * renderer);
-		void deactivate(Renderer * renderer);
+		void activate();
+		void deactivate();
 	};
 
 	//Set normalize_scale to false to not scale down to 1.0
-	RenderObject(std::string model, Renderer::shader_program_t shader_program, bool normalize_scale=true, unsigned int aiOptions=0);
+	RenderObject(std::string model, bool normalize_scale=true, unsigned int aiOptions=0);
 	~RenderObject();
 
 	std::vector<material_t> materials;
@@ -75,11 +80,7 @@ public:
 	std::map<const aiMesh*, mesh_data_t > mesh_data;
 
 
-	void pre_render();
-	void recursive_pre_render(const aiNode* node);
-
-	void recursive_render(const aiNode* node, double dt, Renderer * renderer);
-	void render(double dt, Renderer * renderer);
+	void render(double dt, const Shader &shader);
 
 	const glm::mat4 matrix() const;
 

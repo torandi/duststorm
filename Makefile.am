@@ -3,7 +3,7 @@ AM_CFLAGS = -Wall
 
 bin_PROGRAMS = birdie2012
 
-birdie2012_LDADD = -lSDL -lGL -lGLU -lGLEW
+birdie2012_LDADD = -lSDL -lGL -lGLU -lGLEW -lassimp
 birdie2012_SOURCES = \
 	src/main.cpp \
 	src/color.cpp src/color.hpp \
@@ -12,4 +12,5 @@ birdie2012_SOURCES = \
 	src/movable_object.cpp src/movable_object.hpp \
 	src/camera.cpp src/camera.hpp \
 	src/light.cpp src/light.hpp \
-	src/utils.cpp src/utils.hpp
+	src/utils.cpp src/utils.hpp \
+	src/render_object.cpp src/render_object.hpp

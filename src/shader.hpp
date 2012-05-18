@@ -53,6 +53,7 @@ public:
 		bool use_texture;
 		bool use_normal_map;
 		float shininess;
+		glm::vec4 specular;
 		glm::vec4 diffuse;
 		glm::vec4 ambient;
 		glm::vec4 emission;
@@ -73,11 +74,12 @@ public:
 
 	void upload_light(const Light &light) const;
 	void upload_camera(const Camera &camera) const;
-	void upload_matrices(
-			const glm::mat4 &model,
-			const glm::mat4 &view,
-			const glm::mat4 &projection
+	void upload_projection_view_matrices(
+			const glm::mat4 &projection,
+			const glm::mat4 &view
 		) const;
+
+	void upload_model_matrix( const glm::mat4 &model) const;
 
 	const GLuint program;
 

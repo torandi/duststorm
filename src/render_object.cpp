@@ -1,5 +1,5 @@
 
-#include "render_object.h"
+#include "render_object.hpp"
 #include <string>
 #include <cstdio>
 
@@ -7,6 +7,8 @@
 #include <assimp/aiScene.h>
 #include <assimp/aiPostProcess.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp> 
 
 void RenderObject::color4_to_vec4(const struct aiColor4D *c, glm::vec4 &target) {
 	target.x = c->r;
@@ -19,8 +21,8 @@ RenderObject::~RenderObject() {
 	aiReleaseImport(scene);
 }
 
-RenderObject::RenderObject(std::string model, Renderer::shader_program_t shader_program, bool normalize_scale, unsigned int aiOptions) 
-	: RenderGroup(), shader_program_(shader_program) {
+RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int aiOptions) 
+	: MovableObject() {
 
 	name = model;
 
@@ -44,16 +46,15 @@ RenderObject::RenderObject(std::string model, Renderer::shader_program_t shader_
 		scene_center  = (scene_min+scene_max)/2.0f;
 
 		//Calculate normalization matrix
-		glutil::MatrixStack normMatrix;
+
 		if(normalize_scale) {
 			glm::vec3 size = scene_max - scene_min;
 			float tmp = std::max(size.x, size.y);
 			tmp = std::max(tmp, size.z);
-			normMatrix.Scale(1.f/tmp);
+			normalization_matrix_ = glm::scale(normalization_matrix_, glm::vec3(1.f/tmp));
 		}
-		normMatrix.Translate(-scene_center.x, -scene_center.y, -scene_center.z);
-		
-		normalization_matrix_ = normMatrix.Top();
+
+		normalization_matrix_ = glm::translate(normalization_matrix_,glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
 
 		pre_render();
 
@@ -68,7 +69,8 @@ GLuint RenderObject::load_texture(std::string path) {
 	if(last_slash != std::string::npos) 
 		path = path.substr(last_slash+1);
 	std::string full_path = std::string("textures/")+path;
-	return Renderer::load_texture(full_path);
+	//TODO: LOAD TEXTURE
+	return 0;
 }
 
 void RenderObject::pre_render() {
@@ -164,7 +166,8 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 
 		for(unsigned int n = 0; n<mesh->mNumVertices; ++n) {
 			const aiVector3D* pos = &(mesh->mVertices[n]);
-			const aiVector3D* texCoord = mesh->HasTextureCoords(0)   &(mesh->mTextureCoords[0][n]) : &zero_3d;
+			const aiVector3D* texCoord = &zero_3d;
+			if(mesh->HasTextureCoords(0)) texCoord = &(mesh->mTextureCoords[0][n]);
 			const aiVector3D* normal = &(mesh->mNormals[n]);
 			const aiVector3D* tangent, *bitangent;
 			if(mesh->HasTangentsAndBitangents()) {
@@ -209,14 +212,19 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 	}
 }
 
-void RenderObject::recursive_render(const aiNode* node, double dt, Renderer * renderer) {
-	renderer->modelMatrix.Push();
+void RenderObject::recursive_render(const aiNode* node, double dt, 
+		const Shader &shader,
+		const glm::mat4 &parent_matrix) {
+
 
 	aiMatrix4x4 m = node->mTransformation; 	
 	aiTransposeMatrix4(&m);
-	renderer->modelMatrix *= glm::make_mat4((float*)&m);
+	
+	glm::mat4 matrix(parent_matrix);
 
-	renderer->upload_model_matrices();
+	matrix *= glm::make_mat4((float*)&m);
+
+	shader.upload_model_matrix(matrix);
 
 	for(unsigned int i=0; i<node->mNumMeshes; ++i) {
 		const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -238,11 +246,11 @@ void RenderObject::recursive_render(const aiNode* node, double dt, Renderer * re
 			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
 			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
 
-			materials[md->mtl_index].activate(renderer);
+			materials[md->mtl_index].activate();
 
 			glDrawElements(GL_TRIANGLES, md->num_indices, GL_UNSIGNED_INT,0 );
 
-			materials[md->mtl_index].deactivate(renderer);
+			materials[md->mtl_index].deactivate();
 
 			glDisableVertexAttribArray(4);
 			glDisableVertexAttribArray(3);
@@ -255,22 +263,13 @@ void RenderObject::recursive_render(const aiNode* node, double dt, Renderer * re
 	}
 
 	for(unsigned int i=0; i<node->mNumChildren; ++i) {
-		recursive_render(node->mChildren[i], dt, renderer);
+		recursive_render(node->mChildren[i], dt, shader, matrix);
 	}
 
-	renderer->modelMatrix.Pop();
 }
 
-void RenderObject::render(double dt, Renderer * renderer) {
-
-	glUseProgram(renderer->shaders[shader_program_].program);
-
-	renderer->modelMatrix.Push();
-	renderer->modelMatrix.ApplyMatrix(matrix());
-
-	recursive_render(scene->mRootNode, dt, renderer);		
-
-	renderer->modelMatrix.Pop();
+void RenderObject::render(double dt, const Shader &shader) {
+	recursive_render(scene->mRootNode, dt, shader, matrix());		
 }
 
 const glm::mat4 RenderObject::matrix() const {
@@ -278,29 +277,23 @@ const glm::mat4 RenderObject::matrix() const {
 	return MovableObject::matrix() * glm::scale(glm::mat4(1.0f), scale) * normalization_matrix_;
 }
 
-void RenderObject::material_t::activate(Renderer * renderer) {
-	if(two_sided && renderer->cull_face)
+void RenderObject::material_t::activate() {
+	if(two_sided)
 		glDisable(GL_CULL_FACE);
 
-	if(attr.use_texture) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
-	}
-	
-	if(attr.use_normal_map) {
+
+	/*
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, normal_map);
-	}
-
-	//Upload material attributes to shader
-	glBindBuffer(GL_UNIFORM_BUFFER, Shader::globals.materialBuffer);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Shader::material_t), &attr);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
+	*/
+	
+	//Not handling any material properties!
 }
 
-void RenderObject::material_t::deactivate(Renderer * renderer) {
-	if(two_sided && renderer->cull_face)
+void RenderObject::material_t::deactivate() {
+	if(two_sided)
 		glEnable(GL_CULL_FACE);
 }
 
