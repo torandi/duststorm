@@ -49,7 +49,7 @@ static void load_shaders() {
 	shader = Shader::create_shader("simple");
 }
 
-static void init(){
+static void init(bool fullscreen){
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		exit(1);	}
@@ -59,8 +59,13 @@ static void init(){
 	resolution.x = vi->current_w;
 	resolution.y = vi->current_h;
 
+	if ( !fullscreen ){
+		resolution.x = 800;
+		resolution.y = 600;
+	}
+
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
-	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|SDL_FULLSCREEN);
+	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
 	SDL_EnableKeyRepeat(0, 0);
 
 	SDL_WM_SetCaption("Speed 100%", NULL);
@@ -222,9 +227,10 @@ static void magic_stuff(){
 }
 
 int main(int argc, char* argv[]){
+	const bool fullscreen = argc >= 2;
 	signal(SIGINT, handle_sigint);
 
-	init();
+	init(fullscreen);
 	magic_stuff();
 	cleanup();
 
