@@ -1,0 +1,15 @@
+AC_INIT([birdie2012],[1],[ext@sidvind.com])
+
+AC_CONFIG_AUX_DIR([build-aux])
+AM_INIT_AUTOMAKE([1.11 foreign color-tests subdir-objects -Wall -Werror])
+AM_SILENT_RULES([yes])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_FILES([Makefile])
+
+AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
+AC_PROG_CXX
+AX_CHECK_COMPILE_FLAG([-std=c++0x], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
+
+AC_OUTPUT
