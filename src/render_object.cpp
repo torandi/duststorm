@@ -32,6 +32,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 		aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph  |
 		aiProcess_ImproveCacheLocality | aiProcess_GenUVCoords |
 		aiProcess_ValidateDataStructure | aiProcess_FixInfacingNormals |
+		aiProcess_SortByPType |
 		aiProcess_CalcTangentSpace | aiOptions
 		);
 
@@ -184,12 +185,16 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 
 		for(unsigned int n = 0 ; n<mesh->mNumFaces; ++n) {
 			const aiFace* face = &mesh->mFaces[n];
-			assert(face->mNumIndices == 3);
-			md.num_indices+=3;
+			assert(face->mNumIndices <= 3);
+			if(face->mNumIndices == 3) { //Ignore points and lines
+				md.num_indices+=3;
 
-			for(unsigned int j = 0; j< face->mNumIndices; ++j) {
-				int index = face->mIndices[j];
-				indexData.push_back(index);
+				for(unsigned int j = 0; j< face->mNumIndices; ++j) {
+					int index = face->mIndices[j];
+					indexData.push_back(index);
+				}
+			} else {
+				printf("Derp, ignoring mesh with %d indices\n", face->mNumIndices);
 			}
 		}
 

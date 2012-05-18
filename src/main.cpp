@@ -2,6 +2,8 @@
 #include "config.h"
 #endif
 
+#include "render_object.hpp"
+
 #include "rendertarget.hpp"
 #include "utils.hpp"
 #include "shader.hpp"
@@ -42,6 +44,7 @@ static void handle_sigint(int signum){
 
 static void load_shaders() {
 	Shader shader = Shader::create_shader("simple");
+	RenderObject foo("models/tv.obj");
 }
 
 static void init(){
@@ -55,7 +58,7 @@ static void init(){
 	resolution.y = vi->current_h;
 
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
-	SDL_SetVideoMode(vi->current_w, vi->current_h, 0, SDL_OPENGL|SDL_DOUBLEBUF|SDL_FULLSCREEN);
+	SDL_SetVideoMode(vi->current_w, vi->current_h, 0, SDL_OPENGL|SDL_DOUBLEBUF);//|SDL_FULLSCREEN);
 	SDL_EnableKeyRepeat(0, 0);
 
 	SDL_WM_SetCaption("Speed 100%", NULL);
