@@ -11,4 +11,5 @@ birdie2012_SOURCES = \
 	src/shader.cpp src/shader.hpp \
 	src/movable_object.cpp src/movable_object.hpp \
 	src/camera.cpp src/camera.hpp \
-	src/light.cpp src/light.hpp
+	src/light.cpp src/light.hpp \
+	src/utils.cpp src/utils.cpp
