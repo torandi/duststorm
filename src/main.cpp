@@ -38,8 +38,11 @@ static void init(){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		exit(1);	}
 
+	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
+	if ( !vi ){ fprintf(stderr, "SDL_GetVideoInfo() failed\n"); abort(); }
+
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
-	SDL_SetVideoMode(800, 600, 0, SDL_OPENGL|SDL_DOUBLEBUF);
+	SDL_SetVideoMode(vi->current_w, vi->current_h, 0, SDL_OPENGL|SDL_DOUBLEBUF|SDL_FULLSCREEN);
 	SDL_EnableKeyRepeat(0, 0);
 
 	SDL_WM_SetCaption("Speed 100%", NULL);
@@ -200,8 +203,6 @@ static void magic_stuff(){
 			time.tv_usec -= 1000000;
 			time.tv_sec++;
 		}
-
-		printf("time is now %f (dt: %f)\n", get_time(), scaled_dt);
 
 		/* fixed framerate */
 		if ( delay > 0 ){
