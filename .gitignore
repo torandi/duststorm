@@ -21,3 +21,8 @@ configure
 
 # vim tempfiles
 *.swp
+
+# emacs
+*~
+\#*\#
+.\#*
