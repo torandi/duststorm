@@ -4,6 +4,7 @@
 
 #include "rendertarget.hpp"
 #include "utils.hpp"
+#include "shader.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -15,7 +16,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-struct timeval time = {0,0};      /* current time */
+struct timeval global_time = {0,0};      /* current time */
 glm::ivec2 resolution;            /* current resolution */
 glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
@@ -24,6 +25,10 @@ static bool paused = false;       /* tell if engine is paused */
 static int time_scale = 100;      /* how fast time is flowing in percent*/
 static int time_step = 0;         /* single-step */
 static RenderTarget* test = nullptr;
+
+static const char* shader_programs[] = {
+	"simple"
+};
 
 static void handle_sigint(int signum){
 	if ( !running ){
@@ -35,7 +40,13 @@ static void handle_sigint(int signum){
 	fprintf(stderr, "\rgot SIGINT, terminating graceful\n");
 }
 
+static void load_shaders() {
+	Shader shader = Shader::create_shader("simple");
+}
+
 static void init(){
+	load_shaders();
+
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		exit(1);	}
@@ -180,13 +191,13 @@ static void magic_stuff(){
 
 		/* move global scaled time forward */
 		if ( time_step == 0 ){
-			time.tv_usec += per_frame * scale;
+			global_time.tv_usec += per_frame * scale;
 		} else {
-			time.tv_usec += per_frame;
+			global_time.tv_usec += per_frame;
 		}
-		if ( time.tv_usec > 1000000 ){
-			time.tv_usec -= 1000000;
-			time.tv_sec++;
+		if ( global_time.tv_usec > 1000000 ){
+			global_time.tv_usec -= 1000000;
+			global_time.tv_sec++;
 		}
 
 		/* fixed framerate */
