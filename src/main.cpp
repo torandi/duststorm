@@ -45,8 +45,6 @@ static void load_shaders() {
 }
 
 static void init(){
-	load_shaders();
-
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		exit(1);	}
@@ -67,6 +65,8 @@ static void init(){
 		fprintf(stderr, "Failed to initialize GLEW: %s\n", glewGetErrorString(ret));
 		exit(1);
 	}
+
+	load_shaders();
 
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
