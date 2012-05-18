@@ -1,6 +1,10 @@
-#include "utils.hpp"
-#include <cstdio>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
+#include "utils.hpp"
+#include <GL/glew.h>
+#include <cstdio>
 
 int checkForGLErrors( const char *s ) {
 	int errors = 0 ;
