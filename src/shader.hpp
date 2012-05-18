@@ -18,11 +18,12 @@
 class Shader {
 	static GLuint load_shader(GLenum eShaderType, const std::string &strFilename);
 	static GLuint create_program(const std::string &shader_name, const std::vector<GLuint> &shaderList);
-	
+
 	static void load_file(const std::string &filename, std::stringstream &shaderData, std::string included_from);
 	static std::string parse_shader(const std::string &filename, std::set<std::string> included_files=std::set<std::string>(), std::string included_from="");
 
 	static const char *uniform_names_[];
+	static const char *attribute_names[];
 
 
 public:
@@ -51,6 +52,17 @@ public:
 		NUM_UNIFORMS
   };
 
+	enum attribute_t {
+		ATTR_POSITION,
+		ATTR_TEXCOORD,
+		ATTR_NORMAL,
+		ATTR_TANGENT,
+		ATTR_BITANGENT,
+		ATTR_COLOR,
+
+		NUM_ATTRIBUTES
+	};
+
 	struct material_t {
 		bool use_texture;
 		bool use_normal_map;
@@ -62,10 +74,12 @@ public:
 	};
 
 private:
-	
+
 	GLuint uniform_locations_[NUM_UNIFORMS];
+	GLuint attribute_locations[NUM_ATTRIBUTES];
 
 	void init_uniforms();
+	void init_attributes();
 
 public:
 

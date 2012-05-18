@@ -36,8 +36,18 @@ const char * Shader::uniform_names_[] = {
 	"texture2"
 };
 
+const char* Shader::attribute_names[] = {
+	"in_position",
+	"in_texcoord",
+	"in_normal",
+	"in_tangent",
+	"in_bitangent",
+	"in_color"
+};
+
 Shader::Shader(const std::string &name_, GLuint program_) : name(name_), program(program_) {
 	init_uniforms();
+	init_attributes();
 }
 
 
@@ -57,7 +67,7 @@ void Shader::load_file(const std::string &filename, std::stringstream &shaderDat
 
 std::string Shader::parse_shader(
 			const std::string &filename,
-			std::set<std::string> included_files, 
+			std::set<std::string> included_files,
 			std::string included_from
 		) {
 	char buffer[2048];
@@ -129,20 +139,20 @@ GLuint Shader::load_shader(GLenum eShaderType, const std::string &strFilename) {
 		glGetShaderInfoLog(shader, 2048, NULL, buffer);
 		fprintf(stderr, "Error in shader %s: %s\n",strFilename.c_str(),  buffer);
 		exit(2);
-	} 
+	}
 	return shader;
 }
 
 GLuint Shader::create_program(const std::string &shader_name, const std::vector<GLuint> &shaderList) {
 	GLint gl_tmp;
-	GLuint program = glCreateProgram();	
+	GLuint program = glCreateProgram();
 
 	for(GLuint shader : shaderList) {
 		glAttachShader(program, shader);
 	}
 
 	glLinkProgram(program);
-	
+
 	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
 
 	glGetProgramiv(program, GL_LINK_STATUS, &gl_tmp);
@@ -169,7 +179,7 @@ Shader Shader::create_shader(std::string base_name) {
 	if(file)
 		shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, geom_shader));
 	shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, SHADER_PATH+base_name+FRAG_SHADER_EXTENTION));
-	
+
 	Shader shader(base_name, create_program(base_name, shader_list));
 
 	return shader;
@@ -184,6 +194,13 @@ void Shader::init_uniforms() {
 	glUniform1i(TEXTURE1, 0);
 	glUniform1i(TEXTURE2, 1);
 	unbind();
+}
+
+void Shader::init_attributes() {
+	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
+		attribute_locations[i] = glGetAttribLocation(program, attribute_names[i]);
+		checkForGLErrors((std::string("load attribute ")+uniform_names_[i]+" from shader "+name).c_str());
+	}
 }
 
 void Shader::bind() {
@@ -208,13 +225,13 @@ void Shader::upload_projection_view_matrices(
 		const glm::mat4 &projection,
 		const glm::mat4 &view
 	) const {
-		glUniform4fv(uniform_locations_[VIEW_MATRIX], 1, glm::value_ptr(view));	
-		glUniform4fv(uniform_locations_[PROJECTION_MATRIX], 1, glm::value_ptr(projection));	
+		glUniform4fv(uniform_locations_[VIEW_MATRIX], 1, glm::value_ptr(view));
+		glUniform4fv(uniform_locations_[PROJECTION_MATRIX], 1, glm::value_ptr(projection));
 		glUniform4fv(uniform_locations_[PROJECTION_VIEW_MATRIX], 1, glm::value_ptr(view * projection));
 }
 
 void Shader::upload_model_matrix(const glm::mat4 &model) const {
-	glUniform4fv(uniform_locations_[MODEL_MATRIX], 1, glm::value_ptr(model));	
+	glUniform4fv(uniform_locations_[MODEL_MATRIX], 1, glm::value_ptr(model));
 	glUniform4fv(uniform_locations_[NORMAL_MATRIX],1 , glm::value_ptr(glm::transpose(glm::inverse(model))));
 }
 
