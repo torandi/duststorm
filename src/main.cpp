@@ -60,7 +60,7 @@ static void init(){
 	resolution.y = vi->current_h;
 
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
-	SDL_SetVideoMode(vi->current_w, vi->current_h, 0, SDL_OPENGL|SDL_DOUBLEBUF|SDL_FULLSCREEN);
+	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF);
 	SDL_EnableKeyRepeat(0, 0);
 
 	SDL_WM_SetCaption("Speed 100%", NULL);
