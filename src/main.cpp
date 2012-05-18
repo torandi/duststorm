@@ -88,7 +88,6 @@ static void poll(){
 				running = false;
 			}
 
-
 			bool scale_updated = false;
 
 			if ( event.key.keysym.sym == SDLK_SPACE ){
