@@ -5,6 +5,7 @@
 #include "rendertarget.hpp"
 #include "utils.hpp"
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <cstdio>
 
 RenderTarget* RenderTarget::stack = nullptr;
@@ -98,20 +99,21 @@ void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
 	};
 	static const unsigned int indices[4] = {0,1,2,3};
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	glm::mat4 model(1.f);
 
-	glLoadMatrixf(glm::value_ptr(screen_ortho));
+	model = glm::scale(model, glm::vec3(size.x, size.y, 1.0f));
+	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	shader.upload_model_matrix(model);
 
-	glScalef(size.x, size.y, 1.0f);
-	glTranslatef(pos.x, pos.y, 0.0f);
+	glEnableVertexAttribArray(0);
 
-	glColor4f(1,1,1,1);
 	glBindTexture(GL_TEXTURE_2D, texture());
-	glVertexPointer  (3, GL_FLOAT, sizeof(float)*5, &vertices[0][0]);
-	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[0][3]);
+	glVertexAttribPointer(0, 3, GL_FLOAT,GL_FALSE, sizeof(float)*5,  &vertices[0][0]); 
+	//glVertexPointer  (3, GL_FLOAT, sizeof(float)*5, &vertices[0][0]);
+	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[0][3]);
 	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
+
+
+	glDisableVertexAttribArray(0);
 }

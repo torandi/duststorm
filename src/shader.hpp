@@ -27,6 +27,8 @@ class Shader {
 
 public:
 
+	Shader() : program(-1), name("INVALID") { };
+
 	Shader(const std::string &name_, GLuint program_);
 
 	enum uniforms_t {
@@ -67,7 +69,10 @@ private:
 
 public:
 
-	const std::string name;
+	std::string name;
+	GLuint program;
+
+	Shader &operator= (const Shader &shader);
 
 	void bind();
 	void unbind();
@@ -81,7 +86,6 @@ public:
 
 	void upload_model_matrix( const glm::mat4 &model) const;
 
-	const GLuint program;
 
 	static Shader create_shader(std::string base_name);
 };

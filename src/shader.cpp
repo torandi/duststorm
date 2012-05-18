@@ -217,3 +217,9 @@ void Shader::upload_model_matrix(const glm::mat4 &model) const {
 	glUniform4fv(uniform_locations_[MODEL_MATRIX], 1, glm::value_ptr(model));	
 	glUniform4fv(uniform_locations_[NORMAL_MATRIX],1 , glm::value_ptr(glm::transpose(glm::inverse(model))));
 }
+
+Shader &Shader::operator= (const Shader &shader) {
+	program = shader.program;
+	name = shader.name;
+	memcpy(uniform_locations_, shader.uniform_locations_, sizeof(uniform_locations_));
+}

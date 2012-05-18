@@ -22,11 +22,14 @@ struct timeval global_time = {0,0};      /* current time */
 glm::ivec2 resolution;            /* current resolution */
 glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
+Shader shader;
+
 static volatile bool running = true;
 static bool paused = false;       /* tell if engine is paused */
 static int time_scale = 100;      /* how fast time is flowing in percent*/
 static int time_step = 0;         /* single-step */
 static RenderTarget* test = nullptr;
+
 
 static const char* shader_programs[] = {
 	"simple"
@@ -43,8 +46,7 @@ static void handle_sigint(int signum){
 }
 
 static void load_shaders() {
-	Shader shader = Shader::create_shader("simple");
-	RenderObject foo("models/tv.obj");
+	shader = Shader::create_shader("simple");
 }
 
 static void init(){
@@ -58,7 +60,7 @@ static void init(){
 	resolution.y = vi->current_h;
 
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
-	SDL_SetVideoMode(vi->current_w, vi->current_h, 0, SDL_OPENGL|SDL_DOUBLEBUF);//|SDL_FULLSCREEN);
+	SDL_SetVideoMode(vi->current_w, vi->current_h, 0, SDL_OPENGL|SDL_DOUBLEBUF|SDL_FULLSCREEN);
 	SDL_EnableKeyRepeat(0, 0);
 
 	SDL_WM_SetCaption("Speed 100%", NULL);
@@ -70,6 +72,8 @@ static void init(){
 	}
 
 	load_shaders();
+
+	RenderObject foo("models/tv.obj");
 
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
@@ -150,7 +154,13 @@ static void render(){
 	test->clear((x++ % 2 == 0) ? Color::green : Color::blue);
 	test->unbind();
 
+	shader.bind();
+
+	shader.upload_projection_view_matrices(screen_ortho, glm::mat4(1.f));
+
 	test->draw();
+
+	shader.unbind();
 
 	SDL_GL_SwapBuffers();
 }
