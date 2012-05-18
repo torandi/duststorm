@@ -4,9 +4,12 @@ vec4 computeLighting(in vec4 originalColor,
 	) {
 	vec3 lightIntensity;
 
+	//Statics:
+	float shininess = 32.f;
+	float specular_intensity = 0.8f;
 
-	float lightAttenuation = (1 / ( 1.0 + light.attenuation * length(light_distance)));
-	lightIntensity =  lightAttenuation * light.intensity.rgb;
+	float lightAttenuation = (1 / ( 1.0 + light_attenuation * length(light_distance)));
+	lightIntensity =  lightAttenuation * light_intensity.rgb;
 
 	float LambertTerm = max( dot(light_dir, normal_map), 0.0);
 	float specular_amount = 0.0;
@@ -17,15 +20,13 @@ vec4 computeLighting(in vec4 originalColor,
 	}
 
 	vec3 diffuse = originalColor.rgb * LambertTerm * lightIntensity;	
-	vec3 specular_color = specular.rgb * specular_amount * specular_intensity * length(diffuse);
+	vec3 specular_color = originalColor.rgb * specular_amount * specular_intensity * length(diffuse);
 
 	vec4 color = vec4(0.0);
-/*
-	if(use_diffuse)
-		color.rgb += diffuse;
-	if(use_specular)
-		color.rgb += specular_color;
-		*/
+
+	color.rgb += diffuse;
+	color.rgb += specular_color;
+		
 	color.a = 1.0;
 
 	return color;

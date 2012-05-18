@@ -1,4 +1,5 @@
 #version 130
+#
 #include "uniforms.glsl"
 
 in vec3 position;
@@ -27,13 +28,13 @@ void main() {
 
 	vec4 originalColor; 
 	vec3 normal_map = vec3(0.0, 0.0, 1.0);
-	if(use_normal_map==true_uint) {
-		normal_map = normalize(texture(tex2, texcoord).xyz * 2.0 - 1.0);
-	}
+	/* //Normal map
+		normal_map = normalize(texture(texture2, texcoord).xyz * 2.0 - 1.0);
+	*/
 	
-	originalColor = texture(tex1, texcoord);
+	originalColor = texture(texture1, texcoord);
 
-	vec4 ambient_color = originalColor * vec4(0.1, 0.1, 0.1);
+	vec4 ambient_color = originalColor * vec4(0.1, 0.1, 0.1, 1.0);
 
 	vec3 light_distance = light_position.xyz - position;
 	vec3 dir = normalize(light_distance);
@@ -46,7 +47,7 @@ void main() {
 
 	vec4 ocolor = ambient_color + computeLighting( originalColor,
 			normal_map, light_dir,
-			light_dir, camera_dir, light_distance);
+			camera_dir, light_distance);
 
 
 	ocolor= clamp(ocolor,0.0, 1.0);

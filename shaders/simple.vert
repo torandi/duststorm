@@ -2,11 +2,11 @@
 
 #include "uniforms.glsl"
 
-layout (location = 0) in vec4 in_position;
-layout (location = 1) in vec2 in_texCoord;
-layout (location = 2) in vec4 in_normal;
-layout (location = 3) in vec4 in_tangent;
-layout (location = 4) in vec4 in_bitangent;
+in vec4 in_position;
+in vec2 in_texcoord;
+in vec4 in_normal;
+in vec4 in_tangent;
+in vec4 in_bitangent;
 
 out vec3 position;
 out vec3 normal;
