@@ -12,13 +12,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <unistd.h>
+#include <sys/time.h>
 
 static volatile bool running = true;
-
+static bool paused = false;       /* tell if engine is paused */
+static struct timeval time;       /* current time */
+static int time_scale = 100;      /* how fast time is flowing in percent*/
+static int time_step = 0;         /* single-step */
 static glm::mat4 ortho;
 static RenderTarget* test = nullptr;
 
-void handle_sigint(int signum){
+float get_time() {
+	return (float)time.tv_sec + (float)time.tv_usec / 1000000;
+}
+
+static void handle_sigint(int signum){
 	if ( !running ){
 		fprintf(stderr, "\rgot SIGINT again, aborting\n");
 		abort();
@@ -31,12 +39,13 @@ void handle_sigint(int signum){
 static void init(){
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
-		exit(1);
-	}
+		exit(1);	}
 
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	SDL_SetVideoMode(800, 600, 0, SDL_OPENGL|SDL_DOUBLEBUF);
 	SDL_EnableKeyRepeat(0, 0);
+
+	SDL_WM_SetCaption("Speed 100%", NULL);
 
 	int ret;
 	if ( (ret=glewInit()) != GLEW_OK ){
@@ -78,6 +87,38 @@ static void poll(){
 			if ( event.key.keysym.sym == SDLK_q && event.key.keysym.mod & KMOD_CTRL ){
 				running = false;
 			}
+
+
+			bool scale_updated = false;
+
+			if ( event.key.keysym.sym == SDLK_SPACE ){
+				time_scale = paused ? 100 : 0;
+				paused = !paused;
+				scale_updated = true;
+			}
+
+			if ( event.key.keysym.sym == SDLK_PERIOD ){
+				paused = true;
+				time_scale = 0;
+				time_step = 1;
+				scale_updated = true;
+			}
+
+			if ( event.key.keysym.sym == SDLK_COMMA ){
+				time_scale -= 10;
+				scale_updated = true;
+				paused = false;
+			} else if ( event.key.keysym.sym == SDLK_MINUS || event.key.keysym.sym == SDLK_p ){
+				time_scale += 10;
+				scale_updated = true;
+				paused = false;
+			}
+
+			if ( scale_updated ){
+				char title[64];
+				sprintf(title, "Speed: %d%%", time_scale);
+				SDL_WM_SetCaption(title, NULL);
+			}
 		}
 	}
 }
@@ -116,12 +157,61 @@ static void render(){
 	SDL_GL_SwapBuffers();
 }
 
+static void update(float dt){
+
+}
+
 static void magic_stuff(){
+	static const unsigned int framerate = 60;
+	static const uint64_t per_frame = 1000000 / framerate;
+	static const float dt = 1.0f / framerate;
+
+	/* for calculating dt */
+	struct timeval t;
+	gettimeofday(&t, NULL);
+
 	while ( running ){
 		poll();
+
+		/* calculate dt */
+		struct timeval cur;
+		gettimeofday(&cur, NULL);
+		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
+		const  int64_t delay = per_frame - delta;
+		const float scale = (float)time_scale / 100.0f;
+		float scaled_dt = dt * scale;
+		if ( time_step != 0 ){
+			scaled_dt = dt * time_step;
+		}
+
+		update(scaled_dt);
 		render();
 
-		usleep(500000);
+		/* move time forward */
+		t.tv_usec += per_frame;
+		if ( t.tv_usec > 1000000 ){
+			t.tv_usec -= 1000000;
+			t.tv_sec++;
+		}
+
+		/* move global scaled time forward */
+		if ( time_step == 0 ){
+			time.tv_usec += per_frame * scale;
+		} else {
+			time.tv_usec += per_frame;
+		}
+		if ( time.tv_usec > 1000000 ){
+			time.tv_usec -= 1000000;
+			time.tv_sec++;
+		}
+
+		printf("time is now %f (dt: %f)\n", get_time(), scaled_dt);
+
+		/* fixed framerate */
+		if ( delay > 0 ){
+			usleep(delay);
+		}
+		time_step = 0;
 	}
 }
 
