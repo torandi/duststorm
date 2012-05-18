@@ -1,5 +1,7 @@
 #include "shader.hpp"
 #include "light.hpp"
+#include "utils.hpp"
+
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -11,7 +13,33 @@
 
 #include <GL/glew.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #define PP_INCLUDE "#include"
+
+const char * Shader::uniform_names_[] = {
+	"projectionViewMatrix",
+
+	"projectionMatrix",
+	"viewMatrix",
+	"modelMatrix",
+	"normalMatrix",
+
+	"camera_pos",
+
+	"light_attenuation",
+	"light_intensity",
+	"light_position",
+
+	"texture1",
+	"texture2"
+};
+
+Shader::Shader(const std::string &name_, GLuint program_) : name(name_), program(program_) {
+	init_uniforms();
+}
+
 
 void Shader::load_file(const std::string &filename, std::stringstream &shaderData, std::string included_from) {
 	std::ifstream shaderFile(filename.c_str());
@@ -130,8 +158,6 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 }
 
 Shader Shader::create_shader(std::string base_name) {
-	Shader shader;
-	shader.name = base_name;
 	printf("Compiling shader %s\n", base_name.c_str());
 
 	std::vector<GLuint> shader_list;
@@ -144,9 +170,48 @@ Shader Shader::create_shader(std::string base_name) {
 		shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, geom_shader));
 	shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, SHADER_PATH+base_name+FRAG_SHADER_EXTENTION));
 	
-	shader.program = create_program(base_name, shader_list);
-
-	std::for_each(shader_list.begin(), shader_list.end(), glDeleteShader);
+	Shader shader(base_name, create_program(base_name, shader_list));
 
 	return shader;
+}
+
+void Shader::init_uniforms() {
+	for(int i=0; i<NUM_UNIFORMS; ++i) {
+		uniform_locations_[i] = glGetUniformLocation(program, uniform_names_[i]);
+		checkForGLErrors((std::string("load uniform ")+uniform_names_[i]+" from shader "+name).c_str());
+	}
+	bind();
+	glUniform1i(TEXTURE1, 0);
+	glUniform1i(TEXTURE2, 1);
+	unbind();
+}
+
+void Shader::bind() {
+	glUseProgram(program);
+}
+
+void Shader::unbind() {
+	glUseProgram(0);
+}
+
+void Shader::upload_light(const Light &light) const {
+	glUniform1f(uniform_locations_[LIGHT_ATTENUATION], light.attenuation);
+	glUniform4fv(uniform_locations_[LIGHT_INTENSITY], 1, glm::value_ptr(light.intensity));
+	glUniform4fv(uniform_locations_[LIGHT_POSITION], 1, glm::value_ptr(light.position()));
+}
+
+void Shader::upload_camera(const Camera &camera) const {
+	glUniform3fv(uniform_locations_[CAMERA_POS], 1, glm::value_ptr(camera.position()));
+}
+
+void Shader::upload_matrices(
+		const glm::mat4 &model,
+		const glm::mat4 &view,
+		const glm::mat4 &projection
+	) const {
+		glUniform4fv(uniform_locations_[MODEL_MATRIX], 1, glm::value_ptr(model));	
+		glUniform4fv(uniform_locations_[VIEW_MATRIX], 1, glm::value_ptr(view));	
+		glUniform4fv(uniform_locations_[PROJECTION_MATRIX], 1, glm::value_ptr(projection));	
+		glUniform4fv(uniform_locations_[PROJECTION_VIEW_MATRIX], 1, glm::value_ptr(view * projection));
+		glUniform4fv(uniform_locations_[NORMAL_MATRIX],1 , glm::value_ptr(glm::transpose(glm::inverse(model))));
 }
