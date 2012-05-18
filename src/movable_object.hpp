@@ -2,6 +2,7 @@
 #define MOVABLE_OBJECT_H
 	#include <glm/glm.hpp>
 	#include <glm/gtc/quaternion.hpp>
+
 	class MovableObject {
 	protected:
 		mutable glm::mat4 rot_matrix_, trans_mat_;

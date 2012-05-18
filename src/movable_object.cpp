@@ -2,6 +2,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "movable_object.hpp"
+
 #include <cstdio>
 
 MovableObject::MovableObject() : orientation_(1.f, 0.f, 0.f,0.f) {
