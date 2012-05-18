@@ -22,7 +22,7 @@ struct timeval global_time = {0,0};      /* current time */
 glm::ivec2 resolution;            /* current resolution */
 glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
-Shader shader;
+Shader * shader;
 
 static volatile bool running = true;
 static bool paused = false;       /* tell if engine is paused */
@@ -159,13 +159,13 @@ static void render(){
 	test->clear((x++ % 2 == 0) ? Color::green : Color::blue);
 	test->unbind();
 
-	shader.bind();
+	shader->bind();
 
-	shader.upload_projection_view_matrices(screen_ortho, glm::mat4(1.f));
+	shader->upload_projection_view_matrices(screen_ortho, glm::mat4(1.f));
 
 	test->draw();
 
-	shader.unbind();
+	shader->unbind();
 
 	SDL_GL_SwapBuffers();
 }

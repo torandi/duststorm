@@ -167,7 +167,7 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 
 }
 
-Shader Shader::create_shader(std::string base_name) {
+Shader * Shader::create_shader(std::string base_name) {
 	printf("Compiling shader %s\n", base_name.c_str());
 
 	std::vector<GLuint> shader_list;
@@ -180,9 +180,7 @@ Shader Shader::create_shader(std::string base_name) {
 		shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, geom_shader));
 	shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, SHADER_PATH+base_name+FRAG_SHADER_EXTENTION));
 
-	Shader shader(base_name, create_program(base_name, shader_list));
-
-	return shader;
+	return new Shader(base_name, create_program(base_name, shader_list));
 }
 
 void Shader::init_uniforms() {
@@ -233,10 +231,4 @@ void Shader::upload_projection_view_matrices(
 void Shader::upload_model_matrix(const glm::mat4 &model) const {
 	glUniform4fv(uniform_locations_[MODEL_MATRIX], 1, glm::value_ptr(model));
 	glUniform4fv(uniform_locations_[NORMAL_MATRIX],1 , glm::value_ptr(glm::transpose(glm::inverse(model))));
-}
-
-Shader &Shader::operator= (const Shader &shader) {
-	program = shader.program;
-	name = shader.name;
-	memcpy(uniform_locations_, shader.uniform_locations_, sizeof(uniform_locations_));
 }

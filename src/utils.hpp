@@ -14,7 +14,7 @@ extern glm::ivec2 resolution;
  */
 extern glm::mat4 screen_ortho;
 
-extern Shader shader;
+extern Shader * shader;
 
 /**
  * Get the current in-engine time.
