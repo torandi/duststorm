@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-class Scene {
+class Scene: public RenderTarget {
 public:
 	Scene(const glm::ivec2& size);
 	virtual ~Scene();
@@ -40,12 +40,7 @@ public:
 	 */
 	void render_scene();
 
-	/**
-	 * Get scene texture (from render target).
-	 */
-	GLuint texture() const;
-
-	const RenderTarget* rendertarget() const;
+	bool is_active() const;
 
 protected:
 	float stage(float t) const;
@@ -58,7 +53,6 @@ private:
 
 	std::vector<time> timetable;
 	std::vector<time>::iterator current;
-	RenderTarget* target;
 	bool match;
 };
 

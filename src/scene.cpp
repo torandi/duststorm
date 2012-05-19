@@ -3,22 +3,15 @@
 #endif
 
 #include "scene.hpp"
-#include <cstdio>
 
 Scene::Scene(const glm::ivec2& size)
-	: target(nullptr)
+	: RenderTarget(size, false)
 	, current(timetable.end())
 	, match(false) {
-
-	target = new RenderTarget(size, false);
-	if ( !target ){
-		fprintf(stderr, "Failed to create Scene::RenderTarget\n");
-		abort();
-	}
 }
 
 Scene::~Scene(){
-	delete target;
+
 }
 
 void Scene::add_time(float begin, float end){
@@ -63,14 +56,10 @@ void Scene::update_scene(float t, float dt){
 
 void Scene::render_scene(){
 	if ( !match ) return;
-}
 
-GLuint Scene::texture() const {
-	return target->texture();
-}
-
-const RenderTarget* Scene::rendertarget() const {
-	return target;
+	bind();
+	render();
+	unbind();
 }
 
 float Scene::stage(float t) const {
@@ -78,4 +67,8 @@ float Scene::stage(float t) const {
 	const float a = t - c.begin;
 	const float b = c.end - c.begin;
 	return a / b;
+}
+
+bool Scene::is_active() const {
+	return match;
 }
