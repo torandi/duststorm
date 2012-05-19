@@ -233,11 +233,14 @@ void Shader::init_attributes() {
 }
 
 void Shader::bind() {
+	checkForGLErrors((std::string("pre Bind shader ")+name).c_str());
 	glUseProgram(program);
+	checkForGLErrors((std::string("Bind shader ")+name).c_str());
 }
 
 void Shader::unbind() {
 	glUseProgram(0);
+	checkForGLErrors("Unbind shader ");
 }
 
 void Shader::upload_light(const Light &light) const {
@@ -248,6 +251,7 @@ void Shader::upload_light(const Light &light) const {
 
 void Shader::upload_camera(const Camera &camera) const {
 	glUniform3fv(uniform_locations_[CAMERA_POS], 1, glm::value_ptr(camera.position()));
+	checkForGLErrors("upload camera");
 }
 
 void Shader::upload_projection_view_matrices(
@@ -256,6 +260,7 @@ void Shader::upload_projection_view_matrices(
 	) const {
 		glm::mat4 projection_view = view * projection;
 
+		checkForGLErrors("preupload");
 		glUniformMatrix4fv(uniform_locations_[VIEW_MATRIX], 1, GL_FALSE, glm::value_ptr(view));
 		checkForGLErrors("upload view_matrix");
 		glUniformMatrix4fv(uniform_locations_[PROJECTION_MATRIX], 1,GL_FALSE, glm::value_ptr(projection));
@@ -265,6 +270,8 @@ void Shader::upload_projection_view_matrices(
 }
 
 void Shader::upload_model_matrix(const glm::mat4 &model) const {
-	glUniform4fv(uniform_locations_[MODEL_MATRIX], 1, glm::value_ptr(model));
-	glUniform4fv(uniform_locations_[NORMAL_MATRIX],1 , glm::value_ptr(glm::transpose(glm::inverse(model))));
+	glUniformMatrix4fv(uniform_locations_[MODEL_MATRIX], 1, GL_FALSE, glm::value_ptr(model));
+	checkForGLErrors("upload model matrix");
+	glUniformMatrix4fv(uniform_locations_[NORMAL_MATRIX],1 , GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(model))));
+	checkForGLErrors("upload normal matrix");
 }

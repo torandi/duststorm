@@ -1,9 +1,15 @@
 #include "camera.hpp"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <cstdio>
 #include <cmath>
+
+Camera::Camera(float fov, float aspect, float near, float far) : 
+	fov_(fov), aspect_(aspect), near_(near), far_(far) {
+	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);
+}
 
 const glm::vec3 Camera::look_at() const {
 	return local_z()+position_;
@@ -22,4 +28,21 @@ void Camera::look_at(glm::vec3 position) {
 	rotation = acosf(glm::dot(direction, lz) / (glm::length(direction) * glm::length(lz)));
 
 	pitch(rotation);
+}
+
+
+const glm::mat4 Camera::view_matrix() const {
+	return glm::lookAt(position(), look_at(), local_y());
+}
+
+const glm::mat4 Camera::projection_matrix() const { return projection_matrix_; }
+
+const float Camera::fov() const { return fov_; }
+const float Camera::aspect() const { return aspect_; }
+const float Camera::near() const { return near_; }
+const float Camera::far() const { return far_; }
+
+void Camera::set_fov(float fov) {
+	fov_ = fov;
+	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);
 }

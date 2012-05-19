@@ -7,6 +7,7 @@ in vec2 in_texcoord;
 in vec4 in_normal;
 in vec4 in_tangent;
 in vec4 in_bitangent;
+//in vec4 in_color;
 
 out vec3 position;
 out vec3 normal;

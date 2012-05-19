@@ -26,13 +26,17 @@ Time global_time(per_frame);      /* current time */
 glm::ivec2 resolution;            /* current resolution */
 glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
-Shader * shader;
+Shader * shaders[];
 
 static volatile bool running = true;
 static RenderTarget* test = nullptr;
 
+static RenderObject * tv_test;
+static Camera * camera;
+
 static const char* shader_programs[] = {
-	"simple"
+	"simple",
+	"normal"
 };
 
 class TestScene: public Scene {
@@ -59,7 +63,9 @@ static void handle_sigint(int signum){
 }
 
 static void load_shaders() {
-	shader = Shader::create_shader("simple");
+	for(int i=0; i < NUM_SHADERS; ++i) {
+		shaders[i] = Shader::create_shader(shader_programs[i]);
+	}
 }
 
 static void init(bool fullscreen){
@@ -91,7 +97,10 @@ static void init(bool fullscreen){
 
 	load_shaders();
 
-	RenderObject foo("models/tv.obj");
+	tv_test = new RenderObject("models/cube.obj");
+	camera = new Camera(75.f, resolution.x/(float)resolution.y, -1.0, 1.0);
+	camera->set_position(glm::vec3(0.f, 0.f, -1.f));
+	camera->look_at(glm::vec3(0.f, 0.f, 0.f));
 
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
@@ -106,9 +115,13 @@ static void init(bool fullscreen){
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -600.0f, 0.0f));
 
 	test = new RenderTarget(glm::ivec2(400,100), false);
+
 	scene[0] = new TestScene(resolution);
 	scene[0]->add_time(1, 4);
 	scene[0]->add_time(7, 10);
+
+	checkForGLErrors("post init()");
+
 }
 
 static void cleanup(){
@@ -170,13 +183,21 @@ static void render(){
 	test->clear((x++ % 2 == 0) ? Color::green : Color::blue);
 	test->unbind();
 
-	shader->bind();
-	shader->upload_projection_view_matrices(screen_ortho, glm::mat4(1.f));
-	//shader->upload_model_matrix(screen_ortho);
-	test->draw();
-	shader->unbind();
+	//test->draw();
+	//
+	shaders[SHADER_NORMAL]->bind();
+
+	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
+
+	tv_test->render(shaders[SHADER_NORMAL]);
+
+	checkForGLErrors("model render");
+
+	shaders[SHADER_NORMAL]->unbind();
 
 	SDL_GL_SwapBuffers();
+
+	checkForGLErrors("SDL_GL_SwapBuffer");
 }
 
 static void update(float dt){

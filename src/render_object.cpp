@@ -1,5 +1,8 @@
 
 #include "render_object.hpp"
+#include "shader.hpp"
+#include "utils.hpp"
+
 #include <string>
 #include <cstdio>
 
@@ -241,17 +244,28 @@ void RenderObject::recursive_render(const aiNode* node,
 
 			glBindBuffer(GL_ARRAY_BUFFER, md->vb);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md->ib);
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-			glEnableVertexAttribArray(2);
-			glEnableVertexAttribArray(3);
-			glEnableVertexAttribArray(4);
+			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_POSITION]);
+			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_TEXCOORD]);
+			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_NORMAL]);
+			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_TANGENT]);
+			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_BITANGENT]);
+			//glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_COLOR]);
 
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)));
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
-			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
-			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
+			glVertexAttribPointer(
+					shader->attribute_locations[Shader::ATTR_POSITION], 
+					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
+			glVertexAttribPointer(
+					shader->attribute_locations[Shader::ATTR_TEXCOORD], 
+					2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)));
+			glVertexAttribPointer(
+					shader->attribute_locations[Shader::ATTR_NORMAL], 
+					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
+			glVertexAttribPointer(
+					shader->attribute_locations[Shader::ATTR_TANGENT], 
+					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
+			glVertexAttribPointer(
+					shader->attribute_locations[Shader::ATTR_BITANGENT], 
+					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
 
 			materials[md->mtl_index].activate();
 
@@ -259,11 +273,13 @@ void RenderObject::recursive_render(const aiNode* node,
 
 			materials[md->mtl_index].deactivate();
 
-			glDisableVertexAttribArray(4);
-			glDisableVertexAttribArray(3);
-			glDisableVertexAttribArray(2);
-			glDisableVertexAttribArray(1);
-			glDisableVertexAttribArray(0);
+			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_POSITION]);
+			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_TEXCOORD]);
+			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_NORMAL]);
+			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_TANGENT]);
+			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_BITANGENT]);
+			//glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_COLOR]);
+
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
