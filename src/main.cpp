@@ -7,6 +7,7 @@
 #include "rendertarget.hpp"
 #include "utils.hpp"
 #include "shader.hpp"
+#include "time.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -16,20 +17,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <unistd.h>
-#include <sys/time.h>
 
-struct timeval global_time = {0,0};      /* current time */
+static const unsigned int framerate = 60;
+static const uint64_t per_frame = 1000000 / framerate;
+
+Time global_time(per_frame);      /* current time */
 glm::ivec2 resolution;            /* current resolution */
 glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
 Shader * shader;
 
 static volatile bool running = true;
-static bool paused = false;       /* tell if engine is paused */
-static int time_scale = 100;      /* how fast time is flowing in percent*/
-static int time_step = 0;         /* single-step */
 static RenderTarget* test = nullptr;
-
 
 static const char* shader_programs[] = {
 	"simple"
@@ -118,31 +117,26 @@ static void poll(){
 			bool scale_updated = false;
 
 			if ( event.key.keysym.sym == SDLK_SPACE ){
-				time_scale = paused ? 100 : 0;
-				paused = !paused;
+				global_time.toggle_pause();
 				scale_updated = true;
 			}
 
 			if ( event.key.keysym.sym == SDLK_PERIOD ){
-				paused = true;
-				time_scale = 0;
-				time_step = 1;
+				global_time.step(1);
 				scale_updated = true;
 			}
 
 			if ( event.key.keysym.sym == SDLK_COMMA ){
-				time_scale -= 10;
+				global_time.adjust_speed(-10);
 				scale_updated = true;
-				paused = false;
 			} else if ( event.key.keysym.sym == SDLK_MINUS || event.key.keysym.sym == SDLK_p ){
-				time_scale += 10;
+				global_time.adjust_speed(10);
 				scale_updated = true;
-				paused = false;
 			}
 
 			if ( scale_updated ){
 				char title[64];
-				sprintf(title, "Speed: %d%%", time_scale);
+				sprintf(title, "Speed: %d%%", global_time.current_scale());
 				SDL_WM_SetCaption(title, NULL);
 			}
 		}
@@ -176,10 +170,6 @@ static void update(float dt){
 }
 
 static void magic_stuff(){
-	static const unsigned int framerate = 60;
-	static const uint64_t per_frame = 1000000 / framerate;
-	static const float dt = 1.0f / framerate;
-
 	/* for calculating dt */
 	struct timeval t;
 	gettimeofday(&t, NULL);
@@ -192,13 +182,9 @@ static void magic_stuff(){
 		gettimeofday(&cur, NULL);
 		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
 		const  int64_t delay = per_frame - delta;
-		const float scale = (float)time_scale / 100.0f;
-		float scaled_dt = dt * scale;
-		if ( time_step != 0 ){
-			scaled_dt = dt * time_step;
-		}
 
-		update(scaled_dt);
+		global_time.update();
+		update(global_time.dt());
 		render();
 
 		/* move time forward */
@@ -208,22 +194,10 @@ static void magic_stuff(){
 			t.tv_sec++;
 		}
 
-		/* move global scaled time forward */
-		if ( time_step == 0 ){
-			global_time.tv_usec += per_frame * scale;
-		} else {
-			global_time.tv_usec += per_frame;
-		}
-		if ( global_time.tv_usec > 1000000 ){
-			global_time.tv_usec -= 1000000;
-			global_time.tv_sec++;
-		}
-
 		/* fixed framerate */
 		if ( delay > 0 ){
 			usleep(delay);
 		}
-		time_step = 0;
 	}
 }
 

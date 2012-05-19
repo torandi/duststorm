@@ -7,12 +7,6 @@
 #include <cstdio>
 #include <sys/time.h>
 
-extern struct timeval global_time;       /* current time */
-
-float get_time() {
-	return (float)global_time.tv_sec + (float)global_time.tv_usec / 1000000;
-}
-
 int checkForGLErrors( const char *s ) {
 	int errors = 0 ;
 
