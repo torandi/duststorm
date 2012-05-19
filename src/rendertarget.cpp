@@ -104,12 +104,14 @@ void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
 	//model = glm::scale(model, glm::vec3(size.x, size.y, 1.0f));
 	//model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
 
-	shader->upload_model_matrix(model);
+	//shader->upload_model_matrix(model);
 
-	glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_POSITION]);
+	//glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_POSITION]);
+	glEnableVertexAttribArray(0);
 
 	glBindTexture(GL_TEXTURE_2D, texture());
-	glVertexAttribPointer(shader->attribute_locations[Shader::ATTR_POSITION], 3, GL_FLOAT,GL_FALSE, sizeof(float)*5,  &vertices[0][0]); 
+	glVertexAttribPointer(0, 3, GL_FLOAT,GL_FALSE, sizeof(float)*5,  &vertices[0][0]); 
+	//glVertexAttribPointer(shader->attribute_locations[Shader::ATTR_POSITION], 3, GL_FLOAT,GL_FALSE, sizeof(float)*5,  &vertices[0][0]); 
 	//glVertexPointer  (3, GL_FLOAT, sizeof(float)*5, &vertices[0][0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[0][3]);
 	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);

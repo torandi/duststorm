@@ -162,6 +162,7 @@ static void render(){
 	shader->bind();
 
 	shader->upload_projection_view_matrices(screen_ortho, glm::mat4(1.f));
+	//shader->upload_model_matrix(screen_ortho);
 
 	test->draw();
 

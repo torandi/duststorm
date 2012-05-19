@@ -46,8 +46,10 @@ const char* Shader::attribute_names[] = {
 };
 
 Shader::Shader(const std::string &name_, GLuint program_) : name(name_), program(program_) {
+	bind();
 	init_uniforms();
 	init_attributes();
+	unbind();
 }
 
 
@@ -152,6 +154,8 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 	}
 
 	glLinkProgram(program);
+	glValidateProgram(program);
+	
 
 	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
 
@@ -163,6 +167,32 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 		fprintf(stderr, "Link error in shader %s: %s\n", shader_name.c_str(), buffer);
 		exit(2);
 	}
+
+	glGetProgramiv(program, GL_VALIDATE_STATUS, &gl_tmp);
+
+	if(!gl_tmp) {
+		char buffer[2048];
+		glGetProgramInfoLog(program, 2048, NULL, buffer);
+		fprintf(stderr, "Validate error in shader %s: %s\n", shader_name.c_str(), buffer);
+		exit(2);
+	}
+
+	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &gl_tmp);
+	printf("%d active attributes for %s\n", gl_tmp, shader_name.c_str());
+	char buffer[128];
+	GLint s;
+	GLenum type;
+	for(int i=0; i<gl_tmp; ++i) {
+		glGetActiveAttrib(program, i, 128, NULL, &s, &type, buffer);
+		printf("Attrib: %d: %s, len: %d\n", i, buffer, s);
+	}
+
+	checkForGLErrors("derp");
+	
+
+	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &gl_tmp);
+	printf("%d active uniforms for %s\n", gl_tmp, shader_name.c_str());
+
 	return program;
 
 }
@@ -186,18 +216,19 @@ Shader * Shader::create_shader(std::string base_name) {
 void Shader::init_uniforms() {
 	for(int i=0; i<NUM_UNIFORMS; ++i) {
 		uniform_locations_[i] = glGetUniformLocation(program, uniform_names_[i]);
+		printf("Uniform %s at location %d\n",uniform_names_[i], uniform_locations_[i]); 
 		checkForGLErrors((std::string("load uniform ")+uniform_names_[i]+" from shader "+name).c_str());
 	}
-	bind();
-	glUniform1i(TEXTURE1, 0);
-	glUniform1i(TEXTURE2, 1);
-	unbind();
+	glUniform1i(uniform_locations_[TEXTURE1], 0);
+	glUniform1i(uniform_locations_[TEXTURE2], 1);
+	checkForGLErrors("failed to upload texture locations");
 }
 
 void Shader::init_attributes() {
 	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
 		attribute_locations[i] = glGetAttribLocation(program, attribute_names[i]);
-		checkForGLErrors((std::string("load attribute ")+uniform_names_[i]+" from shader "+name).c_str());
+		printf("Attrib %s at location %d\n",attribute_names[i], attribute_locations[i]); 
+		checkForGLErrors((std::string("load attribute ")+attribute_names[i]+" from shader "+name).c_str());
 	}
 }
 
