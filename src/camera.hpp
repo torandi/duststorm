@@ -10,7 +10,7 @@
 		virtual ~Camera() {};
 
 		const glm::vec3 look_at() const;
-		const glm::vec3 up() const;
+		void look_at(glm::vec3 position);
 	};
 
 #endif

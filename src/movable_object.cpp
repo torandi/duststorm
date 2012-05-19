@@ -70,3 +70,27 @@ void MovableObject::set_rotation(const glm::vec3 &axis, const float angle) {
 glm::vec3 MovableObject::orient_vector(const glm::vec3 &vec) const {
 	return glm::vec3(rotation_matrix()*glm::vec4(vec, 1.f));
 }
+
+void MovableObject::roll(const float angle) {
+	relative_rotate(glm::vec3(0.f, 0.f, 1.f), angle);
+}
+
+void MovableObject::pitch(const float angle) {
+	relative_rotate(glm::vec3(1.f, 0.f, 0.f), angle);
+}
+
+void MovableObject::yaw(const float angle) {
+	relative_rotate(glm::vec3(0.f, 1.f, 0.f), angle);
+}
+
+const glm::vec3 MovableObject::local_z() const {
+	return glm::vec3(rotation_matrix()*glm::vec4(0.f, 0.f, 1.f, 1.f));
+}
+
+const glm::vec3 MovableObject::local_y() const {
+	return glm::vec3(rotation_matrix()*glm::vec4(0.f, 1.f, 0.f, 1.f));
+}
+
+const glm::vec3 MovableObject::local_x() const {
+	return glm::vec3(rotation_matrix()*glm::vec4(1.f, 0.f, 0.f, 1.f));
+}

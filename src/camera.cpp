@@ -3,10 +3,23 @@
 #include <glm/glm.hpp>
 
 #include <cstdio>
+#include <cmath>
 
 const glm::vec3 Camera::look_at() const {
-	return glm::vec3(rotation_matrix()*glm::vec4(0.0, 0.0, 1.0, 1.0))+position_;
+	return local_z()+position_;
 }
-const glm::vec3 Camera::up() const {
-	return glm::vec3(rotation_matrix()*glm::vec4(0.0, 1.0, 0.0, 1.0));
+
+void Camera::look_at(glm::vec3 position) {
+	orientation_ = glm::fquat(1.f, 0.f, 0.f, 0.f); //Reset rotation
+	glm::vec3 direction = position_ - position;
+	glm::vec2 xz_projection = glm::vec2(direction.x,direction.z);
+
+	float rotation = acosf(glm::dot(xz_projection, glm::vec2(0.f, 1.f)) * glm::length(xz_projection));
+	absolute_rotate(glm::vec3(0.f, 1.f, 0.f), rotation);
+
+	glm::vec3 lz = local_z();
+
+	rotation = acosf(glm::dot(direction, lz) / (glm::length(direction) * glm::length(lz)));
+
+	pitch(rotation);
 }
