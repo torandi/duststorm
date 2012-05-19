@@ -100,6 +100,5 @@ public:
 
 	void upload_model_matrix( const glm::mat4 &model) const;
 
-
 };
 #endif

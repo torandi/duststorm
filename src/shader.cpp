@@ -233,12 +233,27 @@ void Shader::init_attributes() {
 }
 
 void Shader::bind() {
-	checkForGLErrors((std::string("pre Bind shader ")+name).c_str());
 	glUseProgram(program);
 	checkForGLErrors((std::string("Bind shader ")+name).c_str());
+
+	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
+		GLint location = attribute_locations[i];
+		if(location != -1) {
+			glEnableVertexAttribArray(location);
+			checkForGLErrors("Enable vertex attrib");
+		}
+	}
 }
 
 void Shader::unbind() {
+	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
+		GLint location = attribute_locations[i];
+		if(location != -1) {
+			glDisableVertexAttribArray(location);
+			checkForGLErrors("Disable vertex attrib");
+		}
+	}
+
 	glUseProgram(0);
 	checkForGLErrors("Unbind shader ");
 }
@@ -275,3 +290,4 @@ void Shader::upload_model_matrix(const glm::mat4 &model) const {
 	glUniformMatrix4fv(uniform_locations_[NORMAL_MATRIX],1 , GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(model))));
 	checkForGLErrors("upload normal matrix");
 }
+

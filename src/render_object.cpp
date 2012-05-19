@@ -244,44 +244,47 @@ void RenderObject::recursive_render(const aiNode* node,
 
 			glBindBuffer(GL_ARRAY_BUFFER, md->vb);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md->ib);
-			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_POSITION]);
-			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_TEXCOORD]);
-			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_NORMAL]);
-			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_TANGENT]);
-			glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_BITANGENT]);
-			//glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_COLOR]);
 
-			glVertexAttribPointer(
+			//glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_COLOR]);
+			if(shader->attribute_locations[Shader::ATTR_POSITION] != -1)
+				glVertexAttribPointer(
 					shader->attribute_locations[Shader::ATTR_POSITION], 
 					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
-			glVertexAttribPointer(
+
+
+			if(shader->attribute_locations[Shader::ATTR_TEXCOORD] != -1)
+				glVertexAttribPointer(
 					shader->attribute_locations[Shader::ATTR_TEXCOORD], 
 					2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)));
-			glVertexAttribPointer(
+
+			if(shader->attribute_locations[Shader::ATTR_NORMAL] != -1)
+				glVertexAttribPointer(
 					shader->attribute_locations[Shader::ATTR_NORMAL], 
 					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
+
+			if(shader->attribute_locations[Shader::ATTR_TANGENT] != -1) 
 			glVertexAttribPointer(
 					shader->attribute_locations[Shader::ATTR_TANGENT], 
 					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
-			glVertexAttribPointer(
+
+			if(shader->attribute_locations[Shader::ATTR_BITANGENT] != -1) 
+				glVertexAttribPointer(
 					shader->attribute_locations[Shader::ATTR_BITANGENT], 
 					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
 
+			checkForGLErrors("set attrib pointers");
+
 			materials[md->mtl_index].activate();
+			checkForGLErrors("Activte material");
 
 			glDrawElements(GL_TRIANGLES, md->num_indices, GL_UNSIGNED_INT,0 );
+			checkForGLErrors("Draw material");
 
 			materials[md->mtl_index].deactivate();
 
-			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_POSITION]);
-			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_TEXCOORD]);
-			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_NORMAL]);
-			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_TANGENT]);
-			glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_BITANGENT]);
-			//glDisableVertexAttribArray(shader->attribute_locations[Shader::ATTR_COLOR]);
-
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			checkForGLErrors("Model post");
 		}
 	}
 
