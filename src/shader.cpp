@@ -254,9 +254,14 @@ void Shader::upload_projection_view_matrices(
 		const glm::mat4 &projection,
 		const glm::mat4 &view
 	) const {
-		glUniform4fv(uniform_locations_[VIEW_MATRIX], 1, glm::value_ptr(view));
-		glUniform4fv(uniform_locations_[PROJECTION_MATRIX], 1, glm::value_ptr(projection));
-		glUniform4fv(uniform_locations_[PROJECTION_VIEW_MATRIX], 1, glm::value_ptr(view * projection));
+		glm::mat4 projection_view = view * projection;
+
+		glUniformMatrix4fv(uniform_locations_[VIEW_MATRIX], 1, GL_FALSE, glm::value_ptr(view));
+		checkForGLErrors("upload view_matrix");
+		glUniformMatrix4fv(uniform_locations_[PROJECTION_MATRIX], 1,GL_FALSE, glm::value_ptr(projection));
+		checkForGLErrors("upload projection_matrix");
+		glUniformMatrix4fv(uniform_locations_[PROJECTION_VIEW_MATRIX], 1, GL_FALSE,glm::value_ptr(projection_view));
+		checkForGLErrors("upload projection_view_matrix");
 }
 
 void Shader::upload_model_matrix(const glm::mat4 &model) const {
