@@ -6,6 +6,7 @@
 
 #include "rendertarget.hpp"
 #include "utils.hpp"
+#include "scene.hpp"
 #include "shader.hpp"
 #include "time.hpp"
 
@@ -33,6 +34,19 @@ static RenderTarget* test = nullptr;
 static const char* shader_programs[] = {
 	"simple"
 };
+
+class TestScene: public Scene {
+public:
+	TestScene(const glm::ivec2& size): Scene(size){
+
+	}
+
+	virtual void update(float t, float dt){
+		printf("test scene active\n");
+	}
+};
+
+Scene* scene[1] = {0,};
 
 static void handle_sigint(int signum){
 	if ( !running ){
@@ -92,6 +106,9 @@ static void init(bool fullscreen){
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -600.0f, 0.0f));
 
 	test = new RenderTarget(glm::ivec2(400,100), false);
+	scene[0] = new TestScene(resolution);
+	scene[0]->add_time(1, 4);
+	scene[0]->add_time(7, 10);
 }
 
 static void cleanup(){
@@ -163,7 +180,10 @@ static void render(){
 }
 
 static void update(float dt){
-
+	float t = global_time.get();
+	for ( Scene* s: scene ){
+		s->update_scene(t, dt);
+	}
 }
 
 static void magic_stuff(){

@@ -14,5 +14,5 @@ birdie2012_SOURCES = \
 	src/light.cpp src/light.hpp \
 	src/utils.cpp src/utils.hpp \
 	src/render_object.cpp src/render_object.hpp \
+	src/scene.cpp src/scene.hpp \
 	src/time.cpp src/time.hpp
-
