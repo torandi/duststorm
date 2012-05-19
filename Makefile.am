@@ -7,6 +7,7 @@ birdie2012_LDADD = -lSDL -lGL -lGLU -lGLEW -lassimp
 birdie2012_SOURCES = \
 	src/main.cpp \
 	src/color.cpp src/color.hpp \
+	src/globals.cpp src/globals.hpp \
 	src/rendertarget.cpp src/rendertarget.hpp \
 	src/shader.cpp src/shader.hpp \
 	src/movable_object.cpp src/movable_object.hpp \

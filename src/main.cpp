@@ -2,8 +2,8 @@
 #include "config.h"
 #endif
 
+#include "globals.hpp"
 #include "render_object.hpp"
-
 #include "rendertarget.hpp"
 #include "utils.hpp"
 #include "scene.hpp"
@@ -18,19 +18,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <unistd.h>
+#include <getopt.h>
 
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
-
-Time global_time(per_frame);      /* current time */
-glm::ivec2 resolution;            /* current resolution */
-glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
-
-Shader * shaders[];
+Time global_time(per_frame);
 
 static volatile bool running = true;
 static RenderTarget* test = nullptr;
-
 static RenderObject * tv_test;
 static Camera * camera;
 
