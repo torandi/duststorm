@@ -47,6 +47,9 @@ public:
 
 	const RenderTarget* rendertarget() const;
 
+protected:
+	float stage(float t) const;
+
 private:
 	struct time {
 		float begin;

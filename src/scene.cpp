@@ -72,3 +72,10 @@ GLuint Scene::texture() const {
 const RenderTarget* Scene::rendertarget() const {
 	return target;
 }
+
+float Scene::stage(float t) const {
+	struct time c = *current;
+	const float a = t - c.begin;
+	const float b = c.end - c.begin;
+	return a / b;
+}
