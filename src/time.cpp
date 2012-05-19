@@ -76,6 +76,6 @@ void Time::move(long int usec){
 			current.tv_usec += USDIVIDER;
 			current.tv_sec--;
 		}
-		current.tv_usec -= usec;
+		current.tv_usec += usec;
 	}
 }
