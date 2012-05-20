@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include <cassert>
+
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>
@@ -18,38 +20,62 @@
 
 #define PP_INCLUDE "#include"
 
-const char * Shader::uniform_names_[] = {
-	"projectionViewMatrix",
+const char * Shader::global_uniform_names_[] = {
+	"projectionViewMatrices",
+	"modelMatrices",
 
-	"projectionMatrix",
-	"viewMatrix",
-	"modelMatrix",
-	"normalMatrix",
+	"Camera",
 
-	"camera_pos",
+   "Material",
 
-	"light_attenuation",
-	"light_intensity",
-	"light_position",
-
-	"texture1",
-	"texture2"
+	"LightsData"
 };
 
-const char* Shader::attribute_names[] = {
-	"in_position",
-	"in_texcoord",
-	"in_normal",
-	"in_tangent",
-	"in_bitangent",
-	"in_color"
+const char * Shader::local_uniform_names_[] = {
+
+   "texture1",
+   "texture2"
 };
 
-Shader::Shader(const std::string &name_, GLuint program_) : name(name_), program(program_) {
-	bind();
+
+const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
+   sizeof(glm::mat4)*3,
+   sizeof(glm::mat4)*2,
+   sizeof(glm::vec3),
+   sizeof(Shader::material_t),
+   sizeof(Shader::lights_data_t)
+};
+
+const GLenum Shader::global_uniform_usage_[] = {
+   GL_DYNAMIC_DRAW,
+   GL_DYNAMIC_DRAW,
+   GL_DYNAMIC_DRAW,
+   GL_DYNAMIC_DRAW,
+   GL_DYNAMIC_DRAW
+};
+
+GLuint Shader::global_uniform_buffers_[Shader::NUM_GLOBAL_UNIFORMS];
+
+void Shader::initialize() {
+   //Generate global uniforms:
+   glGenBuffers(NUM_GLOBAL_UNIFORMS, (GLuint*)&global_uniform_buffers_);
+
+   checkForGLErrors("Generate global uniform buffers");
+
+   for( int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
+      //Allocate memory in the buffer:A
+      glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[i]);
+      glBufferData(GL_UNIFORM_BUFFER, global_uniform_buffer_sizes_[i], NULL, global_uniform_usage_[i]);
+      //Bind buffers to range
+      glBindBufferRange(GL_UNIFORM_BUFFER, i, global_uniform_buffers_[i], 0, global_uniform_buffer_sizes_[i]); 
+   }
+   glBindBuffer(GL_UNIFORM_BUFFER, 0);
+   checkForGLErrors("Bind and allocate global uniforms");
+}
+
+Shader::Shader(const std::string &name_, GLuint program) : name(name_), program_(program) {
+   printf("Created shader %s with id %d\n", name_.c_str(), program);
 	init_uniforms();
-	init_attributes();
-	unbind();
 }
 
 
@@ -154,7 +180,6 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 	}
 
 	glLinkProgram(program);
-	glValidateProgram(program);
 	
 
 	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
@@ -168,6 +193,9 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 		exit(2);
 	}
 
+#ifdef VALIDATE_SHADERS
+   glValidateProgram(program);
+
 	glGetProgramiv(program, GL_VALIDATE_STATUS, &gl_tmp);
 
 	if(!gl_tmp) {
@@ -176,6 +204,8 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 		fprintf(stderr, "Validate error in shader %s: %s\n", shader_name.c_str(), buffer);
 		exit(2);
 	}
+
+#endif
 
 	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &gl_tmp);
 	printf("%d active attributes for %s\n", gl_tmp, shader_name.c_str());
@@ -186,12 +216,6 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 		glGetActiveAttrib(program, i, 128, NULL, &s, &type, buffer);
 		printf("Attrib: %d: %s, len: %d\n", i, buffer, s);
 	}
-
-	checkForGLErrors("derp");
-	
-
-	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &gl_tmp);
-	printf("%d active uniforms for %s\n", gl_tmp, shader_name.c_str());
 
 	return program;
 
@@ -214,80 +238,101 @@ Shader * Shader::create_shader(std::string base_name) {
 }
 
 void Shader::init_uniforms() {
-	for(int i=0; i<NUM_UNIFORMS; ++i) {
-		uniform_locations_[i] = glGetUniformLocation(program, uniform_names_[i]);
-		printf("Uniform %s at location %d\n",uniform_names_[i], uniform_locations_[i]); 
-		checkForGLErrors((std::string("load uniform ")+uniform_names_[i]+" from shader "+name).c_str());
+   const int tmp = program_;
+	for(int i=0; i<NUM_LOCAL_UNIFORMS; ++i) {
+		local_uniform_locations_[i] = glGetUniformLocation(program_, local_uniform_names_[i]);
+		checkForGLErrors((std::string("load uniform ")+local_uniform_names_[i]+" from shader "+name).c_str());
 	}
-	glUniform1i(uniform_locations_[TEXTURE1], 0);
-	glUniform1i(uniform_locations_[TEXTURE2], 1);
-	checkForGLErrors("failed to upload texture locations");
-}
 
-void Shader::init_attributes() {
-	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
-		attribute_locations[i] = glGetAttribLocation(program, attribute_names[i]);
-		printf("Attrib %s at location %d\n",attribute_names[i], attribute_locations[i]); 
-		checkForGLErrors((std::string("load attribute ")+attribute_names[i]+" from shader "+name).c_str());
-	}
+	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE1], 0);
+	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE2], 1);
+
+	checkForGLErrors("Upload texture locations");
+
+   //Bind global uniforms to blocks:
+   for(int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
+      assert(tmp == program_);
+      global_uniform_block_index_[i] = glGetUniformBlockIndex(program_, global_uniform_names_[i]);
+      if(global_uniform_block_index_[i] != -1) {
+         glUniformBlockBinding(program_, global_uniform_block_index_[i], i);
+      } else {
+         printf("Not binding global uniform %s, probably not used\n", global_uniform_names_[i]);
+      }  
+   }
+
+   checkForGLErrors("Bind global uniforms to buffers");
 }
 
 void Shader::bind() {
-	glUseProgram(program);
-	checkForGLErrors((std::string("Bind shader ")+name).c_str());
+	glUseProgram(program_);
+	checkForGLErrors("Bind shader");
 
 	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
-		GLint location = attribute_locations[i];
-		if(location != -1) {
-			glEnableVertexAttribArray(location);
-			checkForGLErrors("Enable vertex attrib");
-		}
+      glEnableVertexAttribArray(i);
+      checkForGLErrors("Enable vertex attrib");
 	}
 }
 
 void Shader::unbind() {
 	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
-		GLint location = attribute_locations[i];
-		if(location != -1) {
-			glDisableVertexAttribArray(location);
-			checkForGLErrors("Disable vertex attrib");
-		}
+      glDisableVertexAttribArray(i);
+      checkForGLErrors("Disable vertex attrib");
 	}
 
 	glUseProgram(0);
 	checkForGLErrors("Unbind shader ");
 }
 
-void Shader::upload_light(const Light &light) const {
-	glUniform1f(uniform_locations_[LIGHT_ATTENUATION], light.attenuation);
-	glUniform4fv(uniform_locations_[LIGHT_INTENSITY], 1, glm::value_ptr(light.intensity));
-	glUniform4fv(uniform_locations_[LIGHT_POSITION], 1, glm::value_ptr(light.position()));
+void Shader::upload_lights(const Shader::lights_data_t &lights) {
+   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_LIGHTS]);
+   glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(lights_data_t), &lights);
+   glBindBuffer(GL_UNIFORM_BUFFER, 0);
+   checkForGLErrors("upload lights");
 }
 
-void Shader::upload_camera(const Camera &camera) const {
-	glUniform3fv(uniform_locations_[CAMERA_POS], 1, glm::value_ptr(camera.position()));
-	checkForGLErrors("upload camera");
+void Shader::upload_camera_position(const Camera &camera) {
+   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_LIGHTS]);
+   glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(camera.position()));
+   glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	checkForGLErrors("upload camera position");
 }
 
 void Shader::upload_projection_view_matrices(
 		const glm::mat4 &projection,
 		const glm::mat4 &view
-	) const {
+	) {
 		glm::mat4 projection_view = projection * view;
 
-		checkForGLErrors("preupload");
-		glUniformMatrix4fv(uniform_locations_[VIEW_MATRIX], 1, GL_FALSE, glm::value_ptr(view));
-		checkForGLErrors("upload view_matrix");
-		glUniformMatrix4fv(uniform_locations_[PROJECTION_MATRIX], 1,GL_FALSE, glm::value_ptr(projection));
-		checkForGLErrors("upload projection_matrix");
-		glUniformMatrix4fv(uniform_locations_[PROJECTION_VIEW_MATRIX], 1, GL_FALSE,glm::value_ptr(projection_view));
-		checkForGLErrors("upload projection_view_matrix");
+      glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_PROJECTION_VIEW_MATRICES]);
+
+      glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection_view));
+      glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
+      glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*2, sizeof(glm::mat4), glm::value_ptr(view));
+
+      glBindBuffer(GL_UNIFORM_BUFFER, 0);
+      checkForGLErrors("upload projection view matrices");
 }
 
-void Shader::upload_model_matrix(const glm::mat4 &model) const {
-	glUniformMatrix4fv(uniform_locations_[MODEL_MATRIX], 1, GL_FALSE, glm::value_ptr(model));
-	checkForGLErrors("upload model matrix");
-	glUniformMatrix4fv(uniform_locations_[NORMAL_MATRIX],1 , GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(model))));
-	checkForGLErrors("upload normal matrix");
+void Shader::upload_model_matrix(const glm::mat4 &model) {
+   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_MODEL_MATRICES]);
+
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::transpose(glm::inverse(model))));
+
+   glBindBuffer(GL_UNIFORM_BUFFER, 0);
+   checkForGLErrors("upload model matrices");
 }
 
+void Shader::upload_material(const Shader::material_t &material) {
+   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_MATERIAL]);
+
+   glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(material_t), &material);
+
+   glBindBuffer(GL_UNIFORM_BUFFER, 0);
+   checkForGLErrors("upload material");
+}
+
+void Shader::upload_camera(const Camera &camera) {
+   upload_camera_position(camera);
+   upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
+}

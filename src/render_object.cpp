@@ -1,4 +1,5 @@
 
+
 #include "render_object.hpp"
 #include "shader.hpp"
 #include "utils.hpp"
@@ -94,14 +95,12 @@ void RenderObject::pre_render() {
 			mtl->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.texture = load_texture(p);
-			mtl_data.attr.use_texture = 1;//toggle textures on
 		} else if(mtl->GetTextureCount(aiTextureType_AMBIENT) > 0 && 
 			mtl->GetTexture(aiTextureType_AMBIENT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.texture = load_texture(p);
-			mtl_data.attr.use_texture = 1;//toggle textures on
 		} else {
-			mtl_data.attr.use_texture = 0; //toggle textures off
+         //TODO: Handle lack of texture
 		}
 	
 		//Check for normalmap:
@@ -109,9 +108,7 @@ void RenderObject::pre_render() {
 			mtl->GetTexture(aiTextureType_HEIGHT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.normal_map = load_texture(p);
-			mtl_data.attr.use_normal_map = 1;
-			printf("Using normal map: %s\n", p.c_str());
-		}
+      }
 
 		aiString name;
 		if(AI_SUCCESS == mtl->Get(AI_MATKEY_NAME, name))
@@ -149,7 +146,6 @@ void RenderObject::pre_render() {
 			mtl_data.attr.shininess = 0.0f;
 			mtl_data.attr.specular = glm::vec4(0.f, 0.f, 0.f, 0.f);
 		}
-		printf("Set shininess to %f\n", mtl_data.attr.shininess);
 		max = 1;
 		int two_sided;
 		if((AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_TWOSIDED, &two_sided, &max)) && two_sided)
@@ -247,32 +243,11 @@ void RenderObject::recursive_render(const aiNode* node,
 			glBindBuffer(GL_ARRAY_BUFFER, md->vb);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md->ib);
 
-			//glEnableVertexAttribArray(shader->attribute_locations[Shader::ATTR_COLOR]);
-			if(shader->attribute_locations[Shader::ATTR_POSITION] != -1)
-				glVertexAttribPointer(
-					shader->attribute_locations[Shader::ATTR_POSITION], 
-					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
-
-
-			if(shader->attribute_locations[Shader::ATTR_TEXCOORD] != -1)
-				glVertexAttribPointer(
-					shader->attribute_locations[Shader::ATTR_TEXCOORD], 
-					2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)));
-
-			if(shader->attribute_locations[Shader::ATTR_NORMAL] != -1)
-				glVertexAttribPointer(
-					shader->attribute_locations[Shader::ATTR_NORMAL], 
-					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
-
-			if(shader->attribute_locations[Shader::ATTR_TANGENT] != -1) 
-			glVertexAttribPointer(
-					shader->attribute_locations[Shader::ATTR_TANGENT], 
-					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
-
-			if(shader->attribute_locations[Shader::ATTR_BITANGENT] != -1) 
-				glVertexAttribPointer(
-					shader->attribute_locations[Shader::ATTR_BITANGENT], 
-					3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
+         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
+         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)));
+         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
+			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
+         glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
 
 			checkForGLErrors("set attrib pointers");
 
@@ -282,7 +257,7 @@ void RenderObject::recursive_render(const aiNode* node,
 			glDrawElements(GL_TRIANGLES, md->num_indices, GL_UNSIGNED_INT,0 );
 			checkForGLErrors("Draw material");
 
-			materials[md->mtl_index].deactivate();
+         materials[md->mtl_index].deactivate();
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -311,15 +286,15 @@ void RenderObject::material_t::activate() {
 		glDisable(GL_CULL_FACE);
 		
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, texture);
 
 	/*
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, normal_map);
 	*/
-	
-	//Not handling any material properties!
+
+   Shader::upload_material(attr);
 }
 
 void RenderObject::material_t::deactivate() {

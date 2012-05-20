@@ -27,6 +27,7 @@ Time global_time(per_frame);
 static volatile bool running = true;
 static RenderObject * tv_test;
 static Camera * camera;
+static Shader::lights_data_t lights;
 static Light * light;
 
 static const char* shader_programs[] = {
@@ -47,6 +48,7 @@ static void handle_sigint(int signum){
 }
 
 static void load_shaders() {
+   Shader::initialize();
 	for(int i=0; i < NUM_SHADERS; ++i) {
 		shaders[i] = Shader::create_shader(shader_programs[i]);
 	}
@@ -86,8 +88,9 @@ static void init(bool fullscreen){
 	camera->set_position(glm::vec3(0.f, 0.f, -1.f));
 	camera->look_at(glm::vec3(0.f, 0.f, 0.f));
 
-	light = new Light(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.f, -1.f, -1.f));
-	//light->set_half_light_distance(2.f);
+   lights.num_lights = 1;
+   lights.ambient_intensity = glm::vec3(0.1, 0.1, 0.1);
+	light = new Light(Light::POINT_LIGHT, glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.f, -1.f, -1.f));
 
 	glDisable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -168,10 +171,11 @@ static void render(){
 	shaders[SHADER_NORMAL]->bind();
 
 //	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
-	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix()
+   Shader::upload_projection_view_matrices(camera->projection_matrix()
 			, glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)));
 
-	shaders[SHADER_NORMAL]->upload_light(*light);
+   lights.lights[0] = light->shader_light();
+   Shader::upload_lights(lights);
 
 	tv_test->render(shaders[SHADER_NORMAL]);
 

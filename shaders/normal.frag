@@ -1,4 +1,4 @@
-#version 130
+#version 330
 
 #include "uniforms.glsl"
 
@@ -27,32 +27,35 @@ void main() {
 	camera_dir.z = dot(camera_direction, norm_normal); 
 
 	vec4 originalColor; 
+   //originalColor = texture(tex1, texcoord);
+   originalColor = vec4(1.f, 1.f, 1.f, 1.f);
+
 	vec3 normal_map = vec3(0.0, 0.0, 1.0);
 	
 	/* //Normal map
 		normal_map = normalize(texture(texture2, texcoord).xyz * 2.0 - 1.0);
 	*/
 	
+   vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity, 1.0);
+
+   for(int light = 0; uint(light) < Lgt.num_lights; ++light) {
+      vec3 light_distance = Lgt.lights[light].position.xyz - position;
+      vec3 dir = normalize(light_distance);
+      vec3 light_dir;
+
+      //Convert to tangent space
+      light_dir.x = dot(dir, norm_tangent);
+      light_dir.y = dot(dir, norm_bitangent);
+      light_dir.z = dot(dir, norm_normal);
+
+      accumLighting += computeLighting(
+            Lgt.lights[light], originalColor, normal_map,
+            light_dir, camera_dir, light_distance, 
+            Mtl.shininess, Mtl.specular, 1.0,
+            true, true);
+   }
+
+
+   ocolor= clamp(accumLighting,0.0, 1.0);
 	
-	originalColor = texture(texture1, texcoord);
-	originalColor = vec4(1.f, 0.f, 0.f, 1.f);
-
-	vec4 ambient_color = originalColor * vec4(0.1, 0.1, 0.1, 1.0);
-
-	vec3 light_distance = light_position.xyz - position;
-	vec3 dir = normalize(light_distance);
-	vec3 light_dir;
-
-	//Convert to tangent space
-	light_dir.x = dot(dir, norm_tangent);
-	light_dir.y = dot(dir, norm_bitangent);
-	light_dir.z = dot(dir, norm_normal);
-
-	ocolor = ambient_color + computeLighting( originalColor,
-			normal_map, light_dir,
-			camera_dir, light_distance);
-
-
-	ocolor= vec4(clamp(ocolor,0.0, 1.0).rgb, 1.f);
-	//ocolor = vec4(1.f, 0.f, 0.f, 1.f);
 }
