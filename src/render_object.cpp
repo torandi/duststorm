@@ -29,6 +29,8 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 
 	name = model;
 
+	scale = glm::vec3(1.f);
+
 	scene = aiImportFile( model.c_str(), 
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
 		aiProcess_JoinIdenticalVertices |  
@@ -300,7 +302,7 @@ void RenderObject::render(const Shader * shader) {
 
 const glm::mat4 RenderObject::matrix() const {
 	//Apply scale and normalization matrix
-	return MovableObject::matrix() * glm::scale(glm::mat4(1.0f), scale) * normalization_matrix_;
+	return MovableObject::matrix() * glm::scale(normalization_matrix_, scale);
 }
 
 void RenderObject::material_t::activate() {
