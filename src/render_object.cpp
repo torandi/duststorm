@@ -306,8 +306,10 @@ const glm::mat4 RenderObject::matrix() const {
 }
 
 void RenderObject::material_t::activate() {
+	glPushAttrib(GL_ENABLE_BIT);
 	if(two_sided)
 		glDisable(GL_CULL_FACE);
+		
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
@@ -321,8 +323,7 @@ void RenderObject::material_t::activate() {
 }
 
 void RenderObject::material_t::deactivate() {
-	if(two_sided)
-		glEnable(GL_CULL_FACE);
+	glPopAttrib();
 }
 
 

@@ -53,5 +53,6 @@ void main() {
 			camera_dir, light_distance);
 
 
-	ocolor= clamp(ocolor,0.0, 1.0);
+	ocolor= vec4(clamp(ocolor,0.0, 1.0).rgb, 1.f);
+	//ocolor = vec4(1.f, 0.f, 0.f, 1.f);
 }

@@ -25,7 +25,6 @@ static const uint64_t per_frame = 1000000 / framerate;
 Time global_time(per_frame);
 
 static volatile bool running = true;
-static RenderTarget* test = nullptr;
 static RenderObject * tv_test;
 static Camera * camera;
 static Light * light;
@@ -35,18 +34,7 @@ static const char* shader_programs[] = {
 	"normal"
 };
 
-class TestScene: public Scene {
-public:
-	TestScene(const glm::ivec2& size): Scene(size){
-
-	}
-
-	virtual void update(float t, float dt){
-		printf("test scene active\n");
-	}
-};
-
-Scene* scene[1] = {0,};
+Scene* scene[0] = {};
 
 static void handle_sigint(int signum){
 	if ( !running ){
@@ -93,15 +81,23 @@ static void init(bool fullscreen){
 
 	load_shaders();
 
-	tv_test = new RenderObject("models/cube.obj");
-	camera = new Camera(75.f, resolution.x/(float)resolution.y, -1.0, 1.0);
+	tv_test = new RenderObject("models/tv.obj");
+	camera = new Camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f);
 	camera->set_position(glm::vec3(0.f, 0.f, -1.f));
 	camera->look_at(glm::vec3(0.f, 0.f, 0.f));
 
-	light = new Light(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.f, 1.f, 0.f));
+	light = new Light(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.f, -1.f, -1.f));
+	//light->set_half_light_distance(2.f);
 
-	glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	//glFrontFace(GL_CCW);
+
+
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	//glDepthRange(0.0f, 1.0f);
+
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -112,18 +108,11 @@ static void init(bool fullscreen){
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -600.0f, 0.0f));
 
-	test = new RenderTarget(glm::ivec2(400,100), false);
-
-	scene[0] = new TestScene(resolution);
-	scene[0]->add_time(1, 4);
-	scene[0]->add_time(7, 10);
-
 	checkForGLErrors("post init()");
 
 }
 
 static void cleanup(){
-	delete test;
 }
 
 static void poll(){
@@ -172,22 +161,14 @@ static void poll(){
 }
 
 static void render(){
-	glClearColor(1,0,1,1);
+	glClearColor(0,1,0,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	static int x = 0;
-
-	test->bind();
-	test->clear((x++ % 2 == 0) ? Color::green : Color::blue);
-	test->unbind();
-
-	//test->draw();
-	//
 	shaders[SHADER_NORMAL]->bind();
 
-	//shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
-	shaders[SHADER_NORMAL]->upload_projection_view_matrices(
-			glm::perspective(75.f, resolution.x/(float)resolution.y, -1.f, 1.f)
+//	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
+	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix()
 			, glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)));
 
 	shaders[SHADER_NORMAL]->upload_light(*light);
@@ -208,6 +189,8 @@ static void update(float dt){
 	for ( Scene* s: scene ){
 		s->update_scene(t, dt);
 	}
+	tv_test->yaw(dt*20);
+	
 }
 
 static void magic_stuff(){
