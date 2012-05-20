@@ -42,7 +42,7 @@ void MovableObject::relative_move(const glm::vec3 &move) {
 	position_+= orient_vector(move);
 }
 
-void MovableObject::absolute_rotate(const glm::vec3 &axis, const float &angle) {
+void MovableObject::absolute_rotate(const glm::vec3 &axis, const double &angle) {
 	rotation_matrix_dirty_ = true;
    glm::vec3 n_axis = glm::normalize(axis) * sinf(angle/2.f);
    glm::fquat offset = glm::fquat(cosf(angle/2.f), n_axis.x, n_axis.y, n_axis.z);
@@ -56,7 +56,7 @@ void MovableObject::absolute_move(const glm::vec3 &move) {
 	position_ += move;
 }
 
-void MovableObject::relative_rotate(const glm::vec3 &axis, const float &angle) {
+void MovableObject::relative_rotate(const glm::vec3 &axis, const double &angle) {
 	rotation_matrix_dirty_ = true;
    glm::vec3 n_axis = glm::normalize(axis) * sinf(angle/2.f);
    glm::fquat offset = glm::fquat(cosf(angle/2.f), n_axis.x, n_axis.y, n_axis.z);
@@ -70,20 +70,20 @@ void MovableObject::set_position(const glm::vec3 &pos) {
 	translation_matrix_dirty_ = true;
 }
 
-void MovableObject::set_rotation(const glm::vec3 &axis, const float angle) {
+void MovableObject::set_rotation(const glm::vec3 &axis, const double angle) {
 	rotation_matrix_dirty_ = true;
 	orientation_ = glm::rotate(glm::fquat(1.f, 0.f, 0.f, 0.f), angle, axis);
 }
 
-void MovableObject::roll(const float angle) {
+void MovableObject::roll(const double angle) {
 	relative_rotate(glm::vec3(0.f, 0.f, 1.f), angle);
 }
 
-void MovableObject::pitch(const float angle) {
+void MovableObject::pitch(const double angle) {
 	relative_rotate(glm::vec3(1.f, 0.f, 0.f), angle);
 }
 
-void MovableObject::yaw(const float angle) {
+void MovableObject::yaw(const double angle) {
 	relative_rotate(glm::vec3(0.f, 1.f, 0.f), angle);
 }
 

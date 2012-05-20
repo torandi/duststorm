@@ -206,12 +206,12 @@ static void update(float dt){
 
    //camera->set_position(glm::vec3(0.f, 0.f, -1.f));
    camera->set_position(pos);
-   camera->look_at(glm::vec3(0.f,0.f,0.f));
+   camera->look_at(glm::vec3(0.f));
 
-
-   printf("camera position: (%f, %f, %f), look at: (%f, %f, %f): up: (%f, %f, %f)\n", camera->position().x, camera->position().y,camera->position().z,
+/*
+   printf("%f rad = %f deg camera position: (%f, %f, %f), look at: (%f, %f, %f): up: (%f, %f, %f)\n", rotation, radians_to_degrees(rotation) ,camera->position().x, camera->position().y,camera->position().z,
       camera->look_at().x, camera->look_at().y,camera->look_at().z,
-      camera->local_y().x, camera->local_y().y,camera->local_y().z);
+      camera->local_y().x, camera->local_y().y,camera->local_y().z);*/
    Shader::upload_camera(*camera);
 	
 }

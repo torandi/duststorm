@@ -24,9 +24,10 @@ void Camera::look_at(glm::vec3 lookat) {
    
 	glm::vec3 direction = lookat - position_;
 	glm::vec2 xz_projection = glm::vec2(direction.x,direction.z);
+   float dot = glm::dot(xz_projection, glm::vec2(0.f, 1.f));
 
-	float rotation = acosf(glm::clamp(glm::dot(xz_projection, glm::vec2(0.f, 1.f)) * glm::length(xz_projection), -1.f, 1.f));
-	absolute_rotate(glm::vec3(0.f, 1.f, 0.f), -rotation);
+	float rotation = acosf(glm::clamp(dot / glm::length(xz_projection), -1.f, 1.f));
+	absolute_rotate(glm::vec3(0.f, 1.f, 0.f), rotation*glm::sign(direction.x));
    
 
    
@@ -34,7 +35,7 @@ void Camera::look_at(glm::vec3 lookat) {
 
 	rotation = acosf(glm::clamp(glm::dot(direction, lz) / (glm::length(direction) * glm::length(lz)), -1.f, 1.f));
 
-	pitch(-rotation);
+	pitch(-rotation*glm::sign(direction.y));
    
 }
 
