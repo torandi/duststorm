@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -Wall
 
-bin_PROGRAMS = birdie2012
+bin_PROGRAMS = demo
 
 birdie2012_LDADD = -lSDL -lGL -lGLU -lGLEW -lassimp
 birdie2012_SOURCES = \
