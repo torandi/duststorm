@@ -21,3 +21,7 @@ int checkForGLErrors( const char *s ) {
 	}
 	return errors;
 }
+
+float radians_to_degrees(double rad) {
+   return (float) (rad * (180/M_PI));
+}

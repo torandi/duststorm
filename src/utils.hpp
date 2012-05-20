@@ -11,4 +11,6 @@ float get_time();
 
 int checkForGLErrors( const char *s );
 
+float radians_to_degrees(double rad);
+
 #endif
