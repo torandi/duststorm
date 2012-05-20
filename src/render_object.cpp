@@ -60,7 +60,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 			normalization_matrix_ = glm::scale(normalization_matrix_, glm::vec3(1.f/tmp));
 		}
 
-		normalization_matrix_ = glm::translate(normalization_matrix_,glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+		//normalization_matrix_ = glm::translate(normalization_matrix_,glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
 
 		pre_render();
 
