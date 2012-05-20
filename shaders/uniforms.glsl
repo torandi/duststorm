@@ -32,8 +32,8 @@ layout(std140) uniform Material {
 struct light_data {
 	float attenuation;
    int type;
-	vec3 intensity;
-	vec3 position;
+	vec4 intensity;
+	vec4 position;
 };
 
 layout(std140) uniform LightsData {

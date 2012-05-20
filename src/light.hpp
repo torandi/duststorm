@@ -11,9 +11,9 @@ public:
    struct shader_light_t {
       float attenuation;
       int type; //light_type_t
-      float padding[1];
-      glm::vec3 intensity;
-      glm::vec3 position;
+      float padding[2];
+      glm::vec4 intensity;
+      glm::vec4 position;
    };
 
    enum light_type_t {
@@ -33,7 +33,9 @@ public:
 	void set_half_light_distance(float hld);
 
    const float &attenuation() const;
-   const glm::vec3 &intensity() const;
+   const glm::vec3 intensity() const;
+
+   void set_intensity(glm::vec3 intensity);
 
    const shader_light_t &shader_light();
 

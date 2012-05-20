@@ -69,8 +69,9 @@ class Shader {
 
    struct lights_data_t {
       int num_lights;
-      float padding[2];
+      float padding[3];
       glm::vec3 ambient_intensity;
+      float padding_2;
       Light::shader_light_t lights[MAX_NUM_LIGHTS];
    };
 
