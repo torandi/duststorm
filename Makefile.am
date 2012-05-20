@@ -3,8 +3,8 @@ AM_CFLAGS = -Wall
 
 bin_PROGRAMS = demo
 
-birdie2012_LDADD = -lSDL -lGL -lGLU -lGLEW -lassimp
-birdie2012_SOURCES = \
+demo_LDADD = -lSDL -lGL -lGLU -lGLEW -lassimp
+demo_SOURCES = \
 	src/main.cpp \
 	src/color.cpp src/color.hpp \
 	src/globals.cpp src/globals.hpp \
