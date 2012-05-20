@@ -32,7 +32,8 @@ static Light * light;
 
 static const char* shader_programs[] = {
 	"simple",
-	"normal"
+	"normal",
+   "debug"
 };
 
 Scene* scene[0] = {};
@@ -172,7 +173,7 @@ static void poll(){
 }
 
 static void render(){
-	glClearColor(0,1,0,1);
+	glClearColor(1,0,1,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	static int x = 0;
@@ -184,8 +185,10 @@ static void render(){
 	tv_test->render(shaders[SHADER_NORMAL]);
 
 	checkForGLErrors("model render");
+   shaders[SHADER_DEBUG]->bind();
+   tv_test->render(shaders[SHADER_NORMAL]);
 
-	shaders[SHADER_NORMAL]->unbind();
+	shaders[SHADER_DEBUG]->unbind();
 
 	SDL_GL_SwapBuffers();
 
