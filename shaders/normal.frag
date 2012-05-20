@@ -35,6 +35,7 @@ void main() {
 	
 	
 	originalColor = texture(texture1, texcoord);
+	originalColor = vec4(1.f, 0.f, 0.f, 1.f);
 
 	vec4 ambient_color = originalColor * vec4(0.1, 0.1, 0.1, 1.0);
 
@@ -53,5 +54,4 @@ void main() {
 
 
 	ocolor= clamp(ocolor,0.0, 1.0);
-	//ocolor = vec4(1.f, 0.f, 0.f, 1.f);
 }

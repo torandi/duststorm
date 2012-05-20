@@ -28,6 +28,7 @@ static volatile bool running = true;
 static RenderTarget* test = nullptr;
 static RenderObject * tv_test;
 static Camera * camera;
+static Light * light;
 
 static const char* shader_programs[] = {
 	"simple",
@@ -97,8 +98,10 @@ static void init(bool fullscreen){
 	camera->set_position(glm::vec3(0.f, 0.f, -1.f));
 	camera->look_at(glm::vec3(0.f, 0.f, 0.f));
 
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
+	light = new Light(glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.f, 1.f, 0.f));
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -186,6 +189,8 @@ static void render(){
 	shaders[SHADER_NORMAL]->upload_projection_view_matrices(
 			glm::perspective(75.f, resolution.x/(float)resolution.y, -1.f, 1.f)
 			, glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)));
+
+	shaders[SHADER_NORMAL]->upload_light(*light);
 
 	tv_test->render(shaders[SHADER_NORMAL]);
 
