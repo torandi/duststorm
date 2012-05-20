@@ -113,6 +113,12 @@ static void init(bool fullscreen){
 
 	checkForGLErrors("post init()");
 
+   Shader::upload_projection_view_matrices(camera->projection_matrix()
+         , glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)));
+
+   lights.lights[0] = light->shader_light();
+   Shader::upload_lights(lights);
+
 }
 
 static void cleanup(){
@@ -171,11 +177,6 @@ static void render(){
 	shaders[SHADER_NORMAL]->bind();
 
 //	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
-   Shader::upload_projection_view_matrices(camera->projection_matrix()
-			, glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)));
-
-   lights.lights[0] = light->shader_light();
-   Shader::upload_lights(lights);
 
 	tv_test->render(shaders[SHADER_NORMAL]);
 
