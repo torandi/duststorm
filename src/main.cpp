@@ -180,20 +180,18 @@ static void render(){
 
 	//test->draw();
 	//
-	shaders[SHADER_SIMPLE]->bind();
+	shaders[SHADER_NORMAL]->bind();
 
-	//shaders[SHADER_SIMPLE]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
-	shaders[SHADER_SIMPLE]->upload_projection_view_matrices(
+	//shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
+	shaders[SHADER_NORMAL]->upload_projection_view_matrices(
 			glm::perspective(75.f, resolution.x/(float)resolution.y, -1.f, 1.f)
 			, glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)));
-	shaders[SHADER_SIMPLE]->upload_model_matrix(glm::mat4(1.f));
 
-	tv_test->render(shaders[SHADER_SIMPLE]);
-	//test->draw();
+	tv_test->render(shaders[SHADER_NORMAL]);
 
 	checkForGLErrors("model render");
 
-	shaders[SHADER_SIMPLE]->unbind();
+	shaders[SHADER_NORMAL]->unbind();
 
 	SDL_GL_SwapBuffers();
 

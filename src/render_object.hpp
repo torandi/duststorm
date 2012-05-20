@@ -42,7 +42,6 @@ public:
 		unsigned int mtl_index;
 	};
 
-
 	struct vertex_t {
 		glm::vec3 pos;
 		glm::vec2 texCoord;
