@@ -20,6 +20,7 @@ void main() {
 	norm_bitangent = normalize(bitangent);
 
 	vec3 camera_direction = normalize(camera_pos - position);
+
 	//Convert to tangent space:
 	vec3 camera_dir;
 	camera_dir.x = dot(camera_direction, norm_tangent); 

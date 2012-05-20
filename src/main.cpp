@@ -37,6 +37,8 @@ static const char* shader_programs[] = {
 
 Scene* scene[0] = {};
 
+static double rotation = 0.0;
+
 static void handle_sigint(int signum){
 	if ( !running ){
 		fprintf(stderr, "\rgot SIGINT again, aborting\n");
@@ -84,6 +86,8 @@ static void init(bool fullscreen){
 	load_shaders();
 
 	tv_test = new RenderObject("models/tv.obj");
+   //tv_test->roll(M_PI_4);
+
 	camera = new Camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f);
 	camera->set_position(glm::vec3(0.f, 0.f, -1.f));
 	camera->look_at(glm::vec3(0.f, 0.f, 0.f));
@@ -113,8 +117,6 @@ static void init(bool fullscreen){
 
 	checkForGLErrors("post init()");
 
-   Shader::upload_projection_view_matrices(camera->projection_matrix()
-         , glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)));
 
    lights.lights[0] = light->shader_light();
    Shader::upload_lights(lights);
@@ -178,6 +180,7 @@ static void render(){
 
 //	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
 
+
 	tv_test->render(shaders[SHADER_NORMAL]);
 
 	checkForGLErrors("model render");
@@ -194,7 +197,22 @@ static void update(float dt){
 	for ( Scene* s: scene ){
 		s->update_scene(t, dt);
 	}
-	tv_test->yaw(dt*20);
+	//tv_test->relative_rotate(glm::vec3(0.f, 1.f, 0.f), M_PI_4*dt);
+
+   rotation += dt*M_PI_4/4.f;
+   rotation = fmod(rotation, 2.f*M_PI);
+
+   glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
+
+   //camera->set_position(glm::vec3(0.f, 0.f, -1.f));
+   camera->set_position(pos);
+   camera->look_at(glm::vec3(0.f,0.f,0.f));
+
+
+   printf("camera position: (%f, %f, %f), look at: (%f, %f, %f): up: (%f, %f, %f)\n", camera->position().x, camera->position().y,camera->position().z,
+      camera->look_at().x, camera->look_at().y,camera->look_at().z,
+      camera->local_y().x, camera->local_y().y,camera->local_y().z);
+   Shader::upload_camera(*camera);
 	
 }
 

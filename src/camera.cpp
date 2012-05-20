@@ -8,6 +8,8 @@
 #include <cstdio>
 #include <cmath>
 
+#include <cassert>
+
 Camera::Camera(float fov, float aspect, float near, float far) : 
 	fov_(fov), aspect_(aspect), near_(near), far_(far) {
 	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);
@@ -23,16 +25,16 @@ void Camera::look_at(glm::vec3 lookat) {
 	glm::vec3 direction = lookat - position_;
 	glm::vec2 xz_projection = glm::vec2(direction.x,direction.z);
 
-	float rotation = acosf(glm::dot(xz_projection, glm::vec2(0.f, 1.f)) * glm::length(xz_projection));
-	absolute_rotate(glm::vec3(0.f, 1.f, 0.f), rotation);
-   printf("[camera] rotate round y: %f degrees\n", radians_to_degrees(rotation));
+	float rotation = acosf(glm::clamp(glm::dot(xz_projection, glm::vec2(0.f, 1.f)) * glm::length(xz_projection), -1.f, 1.f));
+	absolute_rotate(glm::vec3(0.f, 1.f, 0.f), -rotation);
+   
 
    
 	glm::vec3 lz = local_z();
 
-	rotation = acosf(glm::dot(direction, lz) / (glm::length(direction) * glm::length(lz)));
+	rotation = acosf(glm::clamp(glm::dot(direction, lz) / (glm::length(direction) * glm::length(lz)), -1.f, 1.f));
 
-	pitch(rotation);
+	pitch(-rotation);
    
 }
 

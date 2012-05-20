@@ -291,7 +291,7 @@ void Shader::upload_lights(const Shader::lights_data_t &lights) {
 }
 
 void Shader::upload_camera_position(const Camera &camera) {
-   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_LIGHTS]);
+   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_CAMERA]);
    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(camera.position()));
    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	checkForGLErrors("upload camera position");
