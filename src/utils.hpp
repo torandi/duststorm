@@ -13,4 +13,6 @@ int checkForGLErrors( const char *s );
 
 float radians_to_degrees(double rad);
 
+void print_mat4(glm::mat4 &m);
+
 #endif
