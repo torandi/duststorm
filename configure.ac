@@ -1,4 +1,4 @@
-AC_INIT([birdie2012],[1],[ext@sidvind.com])
+AC_INIT([frobnicator],[1],[ext@sidvind.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([1.11 foreign color-tests subdir-objects -Wall -Werror])
@@ -11,5 +11,12 @@ AC_GNU_SOURCE
 AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_CXX
 AX_CHECK_COMPILE_FLAG([-std=c++0x], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
+
+AX_ASSIMP
+AX_CHECK_GL
+AX_CHECK_GLU
+AX_GLEW
+AX_GLM
+AM_PATH_SDL
 
 AC_OUTPUT
