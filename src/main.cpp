@@ -185,8 +185,9 @@ static void render(){
 	tv_test->render(shaders[SHADER_NORMAL]);
 
 	checkForGLErrors("model render");
+
    shaders[SHADER_DEBUG]->bind();
-   tv_test->render(shaders[SHADER_NORMAL]);
+   tv_test->render(shaders[SHADER_DEBUG]);
 
 	shaders[SHADER_DEBUG]->unbind();
 
@@ -207,9 +208,8 @@ static void update(float dt){
 
    glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
 
-   //camera->set_position(glm::vec3(0.f, 0.f, -1.f));
    camera->set_position(pos);
-   camera->look_at(glm::vec3(0.f));
+   //camera->look_at(glm::vec3(0.f));
 
 /*
    printf("%f rad = %f deg camera position: (%f, %f, %f), look at: (%f, %f, %f): up: (%f, %f, %f)\n", rotation, radians_to_degrees(rotation) ,camera->position().x, camera->position().y,camera->position().z,

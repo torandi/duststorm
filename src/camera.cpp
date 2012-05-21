@@ -57,7 +57,7 @@ const glm::mat4 Camera::view_matrix() const {
          x.x, y.x, z.x, 0.f,
          x.y, y.y, z.y, 0.f,
          x.z, y.z, z.z, 0.f,
-         glm::dot(x, position_), glm::dot(y, position_), glm::dot(z, position_), 1
+         -glm::dot(x, position_), -glm::dot(y, position_), glm::dot(z, position_), 1
       );
   
 }
