@@ -19,4 +19,10 @@ AX_GLEW
 AX_GLM
 AM_PATH_SDL
 
+AS_IF([test x"${srcdir}" != x"."], [
+	test -e shaders || ln -s "${srcdir}"/shaders shaders
+	test -e models  || ln -s "${srcdir}"/models  models
+])
+AM_CONDITIONAL([HAVE_SUBDIR], [test x"${srcdir}" != x"."])
+
 AC_OUTPUT

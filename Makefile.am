@@ -18,3 +18,8 @@ demo_SOURCES = \
 	src/render_object.cpp src/render_object.hpp \
 	src/scene.cpp src/scene.hpp \
 	src/time.cpp src/time.hpp
+
+if HAVE_SUBDIR
+distclean-local:
+	rm -f shaders models
+endif
