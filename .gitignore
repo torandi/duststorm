@@ -1,10 +1,17 @@
+.deps
+Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache/
 build
 build-aux/
+config.h
 config.h.in
+config.log
+config.status
 configure
+src/.deps
+stamp-h1
 
 # Compiled Object files
 *.slo
