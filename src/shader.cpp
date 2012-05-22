@@ -78,14 +78,6 @@ Shader::Shader(const std::string &name_, GLuint program) : name(name_), program_
 
    glGetProgramiv(program_, GL_ACTIVE_ATTRIBUTES, &num_attributes_);
    printf("%d active attributes\n", num_attributes_);
-   char buffer[128];
-   GLint s;
-   GLenum type;
-   for(int i=0; i<num_attributes_; ++i) {
-      glGetActiveAttrib(program, i, 128, NULL, &s, &type, buffer);
-      printf("Attrib: %d: %s, len: %d\n", i, buffer, s);
-   }
-
 	init_uniforms();
 }
 
