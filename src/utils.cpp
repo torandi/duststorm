@@ -26,7 +26,7 @@ float radians_to_degrees(double rad) {
    return (float) (rad * (180/M_PI));
 }
 
-void print_mat4(glm::mat4 &m) {
+void print_mat4(const glm::mat4 &m) {
    printf(" %f %f %f %f \n%f %f %f %f \n%f %f %f %f \n%f %f %f %f \n",
          m[0][0], m[0][1], m[0][2], m[0][3] ,
          m[1][0], m[1][1], m[1][2], m[1][3] ,
