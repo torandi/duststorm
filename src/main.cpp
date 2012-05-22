@@ -183,39 +183,16 @@ static void render(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	static int x = 0;
-	//shaders[SHADER_NORMAL]->bind();
+	shaders[SHADER_NORMAL]->bind();
 
 //	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
 
 
-	//tv_test->render(shaders[SHADER_NORMAL]);
+	tv_test->render(shaders[SHADER_NORMAL]);
 
 	checkForGLErrors("model render");
 
-   //shaders[SHADER_NORMAL]->unbind();
-
-   shaders[SHADER_PARTICLES]->bind();
-
-   static const float vertices[][4] = {
-      {0, 0, 0, 0.5f},
-      {0, 1, 0, 0.5f}
-   };
-
-   static const float colors[][4] = {
-      {1, 0, 0, 1},
-      {0, 1, 0, 1}
-   };
-
-   glDisable(GL_CULL_FACE);
-
-   Shader::upload_model_matrix(glm::mat4(1.f));
-
-   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, &vertices[0][0]);   
-   glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, &colors[0][0]);   
-
-   glDrawArrays(GL_POINTS, 0, 2);
-
-	shaders[SHADER_PARTICLES]->unbind();
+   shaders[SHADER_NORMAL]->unbind();
 
 	SDL_GL_SwapBuffers();
 
