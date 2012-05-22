@@ -197,8 +197,8 @@ static void render(){
    shaders[SHADER_PARTICLES]->bind();
 
    static const float vertices[][4] = {
-      {0, 0, 0, 1.f},
-      {0, 1, 0, 1.f}
+      {0, 0, 0, 0.5f},
+      {0, 1, 0, 0.5f}
    };
 
    static const float colors[][4] = {

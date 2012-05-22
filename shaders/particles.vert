@@ -1,13 +1,15 @@
 #version 150
 #include "uniforms.glsl"
 
-layout (location = 0) in vec4 in_position;
+layout (location = 0) in vec4 in_position; //w is used as scale
 layout (location = 1) in vec4 in_color;
 
 out vec4 color;
+out float scale;
 
 void main() {
-	vec4 pos = modelMatrix * in_position;
+	vec4 pos = modelMatrix * vec4(in_position.xyz, 1.0);
+   scale = in_position.w;
 
    gl_Position = viewMatrix * pos;
 
