@@ -75,6 +75,17 @@ void Shader::initialize() {
 
 Shader::Shader(const std::string &name_, GLuint program) : name(name_), program_(program) {
    printf("Created shader %s with id %d\n", name_.c_str(), program);
+
+   glGetProgramiv(program_, GL_ACTIVE_ATTRIBUTES, &num_attributes_);
+   printf("%d active attributes\n", num_attributes_);
+   char buffer[128];
+   GLint s;
+   GLenum type;
+   for(int i=0; i<num_attributes_; ++i) {
+      glGetActiveAttrib(program, i, 128, NULL, &s, &type, buffer);
+      printf("Attrib: %d: %s, len: %d\n", i, buffer, s);
+   }
+
 	init_uniforms();
 }
 
@@ -207,16 +218,6 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 
 #endif
 
-	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &gl_tmp);
-	printf("%d active attributes for %s\n", gl_tmp, shader_name.c_str());
-	char buffer[128];
-	GLint s;
-	GLenum type;
-	for(int i=0; i<gl_tmp; ++i) {
-		glGetActiveAttrib(program, i, 128, NULL, &s, &type, buffer);
-		printf("Attrib: %d: %s, len: %d\n", i, buffer, s);
-	}
-
 	return program;
 
 }
@@ -267,14 +268,14 @@ void Shader::bind() {
 	glUseProgram(program_);
 	checkForGLErrors("Bind shader");
 
-	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
+	for(int i=0; i<num_attributes_; ++i) {
       glEnableVertexAttribArray(i);
       checkForGLErrors("Enable vertex attrib");
 	}
 }
 
 void Shader::unbind() {
-	for(int i=0; i<NUM_ATTRIBUTES; ++i) {
+	for(int i=0; i<<num_attributes_; ++i) {
       glDisableVertexAttribArray(i);
       checkForGLErrors("Disable vertex attrib");
 	}
@@ -336,3 +337,5 @@ void Shader::upload_camera(const Camera &camera) {
    upload_camera_position(camera);
    upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
 }
+
+const GLint Shader::num_attributes() const { return num_attributes_; }

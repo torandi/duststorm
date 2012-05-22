@@ -53,9 +53,7 @@ class Shader {
 		ATTR_NORMAL,
 		ATTR_TANGENT,
 		ATTR_BITANGENT,
-		ATTR_COLOR,
-
-		NUM_ATTRIBUTES
+		ATTR_COLOR
 	};
 
 	struct material_t {
@@ -98,6 +96,8 @@ class Shader {
 
    const GLuint program_;
 
+   GLint num_attributes_;
+
 public:
 
 	std::string name;
@@ -106,6 +106,8 @@ public:
 
 	void bind();
 	void unbind();
+
+   const GLint num_attributes() const;
 
    /**
     * Upload lights
