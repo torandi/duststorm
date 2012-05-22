@@ -18,7 +18,9 @@ demo_SOURCES = \
 	src/render_object.cpp src/render_object.hpp \
 	src/scene.cpp src/scene.hpp \
 	src/time.cpp src/time.hpp \
-	src/cl.cpp src/cl.hpp
+	src/cl.cpp src/cl.hpp \
+	src/mesh.cpp src/mesh.hpp \
+	src/quad.cpp src/quad.hpp
 
 if HAVE_SUBDIR
 distclean-local:

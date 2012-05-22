@@ -34,18 +34,4 @@ vec4 computeLighting(
 	color.a = 1.0;
 
 	return color;
-/*
-	float cosAngIncidence = dot(surfaceNormal, light_dir);
-	cosAngIncidence = clamp(cosAngIncidence, 0, 1);
-
-	vec3 viewDirection = normalize(camera_pos-world_pos);
-	vec3 halfAngle = normalize(light_dir + viewDirection);
-	float angleNormalHalf = acos(dot(halfAngle, surfaceNormal));
-	float exponent = angleNormalHalf / Mtl.shininess;
-	exponent = -(exponent * exponent);
-	float gaussianTerm = exp(exponent);
-
-	gaussianTerm = cosAngIncidence != 0.0 ? gaussianTerm : 0.0;
-	return (originalColor*lightIntensity*cosAngIncidence) + (Mtl.specular * lightIntensity * gaussianTerm);
-*/	
 }

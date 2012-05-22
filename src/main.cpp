@@ -11,6 +11,7 @@
 #include "time.hpp"
 
 #include "cl.hpp"
+#include "quad.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -31,6 +32,8 @@ static RenderObject * tv_test;
 static Camera * camera;
 static Shader::lights_data_t lights;
 static Light * light;
+
+static int current_frame_rate;
 
 static const char* shader_programs[] = {
 	"simple",
@@ -188,10 +191,15 @@ static void render(){
 
 	checkForGLErrors("model render");
 
-   shaders[SHADER_DEBUG]->bind();
-   tv_test->render(shaders[SHADER_DEBUG]);
+   Quad quad;
 
-	shaders[SHADER_DEBUG]->unbind();
+   glm::mat4 qmat = glm::scale(glm::mat4(1.f), glm::vec3(0.5f, 0.5f, 0.5f));
+
+   Shader::upload_model_matrix(qmat);
+
+   //quad.render();
+
+	shaders[SHADER_NORMAL]->unbind();
 
 	SDL_GL_SwapBuffers();
 
@@ -208,25 +216,23 @@ static void update(float dt){
    rotation += dt*M_PI_4/4.f;
    rotation = fmod(rotation, 2.f*M_PI);
 
-   //glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
-   //
-   camera->roll(dt);
+   glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
 
-   //camera->set_position(pos);
-   //camera->look_at(glm::vec3(0.f));
+   camera->set_position(pos);
 
-/*
-   printf("%f rad = %f deg camera position: (%f, %f, %f), look at: (%f, %f, %f): up: (%f, %f, %f)\n", rotation, radians_to_degrees(rotation) ,camera->position().x, camera->position().y,camera->position().z,
-      camera->look_at().x, camera->look_at().y,camera->look_at().z,
-      camera->local_y().x, camera->local_y().y,camera->local_y().z);*/
    Shader::upload_camera(*camera);
 	
 }
 
 static void magic_stuff(){
 	/* for calculating dt */
-	struct timeval t;
+	struct timeval t, last;
 	gettimeofday(&t, NULL);
+   gettimeofday(&last, NULL);
+
+   current_frame_rate = 0;
+   
+   int show_fps = 0;
 
 	while ( running ){
 		poll();
@@ -235,8 +241,16 @@ static void magic_stuff(){
 		struct timeval cur;
 		gettimeofday(&cur, NULL);
 		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
+      current_frame_rate = 1000000/ ( (cur.tv_sec - last.tv_sec) * 1000000 + (cur.tv_usec - last.tv_usec) );
 		const  int64_t delay = per_frame - delta;
 
+      last = cur;
+
+      if(show_fps%100 == 0)
+         printf("FPS: %d\n", current_frame_rate);
+
+      show_fps = show_fps%100;
+      show_fps++;
 		global_time.update();
 		update(global_time.dt());
 		render();

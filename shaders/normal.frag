@@ -30,6 +30,7 @@ void main() {
 	vec4 originalColor; 
    //originalColor = texture(tex1, texcoord);
    originalColor = vec4(1.f, 1.f, 1.f, 1.f);
+   originalColor*=Mtl.diffuse;
 
 	vec3 normal_map = vec3(0.0, 0.0, 1.0);
 	
