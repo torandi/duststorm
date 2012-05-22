@@ -12,6 +12,7 @@ extern glm::mat4 screen_ortho;           /* orthographic projection for primary 
 enum shader_t {
 	SHADER_SIMPLE=0,
 	SHADER_NORMAL,
+   SHADER_PARTICLES,
    SHADER_DEBUG,
 	NUM_SHADERS
 };

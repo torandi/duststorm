@@ -38,6 +38,7 @@ static int current_frame_rate;
 static const char* shader_programs[] = {
 	"simple",
 	"normal",
+   "particles",
    "debug"
 };
 
@@ -100,7 +101,9 @@ static void init(bool fullscreen){
 
    lights.num_lights = 1;
    lights.ambient_intensity = glm::vec3(0.1, 0.1, 0.1);
-	light = new Light(Light::POINT_LIGHT, glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(-1.f, -1.f, -1.f));
+	light = new Light(Light::POINT_LIGHT, glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.f, 0.f, 1.f));
+   lights.lights[0] = light->shader_light();
+   Shader::upload_lights(lights);
 
 	glDisable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -124,8 +127,6 @@ static void init(bool fullscreen){
 	checkForGLErrors("post init()");
 
 
-   lights.lights[0] = light->shader_light();
-   Shader::upload_lights(lights);
 
 }
 
@@ -182,24 +183,39 @@ static void render(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	static int x = 0;
-	shaders[SHADER_NORMAL]->bind();
+	//shaders[SHADER_NORMAL]->bind();
 
 //	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
 
 
-	tv_test->render(shaders[SHADER_NORMAL]);
+	//tv_test->render(shaders[SHADER_NORMAL]);
 
 	checkForGLErrors("model render");
 
-   Quad quad;
+   //shaders[SHADER_NORMAL]->unbind();
 
-   glm::mat4 qmat = glm::scale(glm::mat4(1.f), glm::vec3(0.5f, 0.5f, 0.5f));
+   shaders[SHADER_PARTICLES]->bind();
 
-   Shader::upload_model_matrix(qmat);
+   static const float vertices[][4] = {
+      {0, 0, 0, 1.f},
+      {0, 1, 0, 1.f}
+   };
 
-   //quad.render();
+   static const float colors[][4] = {
+      {1, 0, 0, 1},
+      {0, 1, 0, 1}
+   };
 
-	shaders[SHADER_NORMAL]->unbind();
+   glDisable(GL_CULL_FACE);
+
+   Shader::upload_model_matrix(glm::mat4(1.f));
+
+   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, &vertices[0][0]);   
+   glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, &colors[0][0]);   
+
+   glDrawArrays(GL_POINTS, 0, 2);
+
+	shaders[SHADER_PARTICLES]->unbind();
 
 	SDL_GL_SwapBuffers();
 
@@ -211,12 +227,12 @@ static void update(float dt){
 	for ( Scene* s: scene ){
 		s->update_scene(t, dt);
 	}
-	//tv_test->relative_rotate(glm::vec3(0.f, 1.f, 0.f), M_PI_4*dt);
+	tv_test->yaw(M_PI_4*dt);
 
    rotation += dt*M_PI_4/4.f;
    rotation = fmod(rotation, 2.f*M_PI);
 
-   glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
+   glm::vec3 pos = glm::vec3((1.f+rotation)*cos(rotation), 0.f, (1.f+rotation)*sin(rotation));
 
    camera->set_position(pos);
 
