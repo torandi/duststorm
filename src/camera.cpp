@@ -49,17 +49,7 @@ void Camera::recalculate() {
 
 
 const glm::mat4 Camera::view_matrix() const {
-   
-   glm::vec3 x = local_x();
-   glm::vec3 y = local_y();
-   glm::vec3 z = local_z();
-   return glm::mat4(
-         x.x, y.x, z.x, 0.f,
-         x.y, y.y, z.y, 0.f,
-         x.z, y.z, z.z, 0.f,
-         -glm::dot(x, position_), -glm::dot(y, position_), glm::dot(z, position_), 1
-      );
-  
+   return glm::lookAt(position_, look_at_, local_y());
 }
 
 const glm::mat4 Camera::projection_matrix() const { return projection_matrix_; }
