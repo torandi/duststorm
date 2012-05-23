@@ -43,8 +43,8 @@ static int current_frame_rate;
 static const char* shader_programs[] = {
 	"simple",
 	"normal",
-   "particles",
-   "debug"
+	"particles",
+	"debug"
 };
 
 Scene* scene[0] = {};
@@ -62,7 +62,7 @@ static void handle_sigint(int signum){
 }
 
 static void load_shaders() {
-   Shader::initialize();
+	Shader::initialize();
 	for(int i=0; i < NUM_SHADERS; ++i) {
 		shaders[i] = Shader::create_shader(shader_programs[i]);
 	}
@@ -98,17 +98,17 @@ static void init(bool fullscreen){
 	load_shaders();
 
 	tv_test = new RenderObject("models/tv.obj");
-   //tv_test->roll(M_PI_4);
+	//tv_test->roll(M_PI_4);
 
 	camera = new Camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f);
 	camera->set_position(glm::vec3(0.f, 0.f, -1.f));
 	camera->look_at(glm::vec3(0.f, 0.f, 0.f));
 
-   lights.num_lights = 1;
-   lights.ambient_intensity = glm::vec3(0.1, 0.1, 0.1);
+	lights.num_lights = 1;
+	lights.ambient_intensity = glm::vec3(0.1, 0.1, 0.1);
 	light = new Light(Light::POINT_LIGHT, glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.f, 0.f, 1.f));
-   lights.lights[0] = light->shader_light();
-   Shader::upload_lights(lights);
+	lights.lights[0] = light->shader_light();
+	Shader::upload_lights(lights);
 
 	glDisable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -130,10 +130,10 @@ static void init(bool fullscreen){
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -600.0f, 0.0f));
 
 	checkForGLErrors("post init()");
-   
-   opencl = new CL();
 
-   particles = new ParticleSystem(10000);   
+	opencl = new CL();
+
+	particles = new ParticleSystem(10000);
 }
 
 static void cleanup(){
@@ -198,7 +198,7 @@ static void render(){
 
 	checkForGLErrors("model render");
 
-   shaders[SHADER_NORMAL]->unbind();
+	shaders[SHADER_NORMAL]->unbind();
 
 	SDL_GL_SwapBuffers();
 
@@ -212,26 +212,26 @@ static void update(float dt){
 	}
 	tv_test->yaw(M_PI_4*dt);
 
-   rotation += dt*M_PI_4/4.f;
-   rotation = fmod(rotation, 2.f*M_PI);
+	rotation += dt*M_PI_4/4.f;
+	rotation = fmod(rotation, 2.f*M_PI);
 
-   glm::vec3 pos = glm::vec3((1.f+rotation)*cos(rotation), 0.f, (1.f+rotation)*sin(rotation));
+	glm::vec3 pos = glm::vec3((1.f+rotation)*cos(rotation), 0.f, (1.f+rotation)*sin(rotation));
 
-   camera->set_position(pos);
+	camera->set_position(pos);
 
-   Shader::upload_camera(*camera);
-	
+	Shader::upload_camera(*camera);
+
 }
 
 static void magic_stuff(){
 	/* for calculating dt */
 	struct timeval t, last;
 	gettimeofday(&t, NULL);
-   gettimeofday(&last, NULL);
+	gettimeofday(&last, NULL);
 
-   current_frame_rate = 0;
-   
-   int show_fps = 0;
+	current_frame_rate = 0;
+
+	int show_fps = 0;
 
 	while ( running ){
 		poll();
@@ -240,16 +240,16 @@ static void magic_stuff(){
 		struct timeval cur;
 		gettimeofday(&cur, NULL);
 		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
-      current_frame_rate = 1000000/ ( (cur.tv_sec - last.tv_sec) * 1000000 + (cur.tv_usec - last.tv_usec) );
+		current_frame_rate = 1000000/ ( (cur.tv_sec - last.tv_sec) * 1000000 + (cur.tv_usec - last.tv_usec) );
 		const  int64_t delay = per_frame - delta;
 
-      last = cur;
+		last = cur;
 
-      if(show_fps%100 == 0)
-         printf("FPS: %d\n", current_frame_rate);
+		if(show_fps%100 == 0)
+			printf("FPS: %d\n", current_frame_rate);
 
-      show_fps = show_fps%100;
-      show_fps++;
+		show_fps = show_fps%100;
+		show_fps++;
 		global_time.update();
 		update(global_time.dt());
 		render();

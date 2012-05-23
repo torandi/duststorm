@@ -1,4 +1,6 @@
 #version 150
+#extension GL_ARB_explicit_attrib_location: enable
+
 #include "uniforms.glsl"
 
 layout (location = 0) in vec4 in_position; //w is used as scale
@@ -15,7 +17,7 @@ void main() {
 
    vec4 accumLighting = in_color * vec4(Lgt.ambient_intensity, 1.0);
 
-   for(int light = 0; uint(light) < Lgt.num_lights; ++light) {
+   for(int light = 0; int(light) < Lgt.num_lights; ++light) {
       vec3 light_distance = Lgt.lights[light].position.xyz - pos.xyz;
 
       vec3 lightIntensity;
