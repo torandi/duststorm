@@ -1,9 +1,13 @@
 #ifndef FROB_CL_H
 #define FROB_CL_H
 
-#include <CL/cl.hpp>
+#pragma OPENCL EXTENSION CL_APPLE_gl_sharing : enable 
+#pragma OPENCL EXTENSION CL_KHR_gl_sharing : enable
 
 #include <GL/glew.h>
+
+#include <CL/cl.hpp>
+
 #include <glm/glm.hpp>
 
 #include <vector>

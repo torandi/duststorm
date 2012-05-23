@@ -13,11 +13,11 @@ class ParticleSystem {
    // Buffer 0: position buffer 1: color.
    // Both are set in the opencl-kernel
    GLuint gl_buffers_[2]; 
-   cl::BufferGL cl_gl_buffers_[2];
+   std::vector<cl::Memory> cl_gl_buffers_;
    cl::Buffer particles_, config_;
 
    cl::Program program_;
-   cl::Kernel run_particles_;
+   cl::Kernel kernel_;
    
    struct particle_t {
       glm::vec4 direction;

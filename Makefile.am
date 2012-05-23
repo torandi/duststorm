@@ -20,7 +20,8 @@ demo_SOURCES = \
 	src/time.cpp src/time.hpp \
 	src/cl.cpp src/cl.hpp \
 	src/mesh.cpp src/mesh.hpp \
-	src/quad.cpp src/quad.hpp
+	src/quad.cpp src/quad.hpp \
+	src/particle_system.cpp src/particle_system.hpp
 
 if HAVE_SUBDIR
 distclean-local:

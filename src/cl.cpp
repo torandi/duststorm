@@ -19,12 +19,13 @@ CL::CL() {
 
    platform_ = platforms[0]; //Just select the first platform
 
-   std::string name, version;
+   std::string name, version, extensions;
 
    platform_.getInfo(CL_PLATFORM_NAME, &name);
    platform_.getInfo(CL_PLATFORM_VERSION, &version);
+   platform_.getInfo(CL_PLATFORM_EXTENSIONS, &extensions);
 
-   printf("[OpenCL] Platform: %s %s %ld\n", name.c_str(), version.c_str(),(cl_context_properties) (platform_)() );
+   printf("[OpenCL] Platform: %s %s %ld\n Extensions: %s\n", name.c_str(), version.c_str(),(cl_context_properties) (platform_)() ,extensions.c_str());
 
 #if defined (__APPLE__) || defined(MACOSX)
    CGLContextObj kCGLContext = CGLGetCurrentContext();
@@ -101,15 +102,17 @@ cl::Program CL::create_program(const char * source_file) const{
 
    err = program.build(devices_);
 
-   if(err != CL_SUCCESS) {
-      fprintf(stderr, "[OpenCL] Failed to build program: %s\n", errorString(err));
-   }
 
    std::string build_log;
    program.getBuildInfo(devices_[0], CL_PROGRAM_BUILD_LOG, &build_log);
 
    if(build_log.size() > 0) {
       printf("[OpenCL] Build log: %s\n", build_log.c_str());
+   }
+
+   if(err != CL_SUCCESS) {
+      fprintf(stderr, "[OpenCL] Failed to build program: %s\n", errorString(err));
+      abort();
    }
 
    return program;
