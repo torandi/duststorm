@@ -4,6 +4,7 @@
 #include <CL/cl.hpp>
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
 #include <vector>
 
@@ -19,6 +20,8 @@ class CL {
       cl::BufferGL create_gl_buffer(cl_mem_flags flags, GLuint gl_buffer) const;
 
       static void cl_error_callback(const char * errorinfo, const void * private_info_size, size_t cb, void * user_data);
+
+      static void check_error(const cl_int &err, const char * context);
 
       static const char * errorString(cl_int error);
 

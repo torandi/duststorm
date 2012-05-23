@@ -153,6 +153,13 @@ void CL::cl_error_callback(const char * errorinfo, const void * private_info_siz
    fprintf(stderr, "[OpenCL] Got error callback: %s\n", errorinfo);
 }
 
+void CL::check_error(const cl_int &err, const char * context) {
+   if(err != CL_SUCCESS) {
+      fprintf(stderr,"[OpenCL] %s: %s\n", context, errorString(err));
+      abort();
+   }
+}
+
 const char* CL::errorString(cl_int error) {
     static const char* errorString[] = {
         "CL_SUCCESS",
