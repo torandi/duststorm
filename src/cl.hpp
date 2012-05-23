@@ -3,6 +3,8 @@
 
 #include <CL/cl.hpp>
 
+#include <GL/glew.h>
+
 #include <vector>
 
 class CL {
@@ -14,6 +16,7 @@ class CL {
       cl::Kernel load_kernel(const cl::Program &program, const char * kernel_name) const;
 
       cl::Buffer create_buffer(cl_mem_flags flags, size_t size) const;
+      cl::BufferGL create_gl_buffer(cl_mem_flags flags, GLuint gl_buffer) const;
 
       static void cl_error_callback(const char * errorinfo, const void * private_info_size, size_t cb, void * user_data);
 

@@ -136,6 +136,16 @@ cl::Buffer CL::create_buffer(cl_mem_flags flags, size_t size) const {
    return buffer;
 }
 
+cl::BufferGL CL::create_gl_buffer(cl_mem_flags flags, GLuint gl_buffer) const {
+   cl_int err;
+   cl::BufferGL buffer = cl::BufferGL(context_, flags, gl_buffer, &err);
+   if(err != CL_SUCCESS) {
+      fprintf(stderr,"[OpenCL] Failed to create gl buffer: %s\n", errorString(err));
+      abort();
+   }
+   return buffer;
+}
+
 cl::CommandQueue &CL::queue() { return queue_; }
 cl::Context &CL::context() { return context_; }
 
