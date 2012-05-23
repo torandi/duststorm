@@ -5,6 +5,8 @@
 #include "time.hpp"
 #include <glm/glm.hpp>
 
+#include "cl.hpp"
+
 extern Time global_time;                 /* current time */
 extern glm::ivec2 resolution;            /* current resolution */
 extern glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
@@ -18,5 +20,6 @@ enum shader_t {
 };
 
 extern Shader* shaders[];                /* all shader programs */
+extern CL * opencl;
 
 #endif /* GLOBALS_H */

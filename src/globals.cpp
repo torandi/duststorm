@@ -9,3 +9,4 @@
 glm::ivec2 resolution;
 glm::mat4 screen_ortho;
 Shader* shaders[NUM_SHADERS];
+CL * opencl;

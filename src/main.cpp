@@ -125,7 +125,64 @@ static void init(bool fullscreen){
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -600.0f, 0.0f));
 
 	checkForGLErrors("post init()");
+   
+   opencl = new CL();
 
+   //TEST CL:
+   cl::Program clprogram = opencl->create_program("cl_programs/test.cl");
+   cl::Kernel kernel = opencl->load_kernel(clprogram, "part1");
+
+   cl::CommandQueue &queue = opencl->queue();
+
+    int num = 10;
+    float *a = new float[num];
+    float *b = new float[num];
+    float *c = new float[num];
+    for(int i=0; i < num; i++)
+    {
+        a[i] = 1.0f * i;
+        b[i] = 1.0f * i;
+        c[i] = 0.0f;
+    }
+
+    size_t array_size = sizeof(float) * num;
+
+   cl::Buffer cl_a, cl_b, cl_c;
+   cl_int err;
+   cl::Event event; 
+
+    cl_a = opencl->create_buffer(CL_MEM_READ_ONLY, array_size);
+    cl_b = opencl->create_buffer(CL_MEM_READ_ONLY, array_size);
+    cl_c = opencl->create_buffer(CL_MEM_WRITE_ONLY, array_size);
+
+    printf("Pushing data to the GPU\n");
+    err = queue.enqueueWriteBuffer(cl_a, CL_TRUE, 0, array_size, a, NULL, &event);
+    err = queue.enqueueWriteBuffer(cl_b, CL_TRUE, 0, array_size, b, NULL, &event);
+    err = queue.enqueueWriteBuffer(cl_c, CL_TRUE, 0, array_size, c, NULL, &event);
+    
+
+    err = kernel.setArg(0, cl_a);
+    err = kernel.setArg(1, cl_b);
+    err = kernel.setArg(2, cl_c);
+    queue.finish();
+
+    delete a;
+    delete b;
+
+
+    err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(num), cl::NullRange, NULL, &event);
+    printf("clEnqueueNDRangeKernel: %s\n", CL::errorString(err));
+    queue.finish();
+
+    err = queue.enqueueReadBuffer(cl_c, CL_TRUE, 0, sizeof(float) * num, c, NULL, &event);
+    printf("clEnqueueReadBuffer: %s\n", CL::errorString(err));
+
+    for(int i=0; i < num; i++)
+    {
+        printf("c_done[%d] = %g\n", i, c[i]);
+    }
+
+   delete c;
 
 
 }
@@ -266,63 +323,6 @@ int main(int argc, char* argv[]){
 	const bool fullscreen = argc >= 2;
 	signal(SIGINT, handle_sigint);
 
-   CL ocl;
-
-   //TEST CL:
-   cl::Program clprogram = ocl.create_program("cl_programs/test.cl");
-   cl::Kernel kernel = ocl.load_kernel(clprogram, "part1");
-
-   cl::CommandQueue &queue = ocl.queue();
-
-    int num = 10;
-    float *a = new float[num];
-    float *b = new float[num];
-    float *c = new float[num];
-    for(int i=0; i < num; i++)
-    {
-        a[i] = 1.0f * i;
-        b[i] = 1.0f * i;
-        c[i] = 0.0f;
-    }
-
-    size_t array_size = sizeof(float) * num;
-
-   cl::Buffer cl_a, cl_b, cl_c;
-   cl_int err;
-   cl::Event event; 
-
-    cl_a = ocl.create_buffer(CL_MEM_READ_ONLY, array_size);
-    cl_b = ocl.create_buffer(CL_MEM_READ_ONLY, array_size);
-    cl_c = ocl.create_buffer(CL_MEM_WRITE_ONLY, array_size);
-
-    printf("Pushing data to the GPU\n");
-    err = queue.enqueueWriteBuffer(cl_a, CL_TRUE, 0, array_size, a, NULL, &event);
-    err = queue.enqueueWriteBuffer(cl_b, CL_TRUE, 0, array_size, b, NULL, &event);
-    err = queue.enqueueWriteBuffer(cl_c, CL_TRUE, 0, array_size, c, NULL, &event);
-    
-
-    err = kernel.setArg(0, cl_a);
-    err = kernel.setArg(1, cl_b);
-    err = kernel.setArg(2, cl_c);
-    queue.finish();
-
-    delete a;
-    delete b;
-
-
-    err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(num), cl::NullRange, NULL, &event);
-    printf("clEnqueueNDRangeKernel: %s\n", CL::errorString(err));
-    queue.finish();
-
-    err = queue.enqueueReadBuffer(cl_c, CL_TRUE, 0, sizeof(float) * num, c, NULL, &event);
-    printf("clEnqueueReadBuffer: %s\n", CL::errorString(err));
-
-    for(int i=0; i < num; i++)
-    {
-        printf("c_done[%d] = %g\n", i, c[i]);
-    }
-
-   delete c;
 
 	init(fullscreen);
 	magic_stuff();

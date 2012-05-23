@@ -1,3 +1,6 @@
+#include <GL/glew.h>
+#include <GL/glx.h>
+
 #include "cl.hpp"
 
 #include <CL/cl.hpp>
@@ -16,12 +19,6 @@ CL::CL() {
 
    platform_ = platforms[0]; //Just select the first platform
 
-   cl_context_properties properties[] = { 
-            CL_CONTEXT_PLATFORM, 
-            (cl_context_properties)(platform_)(), 
-            0 
-        };
-
    std::string name, version;
 
    platform_.getInfo(CL_PLATFORM_NAME, &name);
@@ -29,10 +26,40 @@ CL::CL() {
 
    printf("[OpenCL] Platform: %s %s %ld\n", name.c_str(), version.c_str(),(cl_context_properties) (platform_)() );
 
+#if defined (__APPLE__) || defined(MACOSX)
+   CGLContextObj kCGLContext = CGLGetCurrentContext();
+   CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(kCGLContext);
+   cl_context_properties properties[] =
+   {
+      CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)kCGLShareGroup,
+      0
+   };
+#elif defined WIN32 
+   cl_context_properties properties[] =
+   {
+      CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
+      CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
+      CL_CONTEXT_PLATFORM, (cl_context_properties)(platform_)(),
+      0
+   };
+#else
+   if(glXGetCurrentContext() == NULL) {
+      fprintf(stderr, "[OpenCL] glXGetCurrentContex() return NULL. Make sure to create OpenGL context before create the CL-context\n");
+      abort();
+   }
+   cl_context_properties properties[] =
+   {
+      CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
+      CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
+      CL_CONTEXT_PLATFORM, (cl_context_properties)(platform_)(),
+      0
+   };
+#endif
+
    context_ = cl::Context(CL_DEVICE_TYPE_GPU, properties, &CL::cl_error_callback, NULL, &err);
 
    if(err != CL_SUCCESS) {
-      fprintf(stderr, "[OpenCL] Failed to create context: %s \n", errorString(err), err);
+      fprintf(stderr, "[OpenCL] Failed to create context: %s\n", errorString(err));
       abort();
    }
 
