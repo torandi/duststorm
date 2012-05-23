@@ -25,5 +25,5 @@ demo_SOURCES = \
 
 if HAVE_SUBDIR
 distclean-local:
-	rm -f shaders models
+	rm -f shaders models cl_programs
 endif
