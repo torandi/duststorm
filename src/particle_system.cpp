@@ -37,8 +37,8 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
    }
 
    //Create cl buffers:
-   cl_gl_buffers_[0] = opencl->create_gl_buffer(CL_MEM_READ_WRITE, gl_buffers_[0]);
-   cl_gl_buffers_[1] = opencl->create_gl_buffer(CL_MEM_READ_WRITE, gl_buffers_[1]);
+   cl_gl_buffers_.push_back(opencl->create_gl_buffer(CL_MEM_READ_WRITE, gl_buffers_[0]));
+   cl_gl_buffers_.push_back(opencl->create_gl_buffer(CL_MEM_READ_WRITE, gl_buffers_[1]));
 
    particles_ = opencl->create_buffer(CL_MEM_READ_WRITE, sizeof(particle_t)*max_num_particles);
    config_ = opencl->create_buffer(CL_MEM_READ_ONLY, sizeof(config_));
@@ -50,7 +50,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 
    update_blocking_events_.push_back(e);
 
-   delete[] empty;
+   delete[] initial_particles;
 
    err = kernel_.setArg(0, cl_gl_buffers_[0]);
    CL::check_error(err, "[ParticleSystem] Set arg 0");
@@ -123,7 +123,7 @@ void ParticleSystem::update(double dt) {
    err = opencl->queue().enqueueAcquireGLObjects(&cl_gl_buffers_, NULL, &update_blocking_events_[0]);
    CL::check_error(err, "[ParticleSystem] acquire gl objects");
 
-   err = kernel_.setArg(5, dt);
+   err = kernel_.setArg(5, (float)dt);
    CL::check_error(err, "[ParticleSystem] set dt");
 
    cl::Event e, e2;

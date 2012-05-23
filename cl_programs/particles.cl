@@ -36,7 +36,7 @@ __kernel void run_particles (
                   __global particle_t * particle, 
                   __constant config_t * config, 
                   int particle_limit,
-                  double dt)
+                  float dt)
 {
     
 }
