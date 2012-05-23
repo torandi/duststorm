@@ -1,4 +1,6 @@
 #version 150
+#extension GL_ARB_explicit_attrib_location: enable
+
 #include "uniforms.glsl"
 
 layout (location = 0) in vec4 in_position; //w is used as scale
