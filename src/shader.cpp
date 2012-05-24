@@ -243,8 +243,9 @@ void Shader::init_uniforms() {
 		checkForGLErrors((std::string("load uniform ")+local_uniform_names_[i]+" from shader "+name).c_str());
 	}
 
-	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE1], 0);
-	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE2], 1);
+	/* setup samplers */
+	if ( local_uniform_locations_[UNIFORM_TEXTURE1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE1], 0);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE2] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE2], 1);
 
 	checkForGLErrors("Upload texture locations");
 
