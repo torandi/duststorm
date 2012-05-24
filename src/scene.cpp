@@ -32,6 +32,11 @@ void Scene::update_scene(float t, float dt){
 	/* find current timetable entry */
 	struct time c;
 
+	/* sanity check (no entries) */
+	if ( current == timetable.end() ){
+		return;
+	}
+
 	do {
 		c = *current;
 		if ( dt > 0.0f && t > c.end && current+1 != timetable.end() ){
