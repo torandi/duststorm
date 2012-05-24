@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "shader.hpp"
 #include "light.hpp"
 #include "utils.hpp"
@@ -183,7 +187,7 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 	}
 
 	glLinkProgram(program);
-	
+
 
 	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
 
@@ -250,7 +254,7 @@ void Shader::init_uniforms() {
          glUniformBlockBinding(program_, global_uniform_block_index_[i], i);
       } else {
          printf("Not binding global uniform %s, probably not used\n", global_uniform_names_[i]);
-      }  
+      }
    }
 
    checkForGLErrors("Bind global uniforms to buffers");
