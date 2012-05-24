@@ -29,6 +29,7 @@ static const uint64_t per_frame = 1000000 / framerate;
 Time global_time(per_frame);
 
 static volatile bool running = true;
+static const char* program_name;
 
 //These are all test variables that should be moved into a scene later
 static RenderObject * tv_test;
@@ -272,9 +273,16 @@ static void magic_stuff(){
 }
 
 int main(int argc, char* argv[]){
+	/* extract program name from path. e.g. /path/to/MArCd -> MArCd */
+	const char* separator = strrchr(argv[0], '/');
+	if ( separator ){
+		program_name = separator + 1;
+	} else {
+		program_name = argv[0];
+	}
+
 	const bool fullscreen = argc >= 2;
 	signal(SIGINT, handle_sigint);
-
 
 	init(fullscreen);
 	magic_stuff();
