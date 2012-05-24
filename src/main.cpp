@@ -37,10 +37,9 @@ static RenderObject * tv_test;
 static Camera * camera;
 static Shader::lights_data_t lights;
 static Light * light;
+static int frames = 0;
 
 static ParticleSystem * particles;
-
-static int current_frame_rate;
 
 static const char* shader_programs[] = {
 	"simple",
@@ -61,6 +60,11 @@ static void handle_sigint(int signum){
 
 	running = false;
 	fprintf(stderr, "\rgot SIGINT, terminating graceful\n");
+}
+
+static void show_fps(int signum){
+	fprintf(stderr, "FPS: %d\n", frames);
+	frames = 0;
 }
 
 static void load_shaders() {
@@ -227,12 +231,7 @@ static void magic_stuff(){
 	/* for calculating dt */
 	struct timeval t, last;
 	gettimeofday(&t, NULL);
-	gettimeofday(&last, NULL);
-
-	current_frame_rate = 0;
-
-	int show_fps = 0;
-
+	last = t;
 
 	while ( running ){
 		poll();
@@ -241,21 +240,15 @@ static void magic_stuff(){
 		struct timeval cur;
 		gettimeofday(&cur, NULL);
 		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
-		current_frame_rate = 1000000/ ( (cur.tv_sec - last.tv_sec) * 1000000 + (cur.tv_usec - last.tv_usec) );
 		const  int64_t delay = per_frame - delta;
 
-		last = cur;
-
-		if(show_fps%100 == 0)
-			printf("FPS: %d\n", current_frame_rate);
-
-		show_fps = show_fps%100;
-		show_fps++;
 		global_time.update();
 		update(global_time.dt());
 		render();
 
 		/* move time forward */
+		frames++;
+		last = cur;
 		t.tv_usec += per_frame;
 		if ( t.tv_usec > 1000000 ){
 			t.tv_usec -= 1000000;
@@ -357,6 +350,17 @@ int main(int argc, char* argv[]){
 
 	/* proper termination */
 	signal(SIGINT, handle_sigint);
+
+	/* setup FPS alarm handler */
+	{
+		struct itimerval difftime;
+		difftime.it_interval.tv_sec = 1;
+		difftime.it_interval.tv_usec = 0;
+		difftime.it_value.tv_sec = 1;
+		difftime.it_value.tv_usec = 0;
+		signal(SIGALRM, show_fps);
+		setitimer(ITIMER_REAL, &difftime, NULL);
+	}
 
 	/* let the magic begin */
 	init(fullscreen);
