@@ -7,21 +7,21 @@ demo_CXXFLAGS = ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM
 demo_LDADD = ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} 
 demo_SOURCES = \
 	src/main.cpp \
+	src/camera.cpp src/camera.hpp \
+	src/cl.cpp src/cl.hpp \
 	src/color.cpp src/color.hpp \
 	src/globals.cpp src/globals.hpp \
-	src/rendertarget.cpp src/rendertarget.hpp \
-	src/shader.cpp src/shader.hpp \
-	src/movable_object.cpp src/movable_object.hpp \
-	src/camera.cpp src/camera.hpp \
 	src/light.cpp src/light.hpp \
-	src/utils.cpp src/utils.hpp \
+	src/mesh.cpp src/mesh.hpp \
+	src/movable_object.cpp src/movable_object.hpp \
+	src/particle_system.cpp src/particle_system.hpp \
+	src/rendertarget.cpp src/rendertarget.hpp \
 	src/render_object.cpp src/render_object.hpp \
 	src/scene.cpp src/scene.hpp \
+	src/shader.cpp src/shader.hpp \
 	src/time.cpp src/time.hpp \
-	src/cl.cpp src/cl.hpp \
-	src/mesh.cpp src/mesh.hpp \
-	src/quad.cpp src/quad.hpp \
-	src/particle_system.cpp src/particle_system.hpp
+	src/utils.cpp src/utils.hpp \
+	src/quad.cpp src/quad.hpp
 
 if HAVE_SUBDIR
 distclean-local:
