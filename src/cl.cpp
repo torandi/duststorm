@@ -94,7 +94,7 @@ cl::Program CL::create_program(const char * source_file) const{
 	char buffer[2048];
 	while(!file.eof()) {
 		file.getline(buffer, 2048);
-		src += std::string(buffer);
+		src += std::string(buffer)+"\n";
 	}
 	file.close();
 
