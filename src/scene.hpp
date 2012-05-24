@@ -9,6 +9,7 @@
 class Scene: public RenderTarget {
 public:
 	Scene(const glm::ivec2& size);
+	Scene(size_t width, size_t height);
 	virtual ~Scene();
 
 	/**

@@ -10,6 +10,13 @@ Scene::Scene(const glm::ivec2& size)
 	, match(false) {
 }
 
+Scene::Scene(size_t width, size_t height)
+	: RenderTarget(glm::ivec2(width, height), false)
+	, current(timetable.end())
+	, match(false) {
+
+}
+
 Scene::~Scene(){
 
 }
