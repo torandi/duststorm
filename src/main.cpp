@@ -355,6 +355,8 @@ int main(int argc, char* argv[]){
 		}
 	};
 
+	verbose = fopen(verbose_flag ? "/dev/stderr" : "/dev/null", "w");
+
 	/* proper termination */
 	signal(SIGINT, handle_sigint);
 
@@ -362,6 +364,8 @@ int main(int argc, char* argv[]){
 	init(fullscreen);
 	magic_stuff();
 	cleanup();
+
+	fclose(verbose);
 
 	return 0;
 }
