@@ -40,6 +40,7 @@ static Light * light;
 static int frames = 0;
 
 static ParticleSystem * particles;
+static std::vector<Scene*> scene;
 
 static const char* shader_programs[] = {
 	"simple",
@@ -47,8 +48,6 @@ static const char* shader_programs[] = {
 	"particles",
 	"debug"
 };
-
-Scene* scene[0] = {};
 
 static double rotation = 0.0;
 
@@ -139,6 +138,9 @@ static void init(bool fullscreen){
 }
 
 static void cleanup(){
+	for ( Scene* s : scene ){
+		delete s;
+	}
 }
 
 static void poll(){
@@ -188,6 +190,10 @@ static void poll(){
 
 static void render(){
 	checkForGLErrors("Frame begin");
+
+	for ( Scene* s: scene ){
+		s->render_scene();
+	}
 
 	glClearColor(1,0,1,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
