@@ -14,7 +14,7 @@ void main() {
    scale = in_position.w;
 
    gl_Position = viewMatrix * pos;
-
+/*
    vec4 accumLighting = in_color * vec4(Lgt.ambient_intensity, 1.0);
 
    for(int light = 0; int(light) < Lgt.num_lights; ++light) {
@@ -32,6 +32,7 @@ void main() {
    }
 
 
-   color= clamp(accumLighting,0.0, 1.0);
+   color= clamp(accumLighting,0.0, 1.0);*/
+	 color = in_color;
 }
 

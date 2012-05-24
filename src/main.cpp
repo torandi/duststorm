@@ -135,7 +135,7 @@ static void init(bool fullscreen){
 
 	opencl = new CL();
 
-	particles = new ParticleSystem(10000);
+	particles = new ParticleSystem(2000000);
 }
 
 static void cleanup(){
@@ -196,12 +196,21 @@ static void render(){
 //	shaders[SHADER_NORMAL]->upload_projection_view_matrices(camera->projection_matrix(), camera->view_matrix());
 
 
-	tv_test->render(shaders[SHADER_NORMAL]);
+//	tv_test->render(shaders[SHADER_NORMAL]);
 
-	checkForGLErrors("model render");
+	//checkForGLErrors("model render");
 
 	shaders[SHADER_NORMAL]->unbind();
 
+	shaders[SHADER_PARTICLES]->bind();
+
+	Shader::upload_model_matrix(glm::mat4(1.f));
+	glDisable(GL_CULL_FACE);
+	particles->render();
+	checkForGLErrors("Render particles");
+
+	shaders[SHADER_PARTICLES]->unbind();
+	
 	SDL_GL_SwapBuffers();
 
 	checkForGLErrors("SDL_GL_SwapBuffer");

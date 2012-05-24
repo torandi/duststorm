@@ -46,7 +46,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	cl_gl_buffers_.push_back(opencl->create_gl_buffer(CL_MEM_READ_WRITE, gl_buffer_));
 
 	particles_ = opencl->create_buffer(CL_MEM_READ_WRITE, sizeof(particle_t)*max_num_particles);
-	config_ = opencl->create_buffer(CL_MEM_READ_ONLY, sizeof(config_));
+	config_ = opencl->create_buffer(CL_MEM_READ_ONLY, sizeof(config));
 
 	random_ = opencl->create_buffer(CL_MEM_READ_ONLY, sizeof(float)*max_num_particles);
 	srand(time(0));
@@ -60,13 +60,14 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 
 	cl::Event e;
 
-	cl_int err = opencl->queue().enqueueWriteBuffer(particles_, CL_FALSE, 0, sizeof(particle_t)*max_num_particles, initial_particles, NULL, &e);
+	cl_int err = opencl->queue().enqueueWriteBuffer(particles_, CL_TRUE, 0, sizeof(particle_t)*max_num_particles, initial_particles, NULL, &e);
 	CL::check_error(err, "[ParticleSystem] Write particles buffer");
 	update_blocking_events_.push_back(e);
-	err = opencl->queue().enqueueWriteBuffer(random_, CL_FALSE, 0, sizeof(float)*max_num_particles, rnd, NULL, &e);
+	err = opencl->queue().enqueueWriteBuffer(random_, CL_TRUE, 0, sizeof(float)*max_num_particles, rnd, NULL, &e);
 	CL::check_error(err, "[ParticleSystem] Write random data buffer");
 	update_blocking_events_.push_back(e);
 
+	opencl->queue().flush();
 
 	delete[] initial_particles;
 	delete[] rnd;
@@ -87,32 +88,31 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	config.birth_color = glm::vec4(0.f, 0.f, 1.f, 1.f);; 
 	config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);; 
 
-	config.motion_rand = glm::vec4(0.01f, 0.01f, 0.01f, 0.f);
+	config.motion_rand = glm::vec4(0.001f, 0.001f, 0.001f, 0.f);
 
 	config.spawn_direction = glm::vec4(1.f, 0.f, 0.f, 0.f);
-	config.direction_var = glm::vec4(0.f, 0.3f, 0.f,0.f);
+	config.direction_var = glm::vec4(0.f, 0.3f, 0.3f,0.f);
 
 	config.spawn_position = glm::vec4(0, 0, 0, 0);
 	config.spawn_area = glm::vec4(0.2f, 0.2f, 0.f, 0);
 
 	//Time to live
-	config.avg_ttl = 1000;
-	config.ttl_var = 50;
+	config.avg_ttl = 2.0;
+	config.ttl_var = 1.0;
 	//Spawn speed
-	config.avg_spawn_speed = 0.2f;
-	config.spawn_speed_var = 0.01f;
+	config.avg_spawn_speed = 0.1f;
+	config.spawn_speed_var = 0.05f;
 
 	//Acceleration 
 	config.avg_acc = -0.01f;
 	config.acc_var = 0.005f;
 	//Scale
-	config.avg_scale = 0.1f;
-	config.scale_var = 0.02f;
+	config.avg_scale = 0.01f;
+	config.scale_var = 0.005f;
 
 	config.max_num_particles = max_num_particles;
 	update_config();
 
-	opencl->queue().flush();
 }
 
 ParticleSystem::~ParticleSystem() {
@@ -124,7 +124,7 @@ void ParticleSystem::update_config() {
 	cl::Event e;
 
 
-	cl_int err = opencl->queue().enqueueWriteBuffer(config_, CL_FALSE, 0, sizeof(config_), &config, NULL, &e);
+	cl_int err = opencl->queue().enqueueWriteBuffer(config_, CL_TRUE, 0, sizeof(config), &config, NULL, &e);
 	CL::check_error(err, "[ParticleSystem] Write config");
 
 	update_blocking_events_.push_back(e);
@@ -166,9 +166,21 @@ void ParticleSystem::update(float dt) {
 	render_blocking_events_.push_back(e2);
 
 	opencl->queue().flush();
+/*
+	//BEGIN DEBUG
+	particle_t * particles = (particle_t*) opencl->queue().enqueueMapBuffer(particles_, CL_TRUE, CL_MAP_READ, 0, sizeof(particle_t)*max_num_particles_, NULL, NULL, &err);
 
+	opencl->queue().finish();
+
+	for(int i=0; i < max_num_particles_; ++i ) {
+		printf("Dir: (%f, %f, %f), ttl: (%f/%f)\n", particles[i].direction.x, particles[i].direction.y,particles[i].direction.z, particles[i].ttl, particles[i].org_ttl);
+	}
+
+	opencl->queue().enqueueUnmapMemObject(particles_, particles, NULL, NULL);
+	opencl->queue().finish();
 
 	//END DEBUG
+	*/
 }
 
 void ParticleSystem::render() {
@@ -180,8 +192,7 @@ void ParticleSystem::render() {
 	render_blocking_events_.clear();
 
 	glBindBuffer(GL_ARRAY_BUFFER, gl_buffer_);
-
-	/*
+/*
 	//Debug!
 
 	vertex_t * vertices = (vertex_t* )glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
@@ -193,14 +204,12 @@ void ParticleSystem::render() {
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	//END debug
-	*/
+*/
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) sizeof(glm::vec4));
 
-	glPointSize(15.f);
-	//glDrawArrays(GL_POINTS, 0, max_num_particles_);
-	glDrawArrays(GL_POINTS, 0, 4);
+	glDrawArrays(GL_POINTS, 0, max_num_particles_);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

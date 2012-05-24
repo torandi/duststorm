@@ -11,7 +11,7 @@ out vec4 color;
 out vec2 tex_coord;
 
 void main() {
-	float d = scale[0]*0.5;
+	float d = scale[0]*0.1;
 	color = in_color[0];
 
 	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(d, d, 0, 1.0));

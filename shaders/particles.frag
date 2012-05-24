@@ -10,5 +10,4 @@ void main() {
 	//vec4 tex_color = texture(texture1, texcoord);
 	//ocolor = tex_color*color;
    ocolor = color;
-
 }

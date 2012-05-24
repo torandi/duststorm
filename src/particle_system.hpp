@@ -26,7 +26,7 @@ class ParticleSystem : public MovableObject {
       float ttl;
       float speed;
       float acc;
-		float org_ttl;
+			float org_ttl;
    };
 
 	struct vertex_t {
@@ -53,6 +53,7 @@ class ParticleSystem : public MovableObject {
    struct {
 
       glm::vec4 birth_color; 
+
       glm::vec4 death_color;
 
       glm::vec4 motion_rand; 
