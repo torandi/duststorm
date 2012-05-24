@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "particle_system.hpp"
 
 #include <GL/glew.h>
@@ -82,8 +86,8 @@ ParticleSystem::ParticleSystem(const uint32_t max_num_particles) : max_num_parti
 
    //Set default values in config:
 
-   config.birth_color = glm::vec4(0.f, 0.f, 1.f, 1.f);; 
-   config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);; 
+   config.birth_color = glm::vec4(0.f, 0.f, 1.f, 1.f);;
+   config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);;
 
    config.motion_rand = glm::vec4(0.01f, 0.01f, 0.01f, 0.f);
 
@@ -100,7 +104,7 @@ ParticleSystem::ParticleSystem(const uint32_t max_num_particles) : max_num_parti
    config.avg_spawn_speed = 0.2f;
    config.spawn_speed_var = 0.01f;
 
-   //Acceleration 
+   //Acceleration
    config.avg_acc = -0.01f;
    config.acc_var = 0.005f;
    //Scale
@@ -112,7 +116,7 @@ ParticleSystem::ParticleSystem(const uint32_t max_num_particles) : max_num_parti
 }
 
 ParticleSystem::~ParticleSystem() {
-   glDeleteBuffers(2, gl_buffers_); 
+   glDeleteBuffers(2, gl_buffers_);
 }
 
 void ParticleSystem::update_config() {
@@ -159,7 +163,7 @@ void ParticleSystem::update(float dt) {
 
    update_blocking_events_.clear();
    render_blocking_events_.push_back(e2);
-   
+
 }
 
 void ParticleSystem::render() {
