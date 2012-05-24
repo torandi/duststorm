@@ -183,13 +183,15 @@ GLuint Shader::load_shader(GLenum eShaderType, const std::string &strFilename) {
 GLuint Shader::create_program(const std::string &shader_name, const std::vector<GLuint> &shaderList) {
 	GLint gl_tmp;
 	GLuint program = glCreateProgram();
+	checkForGLErrors("glCreateProgram");
 
 	for(GLuint shader : shaderList) {
 		glAttachShader(program, shader);
+		checkForGLErrors("glAttachShader");
 	}
 
 	glLinkProgram(program);
-
+	checkForGLErrors("glLinkProgram");
 
 	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
 
