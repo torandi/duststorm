@@ -1,4 +1,6 @@
-
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "render_object.hpp"
 #include "shader.hpp"
@@ -12,7 +14,7 @@
 #include <assimp/aiPostProcess.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp> 
+#include <glm/gtc/matrix_transform.hpp>
 
 void RenderObject::color4_to_vec4(const struct aiColor4D *c, glm::vec4 &target) {
 	target.x = c->r;
@@ -25,16 +27,16 @@ RenderObject::~RenderObject() {
 	aiReleaseImport(scene);
 }
 
-RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int aiOptions) 
+RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int aiOptions)
 	: MovableObject() {
 
 	name = model;
 
 	scale = glm::vec3(1.f);
 
-	scene = aiImportFile( model.c_str(), 
+	scene = aiImportFile( model.c_str(),
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-		aiProcess_JoinIdenticalVertices |  
+		aiProcess_JoinIdenticalVertices |
 		aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph  |
 		aiProcess_ImproveCacheLocality | aiProcess_GenUVCoords |
 		aiProcess_ValidateDataStructure | aiProcess_FixInfacingNormals |
@@ -69,13 +71,13 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 
 
 	} else {
-		printf("Failed to load model %s\n", model.c_str());
+		fprintf(stderr, "Failed to load model %s\n", model.c_str());
 	}
 }
 
 GLuint RenderObject::load_texture(std::string path) {
 	size_t last_slash = path.rfind("/");
-	if(last_slash != std::string::npos) 
+	if(last_slash != std::string::npos)
 		path = path.substr(last_slash+1);
 	std::string full_path = std::string("textures/")+path;
 	//TODO: LOAD TEXTURE
@@ -91,20 +93,20 @@ void RenderObject::pre_render() {
 		const aiMaterial * mtl = scene->mMaterials[i];
 		material_t mtl_data;
 		aiString path;
-		if(mtl->GetTextureCount(aiTextureType_DIFFUSE) > 0 && 
+		if(mtl->GetTextureCount(aiTextureType_DIFFUSE) > 0 &&
 			mtl->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.texture = load_texture(p);
-		} else if(mtl->GetTextureCount(aiTextureType_AMBIENT) > 0 && 
+		} else if(mtl->GetTextureCount(aiTextureType_AMBIENT) > 0 &&
 			mtl->GetTexture(aiTextureType_AMBIENT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.texture = load_texture(p);
 		} else {
          //TODO: Handle lack of texture
 		}
-	
+
 		//Check for normalmap:
-		if(mtl->GetTextureCount(aiTextureType_HEIGHT) > 0 && 
+		if(mtl->GetTextureCount(aiTextureType_HEIGHT) > 0 &&
 			mtl->GetTexture(aiTextureType_HEIGHT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.normal_map = load_texture(p);
@@ -112,12 +114,12 @@ void RenderObject::pre_render() {
 
 		aiString name;
 		if(AI_SUCCESS == mtl->Get(AI_MATKEY_NAME, name))
-			printf("Loaded material %d %s\n", i, name.data);
+			fprintf(verbose, "Loaded material %d %s\n", i, name.data);
 
 		aiColor4D diffuse;
 		aiColor4D specular;
 		aiColor4D ambient;
-		aiColor4D emission;	
+		aiColor4D emission;
 		mtl_data.attr.diffuse = glm::vec4( 0.8f, 0.8f, 0.8f, 1.0f);
 		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
 			color4_to_vec4(&diffuse, mtl_data.attr.diffuse);
@@ -158,7 +160,7 @@ void RenderObject::pre_render() {
 
 void RenderObject::recursive_pre_render(const aiNode* node) {
 	const aiVector3D zero_3d(0.0f,0.0f,0.0f);
-	
+
 	for(unsigned int i=0; i<node->mNumMeshes; ++i) {
 		const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		mesh_data_t md;
@@ -225,9 +227,9 @@ void RenderObject::recursive_render(const aiNode* node,
 		const glm::mat4 &parent_matrix) {
 
 
-	aiMatrix4x4 m = node->mTransformation; 	
+	aiMatrix4x4 m = node->mTransformation;
 	aiTransposeMatrix4(&m);
-	
+
 	glm::mat4 matrix(parent_matrix);
 
 	matrix *= glm::make_mat4((float*)&m);
@@ -272,7 +274,7 @@ void RenderObject::recursive_render(const aiNode* node,
 }
 
 void RenderObject::render(const Shader * shader) {
-	recursive_render(scene->mRootNode, shader, matrix());		
+	recursive_render(scene->mRootNode, shader, matrix());
 }
 
 const glm::mat4 RenderObject::matrix() const {
@@ -284,7 +286,7 @@ void RenderObject::material_t::activate() {
 	glPushAttrib(GL_ENABLE_BIT);
 	if(two_sided)
 		glDisable(GL_CULL_FACE);
-		
+
 
    glActiveTexture(GL_TEXTURE0);
    glBindTexture(GL_TEXTURE_2D, texture);
@@ -302,9 +304,9 @@ void RenderObject::material_t::deactivate() {
 }
 
 
-void RenderObject::get_bounding_box_for_node (const struct aiNode* nd, 
-	struct aiVector3D* min, 
-	struct aiVector3D* max, 
+void RenderObject::get_bounding_box_for_node (const struct aiNode* nd,
+	struct aiVector3D* min,
+	struct aiVector3D* max,
 	struct aiMatrix4x4* trafo){
 
 	struct aiMatrix4x4 prev;
