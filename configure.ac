@@ -20,6 +20,11 @@ AX_GLEW
 AX_GLM
 AM_PATH_SDL
 
+AC_ARG_ENABLE([input], [AS_HELP_STRING([--enable-input], [Enable mouse- and keyboard debugging/development. @<:@default=disabled@:>@])])
+AS_IF([test "x$enable_input" = "xyes"],
+	[AC_DEFINE([ENABLE_INPUT],  [1], [Define to 1 to enable input])],
+)
+
 AS_IF([test x"${srcdir}" != x"."], [
 	test -e shaders     || ln -s "${srcdir}"/shaders shaders
 	test -e models      || ln -s "${srcdir}"/models  models
