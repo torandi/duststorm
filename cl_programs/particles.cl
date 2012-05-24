@@ -46,16 +46,16 @@ __kernel void run_particles (
 	int id = get_global_id(0);    
 }
 
-float random(uint time, int id, __constant float * rnd, uint32_t max_num_particles) {
+float random(uint time, int id, __constant float * rnd, uint max_num_particles) {
 	return rnd[(time+id)%max_num_particles];
 }
 
 //Set dual to true to get a number in range -m..m (otherwise 0..m)
-float random1(float m, bool dual, uint time, int id, __constant float * rnd, uint32_t max_num_particles) {
+float random1(float m, bool dual, uint time, int id, __constant float * rnd, uint max_num_particles) {
 	return random(time, id, rnd, max_num_particles)*m*(1+dual) - m*dual;
 }
 
-float random4(float4 m, bool dual, uint time, int id, __constant float * rnd, uint32_t max_num_particles) {
+float random4(float4 m, bool dual, uint time, int id, __constant float * rnd, uint max_num_particles) {
 	return float4(
 					random1(m.x, dual, time, id, rnd, max_num_particles),
 					random1(m.y, dual, time, id, rnd, max_num_particles),
