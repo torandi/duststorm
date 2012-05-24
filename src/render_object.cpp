@@ -31,9 +31,9 @@ RenderObject::~RenderObject() {
 RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int aiOptions)
 	: MovableObject() {
 
-	name = model;
+		name = model;
 
-	scale = glm::vec3(1.f);
+		scale = glm::vec3(1.f);
 
 	scene = aiImportFile( model.c_str(),
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
@@ -52,33 +52,33 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 		        "  Materials: %d\n",
 		        model.c_str(), scene->mNumMeshes, scene->mNumTextures, scene->mNumMaterials);
 
-		//Get bounds:
-		aiVector3D s_min, s_max;
-		get_bounding_box(&s_min, &s_max);
-		scene_min = glm::make_vec3((float*)&s_min);
-		scene_max = glm::make_vec3((float*)&s_max);
-		scene_center  = (scene_min+scene_max)/2.0f;
+			//Get bounds:
+			aiVector3D s_min, s_max;
+			get_bounding_box(&s_min, &s_max);
+			scene_min = glm::make_vec3((float*)&s_min);
+			scene_max = glm::make_vec3((float*)&s_max);
+			scene_center  = (scene_min+scene_max)/2.0f;
 
-		//Calculate normalization matrix
+			//Calculate normalization matrix
 
-		normalization_matrix_ = glm::mat4(1.f);
+			normalization_matrix_ = glm::mat4(1.f);
 
-		if(normalize_scale) {
-			glm::vec3 size = scene_max - scene_min;
-			float tmp = std::max(size.x, size.y);
-			tmp = std::max(tmp, size.z);
-			normalization_matrix_ = glm::scale(normalization_matrix_, glm::vec3(1.f/tmp));
+			if(normalize_scale) {
+				glm::vec3 size = scene_max - scene_min;
+				float tmp = std::max(size.x, size.y);
+				tmp = std::max(tmp, size.z);
+				normalization_matrix_ = glm::scale(normalization_matrix_, glm::vec3(1.f/tmp));
+			}
+
+			//normalization_matrix_ = glm::translate(normalization_matrix_,glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
+
+			pre_render();
+
+
+		} else {
+			printf("Failed to load model %s\n", model.c_str());
 		}
-
-		//normalization_matrix_ = glm::translate(normalization_matrix_,glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
-
-		pre_render();
-
-
-	} else {
-		fprintf(stderr, "Failed to load model %s\n", model.c_str());
 	}
-}
 
 GLuint RenderObject::load_texture(std::string path) {
 	size_t last_slash = path.rfind("/");
@@ -107,7 +107,7 @@ void RenderObject::pre_render() {
 			std::string p(path.data);
 			mtl_data.texture = load_texture(p);
 		} else {
-         //TODO: Handle lack of texture
+			//TODO: Handle lack of texture
 		}
 
 		//Check for normalmap:
@@ -115,7 +115,7 @@ void RenderObject::pre_render() {
 			mtl->GetTexture(aiTextureType_HEIGHT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.normal_map = load_texture(p);
-      }
+		}
 
 		aiString name;
 		if(AI_SUCCESS == mtl->Get(AI_MATKEY_NAME, name))
@@ -250,11 +250,11 @@ void RenderObject::recursive_render(const aiNode* node,
 			glBindBuffer(GL_ARRAY_BUFFER, md->vb);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md->ib);
 
-         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
-         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)));
-         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)));
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
 			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
-         glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
+			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
 
 			checkForGLErrors("set attrib pointers");
 
@@ -264,7 +264,7 @@ void RenderObject::recursive_render(const aiNode* node,
 			glDrawElements(GL_TRIANGLES, md->num_indices, GL_UNSIGNED_INT,0 );
 			checkForGLErrors("Draw material");
 
-         materials[md->mtl_index].deactivate();
+			materials[md->mtl_index].deactivate();
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -292,16 +292,15 @@ void RenderObject::material_t::activate() {
 	if(two_sided)
 		glDisable(GL_CULL_FACE);
 
-
-   glActiveTexture(GL_TEXTURE0);
-   glBindTexture(GL_TEXTURE_2D, texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	/*
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, normal_map);
-	*/
+		 glActiveTexture(GL_TEXTURE1);
+		 glBindTexture(GL_TEXTURE_2D, normal_map);
+		 */
 
-   Shader::upload_material(attr);
+	Shader::upload_material(attr);
 }
 
 void RenderObject::material_t::deactivate() {
