@@ -3,6 +3,7 @@
 #endif
 
 #include "render_object.hpp"
+#include "globals.hpp"
 #include "shader.hpp"
 #include "utils.hpp"
 
@@ -45,7 +46,11 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 		);
 
 	if(scene != 0) {
-		printf("Loaded model %s: \nMeshes: %d\nTextures: %d\nMaterials: %d\n",model.c_str(), scene->mNumMeshes, scene->mNumTextures, scene->mNumMaterials);
+		fprintf(verbose, "Loaded model %s:\n"
+		        "  Meshes: %d\n"
+		        "  Textures: %d\n"
+		        "  Materials: %d\n",
+		        model.c_str(), scene->mNumMeshes, scene->mNumTextures, scene->mNumMaterials);
 
 		//Get bounds:
 		aiVector3D s_min, s_max;
@@ -199,7 +204,7 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 					indexData.push_back(index);
 				}
 			} else {
-				printf("Derp, ignoring mesh with %d indices\n", face->mNumIndices);
+				fprintf(verbose, "Derp, ignoring mesh with %d indices\n", face->mNumIndices);
 			}
 		}
 

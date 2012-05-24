@@ -6,10 +6,10 @@
 #include <GL/glx.h>
 
 #include "cl.hpp"
-
 #include <vector>
-
 #include <fstream>
+
+extern FILE* verbose; /* because globals.hpp fails due to libX11 containing Time which collides with our Time class */
 
 CL::CL() {
 	cl_int err;
@@ -28,7 +28,8 @@ CL::CL() {
 	platform_.getInfo(CL_PLATFORM_VERSION, &version);
 	platform_.getInfo(CL_PLATFORM_EXTENSIONS, &extensions);
 
-	printf("[OpenCL] Platform: %s %s\nExtensions:%s\n", name.c_str(), version.c_str() ,extensions.c_str());
+	fprintf(verbose, "[OpenCL] Platform: %s %s\n"
+	        "  Extensions: %s\n", name.c_str(), version.c_str() ,extensions.c_str());
 
 #if defined (__APPLE__) || defined(MACOSX)
 	CGLContextObj kCGLContext = CGLGetCurrentContext();
@@ -66,7 +67,8 @@ CL::CL() {
 		device.getInfo(CL_DEVICE_VENDOR, &name);
 		device.getInfo(CL_DEVICE_VERSION, &version);
 		device.getInfo(CL_DEVICE_EXTENSIONS, &extensions);
-		printf("[OpenCL] Device: %s %s\nExtensions:%s\n", name.c_str(), version.c_str(),extensions.c_str());
+		fprintf(verbose, "[OpenCL] Device: %s %s\n"
+		       "  Extensions: %s\n", name.c_str(), version.c_str(),extensions.c_str());
 
 	}
 
@@ -92,7 +94,7 @@ cl::Program CL::create_program(const char * source_file) const{
 		abort();
 	}
 
-	printf("Building CL program %s\n", source_file);
+	fprintf(verbose, "Building CL program %s\n", source_file);
 
 	std::string src = "";
 	char buffer[2048];
@@ -118,7 +120,7 @@ cl::Program CL::create_program(const char * source_file) const{
 	program.getBuildInfo(devices_[0], CL_PROGRAM_BUILD_LOG, &build_log);
 
 	if(build_log.size() > 0) {
-		printf("[OpenCL] Build log: %s\n", build_log.c_str());
+		fprintf(stderr, "[OpenCL] Build log: %s\n", build_log.c_str());
 	}
 
 	if(err != CL_SUCCESS) {

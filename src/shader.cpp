@@ -3,6 +3,7 @@
 #endif
 
 #include "shader.hpp"
+#include "globals.hpp"
 #include "light.hpp"
 #include "utils.hpp"
 
@@ -71,18 +72,19 @@ void Shader::initialize() {
       glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[i]);
       glBufferData(GL_UNIFORM_BUFFER, global_uniform_buffer_sizes_[i], NULL, global_uniform_usage_[i]);
       //Bind buffers to range
-      glBindBufferRange(GL_UNIFORM_BUFFER, i, global_uniform_buffers_[i], 0, global_uniform_buffer_sizes_[i]); 
+      glBindBufferRange(GL_UNIFORM_BUFFER, i, global_uniform_buffers_[i], 0, global_uniform_buffer_sizes_[i]);
    }
    glBindBuffer(GL_UNIFORM_BUFFER, 0);
    checkForGLErrors("Bind and allocate global uniforms");
 }
 
 Shader::Shader(const std::string &name_, GLuint program) : name(name_), program_(program) {
-   printf("Created shader %s with id %d\n", name_.c_str(), program);
-
    glGetProgramiv(program_, GL_ACTIVE_ATTRIBUTES, &num_attributes_);
-   printf("%d active attributes\n", num_attributes_);
-	init_uniforms();
+   fprintf(verbose, "Created shader %s\n"
+           "  ID %d\n"
+           "  Active attrib: %d\n",
+           name_.c_str(), program, num_attributes_);
+   init_uniforms();
 }
 
 
@@ -97,7 +99,7 @@ void Shader::load_file(const std::string &filename, std::stringstream &shaderDat
 	}
 	shaderData << shaderFile.rdbuf();
 	shaderFile.close();
-	printf("Loaded %s\n", filename.c_str());
+	fprintf(verbose, "Loaded %s\n", filename.c_str());
 }
 
 std::string Shader::parse_shader(
@@ -219,7 +221,7 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 }
 
 Shader * Shader::create_shader(std::string base_name) {
-	printf("Compiling shader %s\n", base_name.c_str());
+	fprintf(verbose, "Compiling shader %s\n", base_name.c_str());
 
 	std::vector<GLuint> shader_list;
 	//Load shaders:
@@ -253,7 +255,7 @@ void Shader::init_uniforms() {
       if(global_uniform_block_index_[i] != -1) {
          glUniformBlockBinding(program_, global_uniform_block_index_[i], i);
       } else {
-         printf("Not binding global uniform %s, probably not used\n", global_uniform_names_[i]);
+	      fprintf(verbose, "Not binding global uniform %s, probably not used\n", global_uniform_names_[i]);
       }
    }
 

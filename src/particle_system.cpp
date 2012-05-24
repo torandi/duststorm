@@ -3,6 +3,7 @@
 #endif
 
 #include "particle_system.hpp"
+#include "globals.hpp"
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -52,11 +53,10 @@ ParticleSystem::ParticleSystem(const uint32_t max_num_particles) : max_num_parti
 
 	float * rnd = new float[max_num_particles];
 
-	printf("Generating random numbers\n");
+	fprintf(verbose, "Generating random numbers\n");
 	for(int i = 0; i<max_num_particles; ++i) {
 		rnd[i] = frand();
 	}
-	printf("Done\n");
 
    cl::Event e;
 
