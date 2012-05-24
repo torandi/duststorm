@@ -219,6 +219,8 @@ static void update(float dt){
 
 	camera->set_position(pos);
 
+	particles->update(dt);
+
 	Shader::upload_camera(*camera);
 
 }
@@ -232,6 +234,7 @@ static void magic_stuff(){
 	current_frame_rate = 0;
 
 	int show_fps = 0;
+
 
 	while ( running ){
 		poll();

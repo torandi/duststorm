@@ -15,4 +15,8 @@ float radians_to_degrees(double rad);
 
 void print_mat4(const glm::mat4 &m);
 
+inline float frand() {
+	return (float)rand()/RAND_MAX;
+}
+
 #endif

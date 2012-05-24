@@ -14,7 +14,7 @@ class ParticleSystem {
    // Both are set in the opencl-kernel
    GLuint gl_buffers_[2]; 
    std::vector<cl::Memory> cl_gl_buffers_;
-   cl::Buffer particles_, config_;
+   cl::Buffer particles_, config_, random_;
 
    cl::Program program_;
    cl::Kernel kernel_;
@@ -44,8 +44,8 @@ class ParticleSystem {
    ParticleSystem(const int max_num_particles);
    ~ParticleSystem();
 
-   void update(double dt);
-   void render(double dt);
+   void update(float dt);
+   void render();
 
    //Limit the spawing of particles
    void limit_particles(float limit);

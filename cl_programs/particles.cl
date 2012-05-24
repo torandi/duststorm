@@ -35,8 +35,11 @@ __kernel void run_particles (
                   __global float4 * color, 
                   __global particle_t * particle, 
                   __constant config_t * config, 
+						__constant float * random,
                   int particle_limit,
-                  float dt)
+                  float dt,
+						uint time
+						)
 {
-    
+	int id = get_global_id(0);    
 }

@@ -173,6 +173,13 @@ void CL::check_error(const cl_int &err, const char * context) {
 	}
 }
 
+void CL::waitForEvent(const std::vector<cl::Event> &events) {
+	if(events.size() == 0)
+		return;
+	cl_int err = WaitForEvents(events);
+	CL::check_error(err, "Wait for events");
+}
+
 const char* CL::errorString(cl_int error) {
 	static const char* errorString[] = {
 		"CL_SUCCESS",

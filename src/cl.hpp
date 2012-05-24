@@ -29,6 +29,8 @@ class CL {
 
       static const char * errorString(cl_int error);
 
+		static void waitForEvent(const std::vector<cl::Event> &events);
+
       cl::CommandQueue &queue();
       cl::Context  &context();
 

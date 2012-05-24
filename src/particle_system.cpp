@@ -43,14 +43,29 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
    particles_ = opencl->create_buffer(CL_MEM_READ_WRITE, sizeof(particle_t)*max_num_particles);
    config_ = opencl->create_buffer(CL_MEM_READ_ONLY, sizeof(config_));
 
+	random_ = opencl->create_buffer(CL_MEM_READ_ONLY, sizeof(float)*max_num_particles);
+	srand(time(0));
+
+	float * rnd = new float[max_num_particles];
+
+	printf("Generating random numbers\n");
+	for(int i = 0; i<max_num_particles; ++i) {
+		rnd[i] = frand();
+	}
+	printf("Done\n");
+
    cl::Event e;
 
    cl_int err = opencl->queue().enqueueWriteBuffer(particles_, CL_FALSE, 0, sizeof(particle_t)*max_num_particles, initial_particles, NULL, &e);
-   CL::check_error(err, "[ParticleSystem] Write particles buffer");
+	CL::check_error(err, "[ParticleSystem] Write particles buffer");
+	update_blocking_events_.push_back(e);
+	err = opencl->queue().enqueueWriteBuffer(random_, CL_FALSE, 0, sizeof(float)*max_num_particles, rnd, NULL, &e);
+	CL::check_error(err, "[ParticleSystem] Write random data buffer");
+	update_blocking_events_.push_back(e);
 
-   update_blocking_events_.push_back(e);
 
    delete[] initial_particles;
+	delete[] rnd;
 
    err = kernel_.setArg(0, cl_gl_buffers_[0]);
    CL::check_error(err, "[ParticleSystem] Set arg 0");
@@ -60,8 +75,10 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
    CL::check_error(err, "[ParticleSystem] Set arg 2");
    err = kernel_.setArg(3, config_);
    CL::check_error(err, "[ParticleSystem] Set arg 3");
-   err = kernel_.setArg(4, max_num_particles);
+   err = kernel_.setArg(4, random_);
    CL::check_error(err, "[ParticleSystem] Set arg 4");
+	err = kernel_.setArg(5, max_num_particles);
+	CL::check_error(err, "[ParticleSystem] Set arg 4");
 
    //Set default values in config:
 
@@ -101,19 +118,19 @@ void ParticleSystem::update_config() {
 
    cl::Event e;
 
+
    cl_int err = opencl->queue().enqueueWriteBuffer(config_, CL_FALSE, 0, sizeof(config_), &config, NULL, &e);
    CL::check_error(err, "[ParticleSystem] Write config");
 
    update_blocking_events_.push_back(e);
 }
 
-void ParticleSystem::update(double dt) {
+void ParticleSystem::update(float dt) {
    cl_int err;
    //Ensure there are no pending writes active
-   err = opencl->queue().enqueueWaitForEvents(update_blocking_events_);
+	CL::waitForEvent(update_blocking_events_);
    update_blocking_events_.clear();
 
-   CL::check_error(err, "[ParticleSystem] Wait for events");
 
    //Make sure opengl is done with our vbos
    glFinish();
@@ -123,8 +140,10 @@ void ParticleSystem::update(double dt) {
    err = opencl->queue().enqueueAcquireGLObjects(&cl_gl_buffers_, NULL, &update_blocking_events_[0]);
    CL::check_error(err, "[ParticleSystem] acquire gl objects");
 
-   err = kernel_.setArg(5, (float)dt);
+   err = kernel_.setArg(6, dt);
    CL::check_error(err, "[ParticleSystem] set dt");
+	err = kernel_.setArg(7, (uint32_t)(time(0)%UINT_MAX));
+	CL::check_error(err, "[ParticleSystem] set dt");
 
    cl::Event e, e2;
 
@@ -142,17 +161,16 @@ void ParticleSystem::update(double dt) {
    
 }
 
-void ParticleSystem::render(double dt) {
+void ParticleSystem::render() {
    //Ensure there are no pending updates
-   cl_int err = opencl->queue().enqueueWaitForEvents(render_blocking_events_);
-   CL::check_error(err, "[ParticleSystem] wait for render blocking events to complete");
+	CL::waitForEvent(update_blocking_events_);
    render_blocking_events_.clear();
 }
 
 void ParticleSystem::limit_particles(float limit) {
    cl_int err;
    if(limit <= max_num_particles_) {
-      err = kernel_.setArg(4, limit);
+      err = kernel_.setArg(5, limit);
       CL::check_error(err, "[ParticleSystem] Set particle limit");
    } else {
       fprintf(stderr,"[ParticleSystem] Can set particle limit higher than initial limit\n");
