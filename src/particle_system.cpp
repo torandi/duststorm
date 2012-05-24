@@ -8,7 +8,7 @@
 #include "utils.hpp"
 
 
-ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_(max_num_particles) {
+ParticleSystem::ParticleSystem(const uint32_t max_num_particles) : max_num_particles_(max_num_particles) {
    program_ = opencl->create_program("cl_programs/particles.cl");
    kernel_  = opencl->load_kernel(program_, "run_particles");
 
@@ -107,6 +107,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
    config.avg_scale = 0.1f;
    config.scale_var = 0.02f;
 
+	config.max_num_particles = max_num_particles;
    update_config();
 }
 
@@ -167,7 +168,7 @@ void ParticleSystem::render() {
    render_blocking_events_.clear();
 }
 
-void ParticleSystem::limit_particles(float limit) {
+void ParticleSystem::limit_particles(uint32_t limit) {
    cl_int err;
    if(limit <= max_num_particles_) {
       err = kernel_.setArg(5, limit);

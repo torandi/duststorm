@@ -6,7 +6,7 @@
 
 class ParticleSystem {
 
-   const int max_num_particles_;
+   const uint32_t max_num_particles_;
 
    //Texture * texture_;
 
@@ -41,14 +41,14 @@ class ParticleSystem {
     * color1: start color
     * color2: end color, color will be randomized in span color1-color2
     */
-   ParticleSystem(const int max_num_particles);
+   ParticleSystem(const uint32_t max_num_particles);
    ~ParticleSystem();
 
    void update(float dt);
    void render();
 
    //Limit the spawing of particles
-   void limit_particles(float limit);
+   void limit_particles(uint32_t limit);
    void update_config();
 
    //Change values in this struct and call update_config() to update
@@ -79,7 +79,7 @@ class ParticleSystem {
       float avg_scale;
       float scale_var;
 
-      
+		uint32_t max_num_particles;      
    } config;
 };
 
