@@ -81,7 +81,16 @@ void update_particle (
 				uint id
 				)
 {
-	
+	particle->ttl -= dt;
+	if(particle->ttl > 0) {
+		float life_progression = 1.0 - (particle->ttl/particle->org_ttl);
+		particle->speed += particle->acc;
+		vertex->position.xyz = particle->direction*particle->speed + random3(config->motion_rand, true);
+		vertex->color = mix(config->birth_color, config->death_color, life_progression);
+	} else {
+		//Dead!
+		vertex->color.w = 0.0;
+	}
 }
 
 void respawn_particle (
