@@ -1,12 +1,22 @@
 #ifndef FROB_CL_H
 #define FROB_CL_H
 
+#ifdef HAVE_CONFIG_H
+	#include "config.h"
+#endif
+
 #pragma OPENCL EXTENSION CL_APPLE_gl_sharing : enable 
 #pragma OPENCL EXTENSION CL_KHR_gl_sharing : enable
 
 #include <GL/glew.h>
 
-#include <CL/cl.hpp>
+#ifdef HAVE_CL_CL_H
+	#include <CL/cl.hpp>
+#else
+	#ifdef HAVE_OPENCL_CL_H
+		#include <OpenCL/cl.hpp>
+	#endif
+#endif
 
 #include <glm/glm.hpp>
 

@@ -1,9 +1,6 @@
 #include <GL/glew.h>
 #include <GL/glx.h>
 
-#include <CL/cl_gl_ext.h>
-#include <CL/cl.hpp>
-
 #include "cl.hpp"
 
 #include <vector>
