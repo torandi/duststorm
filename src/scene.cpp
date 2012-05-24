@@ -56,10 +56,7 @@ void Scene::update_scene(float t, float dt){
 
 void Scene::render_scene(){
 	if ( !match ) return;
-
-	bind();
-	render();
-	unbind();
+	with(std::bind(&Scene::render, this));
 }
 
 float Scene::stage(float t) const {

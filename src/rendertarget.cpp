@@ -73,6 +73,12 @@ void RenderTarget::unbind(){
 	stack = nullptr;
 }
 
+void RenderTarget::with(const std::function<void()>& func){
+	bind();
+	func();
+	unbind();
+}
+
 GLuint RenderTarget::texture() const {
 	return color[1-current];
 }

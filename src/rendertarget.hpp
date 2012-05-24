@@ -4,6 +4,7 @@
 #include "color.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <functional>
 
 class RenderTarget {
 public:
@@ -14,6 +15,12 @@ public:
 
 	void bind();
 	void unbind();
+
+	/**
+	 * Call func while target is bound.
+	 * short for: bind(); func(); unbind();
+	 */
+	void with(const std::function<void()>& func);
 
 	GLuint texture() const;
 
