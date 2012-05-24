@@ -30,6 +30,7 @@ Time global_time(per_frame);
 
 static volatile bool running = true;
 static const char* program_name;
+static bool resolution_given = false;
 
 //These are all test variables that should be moved into a scene later
 static RenderObject * tv_test;
@@ -76,12 +77,10 @@ static void init(bool fullscreen){
 
 	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
 	if ( !vi ){ fprintf(stderr, "SDL_GetVideoInfo() failed\n"); abort(); }
-	resolution.x = vi->current_w;
-	resolution.y = vi->current_h;
 
-	if ( !fullscreen ){
-		resolution.x = 800;
-		resolution.y = 600;
+	if ( fullscreen && !resolution_given ){
+		resolution.x = vi->current_w;
+		resolution.y = vi->current_h;
 	}
 
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
@@ -272,6 +271,33 @@ static void magic_stuff(){
 	}
 }
 
+void show_usage(){
+	printf(PACKAGE_NAME "-" VERSION "\n"
+	       "usage: %s [OPTIONS]\n"
+	       "\n"
+	       "  -r, --resolution=SIZE   Set window resultion (default: 800x600 in windowed and\n"
+	       "                          current resolution in fullscreen.)\n"
+	       "  -f, --fullscreen        Enable fullscreen mode (default: false)\n"
+	       "  -w, --windowed          Inverse of --fullscreen.\n"
+	       "  -v, --verbose           Enable verbose output\n"
+	       "  -q, --quiet             Inverse of --verbose.\n"
+	       "  -h, --help              This text\n",
+	       program_name);
+}
+
+static int fullscreen = 0;
+static int verbose_flag = 0;
+
+static struct option options[] = {
+	{"resolution",   required_argument, 0, 'r'},
+	{"fullscreen",   no_argument,       &fullscreen, 1},
+	{"windowed",     no_argument,       &fullscreen, 0},
+	{"verbose",      no_argument,       &verbose_flag, 1},
+	{"quiet",        no_argument,       &verbose_flag, 0},
+	{"help",         no_argument,       0, 'h'},
+	{0,0,0,0} /* sentinel */
+};
+
 int main(int argc, char* argv[]){
 	/* extract program name from path. e.g. /path/to/MArCd -> MArCd */
 	const char* separator = strrchr(argv[0], '/');
@@ -281,9 +307,58 @@ int main(int argc, char* argv[]){
 		program_name = argv[0];
 	}
 
-	const bool fullscreen = argc >= 2;
+	/* parse arguments */
+	int op, option_index;
+	while ( (op = getopt_long(argc, argv, "r:fwvqh", options, &option_index)) != -1 ){
+		switch ( op ){
+		case 0:   /* long opt*/
+		case '?': /* invalid */
+			break;
+
+		case 'r': /* --resolution */
+		{
+			int w,h;
+			int n = sscanf(optarg, "%dx%d", &w, &h);
+			if ( n != 2 || w <= 0 || h <= 0 ){
+				fprintf(stderr, "%s: Malformed resolution `%s', must be WIDTHxHEIGHT. Option ignored\n", program_name, optarg);
+			} else {
+				resolution.x = w;
+				resolution.y = h;
+				resolution_given = true;
+			}
+		}
+		break;
+
+		case 'f': /* --fullscreen */
+			fullscreen = 1;
+			break;
+
+		case 'w': /* --windowed */
+			fullscreen = 0;
+			break;
+
+		case 'v': /* --verbose */
+			verbose_flag = 1;
+			break;
+
+		case 'q': /* --quiet */
+			verbose_flag = 0;
+			break;
+
+		case 'h': /* --help */
+			show_usage();
+			exit(0);
+
+		default:
+			fprintf(stderr, "%s: declared but unhandled argument '%c' (0x%02X)\n", program_name, op, op);
+			abort();
+		}
+	};
+
+	/* proper termination */
 	signal(SIGINT, handle_sigint);
 
+	/* let the magic begin */
 	init(fullscreen);
 	magic_stuff();
 	cleanup();

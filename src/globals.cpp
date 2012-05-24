@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <cstddef>
 
-glm::ivec2 resolution;
+glm::ivec2 resolution(800,600);
 glm::mat4 screen_ortho;
 Shader* shaders[NUM_SHADERS];
 CL * opencl;
