@@ -114,7 +114,7 @@ static void init(bool fullscreen){
 	lights.lights[0] = light->shader_light();
 	Shader::upload_lights(lights);
 
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	//glFrontFace(GL_CCW);
 

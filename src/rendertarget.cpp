@@ -20,8 +20,6 @@ RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha)
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, id);
 
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
