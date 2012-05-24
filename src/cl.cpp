@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <GL/glew.h>
 #include <GL/glx.h>
 
@@ -34,7 +38,7 @@ CL::CL() {
 		CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)kCGLShareGroup,
 		0
 	};
-#elif defined WIN32 
+#elif defined WIN32
 	cl_context_properties properties[] =
 	{
 		CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
@@ -131,7 +135,7 @@ cl::Kernel CL::load_kernel(const cl::Program &program, const char * kernel_name)
 	if(err != CL_SUCCESS) {
 		fprintf(stderr,"[OpenCL] Failed to create kernel %s: %s\n", kernel_name, errorString(err));
 		abort();
-	}  
+	}
 
 	return kernel;
 }
