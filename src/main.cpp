@@ -213,7 +213,7 @@ static void update(float dt){
 	rotation += dt*M_PI_4/4.f;
 	rotation = fmod(rotation, 2.f*M_PI);
 
-	glm::vec3 pos = glm::vec3((1.f+rotation)*cos(rotation), 0.f, (1.f+rotation)*sin(rotation));
+	glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
 
 	camera->set_position(pos);
 

@@ -5,9 +5,6 @@
 	#include "config.h"
 #endif
 
-#pragma OPENCL EXTENSION CL_APPLE_gl_sharing : enable 
-#pragma OPENCL EXTENSION CL_KHR_gl_sharing : enable
-
 #include <GL/glew.h>
 
 #ifdef HAVE_CL_CL_H

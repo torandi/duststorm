@@ -3,21 +3,26 @@ typedef struct {
    float ttl;
    float speed;
    float acc;
+	float org_ttl; //original time to live, stored to get a percentage
 } particle_t ;
 
+typedef struct {
+	float4 position;
+	float4 color;
+} vertex_t;
 
 typedef struct {
 
    float4 birth_color; 
    float4 death_color;
 
-   float4 motion_rand; 
+   float3 motion_rand; 
 
-   float4 spawn_direction;
-   float4 direction_var;
+   float3 spawn_direction;
+   float3 direction_var;
 
-   float4 spawn_position;
-   float4 spawn_area;
+   float3 spawn_position;
+   float3 spawn_area;
 
    float avg_ttl;
    float ttl_var;
@@ -32,28 +37,80 @@ typedef struct {
 	uint max_num_particles;
 } config_t ;
 
-float random(uint time, int id, __constant const float * rnd, uint max_num_particles) {
-	return rnd[(time+id)%max_num_particles];
-}
-
-//Set dual to true to get a number in range -m..m (otherwise 0..m)
-float random1(float m, bool dual, uint time, int id, __constant const float * rnd, uint max_num_particles) {
-	return random(time, id, rnd, max_num_particles)*m*(1+dual) - m*dual;
-}
-
-float4 random4(float4 m, bool dual, uint time, int id, __constant const float * rnd, uint max_num_particles) {
-	float4 r;
-	r.x = random1(m.x, dual, time, id, rnd, max_num_particles);
-	r.y = random1(m.y, dual, time, id, rnd, max_num_particles);
-	r.z = random1(m.z, dual, time, id, rnd, max_num_particles);
-	r.w = random1(m.w, dual, time, id, rnd, max_num_particles);
+float random(uint *time, uint id, __constant const float * rnd, uint max_num_particles) {
+	float r = rnd[(*time+id)%max_num_particles];
+	//Change time to not get same value next call:
+	*time += (uint)floor(rnd[*time%max_num_particles]*1000.0);
 	return r;
 }
 
+//Set dual to true to get a number in range -m..m (otherwise 0..m)
+float _random1(float m, bool dual, uint *time, uint id, __constant const float * rnd, uint max_num_particles) {
+	return random(time, id, rnd, max_num_particles)*m*(1+dual) - m*dual;
+}
+
+float4 _random4(float4 m, bool dual, uint *time, uint id, __constant const float * rnd, uint max_num_particles) {
+	return (float4) (
+						_random1(m.x, dual, time, id, rnd, max_num_particles),
+						_random1(m.y, dual, time, id, rnd, max_num_particles),
+						_random1(m.z, dual, time, id, rnd, max_num_particles),
+						_random1(m.w, dual, time, id, rnd, max_num_particles)
+						);
+}
+
+float3 _random3(float3 m, bool dual, uint *time, int id, __constant const float * rnd, uint max_num_particles) {
+	return (float3) (
+		_random1(m.x, dual, time, id, rnd, max_num_particles),
+		_random1(m.y, dual, time, id, rnd, max_num_particles),
+		_random1(m.z, dual, time, id, rnd, max_num_particles)
+	);
+}
+
+#define random1(m, dual) _random1((m), (dual), time, id, rnd, config->max_num_particles)
+#define random3(m, dual) _random3((m), (dual), time, id, rnd, config->max_num_particles)
+#define random4(m, dual) _random4((m), (dual), time, id, rnd, config->max_num_particles)
+
+
+void update_particle (
+				__global vertex_t * vertex, 
+				__global particle_t * particle, 
+				__constant config_t * config, 
+				__constant float * rnd,
+				float dt,
+				uint * time,
+				uint id
+				)
+{
+	
+}
+
+void respawn_particle (
+				__global vertex_t * vertex, 
+				__global particle_t * particle, 
+				__constant config_t * config, 
+				__constant float * rnd,
+				float dt,
+				uint * time,
+				uint id
+				)
+{
+	vertex->position.xyz = config->spawn_position + random3(config->spawn_area, false);
+	vertex->position.w = config->avg_scale + random1(config->scale_var, true);
+	vertex->color = config->birth_color;
+
+	particle->direction = config->spawn_direction + random3(config->direction_var, true);
+	particle->org_ttl = particle->ttl = config->avg_ttl + random1(config->ttl_var, true);
+	particle->speed = config->avg_spawn_speed + random1(config->spawn_speed_var, true);
+	particle->acc = config->avg_acc + random1(config->acc_var, true);
+
+	//Update particle
+	update_particle(vertex, particle, config, rnd, dt, time, id);
+}
+
+
 __kernel void run_particles (
-                  __global float4 * position, 
-                  __global float4 * color, 
-                  __global particle_t * particle, 
+                  __global vertex_t * vertices, 
+                  __global particle_t * particles, 
                   __constant config_t * config, 
 						__constant float * rnd,
                   uint particle_limit,
@@ -61,8 +118,14 @@ __kernel void run_particles (
 						uint time
 						)
 {
-	int id = get_global_id(0);    
-	//printf("Id: %d, random: %.5f\n", random1(10.0, false, time, id, rnd, config->max_num_particles));
-	float r = random1(10.0, false, time, id, rnd, config->max_num_particles);
+	uint id = get_global_id(0);    
+	//First check if particle is alive:
+	if(particles[id].ttl > 0) {
+		//It lives
+		update_particle(&vertices[id], &particles[id], config, rnd, dt, &time, id);
+	} else if(id < particle_limit) {
+		//Respawn!
+		respawn_particle(&vertices[id], &particles[id], config, rnd, dt, &time, id);
+	}
 }
 

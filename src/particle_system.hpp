@@ -6,13 +6,13 @@
 
 class ParticleSystem {
 
-   const uint32_t max_num_particles_;
+   const cl_uint max_num_particles_;
 
    //Texture * texture_;
 
    // Buffer 0: position buffer 1: color.
    // Both are set in the opencl-kernel
-   GLuint gl_buffers_[2]; 
+   GLuint gl_buffer_; 
    std::vector<cl::Memory> cl_gl_buffers_;
    cl::Buffer particles_, config_, random_;
 
@@ -24,7 +24,13 @@ class ParticleSystem {
       float ttl;
       float speed;
       float acc;
+		float org_ttl;
    };
+
+	struct vertex_t {
+		glm::vec4 position;
+		glm::vec4 color;
+	};
 
    std::vector<cl::Event> update_blocking_events_;
    std::vector<cl::Event> render_blocking_events_;
@@ -41,14 +47,14 @@ class ParticleSystem {
     * color1: start color
     * color2: end color, color will be randomized in span color1-color2
     */
-   ParticleSystem(const uint32_t max_num_particles);
+   ParticleSystem(const cl_uint max_num_particles);
    ~ParticleSystem();
 
    void update(float dt);
    void render();
 
    //Limit the spawing of particles
-   void limit_particles(uint32_t limit);
+   void limit_particles(cl_uint limit);
    void update_config();
 
    //Change values in this struct and call update_config() to update
@@ -79,7 +85,7 @@ class ParticleSystem {
       float avg_scale;
       float scale_var;
 
-		uint32_t max_num_particles;      
+		cl_uint max_num_particles;      
    } config;
 };
 
