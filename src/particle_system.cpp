@@ -13,12 +13,17 @@
 #include "utils.hpp"
 
 
-ParticleSystem::ParticleSystem(const cl_uint max_num_particles) : max_num_particles_(max_num_particles) {
+ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_(max_num_particles) {
 	program_ = opencl->create_program("cl_programs/particles.cl");
 	kernel_  = opencl->load_kernel(program_, "run_particles");
 
 	//Empty vec4s:
 	vertex_t * empty = new vertex_t[max_num_particles];
+
+	for(int i=0;i<max_num_particles; ++i) {
+		empty[i].position = glm::vec4(0.f,0.f,0.f,0.1f);
+		empty[i].color = glm::vec4(0.f, 0.f, 1.f, 1.f);
+	}	
 
 	//Create VBO's
 	glGenBuffers(1, &gl_buffer_);
@@ -79,8 +84,8 @@ ParticleSystem::ParticleSystem(const cl_uint max_num_particles) : max_num_partic
 
 	//Set default values in config:
 
-	config.birth_color = glm::vec4(0.f, 0.f, 1.f, 1.f);;
-	config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);;
+	config.birth_color = glm::vec4(0.f, 0.f, 1.f, 1.f);; 
+	config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);; 
 
 	config.motion_rand = glm::vec4(0.01f, 0.01f, 0.01f, 0.f);
 
@@ -97,7 +102,7 @@ ParticleSystem::ParticleSystem(const cl_uint max_num_particles) : max_num_partic
 	config.avg_spawn_speed = 0.2f;
 	config.spawn_speed_var = 0.01f;
 
-	//Acceleration
+	//Acceleration 
 	config.avg_acc = -0.01f;
 	config.acc_var = 0.005f;
 	//Scale
@@ -106,6 +111,8 @@ ParticleSystem::ParticleSystem(const cl_uint max_num_particles) : max_num_partic
 
 	config.max_num_particles = max_num_particles;
 	update_config();
+
+	opencl->queue().flush();
 }
 
 ParticleSystem::~ParticleSystem() {
@@ -121,6 +128,7 @@ void ParticleSystem::update_config() {
 	CL::check_error(err, "[ParticleSystem] Write config");
 
 	update_blocking_events_.push_back(e);
+	opencl->queue().flush();
 }
 
 void ParticleSystem::update(float dt) {
@@ -133,14 +141,14 @@ void ParticleSystem::update(float dt) {
 	//Make sure opengl is done with our vbos
 	glFinish();
 
-	update_blocking_events_[0] = cl::Event();
+	update_blocking_events_.push_back(cl::Event());
 
 	err = opencl->queue().enqueueAcquireGLObjects(&cl_gl_buffers_, NULL, &update_blocking_events_[0]);
 	CL::check_error(err, "[ParticleSystem] acquire gl objects");
 
 	err = kernel_.setArg(5, dt);
 	CL::check_error(err, "[ParticleSystem] set dt");
-	err = kernel_.setArg(6, (cl_uint)(time(0)%UINT_MAX));
+	err = kernel_.setArg(6, (int)(time(0)%UINT_MAX));
 	CL::check_error(err, "[ParticleSystem] set time");
 
 	cl::Event e, e2;
@@ -157,15 +165,47 @@ void ParticleSystem::update(float dt) {
 	update_blocking_events_.clear();
 	render_blocking_events_.push_back(e2);
 
+	opencl->queue().flush();
+
+
+	//END DEBUG
 }
 
 void ParticleSystem::render() {
+
+	Shader::upload_model_matrix(matrix());
+
 	//Ensure there are no pending updates
 	CL::waitForEvent(update_blocking_events_);
 	render_blocking_events_.clear();
+
+	glBindBuffer(GL_ARRAY_BUFFER, gl_buffer_);
+
+	/*
+	//Debug!
+
+	vertex_t * vertices = (vertex_t* )glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+	printf("---\n");
+	for(int i=0;i<max_num_particles_; ++i) {
+		printf("Vertex: (%f, %f, %f, %f), (%f, %f, %f, %f)\n", vertices[i].position.x, vertices[i].position.y, vertices[i].position.z, vertices[i].position.w, vertices[i].color.r, vertices[i].color.g, vertices[i].color.b, vertices[i].color.a);
+	}
+
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	//END debug
+	*/
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) sizeof(glm::vec4));
+
+	glPointSize(15.f);
+	//glDrawArrays(GL_POINTS, 0, max_num_particles_);
+	glDrawArrays(GL_POINTS, 0, 4);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void ParticleSystem::limit_particles(cl_uint limit) {
+void ParticleSystem::limit_particles(int limit) {
 	cl_int err;
 	if(limit <= max_num_particles_) {
 		err = kernel_.setArg(4, limit);

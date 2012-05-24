@@ -1,12 +1,14 @@
 #ifndef PARTICLE_SYSTEM_H
 #define PARTICLE_SYSTEM_H
 
+#include "movable_object.hpp"
+
 #include "cl.hpp" 
 #include <glm/glm.hpp>
 
-class ParticleSystem {
+class ParticleSystem : public MovableObject {
 
-   const cl_uint max_num_particles_;
+   const int max_num_particles_;
 
    //Texture * texture_;
 
@@ -36,25 +38,15 @@ class ParticleSystem {
    std::vector<cl::Event> render_blocking_events_;
 
    public:
-   /*
-    * Position: coordinate of the lower left corner of the spawn area
-    * spawn_area_size: Size of spawn area
-    * regeneration: new particles/second
-    * avg_ttl: averange ttl
-    * ttl_var: ttl variance
-    * shader: shader to use
-    * texture: texture to load
-    * color1: start color
-    * color2: end color, color will be randomized in span color1-color2
-    */
-   ParticleSystem(const cl_uint max_num_particles);
+
+   ParticleSystem(const int max_num_particles);
    ~ParticleSystem();
 
    void update(float dt);
    void render();
 
    //Limit the spawing of particles
-   void limit_particles(cl_uint limit);
+   void limit_particles(int limit);
    void update_config();
 
    //Change values in this struct and call update_config() to update
@@ -85,7 +77,7 @@ class ParticleSystem {
       float avg_scale;
       float scale_var;
 
-		cl_uint max_num_particles;      
+		int max_num_particles;      
    } config;
 };
 
