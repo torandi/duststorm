@@ -97,9 +97,9 @@ void RenderTarget::draw(const glm::ivec2& pos){
 void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
 	static const float vertices[][5] = { /* x,y,z,u,v */
 		{0, 0, 0, 0, 0},
-		{1, 0, 0, 1, 0},
-		{1, 1, 0, 1, 1},
 		{0, 1, 0, 0, 1},
+		{1, 1, 0, 1, 1},
+		{1, 0, 0, 1, 0},
 	};
 	static const unsigned int indices[4] = {0,1,2,3};
 
@@ -111,9 +111,7 @@ void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
 	Shader::upload_model_matrix(model);
 
 	glBindTexture(GL_TEXTURE_2D, texture());
-	glVertexAttribPointer(0, 3, GL_FLOAT,GL_FALSE, sizeof(float)*5,  &vertices[0][0]); 
-	//glVertexAttribPointer(shader->attribute_locations[Shader::ATTR_POSITION], 3, GL_FLOAT,GL_FALSE, sizeof(float)*5,  &vertices[0][0]); 
-	//glVertexPointer  (3, GL_FLOAT, sizeof(float)*5, &vertices[0][0]);
-	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[0][3]);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5,  &vertices[0][0]);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5,  &vertices[0][3]);
 	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
 }
