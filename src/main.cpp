@@ -53,7 +53,7 @@ public:
 static ParticleSystem * particles;
 static std::map<std::string, Scene*> scene;
 
-static const char* shader_programs[] = {
+static const char* shader_programs[NUM_SHADERS] = {
 	"simple",
 	"normal",
 	"particles",
