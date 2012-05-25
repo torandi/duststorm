@@ -17,6 +17,11 @@ public:
 	void unbind();
 
 	/**
+	 * Get orthographic projection for rendering on this target.
+	 */
+	const glm::mat4& ortho() const;
+
+	/**
 	 * Call func while target is bound.
 	 * short for: bind(); func(); unbind();
 	 */
@@ -42,6 +47,7 @@ public:
 	void draw(const glm::ivec2& pos, const glm::ivec2& size);
 
 	const glm::ivec2 size;
+	glm::mat4 projection;
 	GLuint id;
 	GLuint current;
 	GLuint color[2];

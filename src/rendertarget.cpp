@@ -17,6 +17,11 @@ RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer,
 
 	checkForGLErrors("RenderTarget()");
 
+	/* generate projection matrix for this target */
+	projection = glm::ortho(0.0f, (float)size.x, 0.0f, (float)size.y, -1.0f, 1.0f);
+	projection = glm::scale(projection, glm::vec3(1.0f, -1.0f, 1.0f));
+	projection = glm::translate(projection, glm::vec3(0.0f, -(float)size.y, 0.0f));
+
 	glGenFramebuffersEXT(1, &id);
 	glGenTextures(2, color);
 	glGenTextures(1, &depth);
@@ -100,6 +105,10 @@ GLuint RenderTarget::texture() const {
 
 GLuint RenderTarget::depthbuffer() const {
 	return depth;
+}
+
+const glm::mat4& RenderTarget::ortho() const {
+	return projection;
 }
 
 void RenderTarget::clear(const Color& color) const {
