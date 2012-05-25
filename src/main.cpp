@@ -202,7 +202,6 @@ static void render(){
 	shaders[SHADER_PARTICLES]->bind();
 	{
 		Shader::upload_model_matrix(glm::mat4(1.f));
-		glDisable(GL_CULL_FACE);
 		particles->render();
 		checkForGLErrors("Render particles");
 	}

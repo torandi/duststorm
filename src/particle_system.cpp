@@ -23,7 +23,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	for(int i=0;i<max_num_particles; ++i) {
 		empty[i].position = glm::vec4(0.f,0.f,0.f,0.1f);
 		empty[i].color = glm::vec4(0.f, 0.f, 1.f, 1.f);
-	}	
+	}
 
 	//Create VBO's
 	glGenBuffers(1, &gl_buffer_);
@@ -85,8 +85,8 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 
 	//Set default values in config:
 
-	config.birth_color = glm::vec4(0.f, 0.f, 1.f, 1.f);; 
-	config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);; 
+	config.birth_color = glm::vec4(0.f, 0.f, 1.f, 1.f);;
+	config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);;
 
 	config.motion_rand = glm::vec4(0.001f, 0.001f, 0.001f, 0.f);
 
@@ -103,7 +103,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	config.avg_spawn_speed = 0.1f;
 	config.spawn_speed_var = 0.05f;
 
-	//Acceleration 
+	//Acceleration
 	config.avg_acc = -0.01f;
 	config.acc_var = 0.005f;
 	//Scale
@@ -116,7 +116,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 }
 
 ParticleSystem::~ParticleSystem() {
-	glDeleteBuffers(1, &gl_buffer_); 
+	glDeleteBuffers(1, &gl_buffer_);
 }
 
 void ParticleSystem::update_config() {
@@ -184,6 +184,8 @@ void ParticleSystem::update(float dt) {
 }
 
 void ParticleSystem::render() {
+	glPushAttrib(GL_ENABLE_BIT);
+	glDisable(GL_CULL_FACE);
 
 	Shader::upload_model_matrix(matrix());
 
@@ -208,10 +210,10 @@ void ParticleSystem::render() {
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) sizeof(glm::vec4));
-
 	glDrawArrays(GL_POINTS, 0, max_num_particles_);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glPopAttrib();
 }
 
 void ParticleSystem::limit_particles(int limit) {
