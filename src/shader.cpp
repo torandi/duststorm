@@ -276,7 +276,7 @@ void Shader::bind() {
 }
 
 void Shader::unbind() {
-	for(int i=0; i<<num_attributes_; ++i) {
+	for(int i=0; i<num_attributes_; ++i) {
       glDisableVertexAttribArray(i);
       checkForGLErrors("Disable vertex attrib");
 	}
