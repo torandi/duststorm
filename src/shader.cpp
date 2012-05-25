@@ -300,19 +300,19 @@ void Shader::upload_camera_position(const Camera &camera) {
 }
 
 void Shader::upload_projection_view_matrices(
-		const glm::mat4 &projection,
-		const glm::mat4 &view
+	const glm::mat4 &projection,
+	const glm::mat4 &view
 	) {
-		glm::mat4 projection_view = projection * view;
+	glm::mat4 projection_view = projection * view;
 
-      glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_PROJECTION_VIEW_MATRICES]);
+	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_PROJECTION_VIEW_MATRICES]);
 
-      glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection_view));
-      glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
-      glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*2, sizeof(glm::mat4), glm::value_ptr(view));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection_view));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*2, sizeof(glm::mat4), glm::value_ptr(view));
 
-      glBindBuffer(GL_UNIFORM_BUFFER, 0);
-      checkForGLErrors("upload projection view matrices");
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	checkForGLErrors("upload projection view matrices");
 }
 
 void Shader::upload_model_matrix(const glm::mat4 &model) {
