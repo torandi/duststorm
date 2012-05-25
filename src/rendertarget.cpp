@@ -105,12 +105,10 @@ void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
 
 	glm::mat4 model(1.f);
 
-	model = glm::scale(model, glm::vec3(size.x, size.y, 1.0f));
 	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
+	model = glm::scale(model, glm::vec3(size.x, size.y, 1.0f));
 
-   Shader::upload_model_matrix(model);
-
-	//glEnableVertexAttribArray(0);
+	Shader::upload_model_matrix(model);
 
 	glBindTexture(GL_TEXTURE_2D, texture());
 	glVertexAttribPointer(0, 3, GL_FLOAT,GL_FALSE, sizeof(float)*5,  &vertices[0][0]); 
@@ -118,7 +116,4 @@ void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
 	//glVertexPointer  (3, GL_FLOAT, sizeof(float)*5, &vertices[0][0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[0][3]);
 	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
-
-
-	//glDisableVertexAttribArray(0);
 }
