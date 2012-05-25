@@ -42,3 +42,8 @@ layout(std140) uniform LightsData {
 	light_data lights[maxNumberOfLights];
 } Lgt;
 
+layout(std140) uniform StateData {
+	float time;
+	float width;
+	float height;
+} state;

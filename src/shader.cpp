@@ -25,14 +25,19 @@
 
 #define PP_INCLUDE "#include"
 
+struct state_data {
+	float time;
+	float width;
+	float height;
+};
+
 const char * Shader::global_uniform_names_[] = {
 	"projectionViewMatrices",
 	"modelMatrices",
 	"Camera",
-
-   "Material",
-
-	"LightsData"
+	"Material",
+	"LightsData",
+	"StateData",
 };
 
 const char * Shader::local_uniform_names_[] = {
@@ -46,10 +51,12 @@ const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
    sizeof(glm::mat4)*2,
    sizeof(glm::vec3),
    sizeof(Shader::material_t),
-   sizeof(Shader::lights_data_t)
+   sizeof(Shader::lights_data_t),
+   sizeof(struct state_data),
 };
 
 const GLenum Shader::global_uniform_usage_[] = {
+   GL_DYNAMIC_DRAW,
    GL_DYNAMIC_DRAW,
    GL_DYNAMIC_DRAW,
    GL_DYNAMIC_DRAW,
@@ -341,6 +348,19 @@ void Shader::upload_material(const Shader::material_t &material) {
 void Shader::upload_camera(const Camera &camera) {
    upload_camera_position(camera);
    upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
+}
+
+void Shader::upload_state(const glm::ivec2& size){
+	struct state_data data = {
+		global_time.get(),
+		(float)size.x,
+		(float)size.y
+	};
+
+	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_STATE]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(struct state_data), &data);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	checkForGLErrors("Shader::upload_state");
 }
 
 const GLint Shader::num_attributes() const { return num_attributes_; }

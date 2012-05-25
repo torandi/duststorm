@@ -36,6 +36,7 @@ class Shader {
       UNIFORM_MATERIAL,
 
       UNIFORM_LIGHTS,
+      UNIFORM_STATE,
       NUM_GLOBAL_UNIFORMS
    };
 
@@ -142,6 +143,9 @@ public:
     */
    static void upload_camera(const Camera &camera);
 
-
+	/**
+	 * Upload current state.
+	 */
+	static void upload_state(const glm::ivec2& size);
 };
 #endif
