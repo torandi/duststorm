@@ -34,7 +34,6 @@ static const char* program_name;
 static bool resolution_given = false;
 
 //These are all test variables that should be moved into a scene later
-static RenderObject * tv_test;
 static Camera * camera;
 static Shader::lights_data_t lights;
 static Light * light;
@@ -50,7 +49,56 @@ public:
 	}
 };
 
-static ParticleSystem * particles;
+class TVScene: public Scene {
+public:
+	TVScene(size_t width, size_t height)
+		: Scene(width, height)
+		, tv_test("models/tv.obj"){
+	}
+
+	virtual void render(){
+		clear(Color::green);
+		shaders[SHADER_NORMAL]->bind();
+		{
+			tv_test.render(shaders[SHADER_NORMAL]);
+		}
+		shaders[SHADER_NORMAL]->unbind();
+	}
+
+	virtual void update(float t, float dt){
+		tv_test.yaw(M_PI_4 * dt);
+	}
+
+private:
+	RenderObject tv_test;
+};
+
+class ParticleScene: public Scene {
+public:
+	ParticleScene(size_t width, size_t height)
+		: Scene(width, height)
+		, particles(100000){
+	}
+
+	virtual void render(){
+		clear(Color::cyan);
+		shaders[SHADER_PARTICLES]->bind();
+		{
+			Shader::upload_model_matrix(glm::mat4(1.f));
+			particles.render();
+			checkForGLErrors("Render particles");
+		}
+		shaders[SHADER_PARTICLES]->unbind();
+	}
+
+	virtual void update(float t, float dt){
+		particles.update(dt);
+	}
+
+private:
+	ParticleSystem particles;
+};
+
 static std::map<std::string, Scene*> scene;
 
 static const char* shader_programs[NUM_SHADERS] = {
@@ -60,8 +108,6 @@ static const char* shader_programs[NUM_SHADERS] = {
 	"debug",
 	"passthru",
 };
-
-static double rotation = 0.0;
 
 static void handle_sigint(int signum){
 	if ( !running ){
@@ -112,9 +158,6 @@ static void init(bool fullscreen){
 
 	load_shaders();
 
-	tv_test = new RenderObject("models/tv.obj");
-	//tv_test->roll(M_PI_4);
-
 	camera = new Camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f);
 	camera->set_position(glm::vec3(0.f, 0.f, -1.f));
 	camera->look_at(glm::vec3(0.f, 0.f, 0.f));
@@ -127,13 +170,8 @@ static void init(bool fullscreen){
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	//glFrontFace(GL_CCW);
-
-
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
-	//glDepthRange(0.0f, 1.0f);
-
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -142,13 +180,12 @@ static void init(bool fullscreen){
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
 
-	scene["test"] = (new TestScene(400, 400))->add_time(0, 10);
+	opencl = new CL();
+	scene["test"]     = (new TestScene(800, 200))->add_time(0, 60);
+	scene["particle"] = (new ParticleScene(400, 400))->add_time(0, 60);
+	scene["tv"]       = (new TVScene(400, 400))->add_time(0, 60);
 
 	checkForGLErrors("post init()");
-
-	opencl = new CL();
-
-	particles = new ParticleSystem(100000);
 }
 
 static void cleanup(){
@@ -211,26 +248,14 @@ static void render(){
 
 	glClearColor(1,0,1,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-	shaders[SHADER_NORMAL]->bind();
-	{
-		tv_test->render(shaders[SHADER_NORMAL]);
-		checkForGLErrors("model render");
-	}
-	shaders[SHADER_NORMAL]->unbind();
-
-	shaders[SHADER_PARTICLES]->bind();
-	{
-		Shader::upload_model_matrix(glm::mat4(1.f));
-		particles->render();
-		checkForGLErrors("Render particles");
-	}
-	shaders[SHADER_PARTICLES]->unbind();
+	glViewport(0, 0, resolution.x, resolution.y);
 
 	shaders[SHADER_PASSTHRU]->bind();
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
 	{
-		scene["test"]->draw(glm::ivec2(100,100));
+		scene["particle"]->draw(glm::ivec2(0,0));
+		scene["tv"]->draw(glm::ivec2(400,0));
+		scene["test"]->draw(glm::ivec2(0,400));
 	}
 	shaders[SHADER_PASSTHRU]->unbind();
 
@@ -243,8 +268,8 @@ static void update(float dt){
 	for ( std::pair<std::string,Scene*> p: scene ){
 		p.second->update_scene(t, dt);
 	}
-	tv_test->yaw(M_PI_4*dt);
 
+	static double rotation = 0.0;
 	rotation += dt*M_PI_4/4.f;
 	rotation = fmod(rotation, 2.f*M_PI);
 
@@ -252,10 +277,7 @@ static void update(float dt){
 
 	camera->set_position(pos);
 
-	particles->update(dt);
-
 	Shader::upload_camera(*camera);
-
 }
 
 static void magic_stuff(){

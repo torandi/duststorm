@@ -54,6 +54,7 @@ void RenderTarget::bind(){
 		abort();
 	}
 
+	glViewport(0, 0, size.x, size.y);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, id);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, color[current], 0);
 
@@ -96,10 +97,10 @@ void RenderTarget::draw(const glm::ivec2& pos){
 
 void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
 	static const float vertices[][5] = { /* x,y,z,u,v */
-		{0, 0, 0, 0, 0},
-		{0, 1, 0, 0, 1},
-		{1, 1, 0, 1, 1},
-		{1, 0, 0, 1, 0},
+		{0, 0, 0, 0, 1},
+		{0, 1, 0, 0, 0},
+		{1, 1, 0, 1, 0},
+		{1, 0, 0, 1, 1},
 	};
 	static const unsigned int indices[4] = {0,1,2,3};
 
