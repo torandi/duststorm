@@ -10,7 +10,7 @@
 
 RenderTarget* RenderTarget::stack = nullptr;
 
-RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer)
+RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer, GLenum filter)
 	: size(size)
 	, id(0)
 	, current(0){
@@ -30,8 +30,8 @@ RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer)
 		glTexImage2D(GL_TEXTURE_2D, 0, alpha ? GL_RGBA8 : GL_RGB8, size.x, size.y, 0, alpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 	}
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, color[current], 0);
 	checkForGLErrors("glFramebufferTexture2DEXT::color");

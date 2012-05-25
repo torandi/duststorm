@@ -10,7 +10,7 @@ class RenderTarget {
 public:
 	static RenderTarget* stack;
 
-	RenderTarget(const glm::ivec2& size, bool alpha, bool depth);
+	RenderTarget(const glm::ivec2& size, bool alpha, bool depth, GLenum filter = GL_NEAREST);
 	~RenderTarget();
 
 	void bind();
