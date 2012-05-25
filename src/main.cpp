@@ -135,7 +135,7 @@ static void init(bool fullscreen){
 
 	opencl = new CL();
 
-	particles = new ParticleSystem(2000000);
+	particles = new ParticleSystem(100000);
 }
 
 static void cleanup(){
