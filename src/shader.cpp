@@ -231,9 +231,11 @@ Shader * Shader::create_shader(std::string base_name) {
 	std::vector<GLuint> shader_list;
 
 	//Load shaders:
-	if ( file_exists(vs) ) shader_list.push_back(load_shader(GL_VERTEX_SHADER, vs));
-	if ( file_exists(gs) ) shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, gs));
-	if ( file_exists(fs) ) shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, fs));
+	shader_list.push_back(load_shader(GL_VERTEX_SHADER,   file_exists(vs) ? vs : SHADER_PATH"default.vert"));
+	shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, file_exists(fs) ? fs : SHADER_PATH"default.frag"));
+	if ( file_exists(gs) ){
+		shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, gs));
+	}
 
 	return new Shader(base_name, create_program(base_name, shader_list));
 }
