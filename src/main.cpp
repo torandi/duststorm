@@ -38,6 +38,7 @@ static Camera * camera;
 static Shader::lights_data_t lights;
 static Light * light;
 static int frames = 0;
+static RenderTarget* downsample[3];
 
 class TestScene: public Scene {
 public:
@@ -107,6 +108,8 @@ static const char* shader_programs[NUM_SHADERS] = {
 	"particles",
 	"debug",
 	"passthru",
+	"distort",
+	"blur"
 };
 
 static void handle_sigint(int signum){
@@ -178,6 +181,10 @@ static void init(bool fullscreen){
 	scene["particle"] = (new ParticleScene(400, 400))->add_time(0, 60);
 	scene["tv"]       = (new TVScene(400, 400))->add_time(0, 60);
 
+	downsample[0] = new RenderTarget(glm::ivec2(200, 200), false, false, GL_LINEAR);
+	downsample[1] = new RenderTarget(glm::ivec2(100, 100), false, false, GL_LINEAR);
+	downsample[2] = new RenderTarget(glm::ivec2( 50,  50), false, false, GL_LINEAR);
+
 	checkForGLErrors("post init()");
 }
 
@@ -241,14 +248,43 @@ static void render(){
 
 	glClearColor(1,0,1,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, resolution.x, resolution.y);
 
-	shaders[SHADER_PASSTHRU]->bind();
+	shaders[SHADER_BLUR]->bind();
+	{
+		RenderTarget* prev = scene["tv"];
+		for ( int i = 0; i < 3; i++ ){
+			Shader::upload_state(downsample[i]->size);
+			Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
+			downsample[i]->with([prev,i](){
+				prev->draw(glm::ivec2(0,0), downsample[i]->size);
+			});
+			prev = downsample[i];
+		}
+	}
+	shaders[SHADER_PASSTHRU]->unbind();
+
+	Shader::upload_state(resolution);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
+	glViewport(0, 0, resolution.x, resolution.y);
+	shaders[SHADER_PASSTHRU]->bind();
 	{
 		scene["particle"]->draw(glm::ivec2(0,0));
-		scene["tv"]->draw(glm::ivec2(400,0));
 		scene["test"]->draw(glm::ivec2(0,400));
+	}
+	shaders[SHADER_PASSTHRU]->unbind();
+
+	shaders[SHADER_DISTORT]->bind();
+	{
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, downsample[2]->texture());
+		glActiveTexture(GL_TEXTURE0);
+
+		scene["tv"]->draw(glm::ivec2(400,0));
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0);
+
 	}
 	shaders[SHADER_PASSTHRU]->unbind();
 

@@ -17,7 +17,12 @@ enum shader_t {
 	SHADER_NORMAL,
 	SHADER_PARTICLES,
 	SHADER_DEBUG,
+
+	/* for rendering targets */
 	SHADER_PASSTHRU,                       /* multiplies vertices with MVP and textures using unit 1 */
+	SHADER_DISTORT,                        /* distorts the view by offsetting UV */
+	SHADER_BLUR,                           /* gaussian blur */
+
 	NUM_SHADERS
 };
 
