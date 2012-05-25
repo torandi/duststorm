@@ -24,4 +24,9 @@ inline float frand() {
  */
 void setup_opengl();
 
+/**
+ * Test if a filename exists.
+ */
+bool file_exists(const std::string& filename);
+
 #endif

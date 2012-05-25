@@ -43,3 +43,7 @@ void setup_opengl(){
 	glDepthFunc(GL_LEQUAL);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 }
+
+bool file_exists(const std::string& filename){
+	return access(filename.c_str(), R_OK) == 0;
+}

@@ -219,21 +219,21 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 #endif
 
 	return program;
-
 }
 
 Shader * Shader::create_shader(std::string base_name) {
 	fprintf(verbose, "Compiling shader %s\n", base_name.c_str());
 
+	const std::string vs = SHADER_PATH+base_name+VERT_SHADER_EXTENTION;
+	const std::string gs = SHADER_PATH+base_name+GEOM_SHADER_EXTENTION;
+	const std::string fs = SHADER_PATH+base_name+FRAG_SHADER_EXTENTION;
+
 	std::vector<GLuint> shader_list;
+
 	//Load shaders:
-	shader_list.push_back(load_shader(GL_VERTEX_SHADER, SHADER_PATH+base_name+VERT_SHADER_EXTENTION));
-	//Check if geometry shader exists:
-	std::string geom_shader = SHADER_PATH+base_name+GEOM_SHADER_EXTENTION;
-	std::ifstream file(geom_shader.c_str());
-	if(file)
-		shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, geom_shader));
-	shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, SHADER_PATH+base_name+FRAG_SHADER_EXTENTION));
+	if ( file_exists(vs) ) shader_list.push_back(load_shader(GL_VERTEX_SHADER, vs));
+	if ( file_exists(gs) ) shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, gs));
+	if ( file_exists(fs) ) shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, fs));
 
 	return new Shader(base_name, create_program(base_name, shader_list));
 }
