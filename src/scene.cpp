@@ -21,10 +21,11 @@ Scene::~Scene(){
 
 }
 
-void Scene::add_time(float begin, float end){
+Scene* Scene::add_time(float begin, float end){
 	struct time tmp = {begin, end};
 	timetable.push_back(tmp);
 	current = timetable.begin();
+	return this;
 }
 
 void Scene::update(float t, float dt){

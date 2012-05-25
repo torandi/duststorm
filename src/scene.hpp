@@ -14,8 +14,9 @@ public:
 
 	/**
 	 * Setup timetable for the scene.
+	 * @return this to allow chaining.
 	 */
-	void add_time(float begin, float end);
+	Scene* add_time(float begin, float end);
 
 	/**
 	 * Update scene state.
