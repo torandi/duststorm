@@ -307,9 +307,10 @@ void Shader::upload_projection_view_matrices(
 
 	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_PROJECTION_VIEW_MATRICES]);
 
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection_view));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*2, sizeof(glm::mat4), glm::value_ptr(view));
+	static const size_t s = sizeof(glm::mat4);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0*s, s, glm::value_ptr(projection_view));
+	glBufferSubData(GL_UNIFORM_BUFFER, 1*s, s, glm::value_ptr(projection));
+	glBufferSubData(GL_UNIFORM_BUFFER, 2*s, s, glm::value_ptr(view));
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	checkForGLErrors("upload projection view matrices");
