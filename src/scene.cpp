@@ -5,13 +5,13 @@
 #include "scene.hpp"
 
 Scene::Scene(const glm::ivec2& size)
-	: RenderTarget(size, false)
+	: RenderTarget(size, false, true)
 	, current(timetable.end())
 	, match(false) {
 }
 
 Scene::Scene(size_t width, size_t height)
-	: RenderTarget(glm::ivec2(width, height), false)
+	: RenderTarget(glm::ivec2(width, height), false, true)
 	, current(timetable.end())
 	, match(false) {
 

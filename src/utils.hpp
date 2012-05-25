@@ -19,4 +19,9 @@ inline float frand() {
 	return (float)rand()/RAND_MAX;
 }
 
+/**
+ * Enable and disable settings.
+ */
+void setup_opengl();
+
 #endif

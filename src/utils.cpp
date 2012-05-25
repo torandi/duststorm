@@ -33,3 +33,13 @@ void print_mat4(const glm::mat4 &m) {
          m[2][0], m[2][1], m[2][2], m[2][3] ,
          m[3][0], m[3][1], m[3][2], m[3][3]);
 }
+
+void setup_opengl(){
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glCullFace(GL_BACK);
+	glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+}

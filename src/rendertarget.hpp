@@ -10,7 +10,7 @@ class RenderTarget {
 public:
 	static RenderTarget* stack;
 
-	RenderTarget(const glm::ivec2& size, bool alpha);
+	RenderTarget(const glm::ivec2& size, bool alpha, bool depth);
 	~RenderTarget();
 
 	void bind();
@@ -22,7 +22,15 @@ public:
 	 */
 	void with(const std::function<void()>& func);
 
+	/**
+	 * Get texture id of current frontbuffer.
+	 */
 	GLuint texture() const;
+
+	/**
+	 * Get texture id of depthbuffer.
+	 */
+	GLuint depthbuffer() const;
 
 	void clear(const Color& color) const;
 
@@ -37,6 +45,7 @@ public:
 	GLuint id;
 	GLuint current;
 	GLuint color[2];
+	GLuint depth;
 };
 
 #endif /* RENDER_TARGET_H */
