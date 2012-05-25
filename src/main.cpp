@@ -23,6 +23,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <unistd.h>
 #include <getopt.h>
+#include <map>
 
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
@@ -39,8 +40,18 @@ static Shader::lights_data_t lights;
 static Light * light;
 static int frames = 0;
 
+class TestScene: public Scene {
+public:
+	TestScene(const glm::ivec2& size): Scene(size){}
+	TestScene(size_t width, size_t height): Scene(width, height){}
+
+	virtual void render(){
+		clear(Color::blue);
+	}
+};
+
 static ParticleSystem * particles;
-static std::vector<Scene*> scene;
+static std::map<std::string, Scene*> scene;
 
 static const char* shader_programs[] = {
 	"simple",
@@ -130,6 +141,8 @@ static void init(bool fullscreen){
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -600.0f, 0.0f));
 
+	scene["test"] = (new TestScene(400, 400))->add_time(0, 10);
+
 	checkForGLErrors("post init()");
 
 	opencl = new CL();
@@ -138,8 +151,8 @@ static void init(bool fullscreen){
 }
 
 static void cleanup(){
-	for ( Scene* s : scene ){
-		delete s;
+	for ( std::pair<std::string,Scene*> p : scene ){
+		delete p.second;
 	}
 }
 
@@ -191,8 +204,8 @@ static void poll(){
 static void render(){
 	checkForGLErrors("Frame begin");
 
-	for ( Scene* s: scene ){
-		s->render_scene();
+	for ( std::pair<std::string,Scene*> p: scene ){
+		p.second->render_scene();
 	}
 
 	glClearColor(1,0,1,1);
@@ -213,14 +226,16 @@ static void render(){
 	}
 	shaders[SHADER_PARTICLES]->unbind();
 
+	scene["test"]->draw();
+
 	SDL_GL_SwapBuffers();
 	checkForGLErrors("Frame end");
 }
 
 static void update(float dt){
 	float t = global_time.get();
-	for ( Scene* s: scene ){
-		s->update_scene(t, dt);
+	for ( std::pair<std::string,Scene*> p: scene ){
+		p.second->update_scene(t, dt);
 	}
 	tv_test->yaw(M_PI_4*dt);
 
