@@ -19,7 +19,7 @@
 #define MAX_NUM_LIGHTS 4
 
 class Shader {
-	public: 
+	public:
 
 	static Shader * create_shader(std::string base_name);
 
@@ -84,7 +84,7 @@ class Shader {
 
 	static GLuint load_shader(GLenum eShaderType, const std::string &strFilename);
 	static GLuint create_program(const std::string &shader_name, const std::vector<GLuint> &shaderList);
-	
+
 	static void load_file(const std::string &filename, std::stringstream &shaderData, std::string included_from);
 	static std::string parse_shader(const std::string &filename, std::set<std::string> included_files=std::set<std::string>(), std::string included_from="");
 

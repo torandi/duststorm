@@ -28,7 +28,6 @@
 const char * Shader::global_uniform_names_[] = {
 	"projectionViewMatrices",
 	"modelMatrices",
-
 	"Camera",
 
    "Material",
@@ -37,7 +36,6 @@ const char * Shader::global_uniform_names_[] = {
 };
 
 const char * Shader::local_uniform_names_[] = {
-
    "texture1",
    "texture2"
 };

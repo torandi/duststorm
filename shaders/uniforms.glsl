@@ -22,11 +22,11 @@ layout(std140) uniform Camera {
 
 
 layout(std140) uniform Material {
-	float shininess; 
-	vec4 diffuse; 
-	vec4 specular; 
-	vec4 ambient; 
-	vec4 emission; 
+	float shininess;
+	vec4 diffuse;
+	vec4 specular;
+	vec4 ambient;
+	vec4 emission;
 } Mtl;
 
 struct light_data {
