@@ -57,7 +57,8 @@ static const char* shader_programs[NUM_SHADERS] = {
 	"simple",
 	"normal",
 	"particles",
-	"debug"
+	"debug",
+	"passthru",
 };
 
 static double rotation = 0.0;
@@ -226,7 +227,12 @@ static void render(){
 	}
 	shaders[SHADER_PARTICLES]->unbind();
 
-	scene["test"]->draw();
+	shaders[SHADER_PASSTHRU]->bind();
+	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
+	{
+		scene["test"]->draw(glm::ivec2(100,100));
+	}
+	shaders[SHADER_PASSTHRU]->unbind();
 
 	SDL_GL_SwapBuffers();
 	checkForGLErrors("Frame end");

@@ -17,6 +17,7 @@ enum shader_t {
 	SHADER_NORMAL,
 	SHADER_PARTICLES,
 	SHADER_DEBUG,
+	SHADER_PASSTHRU,                       /* multiplies vertices with MVP and textures using unit 1 */
 	NUM_SHADERS
 };
 
