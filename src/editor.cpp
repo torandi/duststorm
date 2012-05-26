@@ -124,8 +124,14 @@ int main (int argc, char* argv[]){
 
 	verbose = fopen("/dev/null", "w");
 
+	GError* error = nullptr;
 	GtkBuilder* builder = gtk_builder_new();
-	gtk_builder_add_from_file (builder, "editor.xml", NULL);
+	if ( !gtk_builder_add_from_file (builder, "editor.xml", &error) ){
+		g_print( "Error occured while loading UI file!\n" );
+		g_print( "Message: %s\n", error->message );
+		g_free(error);
+		exit(1);
+	}
 
 	GtkWidget* window  = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
 	drawing            = GTK_WIDGET(gtk_builder_get_object(builder, "drawingarea"));
