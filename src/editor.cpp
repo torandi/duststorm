@@ -145,9 +145,6 @@ int main (int argc, char* argv[]){
 	GdkGLConfig* config = gdk_gl_config_new(attrib);
 	gtk_widget_set_gl_capability(drawing, config, NULL, TRUE, GDK_GL_RGBA_TYPE);
 
-	gtk_builder_connect_signals (builder, NULL);
-	g_object_unref(G_OBJECT(builder));
-
 	// ctrl+q shortcut
 	guint key;
 	GdkModifierType mods;
@@ -173,6 +170,8 @@ int main (int argc, char* argv[]){
 		setitimer(ITIMER_REAL, &difftime, NULL);
 	}
 
+	gtk_builder_connect_signals (builder, NULL);
+	g_object_unref(G_OBJECT(builder));
 
   gtk_widget_show(window);
 	gtk_main();
