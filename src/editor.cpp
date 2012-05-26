@@ -5,27 +5,88 @@
 #include <gdk/gdkgl.h>
 #include <gtk/gtkgl.h>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include "color.hpp"
+#include "engine.hpp"
+#include "globals.hpp"
+#include "rendertarget.hpp"
+#include "time.hpp"
+
+static const unsigned int framerate = 60;
+static const uint64_t per_frame = 1000000 / framerate;
+Time global_time(per_frame);
+
+static bool initialized = false;
+static float aspect = 16.0f / 9.0f;
+static glm::mat4 projection;
+static GtkWidget* drawing = nullptr;
+static RenderTarget* frame = nullptr;
+
+extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data){
+	if ( !gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget)) ) return;
+
+	int w,h;
+	const gchar* label = gtk_menu_item_get_label(GTK_MENU_ITEM(widget));
+	sscanf(label, "%d:%d", &w, &h);
+	aspect = (float)w / (float)h;
+
+	gtk_widget_queue_resize(drawing);
+}
 
 extern "C" G_MODULE_EXPORT gboolean drawingarea_draw_cb(GtkWidget* widget, gpointer data){
+	if ( !initialized ) return FALSE;
 	if (!gtk_widget_begin_gl (widget)) return FALSE;
 
+	frame->bind();
+	shaders[SHADER_NORMAL]->bind();
+	frame->clear(Color::magenta);
+	shaders[SHADER_NORMAL]->unbind();
+	frame->unbind();
+
+	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+
+	const glm::ivec2 center = (resolution-frame->size) / 2;
+	Shader::upload_state(resolution);
+	Shader::upload_projection_view_matrices(projection, glm::mat4());
+	glViewport(0, 0, resolution.x, resolution.y);
+	shaders[SHADER_PASSTHRU]->bind();
+	frame->draw(center);
+	shaders[SHADER_PASSTHRU]->unbind();
 
 	gtk_widget_end_gl(widget, TRUE);
 	return TRUE;
 }
 
 extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* widget, gpointer data){
-  if (!gtk_widget_begin_gl (widget)) return FALSE;
+	if ( !initialized ) return FALSE;
+  if ( !gtk_widget_begin_gl (widget) ) return FALSE;
 
   GtkAllocation allocation;
   gtk_widget_get_allocation (widget, &allocation);
 
-  glViewport (0, 0, allocation.width, allocation.height);
-  glMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
-  glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
+  resolution.x = allocation.width;
+  resolution.y = allocation.height;
+
+	projection = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
+	projection = glm::scale(projection, glm::vec3(1.0f, -1.0f, 1.0f));
+	projection = glm::translate(projection, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
+
+
+  /* fit frame into current resolution while preserving aspect */
+  const float a = (float)resolution.x / (float)resolution.y;
+  glm::ivec2 size = resolution;
+  if ( a < aspect ){
+	  size.y = resolution.x / aspect;
+  } else {
+	  size.x = resolution.y * aspect;
+  }
+
+	delete frame;
+	frame = new RenderTarget(size, false, true, GL_NEAREST);
 
   gtk_widget_end_gl (widget, FALSE);
   return TRUE;
@@ -40,11 +101,12 @@ extern "C" G_MODULE_EXPORT void drawingarea_realize_cb(GtkWidget* widget, gpoint
 		exit(1);
 	}
 
-  glEnable(GL_TEXTURE_2D);
-  glEnable(GL_BLEND);
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	Engine::setup_opengl();
+	Engine::load_shaders();
 
-  gtk_widget_end_gl (widget, FALSE);
+  gtk_widget_end_gl(widget, FALSE);
+  gtk_widget_queue_resize(widget);
+  initialized = true;
 }
 
 int main (int argc, char* argv[]){
@@ -52,11 +114,13 @@ int main (int argc, char* argv[]){
 	gdk_gl_init(&argc, &argv);
 	gtk_gl_init(&argc, &argv);
 
+	verbose = fopen("/dev/null", "w");
+
 	GtkBuilder* builder = gtk_builder_new();
 	gtk_builder_add_from_file (builder, "editor.xml", NULL);
 
 	GtkWidget* window  = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
-	GtkWidget* drawing = GTK_WIDGET(gtk_builder_get_object(builder, "drawingarea"));
+	drawing            = GTK_WIDGET(gtk_builder_get_object(builder, "drawingarea"));
 
 	/* enable opengl on drawingarea */
 	int attrib[] = {
