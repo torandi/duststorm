@@ -3,6 +3,11 @@
 #endif
 
 #include "scene.hpp"
+#include <map>
+
+typedef std::map<std::string, Scene::factory_callback> FactoryMap;
+typedef std::pair<std::string, Scene::factory_callback> FactoryPair;
+static FactoryMap* factory_map = nullptr;
 
 Scene::Scene(const glm::ivec2& size)
 	: RenderTarget(size, false, true)
@@ -81,4 +86,25 @@ float Scene::stage(float t) const {
 
 bool Scene::is_active() const {
 	return match;
+}
+
+void Scene::register_factory(const std::string& name, factory_callback func){
+	if ( !factory_map ){
+		factory_map = new FactoryMap;
+	}
+
+	factory_map->insert(FactoryPair(name, func));
+}
+
+Scene* Scene::create(const std::string& name, const glm::ivec2& size){
+	if ( !factory_map ){
+		fprintf(stderr, "Warning: No scenes has been registred\n");
+		return nullptr;
+	}
+
+	auto it = factory_map->find(name);
+	if ( it == factory_map->end() ){
+		return nullptr;
+	}
+	return it->second(size);
 }

@@ -4,6 +4,7 @@
 #include "rendertarget.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <string>
 #include <vector>
 
 class Scene: public RenderTarget {
@@ -11,6 +12,14 @@ public:
 	Scene(const glm::ivec2& size);
 	Scene(size_t width, size_t height);
 	virtual ~Scene();
+
+	/**
+	 * Allocate a new scene by typename.
+	 * Name must match a previously registered type.
+	 * @see REGISTER_SCENE_TYPE
+	 * @return nullptr if no matching scene could be found.
+	 */
+	static Scene* create(const std::string& name, const glm::ivec2& size);
 
 	/**
 	 * Setup timetable for the scene.
@@ -44,6 +53,9 @@ public:
 
 	bool is_active() const;
 
+	typedef Scene*(*factory_callback)(const glm::ivec2& size);
+	static void register_factory(const std::string& name, factory_callback func);
+
 protected:
 	float stage(float t) const;
 
@@ -57,5 +69,12 @@ private:
 	std::vector<time>::iterator current;
 	bool match;
 };
+
+/**
+ * Register a new scene-type which can be allocated using name.
+ */
+#define REGISTER_SCENE_TYPE(cls, name)	         \
+	class SI__##cls { public: SI__##cls(){ Scene::register_factory(name, cls::factory); } }; \
+	static SI__##cls si
 
 #endif /* SCENE_H */

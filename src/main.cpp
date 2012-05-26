@@ -51,30 +51,6 @@ public:
 	}
 };
 
-class TVScene: public Scene {
-public:
-	TVScene(size_t width, size_t height)
-		: Scene(width, height)
-		, tv_test("models/tv.obj"){
-	}
-
-	virtual void render(){
-		clear(Color::green);
-		shaders[SHADER_NORMAL]->bind();
-		{
-			tv_test.render(shaders[SHADER_NORMAL]);
-		}
-		shaders[SHADER_NORMAL]->unbind();
-	}
-
-	virtual void update(float t, float dt){
-		tv_test.yaw(M_PI_4 * dt);
-	}
-
-private:
-	RenderObject tv_test;
-};
-
 class ParticleScene: public Scene {
 public:
 	ParticleScene(size_t width, size_t height)
@@ -163,7 +139,7 @@ static void init(bool fullscreen){
 	opencl = new CL();
 	scene["test"]     = (new TestScene(800, 200))->add_time(0, 60);
 	scene["particle"] = (new ParticleScene(400, 400))->add_time(0, 60);
-	scene["tv"]       = (new TVScene(400, 400))->add_time(0, 60);
+	scene["tv"]       = Scene::create("TV", glm::ivec2(400,400))->add_time(0, 60);
 
 	downsample[0] = new RenderTarget(glm::ivec2(200, 200), false, false, GL_LINEAR);
 	downsample[1] = new RenderTarget(glm::ivec2(100, 100), false, false, GL_LINEAR);

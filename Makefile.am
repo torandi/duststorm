@@ -22,7 +22,8 @@ demo_SOURCES = \
 	src/shader.cpp src/shader.hpp \
 	src/time.cpp src/time.hpp \
 	src/utils.cpp src/utils.hpp \
-	src/quad.cpp src/quad.hpp
+	src/quad.cpp src/quad.hpp \
+	src/scene/tv.cpp
 
 if HAVE_SUBDIR
 distclean-local:
