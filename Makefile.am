@@ -4,6 +4,10 @@ AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLA
 noinst_LIBRARIES = libfrob.a
 bin_PROGRAMS = demo
 
+if BUILD_EDITOR
+bin_PROGRAMS += editor
+endif
+
 libfrob_a_SOURCES = \
 	src/bindable.hpp \
 	src/camera.cpp src/camera.hpp \
@@ -41,6 +45,11 @@ endif
 
 demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image
 demo_SOURCES = src/main.cpp
+
+editor_CXXFLAGS = $$(pkg-config gtk+-3.0 gtkglext-3.0 --cflags)
+editor_LDFLAGS = $$(pkg-config gtk+-3.0 gtkglext-3.0 --libs) -Wl,--export-dynamic
+editor_LDADD = libfrob.a
+editor_SOURCES = src/editor.cpp
 
 .PHONY: .autoload.tmp
 BUILT_SOURCES = .autoload.tmp autoload.h autoload.cpp

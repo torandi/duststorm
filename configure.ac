@@ -26,8 +26,10 @@ AC_ARG_ENABLE([input], [AS_HELP_STRING([--enable-input], [Enable mouse- and keyb
 AS_IF([test "x$enable_input" = "xyes"],
 	[AC_DEFINE([ENABLE_INPUT],  [1], [Define to 1 to enable input])],
 )
-
 AM_CONDITIONAL(INPUT_ENABLED, test "x$enable_input" = "xyes")
+
+AC_ARG_ENABLE([editor], [AS_HELP_STRING([--enable-editor], [Build editor. @<:@default=disabled@:>@])])
+AM_CONDITIONAL([BUILD_EDITOR], [test "x$enable_editor" = "xyes"])
 
 AC_DEFINE_UNQUOTED([PATH_BASE],    ["${srcdir}/"],             [Base path])
 AC_DEFINE_UNQUOTED([PATH_MODELS],  ["${srcdir}/models/"],      [Path to models])
