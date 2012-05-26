@@ -63,10 +63,13 @@ int main (int argc, char* argv[]){
 	g_object_unref(G_OBJECT(builder));
 
 	// ctrl+q shortcut
-	//GtkAccelGroup* accel_group = gtk_accel_group_new();
-	//gtk_accel_map_add_entry("<editor>/quit", gtk_accelerator_parse("q")[0], gtk.gdk.CONTROL_MASK);
-	//gtk_accel_group_connect_by_path(accel_group, "<editor>/quit", gtk_main_quit);
-	//gtk_window_add_accel_group(window, accel_group);
+	guint key;
+	GdkModifierType mods;
+	GtkAccelGroup* accel_group = gtk_accel_group_new();
+	gtk_accelerator_parse("<Ctrl>q", &key, &mods);
+	gtk_accel_map_add_entry("<editor>/quit", key, mods);
+	gtk_accel_group_connect_by_path(accel_group, "<editor>/quit", g_cclosure_new(gtk_main_quit, NULL, NULL));
+	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
 	gtk_widget_show(window);
 	gtk_main();
