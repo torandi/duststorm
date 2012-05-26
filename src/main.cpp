@@ -2,6 +2,7 @@
 	#include "config.h"
 #endif
 
+#include "engine.hpp"
 #include "globals.hpp"
 #include "render_object.hpp"
 #include "rendertarget.hpp"
@@ -102,16 +103,6 @@ private:
 
 static std::map<std::string, Scene*> scene;
 
-static const char* shader_programs[NUM_SHADERS] = {
-	"simple",
-	"normal",
-	"particles",
-	"debug",
-	"passthru",
-	"distort",
-	"blur"
-};
-
 static void handle_sigint(int signum){
 	if ( !running ){
 		fprintf(stderr, "\rgot SIGINT again, aborting\n");
@@ -125,13 +116,6 @@ static void handle_sigint(int signum){
 static void show_fps(int signum){
 	fprintf(stderr, "FPS: %d\n", frames);
 	frames = 0;
-}
-
-static void load_shaders() {
-	Shader::initialize();
-	for(int i=0; i < NUM_SHADERS; ++i) {
-		shaders[i] = Shader::create_shader(shader_programs[i]);
-	}
 }
 
 static void init(bool fullscreen){
@@ -151,7 +135,6 @@ static void init(bool fullscreen){
 	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
 	SDL_EnableKeyRepeat(0, 0);
 	SDL_WM_SetCaption("Speed 100%", NULL);
-	setup_opengl();
 
 	int ret;
 	if ( (ret=glewInit()) != GLEW_OK ){
@@ -159,7 +142,8 @@ static void init(bool fullscreen){
 		exit(1);
 	}
 
-	load_shaders();
+	Engine::setup_opengl();
+	Engine::load_shaders();
 
 	camera = new Camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f);
 	camera->set_position(glm::vec3(0.f, 0.f, -1.f));

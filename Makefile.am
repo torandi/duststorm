@@ -10,6 +10,7 @@ demo_SOURCES = \
 	src/camera.cpp src/camera.hpp \
 	src/cl.cpp src/cl.hpp \
 	src/color.cpp src/color.hpp \
+	src/engine.cpp src/engine.hpp \
 	src/globals.cpp src/globals.hpp \
 	src/light.cpp src/light.hpp \
 	src/mesh.cpp src/mesh.hpp \

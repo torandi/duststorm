@@ -3,6 +3,7 @@
 #endif
 
 #include "rendertarget.hpp"
+#include "engine.hpp"
 #include "utils.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -27,7 +28,7 @@ RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer,
 	glGenTextures(1, &depth);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, id);
-	setup_opengl();
+	Engine::setup_opengl();
 
 	/* bind color buffers */
 	for ( int i = 0; i < 2; i++ ){

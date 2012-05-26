@@ -20,11 +20,6 @@ inline float frand() {
 }
 
 /**
- * Enable and disable settings.
- */
-void setup_opengl();
-
-/**
  * Test if a filename exists.
  */
 bool file_exists(const std::string& filename);
