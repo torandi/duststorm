@@ -16,6 +16,7 @@
 
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
+static int frames = 0;
 Time global_time(per_frame);
 
 static bool initialized = false;
@@ -23,6 +24,11 @@ static float aspect = 16.0f / 9.0f;
 static glm::mat4 projection;
 static GtkWidget* drawing = nullptr;
 static RenderTarget* frame = nullptr;
+
+static void show_fps(int signum){
+	fprintf(stderr, "FPS: %d\n", frames);
+	frames = 0;
+}
 
 extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data){
 	if ( !gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget)) ) return;
@@ -38,6 +44,8 @@ extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data)
 extern "C" G_MODULE_EXPORT gboolean drawingarea_draw_cb(GtkWidget* widget, gpointer data){
 	if ( !initialized ) return FALSE;
 	if (!gtk_widget_begin_gl (widget)) return FALSE;
+
+	frames++;
 
 	frame->bind();
 	shaders[SHADER_NORMAL]->bind();
@@ -143,7 +151,24 @@ int main (int argc, char* argv[]){
 	gtk_accel_group_connect_by_path(accel_group, "<editor>/quit", g_cclosure_new(gtk_main_quit, NULL, NULL));
 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
-	gtk_widget_show(window);
+	g_timeout_add(per_frame/1000, [](gpointer data) -> gboolean {
+		gtk_widget_queue_draw(drawing);
+		return TRUE;
+	}, NULL);
+
+	/* setup FPS alarm handler */
+	{
+		struct itimerval difftime;
+		difftime.it_interval.tv_sec = 1;
+		difftime.it_interval.tv_usec = 0;
+		difftime.it_value.tv_sec = 1;
+		difftime.it_value.tv_usec = 0;
+		signal(SIGALRM, show_fps);
+		setitimer(ITIMER_REAL, &difftime, NULL);
+	}
+
+
+  gtk_widget_show(window);
 	gtk_main();
 
 	return 0;
