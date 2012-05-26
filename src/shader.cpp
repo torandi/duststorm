@@ -346,13 +346,13 @@ void Shader::upload_projection_view_matrices(
 }
 
 void Shader::upload_model_matrix(const glm::mat4 &model) {
-   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_MODEL_MATRICES]);
+	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_MODEL_MATRICES]);
 
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::transpose(glm::inverse(model))));
 
-   glBindBuffer(GL_UNIFORM_BUFFER, 0);
-   checkForGLErrors("upload model matrices");
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	checkForGLErrors("upload model matrices");
 }
 
 void Shader::upload_material(const Shader::material_t &material) {
