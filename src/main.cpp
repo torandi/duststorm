@@ -118,6 +118,7 @@ static void init(bool fullscreen){
 		exit(1);
 	}
 
+	Engine::autoload_scenes();
 	Engine::setup_opengl();
 	Engine::load_shaders();
 

@@ -12,6 +12,11 @@ namespace Engine {
 	 * Load all shaders.
 	 */
 	void load_shaders();
+
+	/**
+	 * Register all scene types.
+	 */
+	void autoload_scenes();
 };
 
 #endif /* ENGINE_H */

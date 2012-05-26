@@ -23,9 +23,33 @@ demo_SOURCES = \
 	src/time.cpp src/time.hpp \
 	src/utils.cpp src/utils.hpp \
 	src/quad.cpp src/quad.hpp \
-	src/scene/tv.cpp
+	src/scene/tv.cpp \
+	autoload.cpp autoload.h
 
 if HAVE_SUBDIR
 distclean-local:
 	rm -f shaders models cl_programs
 endif
+
+.PHONY: .autoload.tmp
+BUILT_SOURCES = .autoload.tmp autoload.h autoload.cpp
+CLEANFILES = .autoload.tmp autoload.lst autoload.cpp autoload.h stamp-autoload
+
+.autoload.tmp: Makefile
+	@grep "^[[:blank:]]*REGISTER_SCENE_TYPE" -r ${top_srcdir}/src/scene/*.cpp | sed 's/.*(\(.*\),[ ]*\"\(.*\)\").*/_register_\1:\2/g' > .autoload.tmp
+	@cmp -s autoload.lst .autoload.tmp || touch stamp-autoload
+
+autoload.lst: stamp-autoload
+	$(AM_V_GEN)cp .autoload.tmp autoload.lst
+
+autoload.h: autoload.lst Makefile
+	$(AM_V_GEN)sed 's/\(.*\):\(.*\)/void \1();/' autoload.lst > autoload.h
+
+autoload.cpp: autoload.lst Makefile
+	@echo '#include "autoload.h"' > autoload.cpp
+	@echo '#include "globals.hpp"' >> autoload.cpp
+	@echo '#include <cstdio>' >> autoload.cpp
+	@echo 'namespace Engine { void autoload_scenes(){' >> autoload.cpp
+	@echo ' 	fprintf(verbose, "Autoloading scenes.\n");' >> autoload.cpp
+	$(AM_V_GEN)sed 's/\(.*\):\(.*\)/	fprintf(verbose, "  %s -> %s\\n", \"\2\", \"\1\"); \1();/' autoload.lst >> autoload.cpp
+	@echo "}}" >> autoload.cpp

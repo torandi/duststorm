@@ -73,8 +73,6 @@ private:
 /**
  * Register a new scene-type which can be allocated using name.
  */
-#define REGISTER_SCENE_TYPE(cls, name)	         \
-	class SI__##cls { public: SI__##cls(){ Scene::register_factory(name, cls::factory); } }; \
-	static SI__##cls si
+#define REGISTER_SCENE_TYPE(cls, name) void _register_##cls () { Scene::register_factory(name, cls::factory); }
 
 #endif /* SCENE_H */
