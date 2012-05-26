@@ -154,6 +154,16 @@ int main (int argc, char* argv[]){
 	gtk_accel_group_connect_by_path(accel_group, "<editor>/quit", g_cclosure_new(gtk_main_quit, NULL, NULL));
 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
+	/* setup scene-list */
+	GtkTreeIter toplevel, child;
+	GtkTreeStore* scenestore = GTK_TREE_STORE(gtk_builder_get_object(builder, "scenestore"));
+	gtk_tree_store_append(scenestore, &toplevel, NULL);
+	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Scenes</b>", -1);
+	gtk_tree_store_append(scenestore, &child, &toplevel);
+	gtk_tree_store_set(scenestore, &child, 0, "Python", -1);
+	gtk_tree_store_append(scenestore, &toplevel, NULL);
+	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Compositions</b>", -1);
+
 	g_timeout_add(per_frame/1000, [](gpointer data) -> gboolean {
 		gtk_widget_queue_draw(drawing);
 		return TRUE;
