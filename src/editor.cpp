@@ -1,3 +1,5 @@
+#include <cstdio>
+#include <cstdlib>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkgl.h>
@@ -31,6 +33,12 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
 
 extern "C" G_MODULE_EXPORT void drawingarea_realize_cb(GtkWidget* widget, gpointer data){
   if (!gtk_widget_begin_gl (widget)) return;
+
+	int ret;
+	if ( (ret=glewInit()) != GLEW_OK ){
+		fprintf(stderr, "Failed to initialize GLEW: %s\n", glewGetErrorString(ret));
+		exit(1);
+	}
 
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_BLEND);
