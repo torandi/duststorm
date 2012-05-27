@@ -177,6 +177,8 @@ extern "C" G_MODULE_EXPORT void drawingarea_realize_cb(GtkWidget* widget, gpoint
 
 	Engine::setup_opengl();
 	Engine::load_shaders();
+	delete opencl;
+	opencl = new CL();
 
   gtk_widget_end_gl(widget, FALSE);
   gtk_widget_queue_resize(widget);
