@@ -10,9 +10,9 @@ Time::Time(int delta)
 	: current({0,0})
 	, prev(0.0f)
 	, delta(delta)
-	, scale(100)
+	, scale(0)
 	, steps(0)
-	, paused(false) {
+	, paused(true) {
 
 }
 
@@ -53,7 +53,7 @@ void Time::toggle_pause(){
 
 void Time::set_paused(bool state){
 	paused = state;
-	scale = paused ? 100 : 0;
+	scale = paused ? 0 : 100;
 }
 
 float Time::get() const {

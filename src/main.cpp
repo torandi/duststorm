@@ -155,6 +155,7 @@ static void init(bool fullscreen){
 	downsample[1] = new RenderTarget(glm::ivec2(100, 100), false, false, GL_LINEAR);
 	downsample[2] = new RenderTarget(glm::ivec2( 50,  50), false, false, GL_LINEAR);
 
+	global_time.set_paused(false); /* start time */
 	checkForGLErrors("post init()");
 }
 
