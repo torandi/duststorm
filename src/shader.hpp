@@ -14,34 +14,32 @@
 #define MAX_NUM_LIGHTS 4
 
 class Shader {
-	public:
+public:
 
 	static Shader * create_shader(std::string base_name);
 
-   //Must be called before first call to create_shader
-   static void initialize();
+	//Must be called before first call to create_shader
+	static void initialize();
 
-   enum global_uniforms_t {
+	enum global_uniforms_t {
+		UNIFORM_PROJECTION_VIEW_MATRICES=0,
+		UNIFORM_MODEL_MATRICES,
 
-      UNIFORM_PROJECTION_VIEW_MATRICES=0,
-      UNIFORM_MODEL_MATRICES,
+		UNIFORM_CAMERA,
 
-      UNIFORM_CAMERA,
+		UNIFORM_MATERIAL,
 
-      UNIFORM_MATERIAL,
-
-      UNIFORM_LIGHTS,
-      UNIFORM_STATE,
-      NUM_GLOBAL_UNIFORMS
-   };
+		UNIFORM_LIGHTS,
+		UNIFORM_STATE,
+		NUM_GLOBAL_UNIFORMS
+	};
 
 	enum local_uniforms_t {
-
 		UNIFORM_TEXTURE1=0,
 		UNIFORM_TEXTURE2,
 
 		NUM_LOCAL_UNIFORMS
-  };
+	};
 
 	enum attribute_t {
 		ATTR_POSITION=0,
@@ -54,29 +52,29 @@ class Shader {
 
 	struct material_t {
 		float shininess;
-      float padding[3];
+		float padding[3];
 		glm::vec4 specular;
 		glm::vec4 diffuse;
 		glm::vec4 ambient;
 		glm::vec4 emission;
 	};
 
-   struct lights_data_t {
-      int num_lights;
-      float padding[3];
-      glm::vec3 ambient_intensity;
-      float padding_2;
-      Light::shader_light_t lights[MAX_NUM_LIGHTS];
-   };
+	struct lights_data_t {
+		int num_lights;
+		float padding[3];
+		glm::vec3 ambient_intensity;
+		float padding_2;
+		Light::shader_light_t lights[MAX_NUM_LIGHTS];
+	};
 
-	private:
+private:
 
-   Shader(const std::string &name_, GLuint program);
+	Shader(const std::string &name_, GLuint program);
 
 	static const char *global_uniform_names_[];
-   static const char *local_uniform_names_[];
-   static const GLsizeiptr global_uniform_buffer_sizes_[];
-   static const GLenum global_uniform_usage_[];
+	static const char *local_uniform_names_[];
+	static const GLsizeiptr global_uniform_buffer_sizes_[];
+	static const GLenum global_uniform_usage_[];
 
 	static GLuint load_shader(GLenum eShaderType, const std::string &strFilename);
 	static GLuint create_program(const std::string &shader_name, const std::vector<GLuint> &shaderList);
@@ -85,14 +83,14 @@ class Shader {
 	static std::string parse_shader(const std::string &filename, std::set<std::string> included_files=std::set<std::string>(), std::string included_from="");
 
 	GLint local_uniform_locations_[NUM_LOCAL_UNIFORMS];
-   GLint global_uniform_block_index_[NUM_GLOBAL_UNIFORMS];
-   static GLuint global_uniform_buffers_[NUM_GLOBAL_UNIFORMS];
+	GLint global_uniform_block_index_[NUM_GLOBAL_UNIFORMS];
+	static GLuint global_uniform_buffers_[NUM_GLOBAL_UNIFORMS];
 
 	void init_uniforms();
 
-   const GLuint program_;
+	const GLuint program_;
 
-   GLint num_attributes_;
+	GLint num_attributes_;
 
 public:
 
@@ -103,40 +101,40 @@ public:
 	void bind();
 	void unbind();
 
-   const GLint num_attributes() const;
+	const GLint num_attributes() const;
 
-   /**
-    * Upload lights
-    */
+	/**
+	 * Upload lights
+	 */
 	static void upload_lights(const lights_data_t &lights);
 
-   /*
-    * Uploads the camera position
-    */
+	/*
+	 * Uploads the camera position
+	 */
 	static void upload_camera_position(const Camera &camera);
 
-   /**
-    * Upload the material
-    */
-   static void upload_material(const material_t &material);
+	/**
+	 * Upload the material
+	 */
+	static void upload_material(const material_t &material);
 
-   /**
-    * Upload projection and view matrices
-    */
+	/**
+	 * Upload projection and view matrices
+	 */
 	static void upload_projection_view_matrices(
-			const glm::mat4 &projection,
-			const glm::mat4 &view
+		const glm::mat4 &projection,
+		const glm::mat4 &view
 		);
 
-   /**
-    * Uploads the model and normal matrix
-    */
+	/**
+	 * Uploads the model and normal matrix
+	 */
 	static void upload_model_matrix( const glm::mat4 &model);
 
-   /**
-    * Uploads camera position, and projection and view matrix
-    */
-   static void upload_camera(const Camera &camera);
+	/**
+	 * Uploads camera position, and projection and view matrix
+	 */
+	static void upload_camera(const Camera &camera);
 
 	/**
 	 * Upload current state.
