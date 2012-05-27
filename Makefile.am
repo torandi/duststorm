@@ -21,6 +21,7 @@ demo_SOURCES = \
 	src/scene.cpp src/scene.hpp \
 	src/shader.cpp src/shader.hpp \
 	src/time.cpp src/time.hpp \
+	src/timetable.cpp src/timetable.hpp \
 	src/utils.cpp src/utils.hpp \
 	src/quad.cpp src/quad.hpp \
 	src/scene/test.cpp \
