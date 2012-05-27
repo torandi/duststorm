@@ -25,13 +25,14 @@ static float aspect = 16.0f / 9.0f;
 static glm::mat4 projection;
 static GtkWidget* drawing = nullptr;
 static RenderTarget* frame = nullptr;
+static Scene* scene = nullptr;
 
 static void show_fps(int signum){
 	fprintf(stderr, "FPS: %d\n", frames);
 	frames = 0;
 }
 
-extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn *column, gpointer user_data){
+extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column, gpointer user_data){
 	gint depth;
 	gint* tree = gtk_tree_path_get_indices_with_depth(path, &depth);
 
@@ -46,7 +47,21 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 
 	const gint section = tree[0];
 	const gint component = tree[1];
-	printf("selection changed to %d - %d\n", section, component);
+	GtkTreeIter iter;
+	GtkTreeModel* model = gtk_tree_view_get_model(tree_view);
+	if ( !gtk_tree_model_get_iter(model, &iter, path) ){
+		return;
+	}
+
+	gchar* name;
+	gtk_tree_model_get(model, &iter, 0, &name, -1);
+
+	if ( section == 0 ){ /* scene */
+		delete scene;
+		scene = Scene::create(std::string(name), frame->size);
+	}
+
+	g_free(name);
 }
 
 extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data){
