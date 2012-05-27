@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include "shader.hpp"
+#include <functional>
 
 /**
  * Get the current in-engine time.
@@ -23,5 +24,12 @@ inline float frand() {
  * Test if a filename exists.
  */
 bool file_exists(const std::string& filename);
+
+/**
+ * Parse timetable.
+ * Calls func for each valid line.
+ * @return 0 if successful and errno on errors.
+ */
+int timetable_parse(const std::string& filename, std::function<void(const std::string&, float, float)> func);
 
 #endif

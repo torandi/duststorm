@@ -138,9 +138,18 @@ static void init(bool fullscreen){
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
 
 	opencl = new CL();
-	scene["test"]     = (new TestScene(800, 200))->add_time(0, 60);
-	scene["particle"] = (new ParticleScene(400, 400))->add_time(0, 60);
-	scene["TV"]       = Scene::create("TV", glm::ivec2(400,400))->add_time(0, 60);
+
+	/* Instantiate all scenes */
+	scene["test"]     = new TestScene(800, 200);
+	scene["particle"] = new ParticleScene(400, 400);
+	scene["TV"]       = Scene::create("TV", glm::ivec2(400,400));
+
+	/* Setup timetable */
+	const char* tablename = PATH_SRC "timetable.txt";
+	auto func = [](const std::string& name, float begin, float end){ scene[name]->add_time(begin, end); };
+	if ( (ret=timetable_parse(tablename, func)) != 0 ){
+		fprintf(stderr, "%s: failed to read `%s': %s\n", program_name, tablename, strerror(ret));
+	}
 
 	downsample[0] = new RenderTarget(glm::ivec2(200, 200), false, false, GL_LINEAR);
 	downsample[1] = new RenderTarget(glm::ivec2(100, 100), false, false, GL_LINEAR);
