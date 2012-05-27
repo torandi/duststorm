@@ -26,11 +26,6 @@ demo_SOURCES = \
 	src/scene/tv.cpp \
 	autoload.cpp autoload.h
 
-if HAVE_SUBDIR
-distclean-local:
-	rm -f shaders models cl_programs
-endif
-
 .PHONY: .autoload.tmp
 BUILT_SOURCES = .autoload.tmp autoload.h autoload.cpp
 CLEANFILES = .autoload.tmp autoload.lst autoload.cpp autoload.h stamp-autoload

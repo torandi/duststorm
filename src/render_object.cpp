@@ -35,7 +35,9 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	, name(model)
 	, scale(1.0f) {
 
-	scene = aiImportFile(model.c_str(),
+	const std::string real_path = PATH_MODELS + model;
+
+	scene = aiImportFile(real_path.c_str(),
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph  |
@@ -46,7 +48,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 		);
 
 	if ( !scene ) {
-		printf("Failed to load model %s\n", model.c_str());
+		printf("Failed to load model %s\n", real_path.c_str());
 		return;
 	}
 
@@ -54,7 +56,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	        "  Meshes: %d\n"
 	        "  Textures: %d\n"
 	        "  Materials: %d\n",
-	        model.c_str(), scene->mNumMeshes, scene->mNumTextures, scene->mNumMaterials);
+	        real_path.c_str(), scene->mNumMeshes, scene->mNumTextures, scene->mNumMaterials);
 
 	//Get bounds:
 	aiVector3D s_min, s_max;

@@ -30,9 +30,4 @@ AC_DEFINE_UNQUOTED([PATH_SRC],     ["${srcdir}/src/"],         [Path to sources]
 AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${srcdir}/shaders/"],     [Path to shaders])
 AC_DEFINE_UNQUOTED([PATH_OPENCL],  ["${srcdir}/cl_programs/"], [Path to OpenCL programs])
 
-AS_IF([test x"${srcdir}" != x"."], [
-	test -e models      || ln -s "${srcdir}"/models  models
-])
-AM_CONDITIONAL([HAVE_SUBDIR], [test x"${srcdir}" != x"."])
-
 AC_OUTPUT

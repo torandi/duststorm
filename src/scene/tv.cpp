@@ -11,7 +11,7 @@ class TVScene: public Scene {
 public:
 	TVScene(const glm::ivec2& size)
 		: Scene(size)
-		, tv_test("models/tv.obj"){
+		, tv_test("tv.obj"){
 	}
 
 	static Scene* factory(const glm::ivec2& size){
