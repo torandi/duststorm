@@ -24,6 +24,7 @@ static bool initialized = false;
 static float aspect = 16.0f / 9.0f;
 static glm::mat4 projection;
 static GtkWidget* drawing = nullptr;
+static GtkLabel* timelabel = nullptr;
 static RenderTarget* frame = nullptr;
 static Scene* scene = nullptr;
 
@@ -59,6 +60,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 	if ( section == 0 ){ /* scene */
 		delete scene;
 		scene = Scene::create(std::string(name), frame->size);
+		global_time.reset();
 	}
 
 	g_free(name);
@@ -151,6 +153,14 @@ extern "C" G_MODULE_EXPORT void drawingarea_realize_cb(GtkWidget* widget, gpoint
   initialized = true;
 }
 
+void update(){
+	global_time.update();
+
+	char buf[64];
+	sprintf(buf, "%02.3f\n", global_time.get());
+	gtk_label_set_text(timelabel, buf);
+}
+
 int main (int argc, char* argv[]){
 	gtk_init (&argc, &argv);
 	gdk_gl_init(&argc, &argv);
@@ -171,6 +181,7 @@ int main (int argc, char* argv[]){
 
 	GtkWidget* window  = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
 	drawing            = GTK_WIDGET(gtk_builder_get_object(builder, "drawingarea"));
+	timelabel          = GTK_LABEL(gtk_builder_get_object(builder, "timelabel"));
 
 	/* enable opengl on drawingarea */
 	int attrib[] = {
@@ -205,6 +216,7 @@ int main (int argc, char* argv[]){
 	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Compositions</b>", -1);
 
 	g_timeout_add(per_frame/1000, [](gpointer data) -> gboolean {
+		update();
 		gtk_widget_queue_draw(drawing);
 		return TRUE;
 	}, NULL);

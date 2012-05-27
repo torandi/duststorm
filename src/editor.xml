@@ -318,7 +318,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="label1">
+                      <object class="GtkLabel" id="timelabel">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="margin_top">5</property>
