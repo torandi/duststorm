@@ -3,6 +3,7 @@
 #endif
 
 #include "time.hpp"
+#include <cstdlib>
 
 #define USDIVIDER 1000000
 
@@ -91,10 +92,16 @@ void Time::move(long int usec){
 			current.tv_sec++;
 		}
 	} else { /* backward */
-		while ( usec > current.tv_usec ){
+		usec = abs(usec);
+
+		while ( usec > current.tv_usec && current.tv_sec > 0 ){
 			current.tv_usec += USDIVIDER;
 			current.tv_sec--;
 		}
-		current.tv_usec += usec;
+		if ( usec > current.tv_usec ){
+			current.tv_usec = 0;
+			set_paused(true);
+		}
+		current.tv_usec -= usec;
 	}
 }
