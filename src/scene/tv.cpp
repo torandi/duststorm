@@ -34,7 +34,7 @@ public:
 	}
 
 	virtual void update(float t, float dt){
-		tv_test.yaw(M_PI_4 * dt);
+		tv_test.set_rotation(glm::vec3(0.0f,1.0f,0.0f), M_PI_4 * t);
 
 		const double rotation = fmod(t * 0.7f, 2.f*M_PI);
 		const glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
