@@ -1,46 +1,45 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-	#include "movable_object.hpp"
-	#include <glm/glm.hpp>
 
-	class Camera : private MovableObject {
-		float fov_, roll_;
-		const float aspect_, near_, far_;
+#include "movable_object.hpp"
+#include <glm/glm.hpp>
 
-      glm::vec3 look_at_;
+class Camera : private MovableObject {
+public:
+	Camera(float fov, float aspect, float near, float far);
+	virtual ~Camera() {};
 
-		glm::mat4 projection_matrix_;
+	const glm::vec3 look_at() const;
+	void look_at(const glm::vec3 &look_t);
 
-      void recalculate();
+	const glm::mat4 view_matrix() const;
+	const glm::mat4 projection_matrix() const;
 
-	public:
-		Camera(float fov, float aspect, float near, float far);
-		virtual ~Camera() {};
+	const float fov() const;
+	const float aspect() const;
+	const float near() const;
+	const float far() const;
+	const float roll() const;
 
-		const glm::vec3 look_at() const;
-		void look_at(const glm::vec3 &look_t);
+	void set_fov(float fov);
 
-		const glm::mat4 view_matrix() const;
-		const glm::mat4 projection_matrix() const;
+	virtual void roll(const float angle);
+	void set_roll(const float angle);
 
-		const float fov() const;
-		const float aspect() const;
-		const float near() const;
-		const float far() const;
-      const float roll() const;
+	virtual void relative_move(const glm::vec3 &move);
 
-		void set_fov(float fov);
+	virtual void set_position(const glm::vec3 &pos);
 
-      virtual void roll(const float angle);
-      void set_roll(const float angle);
+	virtual const glm::vec3 &position() const;
 
-      virtual void relative_move(const glm::vec3 &move);
+private:
+	void recalculate();
 
-      virtual void set_position(const glm::vec3 &pos);
+	float fov_, roll_;
+	const float aspect_, near_, far_;
 
-      virtual const glm::vec3 &position() const;
-
-
-	};
+	glm::vec3 look_at_;
+	glm::mat4 projection_matrix_;
+};
 
 #endif
