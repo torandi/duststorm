@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkImage" id="gtk-media-forward">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-media-forward</property>
+  </object>
   <object class="GtkImage" id="gtk-media-next">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -15,11 +20,6 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-media-rewind</property>
-  </object>
-  <object class="GtkImage" id="gtk-media-forward">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-media-forward</property>
   </object>
   <object class="GtkListStore" id="liststore2">
     <columns>
@@ -215,7 +215,7 @@
                     <property name="layout_style">center</property>
                     <child>
                       <object class="GtkButton" id="button1">
-                        <property name="label" translatable="yes">Rewind</property>
+                        <property name="label" translatable="yes">Previous</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -279,7 +279,7 @@
                     </child>
                     <child>
                       <object class="GtkButton" id="button6">
-                        <property name="label" translatable="yes">End</property>
+                        <property name="label" translatable="yes">Next</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -370,6 +370,7 @@
                     <property name="model">scenestore</property>
                     <property name="headers_visible">False</property>
                     <property name="headers_clickable">False</property>
+                    <signal name="row-activated" handler="scenelist_row_activated_cb" swapped="no"/>
                     <child internal-child="selection">
                       <object class="GtkTreeSelection" id="treeview-selection"/>
                     </child>

@@ -31,6 +31,24 @@ static void show_fps(int signum){
 	frames = 0;
 }
 
+extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn *column, gpointer user_data){
+	gint depth;
+	gint* tree = gtk_tree_path_get_indices_with_depth(path, &depth);
+
+	if ( depth == 1 ){ /* section selected */
+		if ( gtk_tree_view_row_expanded(tree_view, path) ){
+			gtk_tree_view_collapse_row(tree_view, path);
+		} else {
+			gtk_tree_view_expand_row(tree_view, path, FALSE);
+		}
+		return;
+	}
+
+	const gint section = tree[0];
+	const gint component = tree[1];
+	printf("selection changed to %d - %d\n", section, component);
+}
+
 extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data){
 	if ( !gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget)) ) return;
 
