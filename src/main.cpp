@@ -140,7 +140,7 @@ static void init(bool fullscreen){
 	opencl = new CL();
 	scene["test"]     = (new TestScene(800, 200))->add_time(0, 60);
 	scene["particle"] = (new ParticleScene(400, 400))->add_time(0, 60);
-	scene["tv"]       = Scene::create("TV", glm::ivec2(400,400))->add_time(0, 60);
+	scene["TV"]       = Scene::create("TV", glm::ivec2(400,400))->add_time(0, 60);
 
 	downsample[0] = new RenderTarget(glm::ivec2(200, 200), false, false, GL_LINEAR);
 	downsample[1] = new RenderTarget(glm::ivec2(100, 100), false, false, GL_LINEAR);
@@ -212,7 +212,7 @@ static void render(){
 
 	shaders[SHADER_BLUR]->bind();
 	{
-		RenderTarget* prev = scene["tv"];
+		RenderTarget* prev = scene["TV"];
 		for ( int i = 0; i < 3; i++ ){
 			Shader::upload_state(downsample[i]->size);
 			Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
@@ -240,7 +240,7 @@ static void render(){
 		glBindTexture(GL_TEXTURE_2D, downsample[2]->texture());
 		glActiveTexture(GL_TEXTURE0);
 
-		scene["tv"]->draw(glm::ivec2(400,0));
+		scene["TV"]->draw(glm::ivec2(400,0));
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
