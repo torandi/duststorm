@@ -11,6 +11,16 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-media-next</property>
   </object>
+  <object class="GtkImage" id="gtk-media-pause">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-media-pause</property>
+  </object>
+  <object class="GtkImage" id="gtk-media-play">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-media-play</property>
+  </object>
   <object class="GtkImage" id="gtk-media-previous">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -246,14 +256,14 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkToggleButton" id="togglebutton1">
-                        <property name="label">gtk-media-play</property>
+                      <object class="GtkToggleButton" id="play">
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="use_action_appearance">False</property>
-                        <property name="use_stock">True</property>
+                        <property name="image">gtk-media-play</property>
+                        <signal name="toggled" handler="play_toggled_cb" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
