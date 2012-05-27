@@ -62,6 +62,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 	if ( section == 0 ){ /* scene */
 		delete scene;
 		scene = Scene::create(std::string(name), frame->size);
+		scene->add_time(0,60);
 		global_time.reset();
 	}
 
@@ -85,15 +86,20 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_draw_cb(GtkWidget* widget, gpoin
 
 	frames++;
 
+	if ( scene ) scene->render_scene();
+
 	frame->bind();
-	shaders[SHADER_NORMAL]->bind();
+	shaders[SHADER_PASSTHRU]->bind();
 	frame->clear(Color::magenta);
-	shaders[SHADER_NORMAL]->unbind();
+	if ( scene ){
+		Shader::upload_projection_view_matrices(frame->ortho(), glm::mat4());
+		scene->draw();
+	}
+	shaders[SHADER_PASSTHRU]->unbind();
 	frame->unbind();
 
 	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
 
 	const glm::ivec2 center = (resolution-frame->size) / 2;
 	Shader::upload_state(resolution);
@@ -189,6 +195,10 @@ extern "C" G_MODULE_EXPORT void play_toggled_cb(GtkWidget* widget, gpointer data
 
 void update(){
 	global_time.update();
+
+	if ( scene ){
+		scene->update_scene(global_time.get(), global_time.dt());
+	}
 
 	char buf[64];
 	sprintf(buf, "%02.3f\n%d%%", global_time.get(), global_time.current_scale());
