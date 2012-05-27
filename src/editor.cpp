@@ -68,28 +68,28 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 			gtk_tree_view_expand_row(tree_view, path, FALSE);
 		}
 		return;
+	} else if ( depth == 2 ){ /* subsection selected */
+		const gint section = tree[0];
+		const gint component = tree[1];
+		GtkTreeIter iter;
+		GtkTreeModel* model = gtk_tree_view_get_model(tree_view);
+		if ( !gtk_tree_model_get_iter(model, &iter, path) ){
+			return;
+		}
+
+		gchar* name;
+		gtk_tree_model_get(model, &iter, 0, &name, -1);
+
+		if ( section == 0 ){ /* scene */
+			delete scene;
+			scene_name = name;
+			scene = Scene::create(std::string(name), frame->size);
+			scene->add_time(0,60);
+			global_time.reset();
+		}
+
+		g_free(name);
 	}
-
-	const gint section = tree[0];
-	const gint component = tree[1];
-	GtkTreeIter iter;
-	GtkTreeModel* model = gtk_tree_view_get_model(tree_view);
-	if ( !gtk_tree_model_get_iter(model, &iter, path) ){
-		return;
-	}
-
-	gchar* name;
-	gtk_tree_model_get(model, &iter, 0, &name, -1);
-
-	if ( section == 0 ){ /* scene */
-		delete scene;
-		scene_name = name;
-		scene = Scene::create(std::string(name), frame->size);
-		scene->add_time(0,60);
-		global_time.reset();
-	}
-
-	g_free(name);
 }
 
 extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data){
