@@ -36,7 +36,7 @@ public:
 	}
 
 	virtual void update(float t, float dt){
-		tv_test.set_rotation(glm::vec3(0.0f,1.0f,0.0f), M_PI_4 * t);
+		//tv_test.set_rotation(glm::vec3(0.0f,1.0f,0.0f), M_PI_4 * t);
 		camera.set_position(v.at(t));
 	}
 
