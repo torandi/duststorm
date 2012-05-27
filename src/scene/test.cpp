@@ -14,15 +14,6 @@ public:
 
 	}
 
-	static Scene* factory(const glm::ivec2& size){
-		return new TestScene(size);
-	}
-
-	static Metadata* metadata(){
-		Metadata* _ = new Metadata;
-		return _;
-	}
-
 	virtual void render(){
 		clear(Color::blue);
 	}

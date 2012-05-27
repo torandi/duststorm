@@ -20,18 +20,6 @@ public:
 		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
 	}
 
-	static Scene* factory(const glm::ivec2& size){
-		return new TVScene(size);
-	}
-
-	static Metadata* metadata(){
-		Metadata* _ = new Metadata;
-		Metadata& m = *_;
-		m["Camera 1"] = "camera:tv_cam1.txt";
-		m["TV model"] = "model:tv.obj";
-		return _;
-	}
-
 	virtual void render(){
 		clear(Color::green);
 
@@ -44,7 +32,6 @@ public:
 	}
 
 	virtual void update(float t, float dt){
-		//tv_test.set_rotation(glm::vec3(0.0f,1.0f,0.0f), M_PI_4 * t);
 		camera.set_position(v.at(t));
 	}
 
@@ -53,5 +40,14 @@ private:
 	Camera camera;
 	PointTable v;
 };
+
+template <>
+Scene::Metadata* SceneTraits<TVScene>::metadata(){
+	Scene::Metadata* _ = new Scene::Metadata;
+	Scene::Metadata& m = *_;
+	m["Camera 1"] = "camera:tv_cam1.txt";
+	m["TV model"] = "model:tv.obj";
+	return _;
+}
 
 REGISTER_SCENE_TYPE(TVScene, "TV");

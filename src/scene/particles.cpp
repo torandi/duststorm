@@ -25,15 +25,6 @@ public:
 			particles.update_config();
 	}
 
-	static Scene* factory(const glm::ivec2& size) {
-		return new ParticlesScene(size);
-	}
-
-	static Metadata* metadata(){
-		Metadata* _ = new Metadata;
-		return _;
-	}
-
 	virtual void render(){
 		clear(Color::black);
 		Shader::upload_camera(camera);

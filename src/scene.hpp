@@ -80,9 +80,25 @@ private:
 	bool match;
 };
 
+template <class T>
+class SceneTraits {
+public:
+
+	static Scene* factory(const glm::ivec2& size){
+		return new T(size);
+	}
+
+	static Scene::Metadata* metadata(){
+		return new Scene::Metadata;
+	}
+};
+
 /**
  * Register a new scene-type which can be allocated using name.
  */
-#define REGISTER_SCENE_TYPE(cls, name) void _register_##cls () { Scene::register_factory(name, cls::factory, cls::metadata()); }
+#define REGISTER_SCENE_TYPE(cls, name) \
+	void _register_##cls () { \
+		Scene::register_factory(name, SceneTraits<cls>::factory, SceneTraits<cls>::metadata()); \
+	}
 
 #endif /* SCENE_H */
