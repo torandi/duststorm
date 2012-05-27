@@ -54,10 +54,17 @@ public:
 
 	bool is_active() const;
 
+	typedef std::map<std::string, std::string> Metadata;
 	typedef Scene*(*factory_callback)(const glm::ivec2& size);
-	static void register_factory(const std::string& name, factory_callback func);
-	static std::map<std::string, factory_callback>::const_iterator factory_begin();
-	static std::map<std::string, factory_callback>::const_iterator factory_end();
+
+	struct SceneInfo {
+		Metadata* meta;
+		factory_callback func;
+	};
+
+	static void register_factory(const std::string& name, factory_callback func, Metadata* meta);
+	static std::map<std::string, SceneInfo>::const_iterator factory_begin();
+	static std::map<std::string, SceneInfo>::const_iterator factory_end();
 
 protected:
 	float stage(float t) const;
@@ -76,6 +83,6 @@ private:
 /**
  * Register a new scene-type which can be allocated using name.
  */
-#define REGISTER_SCENE_TYPE(cls, name) void _register_##cls () { Scene::register_factory(name, cls::factory); }
+#define REGISTER_SCENE_TYPE(cls, name) void _register_##cls () { Scene::register_factory(name, cls::factory, cls::metadata()); }
 
 #endif /* SCENE_H */

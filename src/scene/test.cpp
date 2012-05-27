@@ -18,6 +18,11 @@ public:
 		return new TestScene(size);
 	}
 
+	static Metadata* metadata(){
+		Metadata* _ = new Metadata;
+		return _;
+	}
+
 	virtual void render(){
 		clear(Color::blue);
 	}

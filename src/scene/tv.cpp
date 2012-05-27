@@ -24,6 +24,14 @@ public:
 		return new TVScene(size);
 	}
 
+	static Metadata* metadata(){
+		Metadata* _ = new Metadata;
+		Metadata& m = *_;
+		m["Camera 1"] = "camera:tv_cam1.txt";
+		m["TV model"] = "model:tv.obj";
+		return _;
+	}
+
 	virtual void render(){
 		clear(Color::green);
 
