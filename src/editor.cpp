@@ -28,6 +28,7 @@ static GtkWidget* drawing = nullptr;
 static GtkLabel* timelabel = nullptr;
 static GtkToggleButton* playbutton = nullptr;
 static RenderTarget* frame = nullptr;
+static std::string scene_name;
 static Scene* scene = nullptr;
 static float slide_ref;
 
@@ -82,6 +83,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 
 	if ( section == 0 ){ /* scene */
 		delete scene;
+		scene_name = name;
 		scene = Scene::create(std::string(name), frame->size);
 		scene->add_time(0,60);
 		global_time.reset();
@@ -153,6 +155,12 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
 
 	delete frame;
 	frame = new RenderTarget(size, false, true, GL_NEAREST);
+
+	if ( scene ){
+		delete scene;
+		scene = Scene::create(std::string(scene_name), frame->size);
+		scene->add_time(0,60);
+	}
 
   gtk_widget_end_gl (widget, FALSE);
   return TRUE;
