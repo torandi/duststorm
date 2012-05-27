@@ -12,9 +12,8 @@
 #include "globals.hpp"
 #include "utils.hpp"
 
-
 ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_(max_num_particles) {
-	program_ = opencl->create_program("cl_programs/particles.cl");
+	program_ = opencl->create_program(PATH_OPENCL "particles.cl");
 	kernel_  = opencl->load_kernel(program_, "run_particles");
 
 	//Empty vec4s:
