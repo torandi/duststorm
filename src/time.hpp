@@ -44,6 +44,17 @@ public:
 	float get() const;
 
 	/**
+	 * Set current time in number of steps.
+	 */
+	void set(unsigned long steps);
+
+	/**
+	 * Reset time to beginning.
+	 * Same as set(0)
+	 */
+	void reset();
+
+	/**
 	 * Get current time as timeval.
 	 */
 	const struct timeval& timeval() const;

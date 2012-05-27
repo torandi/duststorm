@@ -55,6 +55,20 @@ float Time::get() const {
 	return (float)current.tv_sec + (float)current.tv_usec / USDIVIDER;
 }
 
+void Time::set(unsigned long steps){
+	current.tv_sec = 0;
+	current.tv_usec = 0;
+
+	/* must move in steps so the jump does not overflow */
+	while ( steps --> 0 ){
+		move(delta);
+	}
+}
+
+void Time::reset(){
+	set(0);
+}
+
 const struct timeval& Time::timeval() const {
 	return current;
 }
