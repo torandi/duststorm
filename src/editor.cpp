@@ -35,6 +35,26 @@ static void show_fps(int signum){
 	frames = 0;
 }
 
+static void render_placeholder(){
+	frame->bind();
+	shaders[SHADER_PASSTHRU]->bind();
+	frame->clear(Color::magenta);
+	shaders[SHADER_PASSTHRU]->unbind();
+	frame->unbind();
+}
+
+static void render_scene(){
+	scene->render_scene();
+
+	frame->bind();
+	shaders[SHADER_PASSTHRU]->bind();
+	frame->clear(Color::magenta);
+	Shader::upload_projection_view_matrices(frame->ortho(), glm::mat4());
+	scene->draw();
+	shaders[SHADER_PASSTHRU]->unbind();
+	frame->unbind();
+}
+
 extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column, gpointer user_data){
 	gint depth;
 	gint* tree = gtk_tree_path_get_indices_with_depth(path, &depth);
@@ -86,17 +106,11 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_draw_cb(GtkWidget* widget, gpoin
 
 	frames++;
 
-	if ( scene ) scene->render_scene();
-
-	frame->bind();
-	shaders[SHADER_PASSTHRU]->bind();
-	frame->clear(Color::magenta);
 	if ( scene ){
-		Shader::upload_projection_view_matrices(frame->ortho(), glm::mat4());
-		scene->draw();
+		render_scene();
+	} else {
+		render_placeholder();
 	}
-	shaders[SHADER_PASSTHRU]->unbind();
-	frame->unbind();
 
 	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -126,7 +140,6 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
 	projection = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
 	projection = glm::scale(projection, glm::vec3(1.0f, -1.0f, 1.0f));
 	projection = glm::translate(projection, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
-
 
   /* fit frame into current resolution while preserving aspect */
   const float a = (float)resolution.x / (float)resolution.y;
