@@ -291,14 +291,23 @@ int main (int argc, char* argv[]){
 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
 	/* setup scene-list */
-	GtkTreeIter toplevel, child;
+	GtkTreeIter toplevel;
 	GtkTreeStore* scenestore = GTK_TREE_STORE(gtk_builder_get_object(builder, "scenestore"));
 	gtk_tree_store_append(scenestore, &toplevel, NULL);
 	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Scenes</b>", -1);
 
 	for ( auto it = Scene::factory_begin(); it != Scene::factory_end(); ++it ){
+		GtkTreeIter child;
 		gtk_tree_store_append(scenestore, &child, &toplevel);
 		gtk_tree_store_set(scenestore, &child, 0, it->first.c_str(), -1);
+
+		Scene::Metadata* meta = it->second.meta;
+		for ( std::pair<std::string, std::string> p: *meta ){
+			const std::string& key   = p.first;
+			GtkTreeIter cur;
+			gtk_tree_store_append(scenestore, &cur, &child);
+			gtk_tree_store_set(scenestore, &cur, 0, key.c_str(), -1);
+		}
 	}
 
 	gtk_tree_store_append(scenestore, &toplevel, NULL);
