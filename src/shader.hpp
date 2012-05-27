@@ -10,10 +10,6 @@
 #include <vector>
 #include <set>
 
-#define VERT_SHADER_EXTENTION ".vert"
-#define FRAG_SHADER_EXTENTION ".frag"
-#define GEOM_SHADER_EXTENTION ".geom"
-
 //Muste be same as in uniforms.glsl
 #define MAX_NUM_LIGHTS 4
 

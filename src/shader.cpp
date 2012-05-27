@@ -24,6 +24,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #define PP_INCLUDE "#include"
+#define VERT_SHADER_EXTENTION ".vert"
+#define FRAG_SHADER_EXTENTION ".frag"
+#define GEOM_SHADER_EXTENTION ".geom"
 
 struct state_data {
 	float time;
