@@ -42,16 +42,6 @@ static int frames = 0;
 static RenderTarget* downsample[3];
 static glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
-class TestScene: public Scene {
-public:
-	TestScene(const glm::ivec2& size): Scene(size){}
-	TestScene(size_t width, size_t height): Scene(width, height){}
-
-	virtual void render(){
-		clear(Color::blue);
-	}
-};
-
 class ParticleScene: public Scene {
 public:
 	ParticleScene(size_t width, size_t height)
@@ -140,13 +130,20 @@ static void init(bool fullscreen){
 	opencl = new CL();
 
 	/* Instantiate all scenes */
-	scene["test"]     = new TestScene(800, 200);
+	scene["Test"]     = Scene::create("Test", glm::ivec2(800,200));
 	scene["particle"] = new ParticleScene(400, 400);
 	scene["TV"]       = Scene::create("TV", glm::ivec2(400,400));
 
 	/* Setup timetable */
 	const char* tablename = PATH_SRC "timetable.txt";
-	auto func = [](const std::string& name, float begin, float end){ scene[name]->add_time(begin, end); };
+	auto func = [](const std::string& name, float begin, float end){
+		auto it = scene.find(name);
+		if ( it != scene.end() ){
+			it->second->add_time(begin, end);
+		} else {
+			fprintf(stderr, "Timetable entry for missing scene `%s', ignored.\n", name.c_str());
+		}
+	};
 	if ( (ret=timetable_parse(tablename, func)) != 0 ){
 		fprintf(stderr, "%s: failed to read `%s': %s\n", program_name, tablename, strerror(ret));
 	}
@@ -240,7 +237,7 @@ static void render(){
 	shaders[SHADER_PASSTHRU]->bind();
 	{
 		scene["particle"]->draw(glm::ivec2(0,0));
-		scene["test"]->draw(glm::ivec2(0,400));
+		scene["Test"]->draw(glm::ivec2(0,400));
 	}
 	shaders[SHADER_PASSTHRU]->unbind();
 

@@ -23,6 +23,7 @@ demo_SOURCES = \
 	src/time.cpp src/time.hpp \
 	src/utils.cpp src/utils.hpp \
 	src/quad.cpp src/quad.hpp \
+	src/scene/test.cpp \
 	src/scene/tv.cpp \
 	autoload.cpp autoload.h
 
