@@ -39,6 +39,11 @@ public:
 	void toggle_pause();
 
 	/**
+	 * Set paused.
+	 */
+	void set_paused(bool state);
+
+	/**
 	 * Get current time as seconds in floating-point.
 	 */
 	float get() const;

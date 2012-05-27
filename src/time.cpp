@@ -51,6 +51,11 @@ void Time::toggle_pause(){
 	paused = !paused;
 }
 
+void Time::set_paused(bool state){
+	paused = state;
+	scale = paused ? 100 : 0;
+}
+
 float Time::get() const {
 	return (float)current.tv_sec + (float)current.tv_usec / USDIVIDER;
 }
