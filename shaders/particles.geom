@@ -4,15 +4,18 @@
 layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
 
-in vec4 in_color[];
-in float scale[];
+in ParticleData {
+	vec4 color;
+	float scale;
+} particleData[];
 
 out vec4 color;
 out vec2 tex_coord;
 
 void main() {
-	float d = scale[0]*0.1;
-	color = in_color[0];
+	float d = particleData[0].scale*0.1;
+	color = particleData[0].color;;
+	//color = vec4(1, 1, 1, 1);
 
 	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(d, d, 0, 1.0));
 	tex_coord = vec2(1,0);

@@ -6,12 +6,14 @@
 layout (location = 0) in vec4 in_position; //w is used as scale
 layout (location = 1) in vec4 in_color;
 
-out vec4 color;
-out float scale;
+out ParticleData {
+	vec4 color;
+	float scale;
+} particleData;
 
 void main() {
 	vec4 pos = modelMatrix * vec4(in_position.xyz, 1.0);
-   scale = in_position.w;
+   particleData.scale = in_position.w;
 
    gl_Position = viewMatrix * pos;
 /*
@@ -31,8 +33,9 @@ void main() {
       accumLighting += vec4(lightIntensity, 1.0)*in_color;
    }
 
-
-   color= clamp(accumLighting,0.0, 1.0);*/
-	 color = in_color;
+   color= clamp(accumLighting,0.0, 1.0);
+	*/
+	//color = in_color;
+	particleData.color = in_color;
 }
 

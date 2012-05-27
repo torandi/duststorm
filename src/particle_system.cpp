@@ -21,7 +21,6 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 
 	for(int i=0;i<max_num_particles; ++i) {
 		empty[i].position = glm::vec4(0.f,0.f,0.f,0.1f);
-		empty[i].color = glm::vec4(0.f, 0.f, 1.f, 1.f);
 	}
 
 	//Create VBO's
@@ -84,7 +83,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 
 	//Set default values in config:
 
-	config.birth_color = glm::vec4(0.f, 0.f, 1.f, 1.f);;
+	config.birth_color = glm::vec4(0.f, 1.f, 1.f, 1.f);;
 	config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);;
 
 	config.motion_rand = glm::vec4(0.001f, 0.001f, 0.001f, 0.f);
@@ -92,19 +91,19 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	config.spawn_direction = glm::vec4(1.f, 0.f, 0.f, 0.f);
 	config.direction_var = glm::vec4(0.f, 0.3f, 0.3f,0.f);
 
-	config.spawn_position = glm::vec4(0, 0, 0, 0);
-	config.spawn_area = glm::vec4(0.2f, 0.2f, 0.f, 0);
+	config.spawn_position = glm::vec4(0.f, 0.f, 0.f, 0.f);
+	config.spawn_area = glm::vec4(1.0f, 1.0f, 1.f, 0);
 
 	//Time to live
 	config.avg_ttl = 2.0;
 	config.ttl_var = 1.0;
 	//Spawn speed
-	config.avg_spawn_speed = 0.1f;
-	config.spawn_speed_var = 0.05f;
+	config.avg_spawn_speed = 0.01f;
+	config.spawn_speed_var = 0.005f;
 
 	//Acceleration
-	config.avg_acc = -0.01f;
-	config.acc_var = 0.005f;
+	config.avg_acc = 0.00f;
+	config.acc_var = 0.000f;
 	//Scale
 	config.avg_scale = 0.01f;
 	config.scale_var = 0.005f;
@@ -165,21 +164,21 @@ void ParticleSystem::update(float dt) {
 	render_blocking_events_.push_back(e2);
 
 	opencl->queue().flush();
-/*
+
 	//BEGIN DEBUG
 	particle_t * particles = (particle_t*) opencl->queue().enqueueMapBuffer(particles_, CL_TRUE, CL_MAP_READ, 0, sizeof(particle_t)*max_num_particles_, NULL, NULL, &err);
 
 	opencl->queue().finish();
 
 	for(int i=0; i < max_num_particles_; ++i ) {
-		printf("Dir: (%f, %f, %f), ttl: (%f/%f)\n", particles[i].direction.x, particles[i].direction.y,particles[i].direction.z, particles[i].ttl, particles[i].org_ttl);
+		printf("Dir: (%f, %f, %f), ttl: (%f/%f) speed: (%f)\n", particles[i].direction.x, particles[i].direction.y,particles[i].direction.z, particles[i].ttl, particles[i].org_ttl, particles[i].speed);
 	}
 
 	opencl->queue().enqueueUnmapMemObject(particles_, particles, NULL, NULL);
 	opencl->queue().finish();
 
 	//END DEBUG
-	*/
+	
 }
 
 void ParticleSystem::render() {
@@ -193,9 +192,9 @@ void ParticleSystem::render() {
 	render_blocking_events_.clear();
 
 	glBindBuffer(GL_ARRAY_BUFFER, gl_buffer_);
-/*
-	//Debug!
 
+	//DEBUG
+	
 	vertex_t * vertices = (vertex_t* )glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
 	printf("---\n");
@@ -204,11 +203,13 @@ void ParticleSystem::render() {
 	}
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-	//END debug
-*/
+	//END DEBUG
+	
+
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) sizeof(glm::vec4));
+
 	glDrawArrays(GL_POINTS, 0, max_num_particles_);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
