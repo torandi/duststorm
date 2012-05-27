@@ -6,6 +6,14 @@
 #include "globals.hpp"
 #include "render_object.hpp"
 #include "shader.hpp"
+#include <glm/gtx/spline.hpp>
+
+static glm::vec3 p[] = {
+	glm::vec3( 1.3f,  1.3f,  0.6f),
+	glm::vec3( 1.0f,  1.0f,  1.0f),
+	glm::vec3(-0.5f, -0.2f,  1.5f),
+	glm::vec3(-0.8f,  0.2f,  1.0f),
+};
 
 class TVScene: public Scene {
 public:
@@ -36,8 +44,7 @@ public:
 	virtual void update(float t, float dt){
 		tv_test.set_rotation(glm::vec3(0.0f,1.0f,0.0f), M_PI_4 * t);
 
-		const double rotation = fmod(t * 0.7f, 2.f*M_PI);
-		const glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
+		const glm::vec3 pos = glm::catmullRom(p[0], p[1], p[2], p[3], stage(t));
 		camera.set_position(pos);
 	}
 
