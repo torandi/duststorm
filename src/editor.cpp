@@ -12,6 +12,7 @@
 #include "engine.hpp"
 #include "globals.hpp"
 #include "rendertarget.hpp"
+#include "scene.hpp"
 #include "time.hpp"
 
 static const unsigned int framerate = 60;
@@ -122,7 +123,9 @@ int main (int argc, char* argv[]){
 	gdk_gl_init(&argc, &argv);
 	gtk_gl_init(&argc, &argv);
 
+	/* init engine */
 	verbose = fopen("/dev/null", "w");
+	Engine::autoload_scenes();
 
 	GError* error = nullptr;
 	GtkBuilder* builder = gtk_builder_new();
@@ -159,8 +162,12 @@ int main (int argc, char* argv[]){
 	GtkTreeStore* scenestore = GTK_TREE_STORE(gtk_builder_get_object(builder, "scenestore"));
 	gtk_tree_store_append(scenestore, &toplevel, NULL);
 	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Scenes</b>", -1);
-	gtk_tree_store_append(scenestore, &child, &toplevel);
-	gtk_tree_store_set(scenestore, &child, 0, "Python", -1);
+
+	for ( auto it = Scene::factory_begin(); it != Scene::factory_end(); ++it ){
+		gtk_tree_store_append(scenestore, &child, &toplevel);
+		gtk_tree_store_set(scenestore, &child, 0, it->first.c_str(), -1);
+	}
+
 	gtk_tree_store_append(scenestore, &toplevel, NULL);
 	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Compositions</b>", -1);
 
