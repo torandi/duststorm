@@ -42,32 +42,6 @@ static int frames = 0;
 static RenderTarget* downsample[3];
 static glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
-class ParticleScene: public Scene {
-public:
-	ParticleScene(size_t width, size_t height)
-		: Scene(width, height)
-		, particles(100000){
-	}
-
-	virtual void render(){
-		clear(Color::cyan);
-		shaders[SHADER_PARTICLES]->bind();
-		{
-			Shader::upload_model_matrix(glm::mat4(1.f));
-			particles.render();
-			checkForGLErrors("Render particles");
-		}
-		Shader::unbind();
-	}
-
-	virtual void update(float t, float dt){
-		particles.update(dt);
-	}
-
-private:
-	ParticleSystem particles;
-};
-
 static std::map<std::string, Scene*> scene;
 
 static void handle_sigint(int signum){
@@ -131,7 +105,7 @@ static void init(bool fullscreen){
 
 	/* Instantiate all scenes */
 	scene["Test"]     = Scene::create("Test", glm::ivec2(800,200));
-	scene["particle"] = new ParticleScene(400, 400);
+	scene["particle"] = Scene::create("Particles", glm::ivec2(400, 400));
 	scene["TV"]       = Scene::create("TV", glm::ivec2(400,400));
 
 	/* Setup timetable */
