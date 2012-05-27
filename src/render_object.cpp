@@ -29,13 +29,13 @@ RenderObject::~RenderObject() {
 }
 
 RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int aiOptions)
-	: MovableObject() {
+	: MovableObject()
+	, normalization_matrix_(1.0f)
+	, scene(nullptr)
+	, name(model)
+	, scale(1.0f) {
 
-		name = model;
-
-		scale = glm::vec3(1.f);
-
-	scene = aiImportFile( model.c_str(),
+	scene = aiImportFile(model.c_str(),
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph  |
@@ -45,40 +45,35 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 		aiProcess_CalcTangentSpace | aiOptions
 		);
 
-	if(scene != 0) {
-		fprintf(verbose, "Loaded model %s:\n"
-		        "  Meshes: %d\n"
-		        "  Textures: %d\n"
-		        "  Materials: %d\n",
-		        model.c_str(), scene->mNumMeshes, scene->mNumTextures, scene->mNumMaterials);
-
-			//Get bounds:
-			aiVector3D s_min, s_max;
-			get_bounding_box(&s_min, &s_max);
-			scene_min = glm::make_vec3((float*)&s_min);
-			scene_max = glm::make_vec3((float*)&s_max);
-			scene_center  = (scene_min+scene_max)/2.0f;
-
-			//Calculate normalization matrix
-
-			normalization_matrix_ = glm::mat4(1.f);
-
-			if(normalize_scale) {
-				glm::vec3 size = scene_max - scene_min;
-				float tmp = std::max(size.x, size.y);
-				tmp = std::max(tmp, size.z);
-				normalization_matrix_ = glm::scale(normalization_matrix_, glm::vec3(1.f/tmp));
-			}
-
-			//normalization_matrix_ = glm::translate(normalization_matrix_,glm::vec3(-scene_center.x, -scene_center.y, -scene_center.z));
-
-			pre_render();
-
-
-		} else {
-			printf("Failed to load model %s\n", model.c_str());
-		}
+	if ( !scene ) {
+		printf("Failed to load model %s\n", model.c_str());
+		return;
 	}
+
+	fprintf(verbose, "Loaded model %s:\n"
+	        "  Meshes: %d\n"
+	        "  Textures: %d\n"
+	        "  Materials: %d\n",
+	        model.c_str(), scene->mNumMeshes, scene->mNumTextures, scene->mNumMaterials);
+
+	//Get bounds:
+	aiVector3D s_min, s_max;
+	get_bounding_box(&s_min, &s_max);
+	scene_min = glm::make_vec3((float*)&s_min);
+	scene_max = glm::make_vec3((float*)&s_max);
+	scene_center  = (scene_min+scene_max)/2.0f;
+
+	//Calculate normalization matrix
+
+	if(normalize_scale) {
+		const glm::vec3 size = scene_max - scene_min;
+		float tmp = std::max(size.x, size.y);
+		tmp = std::max(tmp, size.z);
+		normalization_matrix_ = glm::scale(normalization_matrix_, glm::vec3(1.f/tmp));
+	}
+
+	pre_render();
+}
 
 GLuint RenderObject::load_texture(std::string path) {
 	size_t last_slash = path.rfind("/");
@@ -279,6 +274,7 @@ void RenderObject::recursive_render(const aiNode* node,
 }
 
 void RenderObject::render(const Shader * shader) {
+	if ( !scene ) return;
 	recursive_render(scene->mRootNode, shader, matrix());
 }
 
