@@ -25,6 +25,11 @@ AS_IF([test "x$enable_input" = "xyes"],
 	[AC_DEFINE([ENABLE_INPUT],  [1], [Define to 1 to enable input])],
 )
 
+AC_DEFINE_UNQUOTED([PATH_MODELS],  ["${srcdir}/models"],      [Path to models])
+AC_DEFINE_UNQUOTED([PATH_SRC],     ["${srcdir}/src"],         [Path to sources])
+AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${srcdir}/shaders"],     [Path to shaders])
+AC_DEFINE_UNQUOTED([PATH_CL],      ["${srcdir}/cl_programs"], [Path to OpenCL programs])
+
 AS_IF([test x"${srcdir}" != x"."], [
 	test -e shaders     || ln -s "${srcdir}"/shaders shaders
 	test -e models      || ln -s "${srcdir}"/models  models
