@@ -3,7 +3,6 @@
 #endif
 
 #include "scene.hpp"
-#include <map>
 
 static std::map<std::string, Scene::factory_callback> factory_map;
 
@@ -96,4 +95,12 @@ Scene* Scene::create(const std::string& name, const glm::ivec2& size){
 		return nullptr;
 	}
 	return it->second(size);
+}
+
+std::map<std::string, Scene::factory_callback>::const_iterator Scene::factory_begin(){
+	return factory_map.begin();
+}
+
+std::map<std::string, Scene::factory_callback>::const_iterator Scene::factory_end(){
+	return factory_map.end();
 }

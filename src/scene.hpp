@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
+#include <map>
 
 class Scene: public RenderTarget {
 public:
@@ -55,6 +56,8 @@ public:
 
 	typedef Scene*(*factory_callback)(const glm::ivec2& size);
 	static void register_factory(const std::string& name, factory_callback func);
+	static std::map<std::string, factory_callback>::const_iterator factory_begin();
+	static std::map<std::string, factory_callback>::const_iterator factory_end();
 
 protected:
 	float stage(float t) const;
