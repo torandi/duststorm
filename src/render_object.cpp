@@ -64,7 +64,6 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	scene_center  = (scene_min+scene_max)/2.0f;
 
 	//Calculate normalization matrix
-
 	if(normalize_scale) {
 		const glm::vec3 size = scene_max - scene_min;
 		float tmp = std::max(size.x, size.y);
