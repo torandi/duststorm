@@ -149,7 +149,7 @@ std::string Shader::parse_shader(
 			//Include the file:
 			char loc[256];
 			sprintf(loc, "%s:%d", filename.c_str(), linenr);
-			parsed_content << parse_shader(SHADER_PATH+line, included_files, std::string(loc));
+			parsed_content << parse_shader(PATH_SHADERS+line, included_files, std::string(loc));
 		} else {
 			parsed_content << line << std::endl;
 		}
@@ -232,15 +232,15 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 Shader * Shader::create_shader(std::string base_name) {
 	fprintf(verbose, "Compiling shader %s\n", base_name.c_str());
 
-	const std::string vs = SHADER_PATH+base_name+VERT_SHADER_EXTENTION;
-	const std::string gs = SHADER_PATH+base_name+GEOM_SHADER_EXTENTION;
-	const std::string fs = SHADER_PATH+base_name+FRAG_SHADER_EXTENTION;
+	const std::string vs = PATH_SHADERS+base_name+VERT_SHADER_EXTENTION;
+	const std::string gs = PATH_SHADERS+base_name+GEOM_SHADER_EXTENTION;
+	const std::string fs = PATH_SHADERS+base_name+FRAG_SHADER_EXTENTION;
 
 	std::vector<GLuint> shader_list;
 
 	//Load shaders:
-	shader_list.push_back(load_shader(GL_VERTEX_SHADER,   file_exists(vs) ? vs : SHADER_PATH"default.vert"));
-	shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, file_exists(fs) ? fs : SHADER_PATH"default.frag"));
+	shader_list.push_back(load_shader(GL_VERTEX_SHADER,   file_exists(vs) ? vs : PATH_SHADERS"default.vert"));
+	shader_list.push_back(load_shader(GL_FRAGMENT_SHADER, file_exists(fs) ? fs : PATH_SHADERS"default.frag"));
 	if ( file_exists(gs) ){
 		shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, gs));
 	}

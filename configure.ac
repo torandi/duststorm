@@ -31,7 +31,6 @@ AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${srcdir}/shaders/"],     [Path to shaders]
 AC_DEFINE_UNQUOTED([PATH_CL],      ["${srcdir}/cl_programs/"], [Path to OpenCL programs])
 
 AS_IF([test x"${srcdir}" != x"."], [
-	test -e shaders     || ln -s "${srcdir}"/shaders shaders
 	test -e models      || ln -s "${srcdir}"/models  models
 	test -e cl_programs || ln -s "${srcdir}"/cl_programs cl_programs
 ])
