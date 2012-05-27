@@ -327,12 +327,23 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="timelabel">
+                      <object class="GtkEventBox" id="eventbox1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="margin_top">5</property>
-                        <property name="margin_bottom">5</property>
-                        <property name="label" translatable="yes">label</property>
+                        <property name="events">GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
+                        <signal name="button-press-event" handler="timelabel_button_press_event_cb" swapped="no"/>
+                        <signal name="button-release-event" handler="timelabel_button_release_event_cb" swapped="no"/>
+                        <signal name="motion-notify-event" handler="timelabel_motion_notify_event_cb" swapped="no"/>
+                        <child>
+                          <object class="GtkLabel" id="timelabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">center</property>
+                            <property name="margin_top">5</property>
+                            <property name="margin_bottom">5</property>
+                            <property name="label" translatable="yes">label</property>
+                          </object>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">True</property>
