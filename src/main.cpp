@@ -57,7 +57,7 @@ public:
 			particles.render();
 			checkForGLErrors("Render particles");
 		}
-		shaders[SHADER_PARTICLES]->unbind();
+		Shader::unbind();
 	}
 
 	virtual void update(float t, float dt){
@@ -229,7 +229,7 @@ static void render(){
 			prev = downsample[i];
 		}
 	}
-	shaders[SHADER_PASSTHRU]->unbind();
+	Shader::unbind();
 
 	Shader::upload_state(resolution);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
@@ -239,7 +239,7 @@ static void render(){
 		scene["particle"]->draw(glm::ivec2(0,0));
 		scene["Test"]->draw(glm::ivec2(0,400));
 	}
-	shaders[SHADER_PASSTHRU]->unbind();
+	Shader::unbind();
 
 	shaders[SHADER_DISTORT]->bind();
 	{
@@ -254,7 +254,7 @@ static void render(){
 		glActiveTexture(GL_TEXTURE0);
 
 	}
-	shaders[SHADER_PASSTHRU]->unbind();
+	Shader::unbind();
 
 	SDL_GL_SwapBuffers();
 	checkForGLErrors("Frame end");

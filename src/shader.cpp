@@ -69,6 +69,8 @@ const GLenum Shader::global_uniform_usage_[] = {
 
 GLuint Shader::global_uniform_buffers_[Shader::NUM_GLOBAL_UNIFORMS];
 
+Shader* Shader::current = nullptr;
+
 void Shader::initialize() {
    //Generate global uniforms:
    glGenBuffers(NUM_GLOBAL_UNIFORMS, (GLuint*)&global_uniform_buffers_);
@@ -279,6 +281,11 @@ void Shader::init_uniforms() {
 }
 
 void Shader::bind() {
+	if ( current ){
+		fprintf(stderr, "Shader nesting problem, a shader is already bound.\n");
+		abort();
+	}
+
 	glUseProgram(program_);
 	checkForGLErrors("Bind shader");
 
@@ -286,16 +293,24 @@ void Shader::bind() {
       glEnableVertexAttribArray(i);
       checkForGLErrors("Enable vertex attrib");
 	}
+
+	current = this;
 }
 
 void Shader::unbind() {
-	for(int i=0; i<num_attributes_; ++i) {
-      glDisableVertexAttribArray(i);
-      checkForGLErrors("Disable vertex attrib");
+	if ( !current ){
+		fprintf(stderr, "Shader nesting problem, no shader is bound.\n");
+		abort();
+	}
+
+	for( int i = 0; i < current->num_attributes_; ++i ) {
+		glDisableVertexAttribArray(i);
+		checkForGLErrors("Shader::unbind glDisableVertexAttribArray");
 	}
 
 	glUseProgram(0);
-	checkForGLErrors("Unbind shader ");
+	checkForGLErrors("Shader::unbind");
+	current = nullptr;
 }
 
 void Shader::upload_lights(const Shader::lights_data_t &lights) {

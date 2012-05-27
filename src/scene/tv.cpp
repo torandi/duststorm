@@ -30,7 +30,7 @@ public:
 		{
 			tv_test.render(shaders[SHADER_NORMAL]);
 		}
-		shaders[SHADER_NORMAL]->unbind();
+		Shader::unbind();
 	}
 
 	virtual void update(float t, float dt){
