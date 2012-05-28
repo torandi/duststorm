@@ -4,7 +4,7 @@ AM_CXXFLAGS = -Wall -I${top_srcdir}/src
 bin_PROGRAMS = demo
 
 demo_CXXFLAGS = ${AM_CXXFLAGS} ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS}
-demo_LDADD = ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} 
+demo_LDADD = ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS}  -lSDL_image
 demo_SOURCES = \
 	src/main.cpp \
 	src/camera.cpp src/camera.hpp \
@@ -20,6 +20,7 @@ demo_SOURCES = \
 	src/render_object.cpp src/render_object.hpp \
 	src/scene.cpp src/scenefactory.cpp src/scene.hpp \
 	src/shader.cpp src/shader.hpp \
+	src/texture.cpp src/texture.hpp \
 	src/time.cpp src/time.hpp \
 	src/timetable.cpp src/timetable.hpp \
 	src/utils.cpp src/utils.hpp \

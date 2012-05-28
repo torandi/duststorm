@@ -13,7 +13,7 @@
 
 #include "cl.hpp"
 
-#include "particle_system.hpp"
+#include "texture.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -43,6 +43,8 @@ static RenderTarget* downsample[3];
 static glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
 static std::map<std::string, Scene*> scene;
+
+static Texture * texture_test;
 
 static void handle_sigint(int signum){
 	if ( !running ){
@@ -100,6 +102,8 @@ static void init(bool fullscreen){
 	screen_ortho = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
+
+	texture_test = new Texture("textures/hest.jpg");
 
 	opencl = new CL();
 
@@ -218,7 +222,7 @@ static void render(){
 	shaders[SHADER_DISTORT]->bind();
 	{
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, downsample[2]->texture());
+		texture_test->bind();
 		glActiveTexture(GL_TEXTURE0);
 
 		scene["TV"]->draw(glm::ivec2(400,0));

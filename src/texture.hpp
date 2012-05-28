@@ -3,13 +3,16 @@
 
 #include <string>
 #include <vector>
-#include <glload/gl_3_3.h>
-#include <glimg/glimg.h>
+#include <GL/glew.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 
 class Texture  {
 	public:
-		//Load a single texture as GL_TEXTURE_2D
-		Texture(const std::string & path);
+		/* 
+		 * Load a single texture as GL_TEXTURE_2D
+		 */
+		Texture(const std::string & path, const unsigned int num_mipmap_levels=5);
 		/*
 		 * Load an array of textures, set cube_map to true to use it as an cube map
 		 * The cubemap textures will be loaded in the following order:
@@ -32,7 +35,7 @@ class Texture  {
 		//Get texture number on open gl
 		GLuint texture() const; 
 
-		static glimg::ImageSet * load_image(const std::string &path);
+		static SDL_Surface * load_image(const std::string &path);
 
 		/* 
 		 * Requires the texture to be bound!
@@ -41,7 +44,7 @@ class Texture  {
 		 */
 		void set_clamp_params();
 
-		unsigned int mipmap_count() { return _mipmap_count; };
+		unsigned int mipmap_count()  const;
 
 	private:
 		//Copy not allowed (no body implemented, intentional!)
@@ -76,22 +79,34 @@ struct texture_pack_t {
 	};
 
 	void bind() {
-		glActiveTexture(GL_TEXTURE0);
-		texture->bind();
-		glActiveTexture(GL_TEXTURE1);
-		normal_map->bind();
-		glActiveTexture(GL_TEXTURE2);
-		specular_map->bind();
+		if(texture != NULL) {
+			glActiveTexture(GL_TEXTURE0);
+			texture->bind();
+		}
+		if(normal_map != NULL) {
+			glActiveTexture(GL_TEXTURE1);
+			normal_map->bind();
+		}
+		if(specular_map != NULL) {
+			glActiveTexture(GL_TEXTURE2);
+			specular_map->bind();
+		}
 		glActiveTexture(GL_TEXTURE0);
 	};
 
 	void unbind() {
-		glActiveTexture(GL_TEXTURE0);
-		texture->unbind();
-		glActiveTexture(GL_TEXTURE1);
-		normal_map->unbind();
-		glActiveTexture(GL_TEXTURE2);
-		specular_map->unbind();
+		if(texture != NULL) {
+			glActiveTexture(GL_TEXTURE0);
+			texture->unbind();
+		}
+		if(normal_map != NULL) {
+			glActiveTexture(GL_TEXTURE1);
+			normal_map->unbind();
+		}
+		if(specular_map != NULL) {
+			glActiveTexture(GL_TEXTURE2);
+			specular_map->unbind();
+		}
 		glActiveTexture(GL_TEXTURE0);
 	};
 };
