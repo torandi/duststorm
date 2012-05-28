@@ -39,7 +39,7 @@ typedef struct config_t {
 
 } config_t __attribute__ ((aligned (16))) ;
 
-float random(uint *time, uint id, __constant const float * rnd, int max_num_particles) {
+float random(uint *time, uint id, __global const float * rnd, int max_num_particles) {
 	int i = (int)((*time)+id) % max_num_particles;
 	float r = rnd[i];
 	//Change time to not get same value next call:
@@ -48,11 +48,11 @@ float random(uint *time, uint id, __constant const float * rnd, int max_num_part
 }
 
 //Set dual to true to get a number in range -m..m (otherwise 0..m)
-float _random1(float m, bool dual, uint *time, uint id, __constant const float * rnd, int max_num_particles) {
+float _random1(float m, bool dual, uint *time, uint id, __global const float * rnd, int max_num_particles) {
 	return random(time, id, rnd, max_num_particles)*m*(1+dual) - m*dual;
 }
 
-float4 _random4(float4 m, bool dual, uint *time, uint id, __constant const float * rnd, int max_num_particles) {
+float4 _random4(float4 m, bool dual, uint *time, uint id, __global const float * rnd, int max_num_particles) {
 	return (float4) (
 								 _random1(m.x, dual, time, id, rnd, max_num_particles),
 								 _random1(m.y, dual, time, id, rnd, max_num_particles),
@@ -61,7 +61,7 @@ float4 _random4(float4 m, bool dual, uint *time, uint id, __constant const float
 								 );
 }
 
-float3 _random3(float3 m, bool dual, uint *time, int id, __constant const float * rnd, int max_num_particles) {
+float3 _random3(float3 m, bool dual, uint *time, int id, __global const float * rnd, int max_num_particles) {
 	return (float3) (
 								 _random1(m.x, dual, time, id, rnd, max_num_particles),
 								 _random1(m.y, dual, time, id, rnd, max_num_particles),
@@ -77,8 +77,8 @@ float3 _random3(float3 m, bool dual, uint *time, int id, __constant const float 
 void update_particle (
 											__global vertex_t * const vertex, 
 											__global particle_t * const particle, 
-											__constant const config_t * config, 
-											__constant const float * rnd,
+											__constant config_t * config, 
+											__global const float * rnd,
 											float dt,
 											uint * time,
 											uint id
@@ -100,8 +100,8 @@ void update_particle (
 void respawn_particle (
 											 __global vertex_t * const vertex, 
 											 __global particle_t * const particle, 
-											 __constant const config_t * config, 
-											 __constant const float * rnd,
+											 __constant config_t * config, 
+											 __global const float * rnd,
 											 float dt,
 											 uint * time,
 											 uint id
@@ -125,8 +125,8 @@ void respawn_particle (
 __kernel void run_particles (
 														 __global vertex_t * vertices, 
 														 __global particle_t * particles, 
-														 __constant const config_t * config, 
-														 __constant const float * rnd,
+														 __constant config_t * config, 
+														 __global const float * rnd,
 														 int particle_limit,
 														 float dt,
 														 uint time
