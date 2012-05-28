@@ -305,9 +305,24 @@ int main (int argc, char* argv[]){
 		SceneFactory::Metadata* meta = it->second.meta;
 		for ( std::pair<std::string, std::string> p: *meta ){
 			const std::string& key   = p.first;
+			const std::string& value = p.second;
+			std::string title = key;
+
+			char* data = strdup(value.c_str());
+			char* t = strtok(data, ":");
+			char* d = strtok(NULL, ":");
+
+			if ( strcmp(t, "path") == 0 ){
+				title += std::string(" (") + std::string(d?d:"<nil>") + std::string(")");
+			} else if ( strcmp(t, "model") == 0 ){
+				title += std::string(" (") + std::string(d?d:"<nil>") + std::string(")");
+			}
+
+			free(data);
+
 			GtkTreeIter cur;
 			gtk_tree_store_append(scenestore, &cur, &child);
-			gtk_tree_store_set(scenestore, &cur, 0, key.c_str(), -1);
+			gtk_tree_store_set(scenestore, &cur, 0, title.c_str(), -1);
 		}
 	}
 

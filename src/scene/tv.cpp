@@ -128,7 +128,7 @@ template <>
 SceneFactory::Metadata* SceneTraits<TVScene>::metadata(){
 	SceneFactory::Metadata* _ = new SceneFactory::Metadata;
 	SceneFactory::Metadata& m = *_;
-	m["Camera 1"] = "camera:tv_cam1.txt";
+	m["Camera 1"] = "path:tv_cam1.txt";
 	m["TV model"] = "model:tv.obj";
 	m["Room model"] = "model:tv_room.obj";
 	m["Light[0]"] = "light:tv_light0.txt";
