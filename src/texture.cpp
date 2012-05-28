@@ -172,7 +172,7 @@ SDL_Surface * Texture::load_image(const std::string &path) {
 	 * Sam Lantinga to the SDL mailinglist at Sep 11 2002.
 	 */
 	SDL_Surface* rgba_surface = SDL_CreateRGBSurface(
-			SDL_SWSURFACE,
+			SDL_HWSURFACE,
 			surface->w, surface->h,
 			32,
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
