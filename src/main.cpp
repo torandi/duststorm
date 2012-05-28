@@ -103,7 +103,7 @@ static void init(bool fullscreen){
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
 
-	texture_test = new Texture("textures/hest.jpg");
+	texture_test = new Texture(PATH_BASE "textures/hest.jpg");
 
 	opencl = new CL();
 

@@ -25,6 +25,7 @@ AS_IF([test "x$enable_input" = "xyes"],
 	[AC_DEFINE([ENABLE_INPUT],  [1], [Define to 1 to enable input])],
 )
 
+AC_DEFINE_UNQUOTED([PATH_BASE],    ["${srcdir}/"],             [Base path])
 AC_DEFINE_UNQUOTED([PATH_MODELS],  ["${srcdir}/models/"],      [Path to models])
 AC_DEFINE_UNQUOTED([PATH_SRC],     ["${srcdir}/src/"],         [Path to sources])
 AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${srcdir}/shaders/"],     [Path to shaders])
