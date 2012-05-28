@@ -88,13 +88,11 @@ static void render_placeholder(){
 static void render_scene(){
 	scene->render_scene();
 
-	frame->bind();
-	shaders[SHADER_PASSTHRU]->bind();
-	frame->clear(Color::magenta);
 	Shader::upload_projection_view_matrices(frame->ortho(), glm::mat4());
-	scene->draw();
-	shaders[SHADER_PASSTHRU]->unbind();
-	frame->unbind();
+	frame->with([](){
+		RenderTarget::clear(Color::magenta);
+		scene->draw(shaders[SHADER_PASSTHRU]);
+	});
 }
 
 static void render_model(){
@@ -249,9 +247,7 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_draw_cb(GtkWidget* widget, gpoin
 	Shader::upload_state(resolution);
 	Shader::upload_projection_view_matrices(projection, glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
-	shaders[SHADER_PASSTHRU]->bind();
-	frame->draw(center);
-	shaders[SHADER_PASSTHRU]->unbind();
+	frame->draw(shaders[SHADER_PASSTHRU], center);
 
 	gtk_widget_end_gl(widget, TRUE);
 	return TRUE;
