@@ -70,7 +70,6 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		return;
 	} else if ( depth == 2 ){ /* subsection selected */
 		const gint section = tree[0];
-		const gint component = tree[1];
 		GtkTreeIter iter;
 		GtkTreeModel* model = gtk_tree_view_get_model(tree_view);
 		if ( !gtk_tree_model_get_iter(model, &iter, path) ){
