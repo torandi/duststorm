@@ -1,12 +1,10 @@
 ACLOCAL_AMFLAGS = -I m4
-AM_CXXFLAGS = -Wall -I${top_srcdir}/src
+AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS}
 
+noinst_LIBRARIES = libfrob.a
 bin_PROGRAMS = demo
 
-demo_CXXFLAGS = ${AM_CXXFLAGS} ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS}
-demo_LDADD = ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS}  -lSDL_image
-demo_SOURCES = \
-	src/main.cpp \
+libfrob_a_SOURCES = \
 	src/camera.cpp src/camera.hpp \
 	src/cl.cpp src/cl.hpp \
 	src/color.cpp src/color.hpp \
@@ -29,6 +27,9 @@ demo_SOURCES = \
 	src/scene/test.cpp \
 	src/scene/tv.cpp \
 	autoload.cpp autoload.h
+
+demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image
+demo_SOURCES = src/main.cpp
 
 .PHONY: .autoload.tmp
 BUILT_SOURCES = .autoload.tmp autoload.h autoload.cpp
