@@ -38,7 +38,7 @@ public:
 	 */
 	GLuint depthbuffer() const;
 
-	void clear(const Color& color) const;
+	static void clear(const Color& color);
 
 	/**
 	 * Render the RenderTarget on current framebuffer.

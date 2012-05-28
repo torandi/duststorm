@@ -112,7 +112,7 @@ const glm::mat4& RenderTarget::ortho() const {
 	return projection;
 }
 
-void RenderTarget::clear(const Color& color) const {
+void RenderTarget::clear(const Color& color){
 	glClearColor(color.r, color.g, color.b, color.a);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 }
