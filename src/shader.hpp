@@ -142,5 +142,10 @@ public:
 	 * Upload current state.
 	 */
 	static void upload_state(const glm::ivec2& size);
+
+	/**
+	 * Upload white material
+	 */
+	static void upload_blank_material();
 };
 #endif

@@ -363,6 +363,17 @@ void Shader::upload_material(const Shader::material_t &material) {
    checkForGLErrors("upload material");
 }
 
+void Shader::upload_blank_material() {
+	material_t m;
+	m.shininess = 0;
+	m.specular = glm::vec4(0,0,0,0);
+	m.diffuse = glm::vec4(1.f,1.f,1.f,1.f);
+	m.ambient = glm::vec4(1.f,1.f,1.f,1.f);
+	m.emission = glm::vec4(0,0,0,0);
+
+	upload_material(m);
+}
+
 void Shader::upload_camera(const Camera &camera) {
    upload_camera_position(camera);
    upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
