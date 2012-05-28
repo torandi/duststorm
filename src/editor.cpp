@@ -15,6 +15,11 @@
 #include "scene.hpp"
 #include "time.hpp"
 
+enum {
+	COL_ICON = 0,
+	COL_TITLE = 1,
+};
+
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
 static int frames = 0;
@@ -295,12 +300,12 @@ int main (int argc, char* argv[]){
 	GtkTreeIter toplevel;
 	GtkTreeStore* scenestore = GTK_TREE_STORE(gtk_builder_get_object(builder, "scenestore"));
 	gtk_tree_store_append(scenestore, &toplevel, NULL);
-	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Scenes</b>", -1);
+	gtk_tree_store_set(scenestore, &toplevel, COL_TITLE, "<b>Scenes</b>", -1);
 
 	for ( auto it = SceneFactory::begin(); it != SceneFactory::end(); ++it ){
 		GtkTreeIter child;
 		gtk_tree_store_append(scenestore, &child, &toplevel);
-		gtk_tree_store_set(scenestore, &child, 0, it->first.c_str(), -1);
+		gtk_tree_store_set(scenestore, &child, COL_TITLE, it->first.c_str(), -1);
 
 		SceneFactory::Metadata* meta = it->second.meta;
 		for ( std::pair<std::string, std::string> p: *meta ){
@@ -322,12 +327,15 @@ int main (int argc, char* argv[]){
 
 			GtkTreeIter cur;
 			gtk_tree_store_append(scenestore, &cur, &child);
-			gtk_tree_store_set(scenestore, &cur, 0, title.c_str(), -1);
+			gtk_tree_store_set(scenestore, &cur,
+			                   COL_ICON, "gtk-media-play",
+			                   COL_TITLE, title.c_str(),
+			                   -1);
 		}
 	}
 
 	gtk_tree_store_append(scenestore, &toplevel, NULL);
-	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Compositions</b>", -1);
+	gtk_tree_store_set(scenestore, &toplevel, COL_TITLE, "<b>Compositions</b>", -1);
 
 	g_timeout_add(per_frame/1000, [](gpointer data) -> gboolean {
 		update();
