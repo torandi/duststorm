@@ -18,6 +18,16 @@ Camera::Camera(float fov, float aspect, float near, float far)
 	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);
 }
 
+Camera::Camera(float fov, const glm::ivec2& size, float near, float far)
+	: fov_(fov)
+	, roll_(0.f)
+	, aspect_((float)size.x / (float)size.y)
+	, near_(near)
+	, far_(far) {
+
+	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);
+}
+
 const glm::vec3 Camera::look_at() const {
 	return look_at_;
 }

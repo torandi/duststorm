@@ -7,6 +7,7 @@
 class Camera : private MovableObject {
 public:
 	Camera(float fov, float aspect, float near, float far);
+	Camera(float fov, const glm::ivec2& size, float near, float far);
 	virtual ~Camera() {};
 
 	const glm::vec3 look_at() const;
