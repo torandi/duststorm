@@ -83,7 +83,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		if ( section == 0 ){ /* scene */
 			delete scene;
 			scene_name = name;
-			scene = Scene::create(std::string(name), frame->size);
+			scene = SceneFactory::create(std::string(name), frame->size);
 			scene->add_time(0,60);
 			global_time.reset();
 		}
@@ -158,7 +158,7 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
 
 	if ( scene ){
 		delete scene;
-		scene = Scene::create(std::string(scene_name), frame->size);
+		scene = SceneFactory::create(std::string(scene_name), frame->size);
 		scene->add_time(0,60);
 	}
 
@@ -298,12 +298,12 @@ int main (int argc, char* argv[]){
 	gtk_tree_store_append(scenestore, &toplevel, NULL);
 	gtk_tree_store_set(scenestore, &toplevel, 0, "<b>Scenes</b>", -1);
 
-	for ( auto it = Scene::factory_begin(); it != Scene::factory_end(); ++it ){
+	for ( auto it = SceneFactory::begin(); it != SceneFactory::end(); ++it ){
 		GtkTreeIter child;
 		gtk_tree_store_append(scenestore, &child, &toplevel);
 		gtk_tree_store_set(scenestore, &child, 0, it->first.c_str(), -1);
 
-		Scene::Metadata* meta = it->second.meta;
+		SceneFactory::Metadata* meta = it->second.meta;
 		for ( std::pair<std::string, std::string> p: *meta ){
 			const std::string& key   = p.first;
 			GtkTreeIter cur;
