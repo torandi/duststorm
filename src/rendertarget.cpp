@@ -23,11 +23,11 @@ RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer,
 	projection = glm::scale(projection, glm::vec3(1.0f, -1.0f, 1.0f));
 	projection = glm::translate(projection, glm::vec3(0.0f, -(float)size.y, 0.0f));
 
-	glGenFramebuffersEXT(1, &id);
+	glGenFramebuffers(1, &id);
 	glGenTextures(2, color);
 	glGenTextures(1, &depth);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, id);
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
 	Engine::setup_opengl();
 
 	/* bind color buffers */
@@ -39,8 +39,8 @@ RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer,
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 	}
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, color[current], 0);
-	checkForGLErrors("glFramebufferTexture2DEXT::color");
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color[current], 0);
+	checkForGLErrors("glFramebufferTexture2D::color");
 
 	/* bind depth buffer */
 	if ( depth ){
@@ -50,22 +50,22 @@ RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer,
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depth, 0);
-		checkForGLErrors("glFramebufferTexture2DEXT::depth");
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth, 0);
+		checkForGLErrors("glFramebufferTexture2D::depth");
 	}
 
-	GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-	if(status != GL_FRAMEBUFFER_COMPLETE_EXT){
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if(status != GL_FRAMEBUFFER_COMPLETE){
 		fprintf(stderr, "Framebuffer incomplete: %s\n", gluErrorString(status));
 		abort();
 	}
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	checkForGLErrors("RenderTarget() fin");
 }
 
 RenderTarget::~RenderTarget(){
-	glDeleteFramebuffersEXT(1, &id);
+	glDeleteFramebuffers(1, &id);
 	glDeleteTextures(2, color);
 	glDeleteTextures(1, &depth);
 }
@@ -77,8 +77,8 @@ void RenderTarget::bind(){
 	}
 
 	glViewport(0, 0, size.x, size.y);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, id);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, color[current], 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color[current], 0);
 
 	stack = this;
 }
@@ -90,7 +90,7 @@ void RenderTarget::unbind(){
 	}
 
 	current = 1 - current;
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	stack = nullptr;
 }
 
