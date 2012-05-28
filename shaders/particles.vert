@@ -16,26 +16,25 @@ void main() {
 	particleData.scale = in_position.w;
 
 	gl_Position = viewMatrix * pos;
-/*
-   vec4 accumLighting = in_color * vec4(Lgt.ambient_intensity, 1.0);
 
-   for(int light = 0; int(light) < Lgt.num_lights; ++light) {
-      vec3 light_distance = Lgt.lights[light].position.xyz - pos.xyz;
+	vec3 accumLighting = in_color.rgb * Lgt.ambient_intensity;
 
-      vec3 lightIntensity;
-      if(Lgt.lights[light].type == 0) {
-         lightIntensity = Lgt.lights[light].intensity.rgb;	
-      } else { 
-         float lightAttenuation = (1 / ( 1.0 + Lgt.lights[light].attenuation * length(light_distance)));
-         lightIntensity =  lightAttenuation * Lgt.lights[light].intensity.rgb;
-      }
+	for(int light = 0; int(light) < Lgt.num_lights; ++light) {
+		vec3 light_distance = Lgt.lights[light].position.xyz - pos.xyz;
 
-      accumLighting += vec4(lightIntensity, 1.0)*in_color;
-   }
+		vec3 lightIntensity;
+		if(Lgt.lights[light].type == 0) {
+			lightIntensity = Lgt.lights[light].intensity.rgb;	
+		} else {
+			float lightAttenuation = (1 / ( 1.0 + Lgt.lights[light].attenuation * length(light_distance)));
+			lightIntensity =  lightAttenuation * Lgt.lights[light].intensity.rgb;
+		}
 
-   color= clamp(accumLighting,0.0, 1.0);
-	*/
-	//color = in_color;
-	particleData.color = in_color;
+		accumLighting += lightIntensity * in_color.rgb ;
+	}
+
+	particleData.color.rgb= clamp(accumLighting,0.0, 1.0);
+
+	particleData.color.a = in_color.a;
 }
 

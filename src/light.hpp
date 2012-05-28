@@ -4,45 +4,45 @@
 #include <glm/glm.hpp>
 #include "movable_object.hpp"
 
-#define HALF_LIGHT_DISTANCE 1.5f
+#define HALF_LIGHT_DISTANCE 0.5f
 
 class Light : public MovableObject {
-public:
-   struct shader_light_t {
-      float attenuation;
-      int type; //light_type_t
-      float padding[2];
-      glm::vec4 intensity;
-      glm::vec4 position;
-   };
+	public:
+		enum light_type_t {
+			DIRECTIONAL_LIGHT = 0, //No attenuation
+			POINT_LIGHT = 1
+		} light_type;
 
-   enum light_type_t {
-      DIRECTIONAL_LIGHT = 0, //No attenuation
-      POINT_LIGHT = 1
-   } light_type;
+		Light(light_type_t type, glm::vec3 _intensity);
+		Light(light_type_t type, glm::vec3 _intensity, glm::vec3 position);
+		virtual ~Light() {};
 
-private:
+		struct shader_light_t {
+			float attenuation;
+			int type; //light_type_t
+			float padding[2];
+			glm::vec4 intensity;
+			glm::vec4 position;
+		};
 
-   shader_light_t attributes_;
-public:
+		void set_half_light_distance(float hld);
 
-	Light(light_type_t type, glm::vec3 _intensity);
-	Light(light_type_t type, glm::vec3 _intensity, glm::vec3 position);
-	virtual ~Light() {};
+		const float &attenuation() const;
+		const glm::vec3 intensity() const;
 
-	void set_half_light_distance(float hld);
+		void set_intensity(glm::vec3 intensity);
 
-   const float &attenuation() const;
-   const glm::vec3 intensity() const;
+		const shader_light_t &shader_light();
 
-   void set_intensity(glm::vec3 intensity);
+		const light_type_t type() const;
 
-   const shader_light_t &shader_light();
+		void set_type(light_type_t type);
 
-   const light_type_t type() const;
+		virtual void set_position(const glm::vec3 &pos);
 
-   void set_type(light_type_t type);
 
-   virtual void set_position(const glm::vec3 &pos);
+	private:
+
+		shader_light_t attributes_;
 };
 #endif

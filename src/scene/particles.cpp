@@ -27,11 +27,21 @@ public:
 			particles.config.death_color = glm::vec4(0.8, 0.8, 0.8, 0.1);
 			particles.config.motion_rand = glm::vec4(0, 0, 0, 0);
 			particles.update_config();
+
+			Light l(Light::POINT_LIGHT, glm::vec3(0.8, 0, 0));
+			l.set_half_light_distance(0.25f);
+
+			l.set_position(glm::vec3(0, 0, -1));
+			lights.num_lights = 1;
+			lights.ambient_intensity = glm::vec3(0.2, 0.2, 0.2);
+			lights.lights[0] = l.shader_light();
 	}
 
 	virtual void render(){
 		clear(Color::black);
 		Shader::upload_camera(camera);
+
+		Shader::upload_lights(lights);
 
 		shaders[SHADER_PARTICLES]->bind();
 		{
@@ -49,7 +59,7 @@ public:
 private:
 	ParticleSystem particles;
 	Camera camera;
-	double rotation;
+	Shader::lights_data_t lights;
 };
 
 REGISTER_SCENE_TYPE(ParticlesScene, "Particles");
