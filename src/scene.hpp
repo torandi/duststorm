@@ -8,6 +8,9 @@
 #include <vector>
 #include <map>
 
+/**
+ * Scene definition.
+ */
 class Scene: public RenderTarget {
 public:
 	Scene(const glm::ivec2& size);
@@ -57,12 +60,32 @@ public:
 	typedef std::map<std::string, std::string> Metadata;
 	typedef Scene*(*factory_callback)(const glm::ivec2& size);
 
+	/**
+	 * Static information about a scene-type.
+	 */
 	struct SceneInfo {
+		/**
+		 * Metadata is a map of resources the scene depends on.
+		 * Key is the name of the resource.
+		 * Value is a TYPE:DATA pair where TYPE defines what kind of resource it is.
+		 * E.g. "Camera 1" -> "camera:points.txt"
+		 */
 		Metadata* meta;
+
+		/**
+		 * Function used to allocate a new instance.
+		 */
 		factory_callback func;
 	};
 
+	/**
+	 * Register a new scene class. Do not call directly, use REGISTER_SCENE_TYPE.
+	 */
 	static void register_factory(const std::string& name, factory_callback func, Metadata* meta);
+
+	/**
+	 * Scene-type iterator.
+	 */
 	static std::map<std::string, SceneInfo>::const_iterator factory_begin();
 	static std::map<std::string, SceneInfo>::const_iterator factory_end();
 
@@ -80,14 +103,24 @@ private:
 	bool match;
 };
 
+/**
+ * Glue between REGISTER_SCENE_TYPE and Scene.
+ * Specialize this class if you need to implement a custom function.
+ */
 template <class T>
 class SceneTraits {
 public:
 
+	/**
+	 * Create a new instance.
+	 */
 	static Scene* factory(const glm::ivec2& size){
 		return new T(size);
 	}
 
+	/**
+	 * Allocate metadata. Default is an empty map.
+	 */
 	static Scene::Metadata* metadata(){
 		return new Scene::Metadata;
 	}
