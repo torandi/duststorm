@@ -13,9 +13,9 @@ out ParticleData {
 
 void main() {
 	vec4 pos = modelMatrix * vec4(in_position.xyz, 1.0);
-   particleData.scale = in_position.w;
+	particleData.scale = in_position.w;
 
-   gl_Position = viewMatrix * pos;
+	gl_Position = viewMatrix * pos;
 /*
    vec4 accumLighting = in_color * vec4(Lgt.ambient_intensity, 1.0);
 
