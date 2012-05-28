@@ -93,12 +93,13 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		}
 
 		gchar* name;
-		gtk_tree_model_get(model, &iter, 0, &name, -1);
+		gtk_tree_model_get(model, &iter, COL_TITLE, &name, -1);
 
 		if ( section == 0 ){ /* scene */
 			delete scene;
 			scene_name = name;
 			scene = SceneFactory::create(std::string(name), frame->size);
+			assert(scene);
 			scene->add_time(0,60);
 			global_time.reset();
 		}
