@@ -24,6 +24,7 @@
 enum MODE {
 	MODE_BLANK,
 	MODE_SCENE,
+	MODE_PATH,
 	MODE_MODEL,
 } mode = MODE_BLANK;
 
@@ -121,8 +122,6 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 	TYPE type;
 	gtk_tree_model_get(treemodel, &iter, COL_TITLE, &name, COL_TYPE, &type, COL_FILENAME, &filename, -1);
 
-	printf("type: %d\n", type);
-
 	switch ( type ){
 	case TYPE_CAT:
 		if ( gtk_tree_view_row_expanded(tree_view, path) ){
@@ -142,6 +141,9 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		global_time.reset();
 		break;
 
+	case TYPE_PATH:
+		break;
+
 	case TYPE_MODEL:
 		mode = MODE_MODEL;
 		delete model;
@@ -153,6 +155,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		break;
 
 	default:
+		printf("type: %d\n", type);
 		break;
 	}
 
