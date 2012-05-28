@@ -1,6 +1,7 @@
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
+uniform sampler2DArray texture_array1;
 
 const int maxNumberOfLights = 4;
 

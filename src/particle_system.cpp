@@ -12,9 +12,16 @@
 #include "globals.hpp"
 #include "utils.hpp"
 
-ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_(max_num_particles) {
+ParticleSystem::ParticleSystem(const int max_num_particles, Texture * texture) : 
+	max_num_particles_(max_num_particles)
+	,	texture_(texture) {
 	program_ = opencl->create_program(PATH_OPENCL "particles.cl");
 	kernel_  = opencl->load_kernel(program_, "run_particles");
+
+	if(texture_->texture_type() != GL_TEXTURE_2D_ARRAY) {
+		fprintf(stderr, "ParticleSystem requires texture to be an GL_TEXTURE_2D_ARRAY!\n");
+		abort();
+	}
 
 	//Empty vec4s:
 	vertex_t * empty = new vertex_t[max_num_particles];
@@ -22,6 +29,8 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	for(int i=0;i<max_num_particles; ++i) {
 		empty[i].position = glm::vec4(0.f);
 		empty[i].color = glm::vec4(0.f);
+		empty[i].scale = 0.f;
+		empty[i].texture_index = 0;
 	}
 
 	//Create VBO's
@@ -38,7 +47,8 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 
 	particle_t * initial_particles = new particle_t[max_num_particles];
 	for(int i=0; i<max_num_particles; ++i) {
-		initial_particles[i].ttl = -1.f; //mark as dead
+		initial_particles[i].dead = 1; //mark as dead
+		initial_particles[i].ttl = -frand(); //time until spawn
 	}
 
 	//Create cl buffers:
@@ -101,6 +111,9 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	//Spawn speed
 	config.avg_spawn_speed = 0.01f;
 	config.spawn_speed_var = 0.005f;
+	//Spawn delay
+	config.avg_spawn_delay = 1.f;
+	config.spawn_delay_var = 0.5f;
 
 	//Acceleration
 	config.avg_acc = 0.00f;
@@ -108,7 +121,13 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	//Scale
 	config.avg_scale = 0.01f;
 	config.scale_var = 0.005f;
+	config.avg_scale_change = 0.f;
+	config.scale_change_var = 0.f;
+	//Rotation
+	config.avg_rotation_speed = 0.f;
+	config.rotation_speed_var = 0.f;
 
+	config.num_textures = texture->num_textures();
 	config.max_num_particles = max_num_particles;
 	update_config();
 
@@ -174,14 +193,14 @@ void ParticleSystem::update(float dt) {
 	opencl->queue().finish();
 
 	for(int i=0; i < max_num_particles_; ++i ) {
-		printf("Dir: (%f, %f, %f), ttl: (%f/%f) speed: (%f)\n", particles[i].direction.x, particles[i].direction.y,particles[i].direction.z, particles[i].ttl, particles[i].org_ttl, particles[i].speed);
+		printf("Dir: (%f, %f, %f), ttl: (%f/%f) speed: (%f) scale(%f->%f) rotation speed: %f\n", particles[i].direction.x, particles[i].direction.y,particles[i].direction.z, particles[i].ttl, particles[i].org_ttl, particles[i].speed, particles[i].initial_scale, particles[i].final_scale, particles[i].rotation_speed);
 	}
 
 	opencl->queue().enqueueUnmapMemObject(particles_, particles, NULL, NULL);
 	opencl->queue().finish();
 
 	//END DEBUG
-*/	
+*/
 }
 
 void ParticleSystem::render() {
@@ -203,18 +222,30 @@ void ParticleSystem::render() {
 
 	printf("---\n");
 	for(int i=0;i<max_num_particles_; ++i) {
-		printf("Vertex: pos:(%f, %f, %f, %f), color:(%f, %f, %f, %f)\n", vertices[i].position.x, vertices[i].position.y, vertices[i].position.z, vertices[i].position.w, vertices[i].color.r, vertices[i].color.g, vertices[i].color.b, vertices[i].color.a);
+		printf("Vertex: pos:(%f, %f, %f, %f), color:(%f, %f, %f, %f) scale: %f, texture_index: %i\n", vertices[i].position.x, vertices[i].position.y, vertices[i].position.z, vertices[i].position.w, vertices[i].color.r, vertices[i].color.g, vertices[i].color.b, vertices[i].color.a, vertices[i].scale, vertices[i].texture_index);
 	}
+
+	printf("Sizeof(vertex_t): %d\n", sizeof(vertex_t));
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	//END DEBUG
-*/	
-
+*/
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) sizeof(glm::vec4));
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) (2*sizeof(glm::vec4)));
+	glVertexAttribPointer(3, 1, GL_INT, GL_FALSE, sizeof(vertex_t), (GLvoid*)		(2*sizeof(glm::vec4)+sizeof(float)));
+
+	glActiveTexture(GL_TEXTURE0);
+	texture_->bind();
+
+	glDepthMask(GL_FALSE);
 
 	glDrawArrays(GL_POINTS, 0, max_num_particles_);
+
+	glDepthMask(GL_TRUE);
+
+	texture_->unbind();
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glPopAttrib();

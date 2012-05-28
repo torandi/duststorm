@@ -1,14 +1,22 @@
 typedef struct particle_t {
 	float3 direction;
+	
 	float ttl;
 	float speed;
 	float acc;
+	float rotation_speed;
+
+	float initial_scale;
+	float final_scale;
 	float org_ttl; //original time to live, stored to get a percentage
+	int dead;
 } particle_t __attribute__ ((aligned (16))) ;
 
 typedef struct vertex_t {
 	float4 position;
 	float4 color;
+	float scale;
+	int texture_index;
 } vertex_t __attribute__ ((aligned (16))) ;
 
 typedef struct config_t {
@@ -31,10 +39,19 @@ typedef struct config_t {
 
 	float avg_acc;
 	float acc_var;
-
 	float avg_scale;
 	float scale_var;
 
+	float avg_scale_change;
+	float scale_change_var;
+
+	float avg_rotation_speed;
+	float rotation_speed_var;
+
+	float avg_spawn_delay;
+	float spawn_delay_var;
+
+	int num_textures;
 	int max_num_particles;
 
 } config_t __attribute__ ((aligned (16))) ;
@@ -90,10 +107,14 @@ void update_particle (
 		particle->speed += particle->acc;
 		if(particle->speed < 0) particle->speed = 0.0;
 		vertex->position.xyz += particle->direction*particle->speed + random3(config->motion_rand, true);
+		vertex->position.w += particle->rotation_speed;
 		vertex->color = mix(config->birth_color, config->death_color, life_progression);
+		vertex->scale = mix(particle->initial_scale, particle->final_scale, life_progression);
 	} else {
 		//Dead!
 		vertex->color.w = 0.0;
+		particle->dead = 1;
+		particle->ttl = -(config->avg_spawn_delay + random1(config->spawn_delay_var, true));
 	}
 }
 
@@ -108,13 +129,18 @@ void respawn_particle (
 											 )
 {
 	vertex->position.xyz = config->spawn_position + random3(config->spawn_area, false);
-	vertex->position.w = config->avg_scale + random1(config->scale_var, true);
+	vertex->position.w = 0.f;
 
+	vertex->texture_index = (int)floor(random1((float)config->num_textures-0.1, false));
 
 	particle->direction = normalize(config->spawn_direction + random3(config->direction_var, true));
 	particle->org_ttl = particle->ttl = config->avg_ttl + random1(config->ttl_var, true);
 	particle->speed = config->avg_spawn_speed + random1(config->spawn_speed_var, true);
 	particle->acc = config->avg_acc + random1(config->acc_var, true);
+	particle->rotation_speed = config->avg_rotation_speed + random1(config->rotation_speed_var, true);
+	particle->initial_scale = config->avg_scale + random1(config->scale_var, true);
+	particle->final_scale = particle->initial_scale + config->avg_scale_change + random1(config->scale_change_var, true);
+	particle->dead = 0;
 
 	//Update particle
 	update_particle(vertex, particle, config, rnd, dt, time, id);
@@ -134,12 +160,14 @@ __kernel void run_particles (
 {
 	uint id = get_global_id(0);    
 		//First check if particle is alive:
-	if(particles[id].ttl > 0) {
+	if(particles[id].dead == 0) {
 		//It lives
 		update_particle(&vertices[id], &particles[id], config, rnd, dt, &time, id);
-	} else if(id < particle_limit) {
+	} else if(id < particle_limit && particles[id].ttl > 0) {
 		//Respawn!
 		respawn_particle(&vertices[id], &particles[id], config, rnd, dt, &time, id);
+	} else if(id < particle_limit) {
+		particles[id].ttl += dt;
 	}
 }
 

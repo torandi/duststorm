@@ -46,8 +46,13 @@ class Texture  {
 
 		unsigned int mipmap_count()  const;
 
+		unsigned int num_textures() const;
+
+		GLuint texture_type() const;
+
 	private:
-		//Copy not allowed (no body implemented, intentional!)
+		// Copy not allowed (no body implemented, intentional!)
+		// Not allowed since deallocating a texture object frees the texture
 		Texture(const Texture &other);
 
 		void load_texture();

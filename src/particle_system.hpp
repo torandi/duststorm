@@ -2,6 +2,7 @@
 #define PARTICLE_SYSTEM_H
 
 #include "movable_object.hpp"
+#include "texture.hpp"
 
 #include "cl.hpp" 
 #include <glm/glm.hpp>
@@ -23,23 +24,33 @@ class ParticleSystem : public MovableObject {
    
    struct particle_t {
       glm::vec4 direction;
+
       float ttl;
       float speed;
       float acc;
+			float rotation_speed;
+
+			float initial_scale;
+			float final_scale;
 			float org_ttl;
+			int dead;
    } __attribute__ ((aligned (16))) ;
 
 	struct vertex_t {
 		glm::vec4 position;
 		glm::vec4 color;
+		float scale;
+		int texture_index;
 	} __attribute__ ((aligned (16)));
 
    std::vector<cl::Event> update_blocking_events_;
    std::vector<cl::Event> render_blocking_events_;
 
+	 Texture * texture_;
+
    public:
 
-   ParticleSystem(const int max_num_particles);
+   ParticleSystem(const int max_num_particles, Texture * texture);
    ~ParticleSystem();
 
    void update(float dt);
@@ -77,7 +88,18 @@ class ParticleSystem : public MovableObject {
       //Scale
       float avg_scale;
       float scale_var;
+			float avg_scale_change;
+			float scale_change_var;
 
+			//Rotation
+			float avg_rotation_speed;
+			float rotation_speed_var;
+
+			float avg_spawn_delay;
+			float spawn_delay_var;
+
+			//These two should not be manually changed!
+			int num_textures;
 			int max_num_particles;      
    } config __attribute__ ((aligned (16)));
 };

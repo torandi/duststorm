@@ -37,6 +37,7 @@ public:
 	enum local_uniforms_t {
 		UNIFORM_TEXTURE1=0,
 		UNIFORM_TEXTURE2,
+		UNIFORM_TEXTURE_ARRAY1,
 
 		NUM_LOCAL_UNIFORMS
 	};

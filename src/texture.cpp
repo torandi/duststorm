@@ -65,6 +65,14 @@ unsigned int Texture::mipmap_count() const {
 	return _mipmap_count;
 }
 
+unsigned int Texture::num_textures() const {
+	return _num_textures;
+}
+
+GLuint Texture::texture_type() const {
+	return _texture_type;
+}
+
 void Texture::bind() const {
 	assert(_texture != (unsigned int)-1);
 	glBindTexture(_texture_type, _texture);
