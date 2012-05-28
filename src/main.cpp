@@ -195,44 +195,31 @@ static void render(){
 	glClearColor(1,0,1,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	shaders[SHADER_BLUR]->bind();
-	{
-		RenderTarget* prev = scene["TV"];
-		for ( int i = 0; i < 3; i++ ){
-			Shader::upload_state(downsample[i]->size);
-			Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
-			downsample[i]->with([prev,i](){
-				prev->draw(glm::ivec2(0,0), downsample[i]->size);
+	RenderTarget* prev = scene["TV"];
+	for ( int i = 0; i < 3; i++ ){
+		Shader::upload_state(downsample[i]->size);
+		Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
+		downsample[i]->with([prev,i](){
+				prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->size);
 			});
-			prev = downsample[i];
-		}
+		prev = downsample[i];
 	}
-	Shader::unbind();
 
 	Shader::upload_state(resolution);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
-	shaders[SHADER_PASSTHRU]->bind();
-	{
-		scene["particle"]->draw(glm::ivec2(0,0));
-		scene["Test"]->draw(glm::ivec2(0,400));
-	}
-	Shader::unbind();
+	scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,0));
+	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,400));
 
-	shaders[SHADER_DISTORT]->bind();
-	{
-		glActiveTexture(GL_TEXTURE1);
-		texture_test->bind();
-		glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE1);
+	texture_test->bind();
+	glActiveTexture(GL_TEXTURE0);
 
-		scene["TV"]->draw(glm::ivec2(400,0));
+	scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glActiveTexture(GL_TEXTURE0);
-
-	}
-	Shader::unbind();
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0);
 
 	SDL_GL_SwapBuffers();
 	checkForGLErrors("Frame end");

@@ -2,6 +2,7 @@
 #define RENDER_TARGET_H
 
 #include "color.hpp"
+#include "shader.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <functional>
@@ -42,9 +43,9 @@ public:
 	/**
 	 * Render the RenderTarget on current framebuffer.
 	 */
-	void draw();
-	void draw(const glm::ivec2& pos);
-	void draw(const glm::ivec2& pos, const glm::ivec2& size);
+	void draw(Shader* shader);
+	void draw(Shader* shader, const glm::ivec2& pos);
+	void draw(Shader* shader, const glm::ivec2& pos, const glm::ivec2& size);
 
 	const glm::ivec2 size;
 	glm::mat4 projection;

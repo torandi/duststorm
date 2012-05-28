@@ -117,15 +117,15 @@ void RenderTarget::clear(const Color& color) const {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderTarget::draw(){
-	draw(glm::ivec2(0,0), size);
+void RenderTarget::draw(Shader* shader){
+	draw(shader, glm::ivec2(0,0), size);
 }
 
-void RenderTarget::draw(const glm::ivec2& pos){
-	draw(pos, size);
+void RenderTarget::draw(Shader* shader, const glm::ivec2& pos){
+	draw(shader, pos, size);
 }
 
-void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
+void RenderTarget::draw(Shader* shader, const glm::ivec2& pos, const glm::ivec2& size){
 	static const float vertices[][5] = { /* x,y,z,u,v */
 		{0, 0, 0, 0, 1},
 		{0, 1, 0, 0, 0},
@@ -141,6 +141,7 @@ void RenderTarget::draw(const glm::ivec2& pos, const glm::ivec2& size){
 
 	Shader::upload_model_matrix(model);
 
+	shader->bind();
 	glBindTexture(GL_TEXTURE_2D, texture());
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5,  &vertices[0][0]);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5,  &vertices[0][3]);
