@@ -50,7 +50,12 @@ class ParticleSystem : public MovableObject {
 
    public:
 
-   ParticleSystem(const int max_num_particles, Texture * texture);
+	 /**
+		* Creates a particle system with max_num_particles (the actual number can be decreased later)
+		* texture must be an texture_2d_array. 
+		* the particles are initialy spawned with 0..start_delay s delay
+		*/
+   ParticleSystem(const int max_num_particles, Texture * texture, float start_delay=5.f);
    ~ParticleSystem();
 
    void update(float dt);

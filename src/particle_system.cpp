@@ -12,7 +12,7 @@
 #include "globals.hpp"
 #include "utils.hpp"
 
-ParticleSystem::ParticleSystem(const int max_num_particles, Texture * texture) : 
+ParticleSystem::ParticleSystem(const int max_num_particles, Texture * texture, float start_delay) : 
 	max_num_particles_(max_num_particles)
 	,	texture_(texture) {
 	program_ = opencl->create_program(PATH_OPENCL "particles.cl");
@@ -48,7 +48,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles, Texture * texture) :
 	particle_t * initial_particles = new particle_t[max_num_particles];
 	for(int i=0; i<max_num_particles; ++i) {
 		initial_particles[i].dead = 1; //mark as dead
-		initial_particles[i].ttl = -frand(); //time until spawn
+		initial_particles[i].ttl = -start_delay*frand(); //time until spawn
 	}
 
 	//Create cl buffers:
@@ -112,8 +112,8 @@ ParticleSystem::ParticleSystem(const int max_num_particles, Texture * texture) :
 	config.avg_spawn_speed = 0.01f;
 	config.spawn_speed_var = 0.005f;
 	//Spawn delay
-	config.avg_spawn_delay = 1.f;
-	config.spawn_delay_var = 0.5f;
+	config.avg_spawn_delay = start_delay;
+	config.spawn_delay_var = start_delay/2.f;
 
 	//Acceleration
 	config.avg_acc = 0.00f;
