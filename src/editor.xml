@@ -38,7 +38,7 @@
   <object class="GtkTreeStore" id="scenestore">
     <columns>
       <!-- column-name icon -->
-      <column type="gchararray"/>
+      <column type="GdkPixbuf"/>
       <!-- column-name title -->
       <column type="gchararray"/>
     </columns>
@@ -396,7 +396,7 @@
                         <child>
                           <object class="GtkCellRendererPixbuf" id="icon"/>
                           <attributes>
-                            <attribute name="stock-id">0</attribute>
+                            <attribute name="pixbuf">0</attribute>
                           </attributes>
                         </child>
                         <child>

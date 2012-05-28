@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <cstdio>
 #include <cstdlib>
 #include <gtk/gtk.h>
@@ -36,6 +40,12 @@ static RenderTarget* frame = nullptr;
 static std::string scene_name;
 static Scene* scene = nullptr;
 static float slide_ref;
+
+/* icons */
+static GdkPixbuf* icon_cat_scene = nullptr;
+static GdkPixbuf* icon_scene     = nullptr;
+static GdkPixbuf* icon_model     = nullptr;
+static GdkPixbuf* icon_path      = nullptr;
 
 static void show_fps(int signum){
 	fprintf(stderr, "FPS: %d\n", frames);
@@ -296,30 +306,45 @@ int main (int argc, char* argv[]){
 	gtk_accel_group_connect_by_path(accel_group, "<editor>/quit", g_cclosure_new(gtk_main_quit, NULL, NULL));
 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
+	/* load icons */
+	icon_cat_scene = gdk_pixbuf_new_from_file(PATH_SRC "pictures.png", NULL);
+	icon_scene     = gdk_pixbuf_new_from_file(PATH_SRC "picture.png", NULL);
+	icon_model     = gdk_pixbuf_new_from_file(PATH_SRC "brick.png", NULL);
+	icon_path      = gdk_pixbuf_new_from_file(PATH_SRC "map.png", NULL);
+
 	/* setup scene-list */
 	GtkTreeIter toplevel;
 	GtkTreeStore* scenestore = GTK_TREE_STORE(gtk_builder_get_object(builder, "scenestore"));
 	gtk_tree_store_append(scenestore, &toplevel, NULL);
-	gtk_tree_store_set(scenestore, &toplevel, COL_TITLE, "<b>Scenes</b>", -1);
+	gtk_tree_store_set(scenestore, &toplevel,
+	                   COL_ICON, icon_cat_scene,
+	                   COL_TITLE, "<b>Scenes</b>",
+	                   -1);
 
 	for ( auto it = SceneFactory::begin(); it != SceneFactory::end(); ++it ){
 		GtkTreeIter child;
 		gtk_tree_store_append(scenestore, &child, &toplevel);
-		gtk_tree_store_set(scenestore, &child, COL_TITLE, it->first.c_str(), -1);
+		gtk_tree_store_set(scenestore, &child,
+		                   COL_ICON, icon_scene,
+		                   COL_TITLE, it->first.c_str(),
+		                   -1);
 
 		SceneFactory::Metadata* meta = it->second.meta;
 		for ( std::pair<std::string, std::string> p: *meta ){
 			const std::string& key   = p.first;
 			const std::string& value = p.second;
 			std::string title = key;
+			GdkPixbuf* icon = nullptr;
 
 			char* data = strdup(value.c_str());
 			char* t = strtok(data, ":");
 			char* d = strtok(NULL, ":");
 
 			if ( strcmp(t, "path") == 0 ){
+				icon = icon_path;
 				title += std::string(" (") + std::string(d?d:"<nil>") + std::string(")");
 			} else if ( strcmp(t, "model") == 0 ){
+				icon = icon_model;
 				title += std::string(" (") + std::string(d?d:"<nil>") + std::string(")");
 			}
 
@@ -328,7 +353,7 @@ int main (int argc, char* argv[]){
 			GtkTreeIter cur;
 			gtk_tree_store_append(scenestore, &cur, &child);
 			gtk_tree_store_set(scenestore, &cur,
-			                   COL_ICON, "gtk-media-play",
+			                   COL_ICON, icon,
 			                   COL_TITLE, title.c_str(),
 			                   -1);
 		}
