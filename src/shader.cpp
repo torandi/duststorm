@@ -281,9 +281,10 @@ void Shader::init_uniforms() {
 }
 
 void Shader::bind() {
-	if ( current ){
-		fprintf(stderr, "Shader nesting problem, a shader is already bound.\n");
-		abort();
+	if ( this == current ){
+		return; /* do nothing */
+	} else if ( current ){
+		unbind();
 	}
 
 	glUseProgram(program_);
