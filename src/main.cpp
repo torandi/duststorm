@@ -104,9 +104,9 @@ static void init(bool fullscreen){
 	opencl = new CL();
 
 	/* Instantiate all scenes */
-	scene["Test"]     = Scene::create("Test", glm::ivec2(800,200));
-	scene["particle"] = Scene::create("Particles", glm::ivec2(400, 400));
-	scene["TV"]       = Scene::create("TV", glm::ivec2(400,400));
+	scene["Test"]     = SceneFactory::create("Test", glm::ivec2(800,200));
+	scene["particle"] = SceneFactory::create("Particles", glm::ivec2(400, 400));
+	scene["TV"]       = SceneFactory::create("TV", glm::ivec2(400,400));
 
 	/* Setup timetable */
 	const char* tablename = PATH_SRC "timetable.txt";

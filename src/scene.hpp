@@ -18,14 +18,6 @@ public:
 	virtual ~Scene();
 
 	/**
-	 * Allocate a new scene by typename.
-	 * Name must match a previously registered type.
-	 * @see REGISTER_SCENE_TYPE
-	 * @return nullptr if no matching scene could be found.
-	 */
-	static Scene* create(const std::string& name, const glm::ivec2& size);
-
-	/**
 	 * Setup timetable for the scene.
 	 * @return this to allow chaining.
 	 */
@@ -57,38 +49,6 @@ public:
 
 	bool is_active() const;
 
-	typedef std::map<std::string, std::string> Metadata;
-	typedef Scene*(*factory_callback)(const glm::ivec2& size);
-
-	/**
-	 * Static information about a scene-type.
-	 */
-	struct SceneInfo {
-		/**
-		 * Metadata is a map of resources the scene depends on.
-		 * Key is the name of the resource.
-		 * Value is a TYPE:DATA pair where TYPE defines what kind of resource it is.
-		 * E.g. "Camera 1" -> "camera:points.txt"
-		 */
-		Metadata* meta;
-
-		/**
-		 * Function used to allocate a new instance.
-		 */
-		factory_callback func;
-	};
-
-	/**
-	 * Register a new scene class. Do not call directly, use REGISTER_SCENE_TYPE.
-	 */
-	static void register_factory(const std::string& name, factory_callback func, Metadata* meta);
-
-	/**
-	 * Scene-type iterator.
-	 */
-	static std::map<std::string, SceneInfo>::const_iterator factory_begin();
-	static std::map<std::string, SceneInfo>::const_iterator factory_end();
-
 protected:
 	float stage(float t) const;
 
@@ -103,8 +63,54 @@ private:
 	bool match;
 };
 
+namespace SceneFactory {
+	typedef std::map<std::string, std::string> Metadata;
+	typedef Scene*(*factory_callback)(const glm::ivec2& size);
+}
+
 /**
- * Glue between REGISTER_SCENE_TYPE and Scene.
+ * Static information about a scene-type.
+ */
+struct SceneInfo {
+	/**
+	 * Metadata is a map of resources the scene depends on.
+	 * Key is the name of the resource.
+	 * Value is a TYPE:DATA pair where TYPE defines what kind of resource it is.
+	 * E.g. "Camera 1" -> "camera:points.txt"
+	 */
+	SceneFactory::Metadata* meta;
+
+	/**
+	 * Function used to allocate a new instance.
+	 */
+	SceneFactory::factory_callback func;
+};
+
+namespace SceneFactory {
+	typedef std::map<std::string, SceneInfo> SceneMap;
+
+	/**
+	 * Allocate a new scene by typename.
+	 * Name must match a previously registered type.
+	 * @see REGISTER_SCENE_TYPE
+	 * @return nullptr if no matching scene could be found.
+	 */
+	Scene* create(const std::string& name, const glm::ivec2& size);
+
+	/**
+	 * Scene-type iterator.
+	 */
+	SceneMap::const_iterator begin();
+	SceneMap::const_iterator end();
+
+	/**
+	 * Register a new scene class. Do not call directly, use REGISTER_SCENE_TYPE.
+	 */
+	void register_factory(const std::string& name, factory_callback func, Metadata* meta);
+};
+
+/**
+ * Glue between REGISTER_SCENE_TYPE and SceneFactory.
  * Specialize this class if you need to implement a custom function.
  */
 template <class T>
@@ -121,8 +127,8 @@ public:
 	/**
 	 * Allocate metadata. Default is an empty map.
 	 */
-	static Scene::Metadata* metadata(){
-		return new Scene::Metadata;
+	static SceneFactory::Metadata* metadata(){
+		return new SceneFactory::Metadata;
 	}
 };
 
@@ -131,7 +137,7 @@ public:
  */
 #define REGISTER_SCENE_TYPE(cls, name) \
 	void _register_##cls () { \
-		Scene::register_factory(name, SceneTraits<cls>::factory, SceneTraits<cls>::metadata()); \
+		SceneFactory::register_factory(name, SceneTraits<cls>::factory, SceneTraits<cls>::metadata()); \
 	}
 
 #endif /* SCENE_H */

@@ -4,8 +4,6 @@
 
 #include "scene.hpp"
 
-static std::map<std::string, Scene::SceneInfo> factory_map;
-
 Scene::Scene(const glm::ivec2& size)
 	: RenderTarget(size, false, true)
 	, current(timetable.end())
@@ -83,24 +81,4 @@ float Scene::stage(float t) const {
 
 bool Scene::is_active() const {
 	return match;
-}
-
-void Scene::register_factory(const std::string& name, factory_callback func, Metadata* meta){
-	factory_map[name] = {meta, func};
-}
-
-Scene* Scene::create(const std::string& name, const glm::ivec2& size){
-	auto it = factory_map.find(name);
-	if ( it == factory_map.end() ){
-		return nullptr;
-	}
-	return it->second.func(size);
-}
-
-std::map<std::string, Scene::SceneInfo>::const_iterator Scene::factory_begin(){
-	return factory_map.begin();
-}
-
-std::map<std::string, Scene::SceneInfo>::const_iterator Scene::factory_end(){
-	return factory_map.end();
 }

@@ -18,7 +18,7 @@ demo_SOURCES = \
 	src/particle_system.cpp src/particle_system.hpp \
 	src/rendertarget.cpp src/rendertarget.hpp \
 	src/render_object.cpp src/render_object.hpp \
-	src/scene.cpp src/scene.hpp \
+	src/scene.cpp src/scenefactory.cpp src/scene.hpp \
 	src/shader.cpp src/shader.hpp \
 	src/time.cpp src/time.hpp \
 	src/timetable.cpp src/timetable.hpp \
