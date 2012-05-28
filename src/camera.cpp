@@ -64,6 +64,11 @@ const float Camera::far() const { return far_; }
 const float Camera::roll() const { return roll_; }
 const glm::vec3 &Camera::position() const { return position_; }
 
+void Camera::set_aspect(float aspect){
+	aspect_ = aspect;
+	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);
+}
+
 void Camera::set_fov(float fov) {
 	fov_ = fov;
 	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);

@@ -21,6 +21,7 @@ public:
 	const float far() const;
 	const float roll() const;
 
+	void set_aspect(float aspect);
 	void set_fov(float fov);
 
 	virtual void roll(const float angle);
@@ -36,7 +37,7 @@ private:
 	void recalculate();
 
 	float fov_, roll_;
-	const float aspect_, near_, far_;
+	float aspect_, near_, far_;
 
 	glm::vec3 look_at_;
 	glm::mat4 projection_matrix_;
