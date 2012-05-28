@@ -9,6 +9,16 @@
 
 class Texture  {
 	public:
+
+		static Texture * mipmap(std::string &path, const unsigned int num_mipmap_levels = 5);
+		static Texture * cubemap(
+				std::string px, std::string nx,
+				std::string py, std::string ny,
+				std::string pz, std::string nz);
+		static Texture * array(int num_textures, ...);
+		static Texture * array(std::vector<std::string> &paths);
+								
+
 		/* 
 		 * Load a single texture as GL_TEXTURE_2D
 		 */

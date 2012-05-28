@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <cstdarg>
 #include <cassert>
 
 GLuint Texture::cube_map_index_[6] = {
@@ -14,6 +15,39 @@ GLuint Texture::cube_map_index_[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 
 };
+
+Texture * Texture::mipmap(std::string &path, const unsigned int num_mipmap_levels) {
+	return new Texture(path, num_mipmap_levels);
+}
+
+Texture * Texture::cubemap(
+		std::string px, std::string nx,
+		std::string py, std::string ny,
+		std::string pz, std::string nz) {
+	std::vector<std::string> v;
+	v.push_back(px);
+	v.push_back(nx);
+	v.push_back(py);
+	v.push_back(ny);
+	v.push_back(pz);
+	v.push_back(nz);
+	return new Texture(v, true);
+}
+
+Texture * Texture::array(std::vector<std::string> &paths) {
+	return new Texture(paths, false);
+}
+
+Texture * Texture::array(int num_textures, ...) {
+	std::vector<std::string> textures;
+	va_list list;	
+	va_start(list, num_textures);
+	for(int i=0; i < num_textures; ++i) {
+		textures.push_back(va_arg(list, const char *));
+	}
+	va_end(list);
+	return new Texture(textures, false);
+}
 
 Texture::Texture(const std::string &path, const unsigned int num_mipmap_levels) :
 	_texture(-1),
