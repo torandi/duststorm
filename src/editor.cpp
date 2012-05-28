@@ -22,6 +22,7 @@
 enum {
 	COL_ICON = 0,
 	COL_TITLE = 1,
+	COL_FILENAME = 2,
 };
 
 static const unsigned int framerate = 60;
@@ -333,7 +334,7 @@ int main (int argc, char* argv[]){
 		for ( std::pair<std::string, std::string> p: *meta ){
 			const std::string& key   = p.first;
 			const std::string& value = p.second;
-			std::string title = key;
+			std::string filename = "";
 			GdkPixbuf* icon = nullptr;
 
 			char* data = strdup(value.c_str());
@@ -342,10 +343,10 @@ int main (int argc, char* argv[]){
 
 			if ( strcmp(t, "path") == 0 ){
 				icon = icon_path;
-				title += std::string(" (") + std::string(d?d:"<nil>") + std::string(")");
+				filename = std::string(d?d:"<nil>");
 			} else if ( strcmp(t, "model") == 0 ){
 				icon = icon_model;
-				title += std::string(" (") + std::string(d?d:"<nil>") + std::string(")");
+				filename = std::string(d?d:"<nil>");
 			}
 
 			free(data);
@@ -354,7 +355,8 @@ int main (int argc, char* argv[]){
 			gtk_tree_store_append(scenestore, &cur, &child);
 			gtk_tree_store_set(scenestore, &cur,
 			                   COL_ICON, icon,
-			                   COL_TITLE, title.c_str(),
+			                   COL_TITLE, key.c_str(),
+			                   COL_FILENAME, filename.c_str(),
 			                   -1);
 		}
 	}

@@ -41,6 +41,8 @@
       <column type="GdkPixbuf"/>
       <!-- column-name title -->
       <column type="gchararray"/>
+      <!-- column-name filename -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="window">
@@ -403,6 +405,12 @@
                           <object class="GtkCellRendererText" id="title"/>
                           <attributes>
                             <attribute name="markup">1</attribute>
+                          </attributes>
+                        </child>
+                        <child>
+                          <object class="GtkCellRendererText" id="filename"/>
+                          <attributes>
+                            <attribute name="markup">2</attribute>
                           </attributes>
                         </child>
                       </object>
