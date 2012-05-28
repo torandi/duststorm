@@ -27,12 +27,12 @@ class ParticleSystem : public MovableObject {
       float speed;
       float acc;
 			float org_ttl;
-   };
+   } __attribute__ ((aligned (16))) ;
 
 	struct vertex_t {
 		glm::vec4 position;
 		glm::vec4 color;
-	};
+	} __attribute__ ((aligned (16)));
 
    std::vector<cl::Event> update_blocking_events_;
    std::vector<cl::Event> render_blocking_events_;
@@ -78,8 +78,8 @@ class ParticleSystem : public MovableObject {
       float avg_scale;
       float scale_var;
 
-		int max_num_particles;      
-   } config;
+			int max_num_particles;      
+   } config __attribute__ ((aligned (16)));
 };
 
 #endif

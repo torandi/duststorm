@@ -11,7 +11,7 @@ class ParticlesScene: public Scene {
 public:
 	ParticlesScene(const glm::ivec2 &size)
 		: Scene(size)
-		, particles(100000)
+		, particles(1000)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.f) {
 			camera.set_position(glm::vec3(0.f, 0.f, -1));
 			camera.look_at(glm::vec3(0.f, 0.f, 0.f));
@@ -20,7 +20,7 @@ public:
 			particles.config.spawn_direction = glm::vec4(0, 1.f, 0.f, 0.f);
 			particles.config.avg_spawn_speed= 0.001f;
 			particles.config.spawn_speed_var = 0.0005f;
-			particles.config.avg_scale = 0.001f;
+			particles.config.avg_scale = 0.1f;
 			particles.config.scale_var = 0.0005f;
 			particles.update_config();
 	}

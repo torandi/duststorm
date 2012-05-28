@@ -4,12 +4,12 @@ typedef struct particle_t {
 	float speed;
 	float acc;
 	float org_ttl; //original time to live, stored to get a percentage
-} particle_t ;
+} particle_t __attribute__ ((aligned (16))) ;
 
 typedef struct vertex_t {
 	float4 position;
 	float4 color;
-} vertex_t;
+} vertex_t __attribute__ ((aligned (16))) ;
 
 typedef struct config_t {
 
@@ -37,7 +37,7 @@ typedef struct config_t {
 
 	int max_num_particles;
 
-} config_t;
+} config_t __attribute__ ((aligned (16))) ;
 
 float random(uint *time, uint id, __constant const float * rnd, int max_num_particles) {
 	int i = (int)((*time)+id) % max_num_particles;
@@ -108,9 +108,8 @@ void respawn_particle (
 											 )
 {
 	vertex->position.xyz = config->spawn_position + random3(config->spawn_area, false);
-	//vertex->position.w = config->avg_scale + random1(config->scale_var, true);
-	vertex->position.w = 1.f;
-	vertex->color = config->birth_color;
+	vertex->position.w = config->avg_scale + random1(config->scale_var, true);
+
 
 	particle->direction = normalize(config->spawn_direction + random3(config->direction_var, true));
 	particle->org_ttl = particle->ttl = config->avg_ttl + random1(config->ttl_var, true);
@@ -119,6 +118,7 @@ void respawn_particle (
 
 	//Update particle
 	update_particle(vertex, particle, config, rnd, dt, time, id);
+
 }
 
 
@@ -133,7 +133,6 @@ __kernel void run_particles (
 														 )
 {
 	uint id = get_global_id(0);    
-
 		//First check if particle is alive:
 	if(particles[id].ttl > 0) {
 		//It lives

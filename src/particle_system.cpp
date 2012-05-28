@@ -20,7 +20,8 @@ ParticleSystem::ParticleSystem(const int max_num_particles) : max_num_particles_
 	vertex_t * empty = new vertex_t[max_num_particles];
 
 	for(int i=0;i<max_num_particles; ++i) {
-		empty[i].position = glm::vec4(0.f,0.f,0.f,0.1f);
+		empty[i].position = glm::vec4(0.f);
+		empty[i].color = glm::vec4(0.f);
 	}
 
 	//Create VBO's
@@ -139,17 +140,18 @@ void ParticleSystem::update(float dt) {
 	//Make sure opengl is done with our vbos
 	glFinish();
 
-	update_blocking_events_.push_back(cl::Event());
+	cl::Event lock_e, e, e2;
 
-	err = opencl->queue().enqueueAcquireGLObjects(&cl_gl_buffers_, NULL, &update_blocking_events_[0]);
+	err = opencl->queue().enqueueAcquireGLObjects(&cl_gl_buffers_, NULL, &lock_e);
 	CL::check_error(err, "[ParticleSystem] acquire gl objects");
+
+	update_blocking_events_.push_back(lock_e);
 
 	err = kernel_.setArg(5, dt);
 	CL::check_error(err, "[ParticleSystem] set dt");
 	err = kernel_.setArg(6, (int)(time(0)%UINT_MAX));
 	CL::check_error(err, "[ParticleSystem] set time");
 
-	cl::Event e, e2;
 
 	err = opencl->queue().enqueueNDRangeKernel(kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, &update_blocking_events_, &e);
 	CL::check_error(err, "[ParticleSystem] Execute kernel");
@@ -165,7 +167,7 @@ void ParticleSystem::update(float dt) {
 
 	opencl->queue().flush();
 
-	/*
+/*
 	//BEGIN DEBUG
 	particle_t * particles = (particle_t*) opencl->queue().enqueueMapBuffer(particles_, CL_TRUE, CL_MAP_READ, 0, sizeof(particle_t)*max_num_particles_, NULL, NULL, &err);
 
@@ -179,7 +181,7 @@ void ParticleSystem::update(float dt) {
 	opencl->queue().finish();
 
 	//END DEBUG
-	*/	
+*/	
 }
 
 void ParticleSystem::render() {
@@ -194,19 +196,19 @@ void ParticleSystem::render() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, gl_buffer_);
 
-	/*
+/*
 	//DEBUG
 	
 	vertex_t * vertices = (vertex_t* )glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
 	printf("---\n");
 	for(int i=0;i<max_num_particles_; ++i) {
-		printf("Vertex: (%f, %f, %f, %f), (%f, %f, %f, %f)\n", vertices[i].position.x, vertices[i].position.y, vertices[i].position.z, vertices[i].position.w, vertices[i].color.r, vertices[i].color.g, vertices[i].color.b, vertices[i].color.a);
+		printf("Vertex: pos:(%f, %f, %f, %f), color:(%f, %f, %f, %f)\n", vertices[i].position.x, vertices[i].position.y, vertices[i].position.z, vertices[i].position.w, vertices[i].color.r, vertices[i].color.g, vertices[i].color.b, vertices[i].color.a);
 	}
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	//END DEBUG
-	*/	
+*/	
 
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
