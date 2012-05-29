@@ -15,6 +15,7 @@ enum shader_t {
 	SHADER_SIMPLE=0,
 	SHADER_NORMAL,
 	SHADER_PARTICLES,
+	SHADER_PARTICLES_LIGHT, //Particles with lighting
 	SHADER_DEBUG,
 
 	/* for rendering targets */

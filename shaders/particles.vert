@@ -24,24 +24,6 @@ void main() {
 	particleData.scale = scale;
 	gl_Position = viewMatrix * pos;
 
-	vec3 accumLighting = color.rgb * Lgt.ambient_intensity;
-
-	for(int light = 0; int(light) < Lgt.num_lights; ++light) {
-		vec3 light_distance = Lgt.lights[light].position.xyz - pos.xyz;
-
-		vec3 lightIntensity;
-		if(Lgt.lights[light].type == 0) {
-			lightIntensity = Lgt.lights[light].intensity.rgb;	
-		} else {
-			float lightAttenuation = (1 / ( 1.0 + Lgt.lights[light].attenuation * length(light_distance)));
-			lightIntensity =  lightAttenuation * Lgt.lights[light].intensity.rgb;
-		}
-
-		accumLighting += lightIntensity * color.rgb ;
-	}
-	
-	particleData.color.rgb= clamp(accumLighting,0.0, 1.0);
-
-	particleData.color.a = color.a;
+	particleData.color = color;
 }
 

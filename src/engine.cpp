@@ -10,6 +10,7 @@ static const char* shader_programs[NUM_SHADERS] = {
 	"simple",
 	"normal",
 	"particles",
+	"particles_light",
 	"debug",
 	"passthru",
 	"distort",
