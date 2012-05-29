@@ -13,7 +13,7 @@ in ParticleData {
 
 out vec4 color;
 out vec2 tex_coord;
-out int texture_index;
+flat out int texture_index;
 
 void main() {
 	float s = particleData[0].scale*0.1;
