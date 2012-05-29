@@ -4,7 +4,7 @@
 
 in vec4 color;
 in vec2 tex_coord;
-in int texture_index;
+flat int texture_index;
 
 out vec4 ocolor;
 
