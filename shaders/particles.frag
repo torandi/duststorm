@@ -1,4 +1,5 @@
 #version 150
+#extension GL_EXT_gpu_shader4 : enable
 #include "uniforms.glsl"
 
 in vec4 color;
