@@ -48,7 +48,7 @@ demo_SOURCES = src/main.cpp
 
 editor_CXXFLAGS = ${AM_CXXFLAGS} $$(pkg-config gtk+-3.0 gtkglext-3.0 --cflags)
 editor_LDFLAGS = $$(pkg-config gtk+-3.0 gtkglext-3.0 --libs) -Wl,--export-dynamic
-editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS}
+editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} -lSDL_image
 editor_SOURCES = src/editor.cpp
 
 .PHONY: .autoload.tmp
