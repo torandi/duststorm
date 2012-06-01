@@ -60,7 +60,7 @@ static RenderTarget* frame = nullptr;
 static std::string scene_name;
 static Scene* scene = nullptr;
 static RenderObject* model = nullptr;
-static Camera camera(75.f, 1.0f, 0.1f, 100.0f);
+static Camera camera(60.f, 1.0f, 0.1f, 100.0f);
 static float slide_ref;
 static glm::vec2 track_ref;
 static glm::vec2 track_angle(0.0f, M_PI*0.5);
@@ -100,7 +100,7 @@ static void render_model(){
 	shaders[SHADER_NORMAL]->bind();
 	frame->clear(Color::white);
 	Shader::upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
-	model->render(shaders[SHADER_NORMAL]);
+	model->render(shaders[SHADER_MODELVIEWER]);
 	Shader::unbind();
 	frame->unbind();
 }

@@ -9,6 +9,7 @@
 static const char* shader_programs[NUM_SHADERS] = {
 	"simple",
 	"normal",
+	"modelviewer",
 	"particles",
 	"particles_light",
 	"debug",

@@ -24,6 +24,7 @@ extern glm::ivec2 resolution;            /* current resolution */
 enum shader_t {
 	SHADER_SIMPLE=0,
 	SHADER_NORMAL,
+	SHADER_MODELVIEWER,                    /* Texture, no lighting */
 	SHADER_PARTICLES,
 	SHADER_PARTICLES_LIGHT, //Particles with lighting
 	SHADER_DEBUG,
