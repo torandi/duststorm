@@ -8,10 +8,11 @@
 #include <vector>
 #include <cassert>
 
-Mesh::Mesh() : vbos_generated_(false), has_tangents_(false)	{ }
+Mesh::Mesh() : MovableObject(), vbos_generated_(false), has_tangents_(false)	{ }
 
 Mesh::Mesh(const std::vector<vertex_t> &vertices, const std::vector<unsigned int> &indices) :
-	vbos_generated_(false),vertices_(vertices), indices_(indices), has_tangents_(false)	{
+	MovableObject(), 
+	vbos_generated_(false),has_tangents_(false), vertices_(vertices), indices_(indices){
 	assert((indices.size()%3)==0);
 }
 
@@ -39,7 +40,7 @@ void Mesh::set_vertices(const float vertices[][5], const size_t num_vertices) {
    v.tangent = glm::vec3();
    v.bitangent = glm::vec3();
 
-   for(int i=0; i < num_vertices; ++i) {
+   for(unsigned int i=0; i < num_vertices; ++i) {
       v.position = glm::vec3(vertices[i][0], vertices[i][1], vertices[i][2]);
       v.tex_coord = glm::vec2(vertices[i][3], vertices[i][4]);
       vertices_.push_back(v);
@@ -155,6 +156,9 @@ void Mesh::generate_vbos() {
 }
 
 void Mesh::render() {
+
+	Shader::upload_model_matrix(matrix());
+
 	glBindBuffer(GL_ARRAY_BUFFER, buffers_[0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers_[1]);
 

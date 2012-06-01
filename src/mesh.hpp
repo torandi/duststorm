@@ -5,8 +5,9 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "movable_object.hpp"
 
-class Mesh {
+class Mesh : public MovableObject {
 public:
 	
 
@@ -20,7 +21,7 @@ public:
 
    Mesh();
 	Mesh(const std::vector<vertex_t> &vertices, const std::vector<unsigned int> &indices);
-	~Mesh();
+	virtual ~Mesh();
 
    // Call these methods to activate these features.
    // Automaticaly activated if the corresponding activate function is called
