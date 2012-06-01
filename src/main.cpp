@@ -202,12 +202,28 @@ static void downsample_tv(){
 }
 
 static void render_composition(){
+	RenderTarget::clear(Color::black);
+
+	float t = global_time.get();
+	glm::vec2 pos_1(0, 0);
+	glm::vec2 pos_2(0, resolution.y - scene["particle"]->size.y);
+	glm::vec2 pos;
+
+	if ( t < 10.0f ){
+		pos = pos_1;
+	} else if ( t > 11.5f ){
+		pos = pos_2;
+	} else {
+		float s = (t-10.0f) / 1.5f;
+		pos = glm::mix(pos_1, pos_2, s);
+	}
+
 	Shader::upload_state(resolution);
 	Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
 
-	scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,0));
 	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,400));
+	scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2((int)pos.x, (int)pos.y));
 
 	/*glActiveTexture(GL_TEXTURE1);
 	  texture_test->bind();
