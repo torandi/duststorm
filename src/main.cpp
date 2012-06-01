@@ -239,10 +239,6 @@ static void update(float dt){
 	for ( std::pair<std::string,Scene*> p: scene ){
 		p.second->update_scene(t, dt);
 	}
-
-	static double rotation = 0.0;
-	rotation += dt*M_PI_4/4.f;
-	rotation = fmod(rotation, 2.f*M_PI);
 }
 
 static void magic_stuff(){
