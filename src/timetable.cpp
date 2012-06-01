@@ -99,3 +99,58 @@ glm::vec3 PointTable::at(float t){
 
 	return glm::catmullRom(p0, p1, p2, p3, s);
 }
+
+
+XYLerpTable::XYLerpTable(const std::string& filename){
+	int ret = read_file(filename);
+	if ( ret != 0 ){
+		fprintf(stderr, "XYLerpTable: Failed to read `%s': %s\n", filename.c_str(), strerror(ret));
+		abort();
+	}
+
+	if ( p.size() < 2 ){
+		fprintf(stderr, "%s: XYLerpTable requires at least two points, table ignored.\n", filename.c_str());
+		p.clear();
+		while ( p.size() < 2 ){
+			p.push_back(entry({0.0f, glm::vec2(0.0f, 0.0f)}));
+		}
+	}
+}
+
+int XYLerpTable::parse(char* data){
+	char* t = strtok(data, ":");
+	char* x = strtok(NULL, ",");
+	char* y = strtok(NULL, ",");
+	if ( !(t && x && y) ){
+		return 1;
+	}
+	p.push_back(entry({(float)atof(t), glm::vec2(atof(x), atof(y))}));
+	return 0;
+}
+
+glm::vec2 XYLerpTable::at(float t){
+	auto cur = p.begin();
+	while ( cur != p.end() ){
+		if ( t < (*cur).t ) break;
+		++cur;
+	}
+
+	/* special case when t has not reached first timestamp */
+	if ( cur == p.begin() ){
+		return (*cur).p;
+	}
+
+	auto prev = cur-1;
+
+	/* special case when t passed last timestamp */
+	if ( cur == p.end() ){
+		return (*prev).p;
+	}
+
+	const float begin = (*prev).t;
+	const float end   = (*cur).t;
+	const float delta = end - begin;
+	const float s = (t - begin) / delta;
+
+	return glm::mix((*prev).p, (*cur).p, s);
+}

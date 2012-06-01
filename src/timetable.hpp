@@ -34,4 +34,26 @@ private:
 	std::vector<entry> p;
 };
 
+/**
+ * Performs linear interpolation of 2D-dimensional vectors.
+ * Format: Timestamp : X , Y
+ */
+class XYLerpTable: public TimeTable {
+public:
+	XYLerpTable(const std::string& filename);
+
+	glm::vec2 at(float t);
+
+protected:
+	virtual int parse(char* data);
+
+private:
+	struct entry {
+		float t;
+		glm::vec2 p;
+	};
+
+	std::vector<entry> p;
+};
+
 #endif /* TIMETABLE_H */
