@@ -39,6 +39,7 @@ static Camera * camera;
 static Shader::lights_data_t lights;
 static Light * light;
 static int frames = 0;
+static RenderTarget* composition;
 static RenderTarget* downsample[3];
 static glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
@@ -127,6 +128,7 @@ static void init(bool fullscreen){
 		fprintf(stderr, "%s: failed to read `%s': %s\n", program_name, tablename, strerror(ret));
 	}
 
+	composition   = new RenderTarget(resolution, false, false);
 	downsample[0] = new RenderTarget(glm::ivec2(200, 200), false, false, GL_LINEAR);
 	downsample[1] = new RenderTarget(glm::ivec2(100, 100), false, false, GL_LINEAR);
 	downsample[2] = new RenderTarget(glm::ivec2( 50,  50), false, false, GL_LINEAR);
@@ -189,13 +191,12 @@ static void poll(){
 static void render(){
 	checkForGLErrors("Frame begin");
 
+	/* render all active scenes */
 	for ( std::pair<std::string,Scene*> p: scene ){
 		p.second->render_scene();
 	}
 
-	glClearColor(1,0,1,1);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
+	/* blur and downsample scene */
 	RenderTarget* prev = scene["TV"];
 	for ( int i = 0; i < 3; i++ ){
 		Shader::upload_state(downsample[i]->size);
@@ -206,25 +207,34 @@ static void render(){
 		prev = downsample[i];
 	}
 
-	Shader::upload_state(resolution);
-	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
-	glViewport(0, 0, resolution.x, resolution.y);
-	scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,0));
-	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,400));
+	/* render onto composition target */
+	composition->bind();
+	{
+		Shader::upload_state(resolution);
+		Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
+		glViewport(0, 0, resolution.x, resolution.y);
+		scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,0));
+		scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,400));
 
-	/*glActiveTexture(GL_TEXTURE1);
-	texture_test->bind();
-	glActiveTexture(GL_TEXTURE0);
+		/*glActiveTexture(GL_TEXTURE1);
+		  texture_test->bind();
+		  glActiveTexture(GL_TEXTURE0);
 
-	scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
+		  scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
 
-	scene["Water"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(400, 0));
+		scene["Water"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(400, 0));
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0);
+	}
+	composition->unbind();
 
+	/* Render final composition onto screen */
+	RenderTarget::clear(Color::magenta);
+	composition->draw(shaders[SHADER_PASSTHRU]);
 	SDL_GL_SwapBuffers();
+
 	checkForGLErrors("Frame end");
 }
 
