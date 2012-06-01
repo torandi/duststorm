@@ -119,7 +119,7 @@ cl::Program CL::create_program(const char * source_file) const{
 	std::string build_log;
 	program.getBuildInfo(devices_[0], CL_PROGRAM_BUILD_LOG, &build_log);
 
-	if(build_log.size() > 0) {
+	if(build_log.size() > 1) { /* 1+ because nvidia likes to put a single LF in the log */
 		fprintf(stderr, "[OpenCL] Build log: %s\n", build_log.c_str());
 	}
 
