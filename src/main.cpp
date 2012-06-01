@@ -183,54 +183,61 @@ static void poll(){
 	}
 }
 
-static void render(){
-	checkForGLErrors("Frame begin");
-
-	/* render all active scenes */
+static void render_scene(){
 	for ( std::pair<std::string,Scene*> p: scene ){
 		p.second->render_scene();
 	}
+}
 
-	/* blur and downsample scene */
+static void downsample_tv(){
 	RenderTarget* prev = scene["TV"];
 	for ( int i = 0; i < 3; i++ ){
 		Shader::upload_state(downsample[i]->size);
 		Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
 		downsample[i]->with([prev,i](){
-				prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->size);
-			});
+			prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->size);
+		});
 		prev = downsample[i];
 	}
+}
 
-	/* render onto composition target */
-	composition->bind();
-	{
-		Shader::upload_state(resolution);
-		Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
-		glViewport(0, 0, resolution.x, resolution.y);
-		scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,0));
-		scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,400));
+static void render_composition(){
+	Shader::upload_state(resolution);
+	Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
+	glViewport(0, 0, resolution.x, resolution.y);
 
-		/*glActiveTexture(GL_TEXTURE1);
-		  texture_test->bind();
-		  glActiveTexture(GL_TEXTURE0);
+	scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,0));
+	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,400));
 
-		  scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
+	/*glActiveTexture(GL_TEXTURE1);
+	  texture_test->bind();
+	  glActiveTexture(GL_TEXTURE0);
 
-		scene["Water"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(400, 0));
+	  scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glActiveTexture(GL_TEXTURE0);
-	}
-	composition->unbind();
+	scene["Water"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(400, 0));
 
-	/* Render final composition onto screen */
+	/*
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0);*/
+}
+
+static void render_display(){
 	RenderTarget::clear(Color::magenta);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
 	composition->draw(shaders[SHADER_PASSTHRU]);
-	SDL_GL_SwapBuffers();
+}
 
+static void render(){
+	checkForGLErrors("Frame begin");
+
+	render_scene();
+	downsample_tv();
+	composition->with(render_composition);
+	render_display();
+
+	SDL_GL_SwapBuffers();
 	checkForGLErrors("Frame end");
 }
 
