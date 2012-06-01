@@ -10,11 +10,11 @@ void main() {
   float x = 1.0f / state.width;
   float y = 1.0f / state.height;
 
+  ocolor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	for ( int i = -12; i < 13; i++ ){
 		ocolor.rgb += texture2D(texture1, vec2(clamp(uv.x + x * abs(i),0,1), uv.y) ).rgb * PixelWeight[i] * 0.25f;
 		ocolor.rgb += texture2D(texture1, vec2(clamp(uv.x - x * abs(i),0,1), uv.y) ).rgb * PixelWeight[i] * 0.25f;
 		ocolor.rgb += texture2D(texture1, vec2(uv.x, clamp(uv.y + y * abs(i),0,1)) ).rgb * PixelWeight[i] * 0.25f;
 		ocolor.rgb += texture2D(texture1, vec2(uv.x, clamp(uv.y - y * abs(i),0,1)) ).rgb * PixelWeight[i] * 0.25f;
 	}
-  ocolor.a = 1.0f;
 }
