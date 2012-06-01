@@ -226,7 +226,7 @@ static void render_composition(){
 static void render_display(){
 	RenderTarget::clear(Color::magenta);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
-	composition->draw(shaders[SHADER_PASSTHRU]);
+	composition->draw(shaders[SHADER_FILMGRAIN]);
 }
 
 static void render(){

@@ -14,7 +14,8 @@ static const char* shader_programs[NUM_SHADERS] = {
 	"debug",
 	"passthru",
 	"distort",
-	"blur"
+	"blur",
+	"filmgrain",
 };
 
 namespace Engine {
