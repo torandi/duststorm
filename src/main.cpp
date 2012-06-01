@@ -35,7 +35,6 @@ static const char* program_name;
 static bool resolution_given = false;
 
 //These are all test variables that should be moved into a scene later
-static Camera * camera;
 static Shader::lights_data_t lights;
 static Light * light;
 static int frames = 0;
@@ -89,10 +88,6 @@ static void init(bool fullscreen){
 	Engine::autoload_scenes();
 	Engine::setup_opengl();
 	Engine::load_shaders();
-
-	camera = new Camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f);
-	camera->set_position(glm::vec3(0.f, 0.f, -1.f));
-	camera->look_at(glm::vec3(0.f, 0.f, 0.f));
 
 	lights.num_lights = 1;
 	lights.ambient_intensity = glm::vec3(0.1, 0.1, 0.1);
@@ -247,12 +242,6 @@ static void update(float dt){
 	static double rotation = 0.0;
 	rotation += dt*M_PI_4/4.f;
 	rotation = fmod(rotation, 2.f*M_PI);
-
-	glm::vec3 pos = glm::vec3(cos(rotation), 0.f, sin(rotation));
-
-	camera->set_position(pos);
-
-	Shader::upload_camera(*camera);
 }
 
 static void magic_stuff(){
