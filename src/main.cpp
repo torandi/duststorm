@@ -206,7 +206,7 @@ static void render(){
 	composition->bind();
 	{
 		Shader::upload_state(resolution);
-		Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
+		Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
 		glViewport(0, 0, resolution.x, resolution.y);
 		scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,0));
 		scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,400));
@@ -227,6 +227,7 @@ static void render(){
 
 	/* Render final composition onto screen */
 	RenderTarget::clear(Color::magenta);
+	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
 	composition->draw(shaders[SHADER_PASSTHRU]);
 	SDL_GL_SwapBuffers();
 
