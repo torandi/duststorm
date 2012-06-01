@@ -3,6 +3,7 @@
 #endif
 
 #include "utils.hpp"
+#include "globals.hpp"
 #include <GL/glew.h>
 #include <cstdio>
 #include <cstdlib>
@@ -26,6 +27,12 @@ int checkForGLErrors( const char *s ) {
 
 float radians_to_degrees(double rad) {
    return (float) (rad * (180/M_PI));
+}
+
+glm::vec2 screen_pos(const glm::vec2& v, const glm::vec2& size){
+	const glm::vec2 w = glm::clamp(v, 0.0f, 1.0f);
+	const glm::vec2 delta = glm::vec2(resolution.x, resolution.y) - size;
+	return w * delta;
 }
 
 void print_mat4(const glm::mat4 &m) {
