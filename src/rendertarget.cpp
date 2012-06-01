@@ -153,7 +153,15 @@ void RenderTarget::draw(Shader* shader, const glm::ivec2& pos){
 	draw(shader, pos, size);
 }
 
+void RenderTarget::draw(Shader* shader, const glm::vec2& pos){
+	draw(shader, pos, glm::vec2(size.x, size.y));
+}
+
 void RenderTarget::draw(Shader* shader, const glm::ivec2& pos, const glm::ivec2& size){
+	draw(shader, glm::vec2(pos.x, pos.y), glm::vec2(size.x, size.y));
+}
+
+void RenderTarget::draw(Shader* shader, const glm::vec2& pos, const glm::vec2& size){
 	static const float vertices[][5] = { /* x,y,z,u,v */
 		{0, 0, 0, 0, 1},
 		{0, 1, 0, 0, 0},

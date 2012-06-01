@@ -44,8 +44,10 @@ public:
 	 * Render the RenderTarget on current framebuffer.
 	 */
 	void draw(Shader* shader);
+	void draw(Shader* shader, const glm::vec2& pos);
 	void draw(Shader* shader, const glm::ivec2& pos);
 	void draw(Shader* shader, const glm::ivec2& pos, const glm::ivec2& size);
+	void draw(Shader* shader, const glm::vec2& pos, const glm::vec2& size);
 
 	const glm::ivec2 size;
 	glm::mat4 projection;
