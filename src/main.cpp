@@ -111,6 +111,7 @@ static void init(bool fullscreen){
 	scene["Test"]     = SceneFactory::create("Test", glm::ivec2(800,200));
 	scene["particle"] = SceneFactory::create("Particles", glm::ivec2(400, 400));
 	scene["TV"]       = SceneFactory::create("TV", glm::ivec2(400,400));
+	scene["Water"]    = SceneFactory::create("Water", glm::ivec2(400,400));
 
 	/* Setup timetable */
 	const char* tablename = PATH_SRC "timetable.txt";
@@ -211,11 +212,13 @@ static void render(){
 	scene["particle"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,0));
 	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(0,400));
 
-	glActiveTexture(GL_TEXTURE1);
+	/*glActiveTexture(GL_TEXTURE1);
 	texture_test->bind();
 	glActiveTexture(GL_TEXTURE0);
 
-	scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));
+	scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
+
+	scene["Water"]->draw(shaders[SHADER_PASSTHRU], glm::ivec2(400, 0));
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, 0);

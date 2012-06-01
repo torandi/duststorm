@@ -28,9 +28,8 @@ void main() {
 	camera_dir.z = dot(camera_direction, norm_normal); 
 
 	vec4 originalColor; 
-   //originalColor = texture(tex1, texcoord);
-   originalColor = vec4(1.f, 1.f, 1.f, 1.f);
-   originalColor*=Mtl.diffuse;
+   originalColor = texture(texture1, texcoord);
+   //originalColor*=Mtl.diffuse;
 
 	vec3 normal_map = vec3(0.0, 0.0, 1.0);
 	

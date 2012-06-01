@@ -26,6 +26,7 @@ libfrob_a_SOURCES = \
 	src/scene/particles.cpp \
 	src/scene/test.cpp \
 	src/scene/tv.cpp \
+	src/scene/water.cpp \
 	autoload.cpp autoload.h
 
 demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image
