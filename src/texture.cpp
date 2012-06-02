@@ -158,7 +158,7 @@ void Texture::load_texture() {
 				//One texture only:
 				GLint err = gluBuild2DMipmapLevels(GL_TEXTURE_2D, GL_RGBA, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, 0, 0, _mipmap_count, images[0]->pixels );
 				if(err != 0) {
-					fprintf(verbose, "[Texture] gluBuild2DMipmapLevels for %s return %s\n", _filenames[0].c_str(), gluErrorString(err));
+					fprintf(stderr, "[Texture] gluBuild2DMipmapLevels for %s return %s\n", _filenames[0].c_str(), gluErrorString(err));
 					abort();
 				}
 				break;
