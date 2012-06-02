@@ -77,10 +77,13 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 }
 
 GLuint RenderObject::load_texture(std::string path) {
+	fprintf(verbose, "Loading texture `%s'\n", path.c_str());
+
 	size_t last_slash = path.rfind("/");
 	if(last_slash != std::string::npos)
 		path = path.substr(last_slash+1);
 	std::string full_path = std::string("textures/")+path;
+
 	//TODO: LOAD TEXTURE
 	return 0;
 }
