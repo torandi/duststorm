@@ -15,8 +15,8 @@ void main() {
 	/* offset */
 	float x = uv.x * uv.y * 1337.0f * state.time;
 	x = mod(x,13.0f) * mod(x,123.0f);
-	float dx = mod(x, 0.010f) - 0.005f;
-	float dy = mod(x, 0.008f) - 0.004f;
+	float dx = mod(x, 0.003f) - 0.0015f;
+	float dy = mod(x, 0.002f) - 0.001f;
 
 	/* noise */
 	float noise = 1.0f - clamp(rand(uv) * noise_ratio, 0.0, 0.7);
