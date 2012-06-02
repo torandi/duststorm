@@ -80,6 +80,10 @@ static void init(bool fullscreen){
 	SDL_EnableKeyRepeat(0, 0);
 	SDL_WM_SetCaption("Speed 100%", NULL);
 
+	if ( fullscreen ){
+		SDL_ShowCursor(SDL_DISABLE);
+	}
+
 	int ret;
 	if ( (ret=glewInit()) != GLEW_OK ){
 		fprintf(stderr, "Failed to initialize GLEW: %s\n", glewGetErrorString(ret));
