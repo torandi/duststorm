@@ -97,7 +97,7 @@ static void render_scene(){
 
 static void render_model(){
 	frame->bind();
-	shaders[SHADER_NORMAL]->bind();
+	shaders[SHADER_MODELVIEWER]->bind();
 	frame->clear(Color::white);
 	Shader::upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
 	model->render(shaders[SHADER_MODELVIEWER]);
