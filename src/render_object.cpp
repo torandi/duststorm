@@ -5,6 +5,7 @@
 #include "render_object.hpp"
 #include "globals.hpp"
 #include "shader.hpp"
+#include "texture.hpp"
 #include "utils.hpp"
 
 #include <string>
@@ -76,14 +77,8 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	pre_render();
 }
 
-GLuint RenderObject::load_texture(std::string path) {
-	size_t last_slash = path.rfind("/");
-	if(last_slash != std::string::npos)
-		path = path.substr(last_slash+1);
-	std::string full_path = std::string("textures/")+path;
-
-	//TODO: LOAD TEXTURE
-	return 0;
+Texture* RenderObject::load_texture(std::string path) {
+	return Texture::mipmap(path);
 }
 
 void RenderObject::pre_render() {
@@ -94,6 +89,7 @@ void RenderObject::pre_render() {
 	for(unsigned int i= 0; i < scene->mNumMaterials; ++i) {
 		const aiMaterial * mtl = scene->mMaterials[i];
 		material_t mtl_data;
+
 		aiString path;
 		if(mtl->GetTextureCount(aiTextureType_DIFFUSE) > 0 &&
 			mtl->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
@@ -104,7 +100,7 @@ void RenderObject::pre_render() {
 			std::string p(path.data);
 			mtl_data.texture = load_texture(p);
 		} else {
-			//TODO: Handle lack of texture
+			mtl_data.texture = Texture::mipmap("default.jpg");
 		}
 
 		//Check for normalmap:
@@ -291,7 +287,7 @@ void RenderObject::material_t::activate() {
 		glDisable(GL_CULL_FACE);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	texture->bind();
 
 	/*
 		 glActiveTexture(GL_TEXTURE1);
