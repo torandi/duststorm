@@ -10,16 +10,16 @@
 class Texture  {
 	public:
 
-		static Texture * mipmap(std::string &path, const unsigned int num_mipmap_levels = 5);
+		static Texture * mipmap(const std::string &path, const unsigned int num_mipmap_levels = 5);
 		static Texture * cubemap(
 				std::string px, std::string nx,
 				std::string py, std::string ny,
 				std::string pz, std::string nz);
 		static Texture * array(int num_textures, ...);
 		static Texture * array(std::vector<std::string> &paths);
-								
 
-		/* 
+
+		/*
 		 * Load a single texture as GL_TEXTURE_2D
 		 */
 		Texture(const std::string & path, const unsigned int num_mipmap_levels=5);
@@ -31,7 +31,7 @@ class Texture  {
 		 *	 GL_TEXTURE_CUBE_MAP_POSITIVE_Y
 		 *	 GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
 		 *	 GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-		 *	 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 
+		 *	 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 		 */
 		Texture(const std::vector<std::string> &paths, bool cube_map=false);
 		~Texture();
@@ -43,11 +43,11 @@ class Texture  {
 		void unbind() const;
 
 		//Get texture number on open gl
-		GLuint texture() const; 
+		GLuint texture() const;
 
 		static SDL_Surface * load_image(const std::string &path);
 
-		/* 
+		/*
 		 * Requires the texture to be bound!
 		 *
 		 * Sets parameters to CLAMP_EDGE and GL_NEAREST (skybox etc)

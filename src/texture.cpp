@@ -3,6 +3,7 @@
 #include "globals.hpp"
 
 #include <vector>
+#include <map>
 #include <string>
 #include <cstdarg>
 #include <cassert>
@@ -13,11 +14,24 @@ GLuint Texture::cube_map_index_[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z 
+	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 };
 
-Texture * Texture::mipmap(std::string &path, const unsigned int num_mipmap_levels) {
-	return new Texture(path, num_mipmap_levels);
+static std::map<std::string, Texture*> texture_cache;
+
+Texture* Texture::mipmap(const std::string &path, const unsigned int num_mipmap_levels) {
+	/* search cache */
+	auto it = texture_cache.find(path);
+	if ( it != texture_cache.end() ){
+		return it->second;
+	}
+
+	/* create new instance */
+	const std::string real_path = std::string(PATH_BASE "textures/") + path;
+	Texture* texture = new Texture(real_path, num_mipmap_levels);
+	texture_cache[path] = texture;
+
+	return texture;
 }
 
 Texture * Texture::cubemap(
@@ -40,7 +54,7 @@ Texture * Texture::array(std::vector<std::string> &paths) {
 
 Texture * Texture::array(int num_textures, ...) {
 	std::vector<std::string> textures;
-	va_list list;	
+	va_list list;
 	va_start(list, num_textures);
 	for(int i=0; i < num_textures; ++i) {
 		textures.push_back(va_arg(list, const char *));
@@ -133,7 +147,7 @@ void Texture::load_texture() {
 
 	//Generate texture:
 	glGenTextures(1, &_texture);
-	bind();	
+	bind();
 	glTexParameteri(_texture_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(_texture_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	checkForGLErrors("[Texture] load_texture(): gen buffer");
