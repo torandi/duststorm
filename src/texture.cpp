@@ -19,6 +19,10 @@ GLuint Texture::cube_map_index_[6] = {
 
 static std::map<std::string, Texture*> texture_cache;
 
+void Texture::preload(const std::string& path){
+	mipmap(path);
+};
+
 Texture* Texture::mipmap(const std::string &path, const unsigned int num_mipmap_levels) {
 	/* search cache */
 	auto it = texture_cache.find(path);

@@ -8,7 +8,12 @@
 #include <SDL/SDL_image.h>
 
 class Texture  {
-	public:
+public:
+
+	/**
+	 * Preload a texture into memory. Useful during loading sequence.
+	 */
+	static void preload(const std::string& path);
 
 		static Texture * mipmap(const std::string &path, const unsigned int num_mipmap_levels = 5);
 		static Texture * cubemap(

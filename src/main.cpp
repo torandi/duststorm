@@ -114,6 +114,9 @@ static void init(bool fullscreen){
 	scene["TV"]       = SceneFactory::create("TV",        glm::ivec2(resolution.x/2, 2*resolution.y/3));
 	scene["Water"]    = SceneFactory::create("Water",     glm::ivec2(resolution.x/2, 2*resolution.y/3));
 
+	/* Preload common textures */
+	Texture::preload("default.jpg");
+
 	/* Setup timetable */
 	const char* tablename = PATH_SRC "timetable.txt";
 	auto func = [](const std::string& name, float begin, float end){
