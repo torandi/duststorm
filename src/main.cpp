@@ -108,14 +108,15 @@ static void init(bool fullscreen){
 
 	opencl = new CL();
 
+	/* Preload common textures */
+	fprintf(verbose, "Preloading textures\n");
+	Texture::preload("default.jpg");
+
 	/* Instantiate all scenes */
 	scene["Test"]     = SceneFactory::create("Test",      glm::ivec2(resolution.x, resolution.y/3));
 	scene["particle"] = SceneFactory::create("Particles", glm::ivec2(resolution.x/2, 2*resolution.y/3));
 	scene["TV"]       = SceneFactory::create("TV",        glm::ivec2(resolution.x/2, 2*resolution.y/3));
 	scene["Water"]    = SceneFactory::create("Water",     glm::ivec2(resolution.x/2, 2*resolution.y/3));
-
-	/* Preload common textures */
-	Texture::preload("default.jpg");
 
 	/* Setup timetable */
 	const char* tablename = PATH_SRC "timetable.txt";

@@ -31,8 +31,8 @@ Texture* Texture::mipmap(const std::string &path, const unsigned int num_mipmap_
 	}
 
 	/* create new instance */
-	const std::string real_path = std::string(PATH_BASE "textures/") + path;
-	Texture* texture = new Texture(real_path, num_mipmap_levels);
+	fprintf(verbose, "Loading image `%s'\n", path.c_str());
+	Texture* texture = new Texture(path, num_mipmap_levels);
 	texture_cache[path] = texture;
 
 	return texture;
@@ -142,10 +142,12 @@ GLuint Texture::texture() const {
 void Texture::load_texture() {
 	assert(_texture == (unsigned int)-1);
 	//Load textures:
-	SDL_Surface ** images = new SDL_Surface*[_num_textures];
-	for(unsigned int i=0; i < _num_textures; ++i) {
+
+	SDL_Surface* images[_num_textures];
+	for ( unsigned int i=0; i < _num_textures; ++i ) {
 		images[i] = load_image(_filenames[i]);
 	}
+
 	_width = images[0]->w;
 	_height = images[0]->h;
 
@@ -205,7 +207,6 @@ void Texture::load_texture() {
 	for(unsigned int i=0; i<_num_textures; ++i) {
 		SDL_FreeSurface(images[i]);
 	}
-	delete[] images;
 }
 
 //Requires the texture to be bound!
@@ -217,11 +218,16 @@ void Texture::set_clamp_params() {
 	glTexParameteri(_texture_type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }
 
-SDL_Surface * Texture::load_image(const std::string &path) {
+SDL_Surface* Texture::load_image(const std::string &path) {
+	const std::string real_path = std::string(PATH_BASE "textures/") + path;
+
 	/* Load image using SDL Image */
-	SDL_Surface* surface = IMG_Load(path.c_str());
+	SDL_Surface* surface = IMG_Load(real_path.c_str());
 	if ( !surface ){
-		fprintf(stderr, "Failed to load texture at %s\n", path.c_str());
+		fprintf(stderr, "Failed to load texture at %s\n", real_path.c_str());
+		if ( path != "default.jpg" ){
+			return load_image("default.jpg");
+		}
 		abort();
 	}
 
@@ -266,7 +272,6 @@ SDL_Surface * Texture::load_image(const std::string &path) {
 	if ( (saved_flags & SDL_SRCALPHA) == SDL_SRCALPHA ) {
 		SDL_SetAlpha(surface, saved_flags, saved_alpha);
 	}
-
 
 	SDL_FreeSurface(surface);
 
