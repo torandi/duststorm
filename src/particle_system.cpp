@@ -12,16 +12,12 @@
 #include "globals.hpp"
 #include "utils.hpp"
 
-ParticleSystem::ParticleSystem(const int max_num_particles, Texture * texture, float start_delay) : 
-	max_num_particles_(max_num_particles)
+ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* texture, float start_delay)
+	: max_num_particles_(max_num_particles)
 	,	texture_(texture) {
+
 	program_ = opencl->create_program(PATH_OPENCL "particles.cl");
 	kernel_  = opencl->load_kernel(program_, "run_particles");
-
-	if(texture_->texture_type() != GL_TEXTURE_2D_ARRAY) {
-		fprintf(stderr, "ParticleSystem requires texture to be an GL_TEXTURE_2D_ARRAY!\n");
-		abort();
-	}
 
 	//Empty vec4s:
 	vertex_t * empty = new vertex_t[max_num_particles];
@@ -204,7 +200,7 @@ void ParticleSystem::update(float dt) {
 }
 
 void ParticleSystem::render() {
-	glPushAttrib(GL_ENABLE_BIT);
+	glPushAttrib(GL_ENABLE_BIT|GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_CULL_FACE);
 
 	Shader::upload_model_matrix(matrix());
@@ -217,7 +213,7 @@ void ParticleSystem::render() {
 
 /*
 	//DEBUG
-	
+
 	vertex_t * vertices = (vertex_t* )glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
 	printf("---\n");
@@ -237,15 +233,13 @@ void ParticleSystem::render() {
 	glVertexAttribPointer(3, 1, GL_INT, GL_FALSE, sizeof(vertex_t), (GLvoid*)		(2*sizeof(glm::vec4)+sizeof(float)));
 
 	glActiveTexture(GL_TEXTURE0);
-	texture_->bind();
+	texture_->texture_bind();
 
 	glDepthMask(GL_FALSE);
 
 	glDrawArrays(GL_POINTS, 0, max_num_particles_);
 
-	glDepthMask(GL_TRUE);
-
-	texture_->unbind();
+	texture_->texture_unbind();
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glPopAttrib();

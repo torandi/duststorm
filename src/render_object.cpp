@@ -77,8 +77,8 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	pre_render();
 }
 
-Texture* RenderObject::load_texture(std::string path) {
-	return Texture::mipmap(path);
+Texture2D* RenderObject::load_texture(std::string path) {
+	return Texture2D::from_filename(path);
 }
 
 void RenderObject::pre_render() {
@@ -100,7 +100,7 @@ void RenderObject::pre_render() {
 			std::string p(path.data);
 			mtl_data.texture = load_texture(p);
 		} else {
-			mtl_data.texture = Texture::mipmap("default.jpg");
+			mtl_data.texture = Texture2D::default_texture();
 		}
 
 		//Check for normalmap:
@@ -287,7 +287,7 @@ void RenderObject::material_t::activate() {
 		glDisable(GL_CULL_FACE);
 
 	glActiveTexture(GL_TEXTURE0);
-	texture->bind();
+	texture->texture_bind();
 
 	/*
 		 glActiveTexture(GL_TEXTURE1);

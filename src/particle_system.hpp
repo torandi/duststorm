@@ -4,7 +4,7 @@
 #include "movable_object.hpp"
 #include "texture.hpp"
 
-#include "cl.hpp" 
+#include "cl.hpp"
 #include <glm/glm.hpp>
 
 class ParticleSystem : public MovableObject {
@@ -15,13 +15,13 @@ class ParticleSystem : public MovableObject {
 
    // Buffer 0: position buffer 1: color.
    // Both are set in the opencl-kernel
-   GLuint gl_buffer_; 
+   GLuint gl_buffer_;
    std::vector<cl::Memory> cl_gl_buffers_;
    cl::Buffer particles_, config_, random_;
 
    cl::Program program_;
    cl::Kernel kernel_;
-   
+
    struct particle_t {
       glm::vec4 direction;
 
@@ -46,16 +46,15 @@ class ParticleSystem : public MovableObject {
    std::vector<cl::Event> update_blocking_events_;
    std::vector<cl::Event> render_blocking_events_;
 
-	 Texture * texture_;
+	 TextureArray* texture_;
 
    public:
 
 	 /**
 		* Creates a particle system with max_num_particles (the actual number can be decreased later)
-		* texture must be an texture_2d_array. 
 		* the particles are initialy spawned with 0..start_delay s delay
 		*/
-   ParticleSystem(const int max_num_particles, Texture * texture, float start_delay=5.f);
+   ParticleSystem(const int max_num_particles, TextureArray* texture, float start_delay=5.f);
    ~ParticleSystem();
 
    void update(float dt);
@@ -68,11 +67,11 @@ class ParticleSystem : public MovableObject {
    //Change values in this struct and call update_config() to update
    struct {
 
-      glm::vec4 birth_color; 
+      glm::vec4 birth_color;
 
       glm::vec4 death_color;
 
-      glm::vec4 motion_rand; 
+      glm::vec4 motion_rand;
 
       glm::vec4 spawn_direction;
       glm::vec4 direction_var;
@@ -84,10 +83,10 @@ class ParticleSystem : public MovableObject {
       float avg_ttl;
       float ttl_var;
       //Spawn speed
-      float avg_spawn_speed; 
+      float avg_spawn_speed;
       float spawn_speed_var;
 
-      //Acceleration 
+      //Acceleration
       float avg_acc;
       float acc_var;
       //Scale
@@ -105,7 +104,7 @@ class ParticleSystem : public MovableObject {
 
 			//These two should not be manually changed!
 			int num_textures;
-			int max_num_particles;      
+			int max_num_particles;
    } config __attribute__ ((aligned (16)));
 };
 

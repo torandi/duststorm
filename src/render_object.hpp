@@ -21,7 +21,7 @@ class RenderObject : public MovableObject {
 	void color4_to_vec4(const struct aiColor4D *c, glm::vec4 &target);
 
 	//Trims path and loads texture
-	static Texture* load_texture(std::string path);
+	static Texture2D* load_texture(std::string path);
 
 	void pre_render();
 	void recursive_pre_render(const aiNode* node);
@@ -67,8 +67,8 @@ public:
 
 		};
 
-		Texture* texture;
-		Texture* normal_map;
+		TextureBase* texture;
+		TextureBase* normal_map;
 		Shader::material_t attr;
 		bool two_sided;
 

@@ -14,7 +14,7 @@ public:
 	WaterScene(const glm::ivec2& size)
 		: Scene(size)
 		, quad()
-		, water(PATH_BASE "textures/hest.jpg")
+		, water(Texture2D::from_filename("hest.jpg"))
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f) {
 
 		camera.set_position(glm::vec3(0.f, 0.f, -1.f));
@@ -28,13 +28,13 @@ public:
 		Shader::upload_camera(camera);
 		Shader::upload_blank_material();
 		glActiveTexture(GL_TEXTURE0);
-		water.bind();
+		water->texture_bind();
 		shaders[SHADER_NORMAL]->bind();
 		{
 			quad.render();
 		}
 		Shader::unbind();
-		water.unbind();
+		water->texture_unbind();
 	}
 
 	virtual void update(float t, float dt){
@@ -42,7 +42,7 @@ public:
 
 private:
 	Quad quad;
-	Texture water;
+	Texture2D* water;
 	Camera camera;
 };
 

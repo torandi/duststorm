@@ -7,8 +7,10 @@
 #include <string>
 #include <cstdarg>
 #include <cassert>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 
-GLuint Texture::cube_map_index_[6] = {
+static GLuint cube_map_index[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
@@ -17,216 +19,16 @@ GLuint Texture::cube_map_index_[6] = {
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 };
 
-static std::map<std::string, Texture*> texture_cache;
-
-void Texture::preload(const std::string& path){
-	mipmap(path);
-};
-
-Texture* Texture::mipmap(const std::string &path, const unsigned int num_mipmap_levels) {
-	/* search cache */
-	auto it = texture_cache.find(path);
-	if ( it != texture_cache.end() ){
-		return it->second;
-	}
-
-	/* create new instance */
-	fprintf(verbose, "Loading image `%s'\n", path.c_str());
-	Texture* texture = new Texture(path, num_mipmap_levels);
-	texture_cache[path] = texture;
-
-	return texture;
-}
-
-Texture * Texture::cubemap(
-		std::string px, std::string nx,
-		std::string py, std::string ny,
-		std::string pz, std::string nz) {
-	std::vector<std::string> v;
-	v.push_back(px);
-	v.push_back(nx);
-	v.push_back(py);
-	v.push_back(ny);
-	v.push_back(pz);
-	v.push_back(nz);
-	return new Texture(v, true);
-}
-
-Texture * Texture::array(std::vector<std::string> &paths) {
-	return new Texture(paths, false);
-}
-
-Texture * Texture::array(int num_textures, ...) {
-	std::vector<std::string> textures;
-	va_list list;
-	va_start(list, num_textures);
-	for(int i=0; i < num_textures; ++i) {
-		textures.push_back(va_arg(list, const char *));
-	}
-	va_end(list);
-	return new Texture(textures, false);
-}
-
-Texture::Texture(const std::string &path, const unsigned int num_mipmap_levels) :
-	_texture(-1),
-	_width(0),
-	_height(0),
-	_num_textures(1),
-	_mipmap_count(num_mipmap_levels)
-	{
-	_filenames = new std::string[_num_textures];
-	_filenames[0] = path;
-	_texture_type = GL_TEXTURE_2D;
-	load_texture();
-}
-
-Texture::Texture(const std::vector<std::string> &paths, bool cube_map) :
-	_texture(-1),
-	_width(0),
-	_height(0),
-	_num_textures(paths.size()),
-	_mipmap_count(1)
-	{
-	if(cube_map) {
-		assert(_num_textures == 6);
-		_texture_type = GL_TEXTURE_CUBE_MAP;
-	} else
-		_texture_type = GL_TEXTURE_2D_ARRAY;
-	_filenames = new std::string[_num_textures];
-	int i=0;
-	for(std::vector<std::string>::const_iterator it=paths.begin(); it!=paths.end(); ++it) {
-		_filenames[i++] = (*it);
-	}
-	load_texture();
-}
-
-Texture::~Texture(){
-	delete[] _filenames;
-	free_texture();
-}
-
-int Texture::width() const {
-	return _width;
-}
-
-int Texture::height() const {
-	return _height;
-}
-
-unsigned int Texture::mipmap_count() const {
-	return _mipmap_count;
-}
-
-unsigned int Texture::num_textures() const {
-	return _num_textures;
-}
-
-GLuint Texture::texture_type() const {
-	return _texture_type;
-}
-
-void Texture::bind() const {
-	assert(_texture != (unsigned int)-1);
-	glBindTexture(_texture_type, _texture);
-	checkForGLErrors(_filenames[0].c_str());
-}
-
-void Texture::unbind() const {
-	glBindTexture(_texture_type, 0);
-}
-
-GLuint Texture::texture() const {
-	return _texture;
-}
-
-void Texture::load_texture() {
-	assert(_texture == (unsigned int)-1);
-	//Load textures:
-
-	SDL_Surface* images[_num_textures];
-	for ( unsigned int i=0; i < _num_textures; ++i ) {
-		images[i] = load_image(_filenames[i]);
-	}
-
-	_width = images[0]->w;
-	_height = images[0]->h;
-
-	//Generate texture:
-	glGenTextures(1, &_texture);
-	bind();
-	glTexParameteri(_texture_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(_texture_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	checkForGLErrors("[Texture] load_texture(): gen buffer");
-
-	switch(_texture_type) {
-		case GL_TEXTURE_2D:
-			{
-				//One texture only:
-				GLint err = gluBuild2DMipmapLevels(GL_TEXTURE_2D, GL_RGBA, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, 0, 0, _mipmap_count, images[0]->pixels );
-				if(err != 0) {
-					fprintf(stderr, "[Texture] gluBuild2DMipmapLevels for %s return %s\n", _filenames[0].c_str(), gluErrorString(err));
-					abort();
-				}
-				break;
-			}
-		case GL_TEXTURE_2D_ARRAY:
-			//Generate the array:
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, _width, _height,
-				_num_textures, 0, GL_RGBA,  GL_UNSIGNED_BYTE, NULL);
-			checkForGLErrors("[Texture] load_texture(): gen 2d array buffer");
-
-			//Fill the array with data:
-			for(unsigned int i=0; i < _num_textures; ++i) {
-				//											, lvl, x, y, z, width, height, depth
-
-				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, images[i]->w, images[i]->h, 1, GL_RGBA, GL_UNSIGNED_BYTE, images[i]->pixels);
-				checkForGLErrors("[Texture] load_texture(): glTexSubImage3D");
-			}
-			break;
-		case GL_TEXTURE_CUBE_MAP:
-			set_clamp_params();
-			for(int i=0; i < 6; ++i) {
-				assert(_width == _height);
-				glTexImage2D(cube_map_index_[i], 0, GL_RGBA , _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, images[i]->pixels );
-				checkForGLErrors("[Texture] load_texture(): Fill cube map");
-			}
-			break;
-		default:
-			fprintf(verbose, "[Texture] Error! Invalid texture type encountered when loading textures, exiting (Texture::load_texture()");
-			abort();
-	}
-
-	/*if(_mipmap_count > 0) {
-		glTexParameteri(_texture_type, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(_texture_type, GL_TEXTURE_MAX_LEVEL, _mipmap_count - 1);
-	}*/
-
-	unbind();
-
-	//Free images:
-	for(unsigned int i=0; i<_num_textures; ++i) {
-		SDL_FreeSurface(images[i]);
-	}
-}
-
-//Requires the texture to be bound!
-void Texture::set_clamp_params() {
-	glTexParameteri(_texture_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(_texture_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(_texture_type, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(_texture_type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(_texture_type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-}
-
-SDL_Surface* Texture::load_image(const std::string &path) {
+static SDL_Surface* load_image(const std::string &path, glm::ivec2* size) {
 	const std::string real_path = std::string(PATH_BASE "textures/") + path;
 
 	/* Load image using SDL Image */
+	fprintf(verbose, "Loading image `%s'\n", real_path.c_str());
 	SDL_Surface* surface = IMG_Load(real_path.c_str());
 	if ( !surface ){
 		fprintf(stderr, "Failed to load texture at %s\n", real_path.c_str());
 		if ( path != "default.jpg" ){
-			return load_image("default.jpg");
+			return load_image("default.jpg", size);
 		}
 		abort();
 	}
@@ -273,14 +75,217 @@ SDL_Surface* Texture::load_image(const std::string &path) {
 		SDL_SetAlpha(surface, saved_flags, saved_alpha);
 	}
 
+	/* save image resolution */
+	size->x = surface->w;
+	size->y = surface->h;
+
 	SDL_FreeSurface(surface);
 
 	return rgba_surface;
 }
 
-void Texture::free_texture(){
-	if(_texture != (unsigned int)-1) {
-		glDeleteTextures(1, &_texture);
-		_texture = -1;
+TextureBase::TextureBase()
+	: size(0,0) {
+
+}
+
+TextureBase::~TextureBase(){
+
+}
+
+const glm::ivec2& TextureBase::texture_size(){
+	return size;
+}
+
+static std::map<std::string, Texture2D*> texture_cache;
+
+void Texture2D::preload(const std::string& path){
+	from_filename(path);
+};
+
+Texture2D* Texture2D::from_filename(const std::string &path, const unsigned int num_mipmap_levels) {
+	/* if custom mipmap levels has been set texture cannot be cached */
+	if ( num_mipmap_levels != default_mipmap_level ){
+		return new Texture2D(path, num_mipmap_levels);
 	}
+
+	/* search cache */
+	auto it = texture_cache.find(path);
+	if ( it != texture_cache.end() ){
+		return it->second;
+	}
+
+	/* create new instance */
+	Texture2D* texture = new Texture2D(path, num_mipmap_levels);
+	texture_cache[path] = texture;
+
+	return texture;
+}
+
+Texture2D* Texture2D::default_texture(){
+	return from_filename("default.jpg");
+}
+
+Texture2D::Texture2D(const std::string& filename, unsigned int num_mipmap_levels)
+	: TextureBase()
+	, _texture(0)
+	, _mipmap_count(num_mipmap_levels) {
+
+	SDL_Surface* image = load_image(filename, &size);
+
+	glGenTextures(1, &_texture);
+	glBindTexture(GL_TEXTURE_2D, _texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	SDL_FreeSurface(image);
+}
+
+Texture2D::~Texture2D(){
+	glDeleteTextures(1, &_texture);
+}
+
+void Texture2D::texture_bind() const {
+	glBindTexture(GL_TEXTURE_2D, _texture);
+}
+
+void Texture2D::texture_unbind() const {
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+TextureCubemap* TextureCubemap::from_filename(
+	const std::string& px, const std::string& nx,
+	const std::string& py, const std::string& ny,
+	const std::string& pz, const std::string& nz) {
+
+	std::vector<std::string> v;
+	v.push_back(px);
+	v.push_back(nx);
+	v.push_back(py);
+	v.push_back(ny);
+	v.push_back(pz);
+	v.push_back(nz);
+
+	return new TextureCubemap(v);
+}
+
+TextureCubemap* TextureCubemap::from_filename(const std::vector<std::string>& paths){
+	return new TextureCubemap(paths);
+}
+
+TextureCubemap::TextureCubemap(std::vector<std::string> path)
+	: TextureBase()
+	, _texture(0) {
+
+	/* ensure we got correct number of filenames */
+	if ( path.size() != 6 ){
+		fprintf(stderr, "TextureCubemap requires 6 filenames, got %zd\n", path.size());
+		while ( path.size() < 6 ) path.push_back("default.jpg");
+	}
+
+	glGenTextures(1, &_texture);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _texture);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	for ( size_t i = 0; i < 6; i++ ){
+		SDL_Surface* surface = load_image(path[i], &size);
+		glTexImage2D(cube_map_index[i], 0, GL_RGBA , size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+		SDL_FreeSurface(surface);
+	}
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+TextureCubemap::~TextureCubemap(){
+	glDeleteTextures(1, &_texture);
+}
+
+void TextureCubemap::texture_bind() const {
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _texture);
+}
+
+void TextureCubemap::texture_unbind() const {
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+TextureArray* TextureArray::from_filename(const char* filename, ...){
+	std::vector<std::string> paths;
+	va_list ap;
+	va_start(ap, filename);
+	while ( filename ){
+		paths.push_back(filename);
+		filename = va_arg(ap, const char*);
+	}
+	va_end(ap);
+
+	return new TextureArray(paths);
+}
+
+TextureArray* TextureArray::from_filename(const std::vector<std::string>& paths) {
+	return new TextureArray(paths);
+}
+
+TextureArray::TextureArray(std::vector<std::string> path)
+	: TextureBase()
+	, _num(path.size())
+	, _texture(0) {
+
+	if ( path.size() == 0 ){
+		fprintf(stderr, "TextureArray must have at least one image, got 0.\n");
+		path.push_back("default.jpg");
+		_num++;
+	}
+
+	/* hack to get size */
+	{
+		SDL_Surface* surface = load_image(path[0], &size);
+		SDL_FreeSurface(surface);
+	}
+
+	fprintf(verbose, "Creating TextureArray with %zd images at %dx%d\n", path.size(), size.x, size.y);
+
+	glGenTextures(1, &_texture);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, _texture);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, size.x, size.y, num_textures(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+	int n = 0;
+	for ( const std::string& filename: path) {
+		glm::ivec2 cur_size;
+		SDL_Surface* surface = load_image(filename, &cur_size);
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, n++, cur_size.x, cur_size.y, 1, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+		SDL_FreeSurface(surface);
+	}
+
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+}
+
+TextureArray::~TextureArray(){
+	glDeleteTextures(1, &_texture);
+}
+
+size_t TextureArray::num_textures() const {
+	return _num;
+}
+
+void TextureArray::texture_bind() const {
+	glBindTexture(GL_TEXTURE_2D_ARRAY, _texture);
+}
+
+void TextureArray::texture_unbind() const {
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }

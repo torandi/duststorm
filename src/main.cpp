@@ -45,8 +45,6 @@ static XYLerpTable* tv_pos = nullptr;
 static XYLerpTable* test_pos = nullptr;
 static std::map<std::string, Scene*> scene;
 
-static Texture * texture_test;
-
 static void handle_sigint(int signum){
 	if ( !running ){
 		fprintf(stderr, "\rgot SIGINT again, aborting\n");
@@ -104,13 +102,11 @@ static void init(bool fullscreen){
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
 
-	texture_test = new Texture(PATH_BASE "textures/hest.jpg");
-
 	opencl = new CL();
 
 	/* Preload common textures */
 	fprintf(verbose, "Preloading textures\n");
-	Texture::preload("default.jpg");
+	Texture2D::preload("default.jpg");
 
 	/* Instantiate all scenes */
 	scene["Test"]     = SceneFactory::create("Test",      glm::ivec2(resolution.x, resolution.y/3));
@@ -228,7 +224,8 @@ static void render_composition(){
 	  scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
 
 	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], screen_pos(test_pos->at(t), glm::vec2(scene["Test"]->size)));
-	scene["Water"   ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["Water"]->size)));
+	//scene["Water"   ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["Water"]->size)));
+	scene["TV"      ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["TV"]->size)));
 	scene["particle"]->draw(shaders[SHADER_PASSTHRU], screen_pos(particle_pos->at(t), glm::vec2(scene["particle"]->size)));
 
 	/*

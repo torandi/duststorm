@@ -11,8 +11,8 @@ class ParticlesScene: public Scene {
 public:
 	ParticlesScene(const glm::ivec2 &size)
 		: Scene(size)
-		, fire(1000, Texture::array(3, PATH_BASE "textures/fire1.png", PATH_BASE "textures/fire2.png", PATH_BASE "textures/fire3.png"))
-		, smoke(1000, Texture::array(1, PATH_BASE "textures/fog.png"), 20)
+		, fire(1000,  TextureArray::from_filename("fire1.png", "fire2.png", "fire3.png", nullptr))
+		, smoke(1000, TextureArray::from_filename("fog.png", nullptr), 20)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.f) {
 			camera.set_position(glm::vec3(0.f, 0.f, -1));
 			camera.look_at(glm::vec3(0.f, 0.f, 0.f));
