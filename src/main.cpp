@@ -61,7 +61,21 @@ static void show_fps(int signum){
 }
 
 namespace Engine {
-	RenderTarget* rendertarget_by_name(const std::string& name){
+	RenderTarget* rendertarget_by_name(const std::string& fullname){
+		const size_t offset = fullname.find_first_of(":");
+		if ( offset == std::string::npos ){
+			return nullptr;
+		}
+
+		const std::string prefix = fullname.substr(0, offset);
+		const std::string name   = fullname.substr(offset+1);
+
+		if ( prefix == "scene" ){
+			auto it = scene.find(name);
+			if ( it == scene.end() ) return nullptr;
+			return it->second;
+		}
+
 		return nullptr;
 	}
 }
