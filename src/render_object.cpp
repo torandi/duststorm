@@ -77,7 +77,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	pre_render();
 }
 
-Texture2D* RenderObject::load_texture(std::string path) {
+Texture2D* RenderObject::load_texture(const std::string& path) {
 	return Texture2D::from_filename(path);
 }
 
