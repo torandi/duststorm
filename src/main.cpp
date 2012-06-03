@@ -127,9 +127,9 @@ static void init(bool fullscreen){
 	if ( (ret=timetable_parse(tablename, func)) != 0 ){
 		fprintf(stderr, "%s: failed to read `%s': %s\n", program_name, tablename, strerror(ret));
 	}
-	particle_pos = new XYLerpTable(PATH_SRC "scene/particles_pos.txt");
-	tv_pos       = new XYLerpTable(PATH_SRC "scene/tv_pos.txt");
-	test_pos     = new XYLerpTable(PATH_SRC "scene/test_pos.txt");
+	particle_pos = new XYLerpTable("scene/particles_pos.txt");
+	tv_pos       = new XYLerpTable("scene/tv_pos.txt");
+	test_pos     = new XYLerpTable("scene/test_pos.txt");
 
 	composition   = new RenderTarget(resolution, false, false);
 	downsample[0] = new RenderTarget(glm::ivec2(200, 200), false, false, GL_LINEAR);
