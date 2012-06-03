@@ -4,8 +4,8 @@
 in vec2 uv;
 out vec4 ocolor;
 
-const float offset_ratio = 0.5f;
-const float noise_ratio = 0.4f;
+const float offset_ratio = 0.6f;
+const float noise_ratio = 0.3f;
 
 float rand(vec2 co){
 	return fract(sin(dot(co.xy, vec2(12.9898, 78.233) * (state.time + 1.0f))) * 43758.5453);
