@@ -103,6 +103,11 @@ void RenderObject::pre_render() {
 			mtl_data.texture = Texture2D::default_texture();
 		}
 
+		if ( !mtl_data.texture ){
+			fprintf(stderr, "RenderObject `%s' texture failed to load.\n", name.c_str());
+			abort();
+		}
+
 		//Check for normalmap:
 		if(mtl->GetTextureCount(aiTextureType_HEIGHT) > 0 &&
 			mtl->GetTexture(aiTextureType_HEIGHT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
