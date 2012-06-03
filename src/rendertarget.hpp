@@ -3,11 +3,12 @@
 
 #include "color.hpp"
 #include "shader.hpp"
+#include "texture.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <functional>
 
-class RenderTarget {
+class RenderTarget: public TextureBase {
 public:
 	static RenderTarget* stack;
 
@@ -33,6 +34,9 @@ public:
 	 */
 	GLuint texture() const;
 
+	virtual void texture_bind() const;
+	virtual void texture_unbind() const;
+
 	/**
 	 * Get texture id of depthbuffer.
 	 */
@@ -49,7 +53,6 @@ public:
 	void draw(Shader* shader, const glm::ivec2& pos, const glm::ivec2& size);
 	void draw(Shader* shader, const glm::vec2& pos, const glm::vec2& size);
 
-	const glm::ivec2 size;
 	glm::mat4 projection;
 	GLuint id;
 	GLuint current;

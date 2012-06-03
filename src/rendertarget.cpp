@@ -12,11 +12,12 @@
 RenderTarget* RenderTarget::stack = nullptr;
 
 RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer, GLenum filter)
-	: size(size)
+	: TextureBase()
 	, id(0)
 	, current(0){
 
 	checkForGLErrors("RenderTarget()");
+	this->size = size;
 
 	/* generate projection matrix for this target */
 	projection = glm::ortho(0.0f, (float)size.x, 0.0f, (float)size.y, -1.0f, 1.0f);
@@ -138,6 +139,14 @@ GLuint RenderTarget::depthbuffer() const {
 
 const glm::mat4& RenderTarget::ortho() const {
 	return projection;
+}
+
+void RenderTarget::texture_bind() const {
+	glBindTexture(GL_TEXTURE_2D, texture());
+}
+
+void RenderTarget::texture_unbind() const {
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void RenderTarget::clear(const Color& color){

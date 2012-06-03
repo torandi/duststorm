@@ -201,10 +201,10 @@ static void render_scene(){
 static void downsample_tv(){
 	RenderTarget* prev = scene["TV"];
 	for ( int i = 0; i < 3; i++ ){
-		Shader::upload_state(downsample[i]->size);
+		Shader::upload_state(downsample[i]->texture_size());
 		Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
 		downsample[i]->with([prev,i](){
-			prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->size);
+			prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->texture_size());
 		});
 		prev = downsample[i];
 	}
@@ -224,10 +224,10 @@ static void render_composition(){
 
 	  scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
 
-	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], screen_pos(test_pos->at(t), glm::vec2(scene["Test"]->size)));
-	//scene["Water"   ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["Water"]->size)));
-	scene["TV"      ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["TV"]->size)));
-	scene["particle"]->draw(shaders[SHADER_PASSTHRU], screen_pos(particle_pos->at(t), glm::vec2(scene["particle"]->size)));
+	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], screen_pos(test_pos->at(t), glm::vec2(scene["Test"]->texture_size())));
+	//scene["Water"   ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["Water"]->texture_size())));
+	scene["TV"      ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["TV"]->texture_size())));
+	scene["particle"]->draw(shaders[SHADER_PASSTHRU], screen_pos(particle_pos->at(t), glm::vec2(scene["particle"]->texture_size())));
 
 	/*
 	glActiveTexture(GL_TEXTURE1);
