@@ -63,7 +63,8 @@ static void show_fps(int signum){
 static void init(bool fullscreen){
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
-		exit(1);	}
+		exit(1);
+	}
 
 	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
 	if ( !vi ){ fprintf(stderr, "SDL_GetVideoInfo() failed\n"); abort(); }
