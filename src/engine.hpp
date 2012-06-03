@@ -1,6 +1,8 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <string>
+
 namespace Engine {
 
 	/**
@@ -17,6 +19,12 @@ namespace Engine {
 	 * Register all scene types.
 	 */
 	void autoload_scenes();
+
+	/**
+	 * Get a rendertarget by name.
+	 * @return nullptr if not found.
+	 */
+	RenderTarget* rendertarget_by_name(const std::string& name);
 };
 
 #endif /* ENGINE_H */

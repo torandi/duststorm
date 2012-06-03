@@ -3,7 +3,9 @@
 #endif
 
 #include "render_object.hpp"
+#include "engine.hpp"
 #include "globals.hpp"
+#include "rendertarget.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
 #include "utils.hpp"
@@ -78,6 +80,16 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 }
 
 TextureBase* RenderObject::load_texture(const std::string& path) {
+	if ( path.substr(0, 6) == "scene:" || path.substr(0, 7) == "target:" ){
+		RenderTarget* target = Engine::rendertarget_by_name(path);
+		if ( target ){
+			return target;
+		} else {
+			fprintf(stderr, "%s: no rendertarget named `%s', ignored.\n", name.c_str(), path.c_str());
+			return Texture2D::default_texture();
+		}
+	}
+
 	return Texture2D::from_filename(path);
 }
 
