@@ -79,6 +79,19 @@ static SDL_Surface* load_image(const std::string &path, glm::ivec2* size) {
 	size->x = surface->w;
 	size->y = surface->h;
 
+	/* flip image correct (SDL used flipped images) */
+	uint8_t* t = (uint8_t*)malloc(rgba_surface->pitch);
+	int middle = (int)(rgba_surface->h * 0.5f);
+	for ( int i = 0; i < middle; i++ ){
+		uint8_t* a = (uint8_t*)rgba_surface->pixels + rgba_surface->pitch * i;
+		uint8_t* b = (uint8_t*)rgba_surface->pixels + rgba_surface->pitch * (rgba_surface->h - i-1);
+
+		memcpy(t, a, rgba_surface->pitch);
+		memcpy(a, b, rgba_surface->pitch);
+		memcpy(b,	t, rgba_surface->pitch);
+	}
+
+	free(t);
 	SDL_FreeSurface(surface);
 
 	return rgba_surface;
