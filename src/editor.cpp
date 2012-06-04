@@ -397,7 +397,7 @@ int main (int argc, char* argv[]){
 
 	GError* error = nullptr;
 	GtkBuilder* builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file (builder, "editor.xml", &error) ){
+	if ( !gtk_builder_add_from_file (builder, PATH_SRC "editor.xml", &error) ){
 		g_print( "Error occured while loading UI file!\n" );
 		g_print( "Message: %s\n", error->message );
 		g_free(error);
