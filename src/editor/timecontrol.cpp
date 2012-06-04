@@ -2,7 +2,7 @@
 #include "config.h"
 #endif
 
-#include "editor/globals.hpp"
+#include "editor/editor.hpp"
 #include <cmath>
 
 static float slide_ref;
@@ -26,7 +26,6 @@ extern "C" G_MODULE_EXPORT void next_clicked_cb(GtkWidget* widget, gpointer data
 	global_time.step(1);
 	gtk_toggle_button_set_active(playbutton, FALSE);
 }
-
 
 extern "C" G_MODULE_EXPORT void play_toggled_cb(GtkWidget* widget, gpointer data){
 	running = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));

@@ -51,6 +51,7 @@ editor_LDFLAGS = $$(pkg-config gtk+-3.0 gtkglext-3.0 --libs) -Wl,--export-dynami
 editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} -lSDL_image
 editor_SOURCES = \
 	src/editor.cpp \
+	src/editor/render.cpp \
 	src/editor/timecontrol.cpp
 
 .PHONY: .autoload.tmp
