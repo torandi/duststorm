@@ -77,6 +77,14 @@ static void show_fps(int signum){
 	frames = 0;
 }
 
+namespace Engine {
+	RenderTarget* rendertarget_by_name(const std::string& fullname){
+		/* not implemented */
+		return nullptr;
+	}
+}
+
+
 static void render_placeholder(){
 	frame->bind();
 	shaders[SHADER_PASSTHRU]->bind();
@@ -133,7 +141,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		mode = MODE_SCENE;
 		delete scene;
 		scene_name = name;
-		scene = SceneFactory::create(std::string(name), frame->size);
+		scene = SceneFactory::create(std::string(name), frame->texture_size());
 		assert(scene);
 		scene->add_time(0,60);
 		global_time.reset();
@@ -243,7 +251,7 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_draw_cb(GtkWidget* widget, gpoin
 	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	const glm::ivec2 center = (resolution-frame->size) / 2;
+	const glm::ivec2 center = (resolution - frame->texture_size()) / 2;
 	Shader::upload_state(resolution);
 	Shader::upload_projection_view_matrices(projection, glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
@@ -281,7 +289,7 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
 
 	if ( scene ){
 		delete scene;
-		scene = SceneFactory::create(std::string(scene_name), frame->size);
+		scene = SceneFactory::create(std::string(scene_name), frame->texture_size());
 		scene->add_time(0,60);
 	}
 
