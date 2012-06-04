@@ -57,6 +57,7 @@ static glm::mat4 projection;
 static GtkWidget* drawing = nullptr;
 static GtkLabel* timelabel = nullptr;
 static GtkToggleButton* playbutton = nullptr;
+static GtkListStore* propstore = nullptr;
 static RenderTarget* frame = nullptr;
 static std::string scene_name;
 static Scene* scene = nullptr;
@@ -147,6 +148,24 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		assert(scene);
 		scene->add_time(0,60);
 		global_time.reset();
+
+		{
+			GtkTreeIter iter;
+			gtk_list_store_clear(propstore);
+			SceneFactory::Metadata* meta = SceneFactory::find(name)->second.meta;
+			for ( std::pair<std::string, std::string> p: *meta ){
+				const std::string& key   = p.first;
+				const std::string& value = p.second;
+				gtk_list_store_append(propstore, &iter);
+				gtk_list_store_set(propstore, &iter,
+				                   0, key.c_str(),
+				                   1, value.c_str(),
+				                   -1);
+
+			}
+		}
+
+
 		break;
 
 	case TYPE_PATH:
@@ -408,6 +427,7 @@ int main (int argc, char* argv[]){
 	drawing            = GTK_WIDGET(gtk_builder_get_object(builder, "drawingarea"));
 	timelabel          = GTK_LABEL(gtk_builder_get_object(builder, "timelabel"));
 	playbutton         = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "play"));
+	propstore          = GTK_LIST_STORE(gtk_builder_get_object(builder, "propstore"));
 
 	/* enable opengl on drawingarea */
 	int attrib[] = {

@@ -21,19 +21,13 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-media-rewind</property>
   </object>
-  <object class="GtkListStore" id="liststore2">
+  <object class="GtkListStore" id="propstore">
     <columns>
       <!-- column-name Property -->
       <column type="gchararray"/>
       <!-- column-name Value -->
       <column type="gchararray"/>
     </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">Name</col>
-        <col id="1" translatable="yes">derp</col>
-      </row>
-    </data>
   </object>
   <object class="GtkTreeStore" id="scenestore">
     <columns>
@@ -505,11 +499,37 @@
                         <property name="height_request">200</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="model">liststore2</property>
+                        <property name="model">propstore</property>
                         <property name="search_column">0</property>
                         <property name="enable_grid_lines">both</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection" id="treeview-selection1"/>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="treeviewcolumn2">
+                            <property name="resizable">True</property>
+                            <property name="title" translatable="yes">Key</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="cellrenderertext1"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="treeviewcolumn3">
+                            <property name="resizable">True</property>
+                            <property name="title" translatable="yes">Value</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="cellrenderertext2">
+                                <property name="editable">True</property>
+                              </object>
+                              <attributes>
+                                <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
                       </object>
                       <packing>
