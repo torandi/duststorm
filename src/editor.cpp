@@ -48,22 +48,25 @@ enum TYPE: gint {
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
 static int frames = 0;
+
+/* globals */
+bool running = false;
 Time global_time(per_frame);
 
+/* editor widgets */
+GtkWidget* drawing = nullptr;
+GtkLabel* timelabel = nullptr;
+GtkToggleButton* playbutton = nullptr;
+GtkListStore* propstore = nullptr;
+RenderTarget* frame = nullptr;
+
 static bool initialized = false;
-static bool running = false;
 static float aspect = 16.0f / 9.0f;
 static glm::mat4 projection;
-static GtkWidget* drawing = nullptr;
-static GtkLabel* timelabel = nullptr;
-static GtkToggleButton* playbutton = nullptr;
-static GtkListStore* propstore = nullptr;
-static RenderTarget* frame = nullptr;
 static std::string scene_name;
 static Scene* scene = nullptr;
 static RenderObject* model = nullptr;
 static Camera camera(60.f, 1.0f, 0.1f, 100.0f);
-static float slide_ref;
 static glm::vec2 track_ref;
 static glm::vec2 track_angle(0.0f, M_PI*0.5);
 static float track_distance = 1.0f;
@@ -337,60 +340,6 @@ extern "C" G_MODULE_EXPORT void drawingarea_realize_cb(GtkWidget* widget, gpoint
   gtk_widget_end_gl(widget, FALSE);
   gtk_widget_queue_resize(widget);
   initialized = true;
-}
-
-extern "C" G_MODULE_EXPORT void prev_clicked_cb(GtkWidget* widget, gpointer data){
-	global_time.step(-1);
-	gtk_toggle_button_set_active(playbutton, FALSE);
-}
-
-extern "C" G_MODULE_EXPORT void slower_clicked_cb(GtkWidget* widget, gpointer data){
-	global_time.adjust_speed(-10);
-	gtk_toggle_button_set_active(playbutton, TRUE);
-}
-
-extern "C" G_MODULE_EXPORT void faster_clicked_cb(GtkWidget* widget, gpointer data){
-	global_time.adjust_speed(10);
-	gtk_toggle_button_set_active(playbutton, TRUE);
-}
-
-extern "C" G_MODULE_EXPORT void next_clicked_cb(GtkWidget* widget, gpointer data){
-	global_time.step(1);
-	gtk_toggle_button_set_active(playbutton, FALSE);
-}
-
-
-extern "C" G_MODULE_EXPORT void play_toggled_cb(GtkWidget* widget, gpointer data){
-	running = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
-	if ( running ){
-		gtk_button_set_image(GTK_BUTTON(widget), gtk_image_new_from_stock("gtk-media-pause", GTK_ICON_SIZE_SMALL_TOOLBAR));
-		global_time.set_paused(false);
-	} else {
-		gtk_button_set_image(GTK_BUTTON(widget), gtk_image_new_from_stock("gtk-media-play", GTK_ICON_SIZE_SMALL_TOOLBAR));
-		global_time.set_paused(true);
-	}
-}
-
-extern "C" G_MODULE_EXPORT void timelabel_button_press_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data){
-	global_time.set_paused(true);
-	gtk_toggle_button_set_active(playbutton, FALSE);
-
-	slide_ref = event->button.x;
-	gdk_device_grab(gdk_event_get_device(event), gtk_widget_get_parent_window(widget),
-	                GDK_OWNERSHIP_WINDOW, TRUE, GDK_BUTTON_RELEASE_MASK, NULL, event->button.time);
-}
-
-extern "C" G_MODULE_EXPORT void timelabel_button_release_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data){
-	gdk_device_ungrab(gdk_event_get_device(event), event->button.time);
-}
-
-extern "C" G_MODULE_EXPORT void timelabel_motion_notify_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data){
-	const float dx = slide_ref - event->motion.x;
-	const float adj = dx * 0.6; /* >0.5 so 1px will always count to something */
-	const int steps = (int)roundf(adj);
-
-	global_time.step(steps);
-	slide_ref = event->motion.x;
 }
 
 void update(){
