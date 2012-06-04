@@ -428,11 +428,11 @@ int main (int argc, char* argv[]){
 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
 	/* load icons */
-	icon_cat_scene = gdk_pixbuf_new_from_file(PATH_SRC "pictures.png", NULL);
-	icon_scene     = gdk_pixbuf_new_from_file(PATH_SRC "picture.png", NULL);
-	icon_model     = gdk_pixbuf_new_from_file(PATH_SRC "brick.png", NULL);
-	icon_path      = gdk_pixbuf_new_from_file(PATH_SRC "map.png", NULL);
-	icon_light     = gdk_pixbuf_new_from_file(PATH_SRC "light.png", NULL);
+	icon_cat_scene = gdk_pixbuf_new_from_file(PATH_ICON "pictures.png", NULL);
+	icon_scene     = gdk_pixbuf_new_from_file(PATH_ICON "picture.png", NULL);
+	icon_model     = gdk_pixbuf_new_from_file(PATH_ICON "brick.png", NULL);
+	icon_path      = gdk_pixbuf_new_from_file(PATH_ICON "map.png", NULL);
+	icon_light     = gdk_pixbuf_new_from_file(PATH_ICON "lightbulb.png", NULL);
 
 	/* setup scene-list */
 	GtkTreeIter toplevel;

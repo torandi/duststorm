@@ -36,5 +36,6 @@ AC_DEFINE_UNQUOTED([PATH_MODELS],  ["${srcdir}/models/"],      [Path to models])
 AC_DEFINE_UNQUOTED([PATH_SRC],     ["${srcdir}/src/"],         [Path to sources])
 AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${srcdir}/shaders/"],     [Path to shaders])
 AC_DEFINE_UNQUOTED([PATH_OPENCL],  ["${srcdir}/cl_programs/"], [Path to OpenCL programs])
+AC_DEFINE_UNQUOTED([PATH_ICON],    ["${srcdir}/icons/"],       [Path to editor icons])
 
 AC_OUTPUT
