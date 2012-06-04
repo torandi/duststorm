@@ -41,6 +41,7 @@ enum TYPE: gint {
 	TYPE_COMPOSITION,
 	TYPE_PATH,
 	TYPE_MODEL,
+	TYPE_LIGHT,
 	TYPE_UNKNOWN,
 };
 
@@ -71,6 +72,7 @@ static GdkPixbuf* icon_cat_scene = nullptr;
 static GdkPixbuf* icon_scene     = nullptr;
 static GdkPixbuf* icon_model     = nullptr;
 static GdkPixbuf* icon_path      = nullptr;
+static GdkPixbuf* icon_light     = nullptr;
 
 static void show_fps(int signum){
 	//fprintf(stderr, "FPS: %d\n", frames);
@@ -430,6 +432,7 @@ int main (int argc, char* argv[]){
 	icon_scene     = gdk_pixbuf_new_from_file(PATH_SRC "picture.png", NULL);
 	icon_model     = gdk_pixbuf_new_from_file(PATH_SRC "brick.png", NULL);
 	icon_path      = gdk_pixbuf_new_from_file(PATH_SRC "map.png", NULL);
+	icon_light     = gdk_pixbuf_new_from_file(PATH_SRC "light.png", NULL);
 
 	/* setup scene-list */
 	GtkTreeIter toplevel;
@@ -469,6 +472,10 @@ int main (int argc, char* argv[]){
 			} else if ( strcmp(t, "model") == 0 ){
 				type = TYPE_MODEL;
 				icon = icon_model;
+				filename = std::string(d?d:"<nil>");
+			} else if ( strcmp(t, "light") == 0 ){
+				type = TYPE_LIGHT;
+				icon = icon_light;
 				filename = std::string(d?d:"<nil>");
 			}
 
