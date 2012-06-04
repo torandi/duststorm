@@ -14,6 +14,44 @@ enum COL {
 	COL_TYPE,
 };
 
+static Editor::TYPE classify_name(const std::string&name, std::string& data){
+	const size_t offset = name.find_first_of(":");
+	if ( offset == std::string::npos ){
+		data = name;
+		return Editor::TYPE_UNKNOWN;
+	}
+
+	const std::string prefix = name.substr(0, offset);
+	data = name.substr(offset);
+
+	if ( prefix == "path"     ) return Editor::TYPE_PATH;
+	if ( prefix == "model"    ) return Editor::TYPE_MODEL;
+	if ( prefix == "light"    ) return Editor::TYPE_LIGHT;
+
+	data = name;
+	return Editor::TYPE_UNKNOWN;
+}
+
+static void populate_sceneprops(const std::string& name){
+	GtkTreeIter iter;
+	gtk_list_store_clear(propstore);
+	SceneFactory::Metadata* meta = SceneFactory::find(name)->second.meta;
+	for ( std::pair<std::string, std::string> p: *meta ){
+		const std::string& key   = p.first;
+		const std::string& value = p.second;
+
+		std::string data;
+		Editor::TYPE type = classify_name(key, data);
+
+		gtk_list_store_append(propstore, &iter);
+		gtk_list_store_set(propstore, &iter,
+		                   0, data.c_str(),
+		                   1, value.c_str(),
+		                   -1);
+
+	}
+}
+
 extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column, gpointer user_data){
 	//gint depth;
 	//gint* tree = gtk_tree_path_get_indices_with_depth(path, &depth);
@@ -46,22 +84,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		assert(scene);
 		scene->add_time(0,60);
 		global_time.reset();
-
-		{
-			GtkTreeIter iter;
-			gtk_list_store_clear(propstore);
-			SceneFactory::Metadata* meta = SceneFactory::find(name)->second.meta;
-			for ( std::pair<std::string, std::string> p: *meta ){
-				const std::string& key   = p.first;
-				const std::string& value = p.second;
-				gtk_list_store_append(propstore, &iter);
-				gtk_list_store_set(propstore, &iter,
-				                   0, key.c_str(),
-				                   1, value.c_str(),
-				                   -1);
-
-			}
-		}
+		populate_sceneprops(name);
 		break;
 
 	case Editor::TYPE_PATH:
