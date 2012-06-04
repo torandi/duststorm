@@ -27,4 +27,8 @@ namespace SceneFactory {
 	SceneMap::const_iterator end(){
 		return map.end();
 	}
+
+	SceneMap::const_iterator find(const std::string& name){
+		return map.find(name);
+	}
 }

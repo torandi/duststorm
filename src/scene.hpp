@@ -103,6 +103,7 @@ namespace SceneFactory {
 	 */
 	SceneMap::const_iterator begin();
 	SceneMap::const_iterator end();
+	SceneMap::const_iterator find(const std::string& name);
 
 	/**
 	 * Register a new scene class. Do not call directly, use REGISTER_SCENE_TYPE.
