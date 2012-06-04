@@ -52,6 +52,7 @@ editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL
 editor_SOURCES = \
 	src/editor.cpp \
 	src/editor/render.cpp \
+	src/editor/scenelist.cpp \
 	src/editor/timecontrol.cpp
 
 .PHONY: .autoload.tmp

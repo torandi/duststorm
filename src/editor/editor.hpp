@@ -14,8 +14,16 @@ extern Scene* scene;
 extern GtkWidget* drawing;
 extern GtkLabel* timelabel;
 extern GtkToggleButton* playbutton;
+extern GtkTreeStore* scenestore;
 extern GtkListStore* propstore;
 extern RenderTarget* frame;
+
+/* icons */
+extern GdkPixbuf* icon_cat_scene;
+extern GdkPixbuf* icon_scene;
+extern GdkPixbuf* icon_model;
+extern GdkPixbuf* icon_path;
+extern GdkPixbuf* icon_light;
 
 namespace Editor {
 
@@ -39,6 +47,8 @@ namespace Editor {
 	extern MODE mode;
 	extern unsigned int frames;
 	extern std::string scene_name;
+
+	void scenelist_populate();
 
 	void reset();
 	void load_model(const std::string& filename);
