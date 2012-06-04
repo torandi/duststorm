@@ -12,7 +12,8 @@ class TVScene: public Scene {
 public:
 	TVScene(const glm::ivec2& size)
 		: Scene(size)
-		, tv_test("tv.obj")
+		, tv_test("tv.obj", false)
+		, tv_room("tv_room.obj", false)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
 		, v("scene/tv_cam1.txt") {
 
@@ -27,6 +28,7 @@ public:
 		shaders[SHADER_NORMAL]->bind();
 		{
 			tv_test.render(shaders[SHADER_NORMAL]);
+			tv_room.render(shaders[SHADER_NORMAL]);
 		}
 		Shader::unbind();
 	}
@@ -37,6 +39,7 @@ public:
 
 private:
 	RenderObject tv_test;
+	RenderObject tv_room;
 	Camera camera;
 	PointTable v;
 };
