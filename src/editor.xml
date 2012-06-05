@@ -516,7 +516,7 @@
                         <child>
                           <object class="GtkTreeViewColumn" id="treeviewcolumn2">
                             <property name="resizable">True</property>
-                            <property name="min_width">100</property>
+                            <property name="min_width">140</property>
                             <property name="title" translatable="yes">Key</property>
                             <child>
                               <object class="GtkCellRendererText" id="cellrenderertext1"/>
