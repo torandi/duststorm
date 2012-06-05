@@ -14,6 +14,14 @@ enum COL {
 	COL_TYPE,
 };
 
+enum {
+	PROP_KEY = 0,
+	PROP_VALUE,
+	PROP_MODE,
+	PROP_EDITABLE,
+	PROP_COLOR,
+};
+
 static Editor::TYPE classify_name(const std::string&name, std::string& data){
 	const size_t offset = name.find_first_of(":");
 	if ( offset == std::string::npos ){
@@ -22,33 +30,60 @@ static Editor::TYPE classify_name(const std::string&name, std::string& data){
 	}
 
 	const std::string prefix = name.substr(0, offset);
-	data = name.substr(offset);
+	data = name.substr(offset+1);
 
 	if ( prefix == "path"     ) return Editor::TYPE_PATH;
 	if ( prefix == "model"    ) return Editor::TYPE_MODEL;
 	if ( prefix == "light"    ) return Editor::TYPE_LIGHT;
+	if ( prefix == "int"      ) return Editor::TYPE_INT;
+	if ( prefix == "float"    ) return Editor::TYPE_FLOAT;
+	if ( prefix == "vec2"     ) return Editor::TYPE_VEC2;
+	if ( prefix == "vec3"     ) return Editor::TYPE_VEC3;
+	if ( prefix == "vec4"     ) return Editor::TYPE_VEC4;
+	if ( prefix == "string"   ) return Editor::TYPE_STRING;
 
 	data = name;
 	return Editor::TYPE_UNKNOWN;
 }
 
 static void populate_sceneprops(const std::string& name){
-	GtkTreeIter iter;
-	gtk_list_store_clear(propstore);
+	GtkTreeIter parent, child;
+	gtk_tree_store_clear(propstore);
 	SceneFactory::Metadata* meta = SceneFactory::find(name)->second.meta;
 	for ( std::pair<std::string, std::string> p: *meta ){
 		const std::string& key   = p.first;
 		const std::string& value = p.second;
 
 		std::string data;
-		Editor::TYPE type = classify_name(key, data);
+		Editor::TYPE type = classify_name(value, data);
 
-		gtk_list_store_append(propstore, &iter);
-		gtk_list_store_set(propstore, &iter,
-		                   0, data.c_str(),
-		                   1, value.c_str(),
-		                   -1);
+		switch ( type ){
+		case Editor::TYPE_PATH:
+		case Editor::TYPE_MODEL:
+			/* don't show these in property editor */
+			break;
 
+		case Editor::TYPE_LIGHT:
+			gtk_tree_store_append(propstore, &parent, NULL);
+			gtk_tree_store_set(propstore, &parent, PROP_KEY, key.c_str(), PROP_VALUE, "Light", PROP_COLOR, "#ddd", -1);
+
+			gtk_tree_store_append(propstore, &child, &parent);
+			gtk_tree_store_set(propstore, &child, PROP_KEY, "Type", PROP_VALUE, "derp", PROP_EDITABLE, TRUE, -1);
+
+			gtk_tree_store_append(propstore, &child, &parent);
+			gtk_tree_store_set(propstore, &child, PROP_KEY, "Attenuation", PROP_VALUE, "derp", PROP_EDITABLE, TRUE, PROP_MODE, gtk_cell_renderer_progress_new(), -1);
+
+			gtk_tree_store_append(propstore, &child, &parent);
+			gtk_tree_store_set(propstore, &child, PROP_KEY, "Color", PROP_VALUE, "derp", PROP_EDITABLE, TRUE, -1);
+
+			gtk_tree_store_append(propstore, &child, &parent);
+			gtk_tree_store_set(propstore, &child, PROP_KEY, "Position", PROP_VALUE, "derp", PROP_EDITABLE, TRUE, -1);
+			break;
+
+		default:
+			gtk_tree_store_append(propstore, &parent, NULL);
+			gtk_tree_store_set(propstore, &parent, PROP_KEY, data.c_str(), PROP_VALUE, value.c_str(), PROP_EDITABLE, TRUE, -1);
+		}
 	}
 }
 

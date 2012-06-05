@@ -132,6 +132,9 @@ SceneFactory::Metadata* SceneTraits<TVScene>::metadata(){
 	m["TV model"] = "model:tv.obj";
 	m["Room model"] = "model:tv_room.obj";
 	m["Light[0]"] = "light:tv_light0.txt";
+	m["Float"] = "float:test1";
+	m["Int"] = "int:test2";
+	m["Vec3"] = "vec3:test3";
 	return _;
 }
 

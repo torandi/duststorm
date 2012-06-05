@@ -39,7 +39,7 @@ GtkWidget* drawing = nullptr;
 GtkLabel* timelabel = nullptr;
 GtkToggleButton* playbutton = nullptr;
 GtkTreeStore* scenestore = nullptr;
-GtkListStore* propstore = nullptr;
+GtkTreeStore* propstore = nullptr;
 RenderTarget* frame = nullptr;
 
 /* icons */
@@ -96,7 +96,7 @@ int main (int argc, char* argv[]){
 	timelabel          = GTK_LABEL(gtk_builder_get_object(builder, "timelabel"));
 	playbutton         = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "play"));
 	scenestore         = GTK_TREE_STORE(gtk_builder_get_object(builder, "scenestore"));
-	propstore          = GTK_LIST_STORE(gtk_builder_get_object(builder, "propstore"));
+	propstore          = GTK_TREE_STORE(gtk_builder_get_object(builder, "propstore"));
 
 	/* enable opengl on drawingarea */
 	int attrib[] = {

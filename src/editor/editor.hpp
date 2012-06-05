@@ -15,7 +15,7 @@ extern GtkWidget* drawing;
 extern GtkLabel* timelabel;
 extern GtkToggleButton* playbutton;
 extern GtkTreeStore* scenestore;
-extern GtkListStore* propstore;
+extern GtkTreeStore* propstore;
 extern RenderTarget* frame;
 
 /* icons */
@@ -41,6 +41,12 @@ namespace Editor {
 		TYPE_PATH,
 		TYPE_MODEL,
 		TYPE_LIGHT,
+		TYPE_INT,
+		TYPE_FLOAT,
+		TYPE_VEC2,
+		TYPE_VEC3,
+		TYPE_VEC4,
+		TYPE_STRING,
 		TYPE_UNKNOWN,
 	};
 
