@@ -82,4 +82,4 @@ private:
 	Camera camera;
 };
 
-REGISTER_SCENE_TYPE(ParticlesScene, "Particles");
+REGISTER_SCENE_TYPE(ParticlesScene, "Particles", "particles.meta");

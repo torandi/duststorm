@@ -85,6 +85,11 @@ struct SceneInfo {
 	 * Function used to allocate a new instance.
 	 */
 	SceneFactory::factory_callback func;
+
+	/**
+	 * Filename holding metadata for the scene.
+	 */
+	std::string filename;
 };
 
 namespace SceneFactory {
@@ -108,7 +113,7 @@ namespace SceneFactory {
 	/**
 	 * Register a new scene class. Do not call directly, use REGISTER_SCENE_TYPE.
 	 */
-	void register_factory(const std::string& name, factory_callback func, Metadata* meta);
+	void register_factory(const std::string& name, factory_callback func, Metadata* meta, const std::string& filename);
 };
 
 /**
@@ -137,9 +142,9 @@ public:
 /**
  * Register a new scene-type which can be allocated using name.
  */
-#define REGISTER_SCENE_TYPE(cls, name) \
+#define REGISTER_SCENE_TYPE(cls, name, filename) \
 	void _register_##cls () { \
-		SceneFactory::register_factory(name, SceneTraits<cls>::factory, SceneTraits<cls>::metadata()); \
+		SceneFactory::register_factory(name, SceneTraits<cls>::factory, SceneTraits<cls>::metadata(), filename); \
 	}
 
 #endif /* SCENE_H */

@@ -47,7 +47,7 @@ BUILT_SOURCES = .autoload.tmp autoload.h autoload.cpp
 CLEANFILES = .autoload.tmp autoload.lst autoload.cpp autoload.h stamp-autoload
 
 .autoload.tmp: Makefile
-	@grep "^[[:blank:]]*REGISTER_SCENE_TYPE" -r ${top_srcdir}/src/scene/*.cpp | sed 's/.*(\(.*\),[ ]*\"\(.*\)\").*/_register_\1:\2/g' > .autoload.tmp
+	@grep "^[[:blank:]]*REGISTER_SCENE_TYPE" -r ${top_srcdir}/src/scene/*.cpp | sed 's/.*(\(.*\),[ \t]*\"\(.*\)\"[ \t]*,.*).*/_register_\1:\2/g' > .autoload.tmp
 	@cmp -s autoload.lst .autoload.tmp || touch stamp-autoload
 
 autoload.lst: stamp-autoload

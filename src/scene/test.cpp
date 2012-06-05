@@ -19,4 +19,4 @@ public:
 	}
 };
 
-REGISTER_SCENE_TYPE(TestScene, "Test");
+REGISTER_SCENE_TYPE(TestScene, "Test", "test.meta");

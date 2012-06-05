@@ -131,4 +131,4 @@ SceneFactory::Metadata* SceneTraits<TVScene>::metadata(){
 	return _;
 }
 
-REGISTER_SCENE_TYPE(TVScene, "TV");
+REGISTER_SCENE_TYPE(TVScene, "TV", "tv.meta");

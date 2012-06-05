@@ -123,4 +123,4 @@ private:
 	MovableObject * ctrl;
 };
 
-REGISTER_SCENE_TYPE(WaterScene, "Water");
+REGISTER_SCENE_TYPE(WaterScene, "Water", "water.meta");

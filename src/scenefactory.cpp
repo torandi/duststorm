@@ -8,8 +8,8 @@ static SceneFactory::SceneMap map;
 
 namespace SceneFactory {
 
-	void register_factory(const std::string& name, factory_callback func, Metadata* meta){
-		map[name] = {meta, func};
+	void register_factory(const std::string& name, factory_callback func, Metadata* meta, const std::string& filename){
+		map[name] = {meta, func, filename};
 	}
 
 	Scene* create(const std::string& name, const glm::ivec2& size){
