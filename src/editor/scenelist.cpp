@@ -143,6 +143,21 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 namespace Editor {
 
 	void scenelist_populate(){
+		static GdkPixbuf* type_icon[Editor::TYPE_MAX] = {
+			NULL,           /* TYPE_CAT */
+			icon_cat_scene, /* TYPE_SCENE, */
+			NULL,           /* TYPE_COMPOSITION, */
+			icon_path,      /* TYPE_PATH, */
+			icon_model,     /* TYPE_MODEL, */
+			icon_light,     /* TYPE_LIGHT, */
+			NULL,           /* TYPE_INT, */
+			NULL,           /* TYPE_FLOAT, */
+			NULL,           /* TYPE_VEC2, */
+			NULL,           /* TYPE_VEC3, */
+			NULL,           /* TYPE_VEC4, */
+			NULL,           /* TYPE_STRING, */
+		};
+
 		GtkTreeIter toplevel;
 		gtk_tree_store_append(scenestore, &toplevel, NULL);
 		gtk_tree_store_set(scenestore, &toplevel,
@@ -164,38 +179,26 @@ namespace Editor {
 			for ( std::pair<std::string, std::string> p: *meta ){
 				const std::string& key   = p.first;
 				const std::string& value = p.second;
-				std::string filename = "";
-				GdkPixbuf* icon = nullptr;
-				gint type = Editor::TYPE_UNKNOWN;
-
-				char* data = strdup(value.c_str());
-				char* t = strtok(data, ":");
-				char* d = strtok(NULL, ":");
-
-				if ( strcmp(t, "path") == 0 ){
-					type = Editor::TYPE_PATH;
-					icon = icon_path;
-					filename = std::string(d?d:"<nil>");
-				} else if ( strcmp(t, "model") == 0 ){
-					type = Editor::TYPE_MODEL;
-					icon = icon_model;
-					filename = std::string(d?d:"<nil>");
-				} else if ( strcmp(t, "light") == 0 ){
-					type = Editor::TYPE_LIGHT;
-					icon = icon_light;
-					filename = std::string(d?d:"<nil>");
-				}
-
-				free(data);
-
 				GtkTreeIter cur;
-				gtk_tree_store_append(scenestore, &cur, &child);
-				gtk_tree_store_set(scenestore, &cur,
-				                   COL_ICON, icon,
-				                   COL_TITLE, key.c_str(),
-				                   COL_FILENAME, filename.c_str(),
-				                   COL_TYPE, type,
-				                   -1);
+				std::string data;
+				Editor::TYPE type = classify_name(value, data);
+
+				switch ( type ){
+				case Editor::TYPE_PATH:
+				case Editor::TYPE_MODEL:
+				case Editor::TYPE_LIGHT:
+					gtk_tree_store_append(scenestore, &cur, &child);
+					gtk_tree_store_set(scenestore, &cur,
+					                   COL_ICON, type_icon[type],
+					                   COL_TITLE, key.c_str(),
+					                   COL_FILENAME, data.c_str(),
+					                   COL_TYPE, type,
+					                   -1);
+					break;
+
+				default:
+					break;
+				}
 			}
 		}
 

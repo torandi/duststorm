@@ -35,6 +35,7 @@ namespace Editor {
 	};
 
 	enum TYPE: gint {
+		TYPE_UNKNOWN, /* should be first */
 		TYPE_CAT = 0,
 		TYPE_SCENE,
 		TYPE_COMPOSITION,
@@ -47,7 +48,7 @@ namespace Editor {
 		TYPE_VEC3,
 		TYPE_VEC4,
 		TYPE_STRING,
-		TYPE_UNKNOWN,
+		TYPE_MAX, /* should be last */
 	};
 
 	extern MODE mode;
