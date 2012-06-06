@@ -55,6 +55,8 @@ namespace Editor {
 	extern unsigned int frames;
 	extern std::string scene_name;
 
+	TYPE classify_name(const std::string&name, std::string& data);
+
 	void scenelist_populate();
 
 	void reset();

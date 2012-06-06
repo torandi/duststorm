@@ -22,30 +22,6 @@ enum {
 	PROP_COLOR,
 };
 
-static Editor::TYPE classify_name(const std::string&name, std::string& data){
-	const size_t offset = name.find_first_of(":");
-	std::string prefix = name;
-	data = "";
-
-	if ( offset != std::string::npos ){
-		prefix = name.substr(0, offset);
-		data = name.substr(offset+1);
-	}
-
-	if ( prefix == "path"     ) return Editor::TYPE_PATH;
-	if ( prefix == "model"    ) return Editor::TYPE_MODEL;
-	if ( prefix == "light"    ) return Editor::TYPE_LIGHT;
-	if ( prefix == "int"      ) return Editor::TYPE_INT;
-	if ( prefix == "float"    ) return Editor::TYPE_FLOAT;
-	if ( prefix == "vec2"     ) return Editor::TYPE_VEC2;
-	if ( prefix == "vec3"     ) return Editor::TYPE_VEC3;
-	if ( prefix == "vec4"     ) return Editor::TYPE_VEC4;
-	if ( prefix == "string"   ) return Editor::TYPE_STRING;
-
-	data = name;
-	return Editor::TYPE_UNKNOWN;
-}
-
 static void populate_sceneprops(const std::string& name){
 	GtkTreeIter parent, child;
 	gtk_tree_store_clear(propstore);
@@ -55,7 +31,7 @@ static void populate_sceneprops(const std::string& name){
 		const std::string& value = p.second;
 
 		std::string data;
-		Editor::TYPE type = classify_name(value, data);
+		Editor::TYPE type = Editor::classify_name(value, data);
 
 		switch ( type ){
 		case Editor::TYPE_PATH:
@@ -181,7 +157,7 @@ namespace Editor {
 				const std::string& value = p.second;
 				GtkTreeIter cur;
 				std::string data;
-				Editor::TYPE type = classify_name(value, data);
+				Editor::TYPE type = Editor::classify_name(value, data);
 
 				switch ( type ){
 				case Editor::TYPE_PATH:

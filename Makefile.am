@@ -3,9 +3,15 @@ AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLA
 
 noinst_LIBRARIES = libfrob.a
 bin_PROGRAMS = demo
+TESTS =
 
 if BUILD_EDITOR
 bin_PROGRAMS += editor
+TESTS += test/editor_classify
+endif
+
+if BUILD_TESTS
+check_PROGRAMS = ${TESTS}
 endif
 
 libfrob_a_SOURCES = \
@@ -51,9 +57,14 @@ editor_LDFLAGS = $$(pkg-config gtk+-3.0 gtkglext-3.0 --libs) -Wl,--export-dynami
 editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} -lSDL_image
 editor_SOURCES = \
 	src/editor.cpp \
+	src/editor/classify.cpp \
 	src/editor/render.cpp \
 	src/editor/scenelist.cpp \
 	src/editor/timecontrol.cpp
+
+test_editor_classify_CXXFLAGS = ${AM_CXXFLAGS} $(CPPUNIT_CFLAGS) $$(pkg-config gtk+-3.0 gtkglext-3.0 --cflags)
+test_editor_classify_LDFLAGS = $(CPPUNIT_LIBS)
+test_editor_classify_SOURCES = test/editor_classify.cpp src/editor/classify.cpp
 
 .PHONY: .autoload.tmp
 BUILT_SOURCES = .autoload.tmp autoload.h autoload.cpp

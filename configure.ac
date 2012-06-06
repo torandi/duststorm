@@ -38,4 +38,7 @@ AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${srcdir}/shaders/"],     [Path to shaders]
 AC_DEFINE_UNQUOTED([PATH_OPENCL],  ["${srcdir}/cl_programs/"], [Path to OpenCL programs])
 AC_DEFINE_UNQUOTED([PATH_ICON],    ["${srcdir}/icons/"],       [Path to editor icons])
 
+AM_PATH_CPPUNIT(1.9.6,,[AC_MSG_NOTICE([cppunit not found, tests disabled])])
+AM_CONDITIONAL([BUILD_TESTS], [test "x$no_cppunit" != "xyes"])
+
 AC_OUTPUT
