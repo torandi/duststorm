@@ -1,6 +1,8 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include <cstdio>
+
 class Color {
 public:
 	Color()
@@ -49,6 +51,15 @@ public:
 		}
 
 		return v;
+	}
+
+	const char* to_hex() const {
+		static char buffer[8]; /* #RRGGBB */
+		sprintf(buffer, "#%02x%02x%02x",
+		        static_cast<unsigned int>(r / 1.0f * 0xFF),
+		        static_cast<unsigned int>(g / 1.0f * 0xFF),
+		        static_cast<unsigned int>(b / 1.0f * 0xFF));
+		return buffer;
 	}
 
 	static Color lerp(const Color& c1, const Color& c2, float s){
