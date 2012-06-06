@@ -24,13 +24,13 @@ enum {
 
 static Editor::TYPE classify_name(const std::string&name, std::string& data){
 	const size_t offset = name.find_first_of(":");
-	if ( offset == std::string::npos ){
-		data = name;
-		return Editor::TYPE_UNKNOWN;
-	}
+	std::string prefix = name;
+	data = "";
 
-	const std::string prefix = name.substr(0, offset);
-	data = name.substr(offset+1);
+	if ( offset != std::string::npos ){
+		prefix = name.substr(0, offset);
+		data = name.substr(offset+1);
+	}
 
 	if ( prefix == "path"     ) return Editor::TYPE_PATH;
 	if ( prefix == "model"    ) return Editor::TYPE_MODEL;
@@ -82,7 +82,7 @@ static void populate_sceneprops(const std::string& name){
 
 		default:
 			gtk_tree_store_append(propstore, &parent, NULL);
-			gtk_tree_store_set(propstore, &parent, PROP_KEY, data.c_str(), PROP_VALUE, value.c_str(), PROP_EDITABLE, TRUE, -1);
+			gtk_tree_store_set(propstore, &parent, PROP_KEY, key.c_str(), PROP_VALUE, value.c_str(), PROP_EDITABLE, TRUE, -1);
 		}
 	}
 }
