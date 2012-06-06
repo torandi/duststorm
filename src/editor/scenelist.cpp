@@ -8,6 +8,7 @@
 #include <gtk/gtk.h>
 #include <dirent.h>
 #include <fnmatch.h>
+#include <sstream>
 
 enum COL {
 	COL_ICON = 0,
@@ -22,47 +23,148 @@ enum {
 	PROP_MODE,
 	PROP_EDITABLE,
 	PROP_COLOR,
+	PROP_POINTER,
+	PROP_OFFSET,
 };
 
-static void populate_sceneprops(const std::string& name){
-	GtkTreeIter parent, child;
+static unsigned int add_property(GtkTreeIter* parent, const glm::vec3& v, const std::string& name, Meta* variable, unsigned int offset){
+	GtkTreeIter cur, child;
+	std::stringstream s; s << "<" << v.x << ", " << v.y << ", " << v.z << ">";
+	std::stringstream x; x << v.x;
+	std::stringstream y; y << v.y;
+	std::stringstream z; z << v.z;
+
+	gtk_tree_store_append(propstore, &cur, parent);
+	gtk_tree_store_set(propstore, &cur, PROP_KEY, name.c_str(), PROP_VALUE, s.str().c_str(), PROP_COLOR, "#ddd", -1);
+
+	gtk_tree_store_append(propstore, &child, &cur);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "x", PROP_VALUE, x.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 1, -1);
+
+	gtk_tree_store_append(propstore, &child, &cur);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "y", PROP_VALUE, y.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 2, -1);
+
+	gtk_tree_store_append(propstore, &child, &cur);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "z", PROP_VALUE, z.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 3, -1);
+
+	return offset + 3;
+}
+
+static unsigned int add_property(GtkTreeIter* parent, const Color& c, unsigned int components, const std::string& name, Meta* variable, unsigned int offset){
+	GtkTreeIter cur, child;
+	std::stringstream r; r << c.r;
+	std::stringstream g; g << c.g;
+	std::stringstream b; b << c.b;
+	std::stringstream a; a << c.a;
+
+	gtk_tree_store_append(propstore, &cur, parent);
+	gtk_tree_store_set(propstore, &cur, PROP_KEY, name.c_str(), PROP_VALUE, "Color", PROP_COLOR, "#ddd", -1);
+
+	gtk_tree_store_append(propstore, &child, &cur);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "r", PROP_VALUE, r.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 1, -1);
+
+	gtk_tree_store_append(propstore, &child, &cur);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "g", PROP_VALUE, g.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 2, -1);
+
+	gtk_tree_store_append(propstore, &child, &cur);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "b", PROP_VALUE, b.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 3, -1);
+
+	if ( components == 4 ){
+		gtk_tree_store_append(propstore, &child, &cur);
+		gtk_tree_store_set(propstore, &child, PROP_KEY, "a", PROP_VALUE, a.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 4, -1);
+	}
+
+	return offset + components;
+}
+
+static void add_light_property(GtkTreeIter* parent, const MovableLight& light, const std::string& name, Meta* variable, unsigned int offset){
+	GtkTreeIter cur, child;
+
+	std::stringstream t; t << light.type;
+	std::stringstream ac; ac << light.constant_attenuation;
+
+	gtk_tree_store_append(propstore, &cur, parent);
+	gtk_tree_store_set(propstore, &cur, PROP_KEY, name.c_str(), PROP_VALUE, "Light", PROP_POINTER, variable, PROP_COLOR, "#ddd", -1);
+
+	gtk_tree_store_append(propstore, &child, &cur);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "Type", PROP_VALUE, t.str().c_str(), PROP_EDITABLE, TRUE, PROP_OFFSET, offset + 1, -1);
+
+	gtk_tree_store_append(propstore, &child, &cur);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "Attenuation", PROP_VALUE, ac.str().c_str(), PROP_EDITABLE, TRUE, PROP_OFFSET, offset + 2, -1);
+
+	offset += 2;
+	offset = add_property(&cur, Color(light.intensity), 3, "Color", NULL, offset);
+	offset = add_property(&cur, light.position(), "Position", NULL, offset);
+}
+
+static void populate_sceneprops(Scene* scene, const std::string& name){
+	GtkTreeIter parent;
 	gtk_tree_store_clear(propstore);
 	SceneFactory::Metadata* meta = SceneFactory::find(name)->second.meta;
-	for ( std::pair<std::string, std::string> p: *meta ){
+	for ( std::pair<std::string, Meta*> p: *meta ){
 		const std::string& key   = p.first;
-		const std::string& value = p.second;
+		Meta* variable = p.second;
 
-		std::string data;
-		Editor::TYPE type = Editor::classify_name(value, data);
-
-		switch ( type ){
-		case Editor::TYPE_PATH:
-		case Editor::TYPE_MODEL:
+		switch ( variable->type ){
+		case Meta::TYPE_MODEL:
+		case Meta::TYPE_PATH:
 			/* don't show these in property editor */
 			break;
 
-		case Editor::TYPE_LIGHT:
-			gtk_tree_store_append(propstore, &parent, NULL);
-			gtk_tree_store_set(propstore, &parent, PROP_KEY, key.c_str(), PROP_VALUE, "Light", PROP_COLOR, "#ddd", -1);
-
-			gtk_tree_store_append(propstore, &child, &parent);
-			gtk_tree_store_set(propstore, &child, PROP_KEY, "Type", PROP_VALUE, "derp", PROP_EDITABLE, TRUE, -1);
-
-			gtk_tree_store_append(propstore, &child, &parent);
-			gtk_tree_store_set(propstore, &child, PROP_KEY, "Attenuation", PROP_VALUE, "derp", PROP_EDITABLE, TRUE, PROP_MODE, gtk_cell_renderer_progress_new(), -1);
-
-			gtk_tree_store_append(propstore, &child, &parent);
-			gtk_tree_store_set(propstore, &child, PROP_KEY, "Color", PROP_VALUE, "derp", PROP_EDITABLE, TRUE, -1);
-
-			gtk_tree_store_append(propstore, &child, &parent);
-			gtk_tree_store_set(propstore, &child, PROP_KEY, "Position", PROP_VALUE, "derp", PROP_EDITABLE, TRUE, -1);
+		case Meta::TYPE_LIGHT:
+		{
+			const MetaLightBase* r = dynamic_cast<const MetaLightBase*>(variable);
+			add_light_property(NULL, r->get(scene), key, variable, 0);
 			break;
+		}
+
+		case Meta::TYPE_VEC3:
+		{
+			const MetaVariableBase<glm::vec3>* r = dynamic_cast<const MetaVariableBase<glm::vec3>*>(variable);
+			add_property(NULL, r->get(scene), key, variable, 0);
+			break;
+		}
+
+		case Meta::TYPE_COLOR:
+		{
+			const MetaVariableBase<Color>* r = dynamic_cast<const MetaVariableBase<Color>*>(variable);
+			add_property(NULL, r->get(scene), 4, key, variable, 0);
+			break;
+		}
 
 		default:
 			gtk_tree_store_append(propstore, &parent, NULL);
-			gtk_tree_store_set(propstore, &parent, PROP_KEY, key.c_str(), PROP_VALUE, value.c_str(), PROP_EDITABLE, TRUE, -1);
+			gtk_tree_store_set(propstore, &parent, PROP_KEY, key.c_str(), PROP_VALUE, variable->get_string(scene, 0).c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, -1);
 		}
 	}
+}
+
+extern "C" G_MODULE_EXPORT void property_edited_cb (GtkCellRendererText* cell, gchar* path, gchar* new_text, gpointer user_data){
+	GtkTreeIter iter, prev, child;
+	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(propstore), &iter, path);
+	child = iter;
+
+	gpointer pointer;
+	guint offset;
+	gtk_tree_model_get(GTK_TREE_MODEL(propstore), &iter, PROP_OFFSET, &offset, -1);
+
+	/* locate meta variable by searching parents */
+	Meta* variable = nullptr;
+	do {
+		gtk_tree_model_get(GTK_TREE_MODEL(propstore), &iter, PROP_POINTER, &pointer, -1);
+
+		variable = static_cast<Meta*>(pointer);
+		if ( variable ) break;
+
+		prev = iter;
+	} while ( gtk_tree_model_iter_parent(GTK_TREE_MODEL(propstore), &iter, &prev) == TRUE );
+
+	if ( !variable ){
+		fprintf(stderr, "Cell at %s does not have an associated metadata variable assigned, edit ignored.\n", path);
+		return;
+	}
+
+	variable->set_string(scene, std::string(new_text), offset);
+	gtk_tree_store_set(propstore, &child, PROP_VALUE, variable->get_string(scene, offset).c_str(), -1);
 }
 
 extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column, gpointer user_data){
@@ -97,7 +199,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		assert(scene);
 		scene->add_time(0,60);
 		global_time.reset();
-		populate_sceneprops(name);
+		populate_sceneprops(scene, name);
 		break;
 
 	case Editor::TYPE_PATH:
@@ -155,17 +257,25 @@ namespace Editor {
 			                   -1);
 
 			SceneFactory::Metadata* meta = it->second.meta;
-			for ( std::pair<std::string, std::string> p: *meta ){
+			for ( std::pair<std::string, Meta*> p: *meta ){
 				const std::string& key   = p.first;
-				const std::string& value = p.second;
+				const Meta* value = p.second;
 				GtkTreeIter cur;
 				std::string data;
-				Editor::TYPE type = Editor::classify_name(value, data);
+				//Editor::TYPE type = Editor::classify_name(value, data);
 
-				switch ( type ){
-				case Editor::TYPE_PATH:
-				case Editor::TYPE_MODEL:
-				case Editor::TYPE_LIGHT:
+				static Editor::TYPE type_lut[] = {
+					Editor::TYPE_MODEL,
+					Editor::TYPE_PATH,
+					Editor::TYPE_LIGHT,
+					Editor::TYPE_UNKNOWN,
+				};
+				Editor::TYPE type = type_lut[value->type];
+
+				switch ( value->type ){
+				case Meta::TYPE_MODEL:
+				case Meta::TYPE_PATH:
+				case Meta::TYPE_LIGHT:
 					gtk_tree_store_append(scenestore, &cur, &child);
 					gtk_tree_store_set(scenestore, &cur,
 					                   COL_ICON, type_icon[type],

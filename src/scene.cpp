@@ -3,6 +3,7 @@
 #endif
 
 #include "scene.hpp"
+#include <cstring>
 
 Scene::Scene(const glm::ivec2& size, GLenum format)
 	: RenderTarget(size, format, true)
@@ -74,4 +75,49 @@ float Scene::stage(float t) const {
 
 bool Scene::is_active() const {
 	return match;
+}
+
+void Scene::meta_load(struct SceneInfo* info){
+	const std::string filename = PATH_SRC "scene/" + info->filename;
+	FILE* fp = fopen(filename.c_str(), "r");
+	if ( !fp ){
+		fprintf(stderr, "Failed to read metadata for scene `%s' from `%s': %s\n", info->name.c_str(), filename.c_str(), strerror(errno));
+		abort();
+	}
+
+	char empty[] = "";
+	char* buffer = nullptr;
+	size_t len = 0;
+	while ( getline(&buffer, &len, fp) != -1 ){
+		char* key = strtok(buffer, ":");
+		char* value = strtok(NULL, ":");
+
+		/* ensure value exists */
+		if ( !value ) value = empty;
+
+		/* strip trailing newline */
+		const size_t len = strlen(value);
+		if ( value[len-1] == '\n' ) value[len-1] = 0;
+
+		/* find in metatable */
+		auto it = info->meta->find(std::string(key));
+		if ( it != info->meta->end() ){
+			it->second->set_string(this, value, 0);
+		} else {
+			fprintf(stderr, "%s: unknown key `%s' ignored.\n", filename.c_str(), key);
+		}
+	}
+	free(buffer);
+}
+
+bool Scene::meta_set(const std::string& key, const std::string& value){
+	return false;
+}
+
+std::string Scene::meta_get(const std::string& key) const {
+	return "";
+}
+
+void Scene::meta_persist(){
+
 }

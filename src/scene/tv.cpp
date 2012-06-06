@@ -4,6 +4,7 @@
 
 #include "scene.hpp"
 #include "globals.hpp"
+#include "light.hpp"
 #include "render_object.hpp"
 #include "particle_system.hpp"
 #include "shader.hpp"
@@ -20,7 +21,10 @@ public:
 		, v("scene/tv_cam1.txt")
 		, skybox("skydark")
 		, fire(2000,  TextureArray::from_filename("fire1.png", "fire2.png", "fire3.png", nullptr))
-		, smoke(2000, TextureArray::from_filename("fog.png", nullptr), 20) {
+		, smoke(2000, TextureArray::from_filename("fog.png", nullptr), 20)
+		, int_test(42)
+		, vec3_test(1.0f, 2,3)
+		, clear_color(Color::green) {
 
 		camera.set_position(glm::vec3(-5.f, 0.f, 10.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
@@ -85,8 +89,12 @@ public:
 		smoke.update_config();
 	}
 
+	virtual bool meta_set(const std::string& key, const std::string& value){
+		return false;
+	}
+
 	virtual void render(){
-		clear(Color::green);
+		clear(clear_color);
 
 		Shader::upload_lights(lights);
 		shaders[SHADER_SKYBOX]->bind();
@@ -113,28 +121,31 @@ public:
 		smoke.update(dt);
 	}
 
-private:
 	RenderObject tv_test;
 	RenderObject tv_room;
-	Shader::lights_data_t light_data;
-	Light* light[1];
 	Camera camera;
 	PointTable v;
 	Skybox skybox;
 	ParticleSystem fire, smoke;
+	float float_test;
+	int int_test;
+	glm::vec3 vec3_test;
+	Color clear_color;
 };
 
 template <>
 SceneFactory::Metadata* SceneTraits<TVScene>::metadata(){
 	SceneFactory::Metadata* _ = new SceneFactory::Metadata;
 	SceneFactory::Metadata& m = *_;
-	m["Camera 1"] = "path:tv_cam1.txt";
-	m["TV model"] = "model:tv.obj";
-	m["Room model"] = "model:tv_room.obj";
-	m["Light[0]"] = "light:tv_light0.txt";
-	m["Float"] = "float";
-	m["Int"] = "int";
-	m["Vec3"] = "vec3";
+	m["Camera 1"]   = new MetaPath("tv_cam1.txt");
+	m["TV model"]   = new MetaModel("tv.obj");
+	m["Room model"] = new MetaModel("tv_room.obj");
+	m["Light[0]"]   = new MetaLight<TVScene>(&TVScene::lights, 0, "tv_light0.txt");
+	m["Light[1]"]   = new MetaLight<TVScene>(&TVScene::lights, 1, "tv_light1.txt");
+	m["Float test"] = new MetaVariable<float, TVScene>(&TVScene::float_test);
+	m["Int"]        = new MetaVariable<int, TVScene>(&TVScene::int_test);
+	m["Vec3"]       = new MetaVariable<glm::vec3, TVScene>(&TVScene::vec3_test);
+	m["Background"] = new MetaVariable<Color, TVScene>(&TVScene::clear_color);
 	return _;
 }
 
