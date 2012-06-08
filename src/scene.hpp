@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include "rendertarget.hpp"
+#include "lights_data.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <string>
@@ -51,6 +52,7 @@ public:
 
 protected:
 	float stage(float t) const;
+	LightsData lights;
 
 private:
 	struct time {
