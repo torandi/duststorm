@@ -25,6 +25,8 @@
 #include <getopt.h>
 #include <map>
 
+#include "light.hpp"
+
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
 Time global_time(per_frame);
@@ -78,6 +80,7 @@ namespace Engine {
 }
 
 static void init(bool fullscreen){
+
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		exit(1);

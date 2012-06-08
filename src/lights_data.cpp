@@ -3,6 +3,7 @@
 
 LightsData::LightsData() {
 	for(int i=0; i < MAX_NUM_LIGHTS; ++i) {
+		data_.lights[i].intensity = glm::vec3(1.f, 0.f, 0.f);
 		lights[i] = new MovableLight(&data_.lights[i]);
 	}
 	data_.num_lights = 0;

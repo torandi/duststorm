@@ -10,7 +10,16 @@ class MovableLight : public MovableObject {
 
 		void update(); //Must be called to update position in light
 
+		float &constant_attenuation;
+		float &linear_attenuation;
+		float &quadratic_attenuation;
+		int &type;
+		glm::vec3 &intensity;
+	
+	private:
 		Light * data;
+	protected:
+//		glm::vec3 &position_;
 };
 
 #endif

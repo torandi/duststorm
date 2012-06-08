@@ -35,8 +35,8 @@ struct light_data {
 	float linear_attenuation;
 	float quadratic_attenuation;
 	int type;
-	vec4 intensity;
-	vec4 position;
+	vec3 intensity;
+	vec3 position;
 };
 
 layout(std140) uniform LightsData {

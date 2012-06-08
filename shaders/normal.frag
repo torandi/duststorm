@@ -1,5 +1,7 @@
 #version 150
 
+//NORMAL SHADER
+
 #include "uniforms.glsl"
 
 in vec3 position;
