@@ -11,7 +11,9 @@ libfrob_a_SOURCES = \
 	src/engine.cpp src/engine.hpp \
 	src/globals.cpp src/globals.hpp \
 	src/light.cpp src/light.hpp \
+	src/lights_data.cpp src/lights_data.hpp \
 	src/mesh.cpp src/mesh.hpp \
+	src/movable_light.cpp src/movable_light.hpp \
 	src/movable_object.cpp src/movable_object.hpp \
 	src/particle_system.cpp src/particle_system.hpp \
 	src/rendertarget.cpp src/rendertarget.hpp \

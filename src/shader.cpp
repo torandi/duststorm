@@ -6,6 +6,7 @@
 #include "globals.hpp"
 #include "light.hpp"
 #include "utils.hpp"
+#include "lights_data.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -89,7 +90,9 @@ void Shader::initialize() {
    checkForGLErrors("Bind and allocate global uniforms");
 }
 
-Shader::Shader(const std::string &name_, GLuint program) : name(name_), program_(program) {
+Shader::Shader(const std::string &name_, GLuint program) : 
+		program_(program) 
+	,	name(name_) {
    glGetProgramiv(program_, GL_ACTIVE_ATTRIBUTES, &num_attributes_);
    fprintf(verbose, "Created shader %s\n"
            "  ID %d\n"
@@ -255,7 +258,6 @@ Shader * Shader::create_shader(std::string base_name) {
 }
 
 void Shader::init_uniforms() {
-   const int tmp = program_;
 	for(int i=0; i<NUM_LOCAL_UNIFORMS; ++i) {
 		local_uniform_locations_[i] = glGetUniformLocation(program_, local_uniform_names_[i]);
 		checkForGLErrors((std::string("load uniform ")+local_uniform_names_[i]+" from shader "+name).c_str());
@@ -268,18 +270,17 @@ void Shader::init_uniforms() {
 
 	checkForGLErrors("Upload texture locations");
 
-   //Bind global uniforms to blocks:
-   for(int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
-      assert(tmp == program_);
-      global_uniform_block_index_[i] = glGetUniformBlockIndex(program_, global_uniform_names_[i]);
-      if(global_uniform_block_index_[i] != -1) {
-         glUniformBlockBinding(program_, global_uniform_block_index_[i], i);
-      } else {
-	      fprintf(verbose, "Not binding global uniform %s, probably not used\n", global_uniform_names_[i]);
-      }
-   }
+	//Bind global uniforms to blocks:
+	for(int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
+		global_uniform_block_index_[i] = glGetUniformBlockIndex(program_, global_uniform_names_[i]);
+		if(global_uniform_block_index_[i] != -1) {
+			glUniformBlockBinding(program_, global_uniform_block_index_[i], i);
+		} else {
+			fprintf(verbose, "Not binding global uniform %s, probably not used\n", global_uniform_names_[i]);
+		}
+	}
 
-   checkForGLErrors("Bind global uniforms to buffers");
+	checkForGLErrors("Bind global uniforms to buffers");
 }
 
 void Shader::bind() {
@@ -321,6 +322,10 @@ void Shader::upload_lights(const Shader::lights_data_t &lights) {
    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(lights_data_t), &lights);
    glBindBuffer(GL_UNIFORM_BUFFER, 0);
    checkForGLErrors("upload lights");
+}
+
+void Shader::upload_lights(LightsData &lights) {
+	upload_lights(lights.shader_data());
 }
 
 void Shader::upload_camera_position(const Camera &camera) {

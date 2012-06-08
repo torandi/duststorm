@@ -33,7 +33,8 @@ void main() {
 		if(Lgt.lights[light].type == 0) {
 			lightIntensity = Lgt.lights[light].intensity.rgb;	
 		} else {
-			float lightAttenuation = (1 / ( 1.0 + Lgt.lights[light].attenuation * length(light_distance)));
+			float d = length(light_distance);
+			float lightAttenuation = 1.0 / ( Lgt.lights[light].constant_attenuation + Lgt.lights[light].linear_attenuation * d + Lgt.lights[light].quadratic_attenuation * d * d);
 			lightIntensity =  lightAttenuation * Lgt.lights[light].intensity.rgb;
 		}
 

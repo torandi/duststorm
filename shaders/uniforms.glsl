@@ -31,8 +31,10 @@ layout(std140) uniform Material {
 } Mtl;
 
 struct light_data {
-	float attenuation;
-   int type;
+	float constant_attenuation;
+	float linear_attenuation;
+	float quadratic_attenuation;
+	int type;
 	vec4 intensity;
 	vec4 position;
 };

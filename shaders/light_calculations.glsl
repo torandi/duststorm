@@ -11,7 +11,8 @@ vec4 computeLighting(
 	if(light.type == 0) {
 		lightIntensity = light.intensity.rgb;	
 	} else { 
-		float lightAttenuation = (1 / ( 1.0 + light.attenuation * length(light_distance)));
+		float d = length(light_distance);
+		float lightAttenuation = 1.0 / ( light.constant_attenuation + light.linear_attenuation * d + light.quadratic_attenuation * d * d);
 		lightIntensity =  lightAttenuation * light.intensity.rgb;
 	}
 

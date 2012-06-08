@@ -1,8 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "light.hpp"
 #include "camera.hpp"
+#include "light.hpp"
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -10,8 +10,10 @@
 #include <vector>
 #include <set>
 
-//Muste be same as in uniforms.glsl
+//Must be same as in uniforms.glsl
 #define MAX_NUM_LIGHTS 4
+
+class LightsData;
 
 class Shader {
 public:
@@ -65,7 +67,7 @@ public:
 		float padding[3];
 		glm::vec3 ambient_intensity;
 		float padding_2;
-		Light::shader_light_t lights[MAX_NUM_LIGHTS];
+		Light lights[MAX_NUM_LIGHTS];
 	};
 
 private:
@@ -110,6 +112,7 @@ public:
 	 * Upload lights
 	 */
 	static void upload_lights(const lights_data_t &lights);
+	static void upload_lights(LightsData &lights);
 
 	/*
 	 * Uploads the camera position

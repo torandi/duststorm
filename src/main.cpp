@@ -33,9 +33,6 @@ static volatile bool running = true;
 static const char* program_name;
 static bool resolution_given = false;
 
-//These are all test variables that should be moved into a scene later
-static Shader::lights_data_t lights;
-static Light * light;
 static int frames = 0;
 static RenderTarget* composition;
 static RenderTarget* downsample[3];
@@ -112,12 +109,6 @@ static void init(bool fullscreen){
 	Engine::autoload_scenes();
 	Engine::setup_opengl();
 	Engine::load_shaders();
-
-	lights.num_lights = 1;
-	lights.ambient_intensity = glm::vec3(0.1, 0.1, 0.1);
-	light = new Light(Light::POINT_LIGHT, glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(0.f, 0.f, 1.f));
-	lights.lights[0] = light->shader_light();
-	Shader::upload_lights(lights);
 
 	screen_ortho = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
