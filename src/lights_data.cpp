@@ -6,6 +6,7 @@ LightsData::LightsData() {
 		lights[i] = new MovableLight(&data_.lights[i]);
 	}
 	data_.num_lights = 0;
+	data_.ambient_intensity = glm::vec3(0.1f);
 }
 
 LightsData::~LightsData() {
