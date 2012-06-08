@@ -18,8 +18,6 @@ class MovableLight : public MovableObject {
 	
 	private:
 		Light * data;
-	protected:
-//		glm::vec3 &position_;
 };
 
 #endif
