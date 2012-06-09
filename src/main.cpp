@@ -238,10 +238,10 @@ static void render_composition(){
 
 	  scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
 
-	scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], screen_pos(test_pos->at(t), glm::vec2(scene["Test"]->texture_size())));
-	//scene["Water"   ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["Water"]->texture_size())));
-	scene["TV"      ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["TV"]->texture_size())));
-	scene["particle"]->draw(shaders[SHADER_PASSTHRU], screen_pos(particle_pos->at(t), glm::vec2(scene["particle"]->texture_size())));
+	//scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], screen_pos(test_pos->at(t), glm::vec2(scene["Test"]->texture_size())));
+	scene["Water"   ]->draw(shaders[SHADER_PASSTHRU], screen_pos(glm::vec2(0,0), glm::vec2(scene["Water"]->texture_size())));
+	//scene["TV"      ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["TV"]->texture_size())));
+	//scene["particle"]->draw(shaders[SHADER_PASSTHRU], screen_pos(particle_pos->at(t), glm::vec2(scene["particle"]->texture_size())));
 
 	/*
 	glActiveTexture(GL_TEXTURE1);
@@ -252,7 +252,7 @@ static void render_composition(){
 static void render_display(){
 	RenderTarget::clear(Color::magenta);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
-	composition->draw(shaders[SHADER_FILMGRAIN]);
+	composition->draw(shaders[SHADER_PASSTHRU]);
 }
 
 static void render(){

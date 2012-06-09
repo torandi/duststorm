@@ -5,7 +5,7 @@
 
 	class MovableObject {
 	protected:
-		mutable glm::mat4 rot_matrix_, trans_mat_;
+		mutable glm::mat4 rot_matrix_, trans_mat_, matrix_;
 		mutable bool rotation_matrix_dirty_, translation_matrix_dirty_;
 		glm::vec3 position_;
 		glm::fquat orientation_;

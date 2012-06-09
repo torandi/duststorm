@@ -34,7 +34,8 @@ const glm::mat4 MovableObject::rotation_matrix() const{
 }
 
 const glm::mat4 MovableObject::matrix() const{
-	return translation_matrix()*rotation_matrix();
+	if(translation_matrix_dirty_ || rotation_matrix_dirty_) matrix_ = translation_matrix()*rotation_matrix();
+	return matrix_;
 }
 
 void MovableObject::relative_move(const glm::vec3 &move) {
