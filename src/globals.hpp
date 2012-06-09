@@ -18,6 +18,7 @@ enum shader_t {
 	SHADER_PARTICLES_LIGHT, //Particles with lighting
 	SHADER_DEBUG,
 	SHADER_SKYBOX,
+	SHADER_WATER,
 
 	/* for rendering targets */
 	SHADER_PASSTHRU,                       /* multiplies vertices with MVP and textures using unit 1 */

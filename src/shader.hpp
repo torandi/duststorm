@@ -109,6 +109,8 @@ public:
 
 	const GLint num_attributes() const;
 
+	GLint uniform_location(const char * uniform_name) const;
+
 	/**
 	 * Upload lights
 	 */
@@ -152,5 +154,7 @@ public:
 	 * Upload white material
 	 */
 	static void upload_blank_material();
+
+	const GLint uniform(local_uniforms_t uniform) const;
 };
 #endif
