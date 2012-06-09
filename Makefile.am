@@ -20,6 +20,7 @@ libfrob_a_SOURCES = \
 	src/render_object.cpp src/render_object.hpp \
 	src/scene.cpp src/scenefactory.cpp src/scene.hpp \
 	src/shader.cpp src/shader.hpp \
+	src/skybox.cpp src/skybox.hpp \
 	src/texture.cpp src/texture.hpp \
 	src/time.cpp src/time.hpp \
 	src/timetable.cpp src/timetable.hpp \

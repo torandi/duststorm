@@ -7,6 +7,7 @@
 #include "render_object.hpp"
 #include "shader.hpp"
 #include "timetable.hpp"
+#include "skybox.hpp"
 
 class TVScene: public Scene {
 public:
@@ -15,7 +16,8 @@ public:
 		, tv_test("tv.obj", false)
 		, tv_room("tv_room.obj", false)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
-		, v("scene/tv_cam1.txt") {
+		, v("scene/tv_cam1.txt")
+		, skybox("skydark") {
 
 		camera.set_position(glm::vec3(0.f, 0.f, -1.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
@@ -36,6 +38,10 @@ public:
 		clear(Color::green);
 	
 		Shader::upload_lights(lights);
+		shaders[SHADER_SKYBOX]->bind();
+		{
+			skybox.render(camera);
+		}
 		Shader::upload_camera(camera);
 		shaders[SHADER_NORMAL]->bind();
 		{
@@ -54,6 +60,7 @@ private:
 	RenderObject tv_room;
 	Camera camera;
 	PointTable v;
+	Skybox skybox;
 };
 
 template <>

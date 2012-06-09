@@ -73,6 +73,7 @@ const float Camera::near() const { return near_; }
 const float Camera::far() const { return far_; }
 const float Camera::roll() const { return roll_; }
 const glm::vec3 &Camera::position() const { return position_; }
+const glm::vec3 Camera::up() const { return local_y(); };
 
 void Camera::set_aspect(float aspect){
 	aspect_ = aspect;

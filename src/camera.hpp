@@ -21,6 +21,7 @@ public:
 	const float near() const;
 	const float far() const;
 	const float roll() const;
+	const glm::vec3 up() const;
 
 	void set_aspect(float aspect);
 	void set_fov(float fov);

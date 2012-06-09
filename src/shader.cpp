@@ -47,7 +47,8 @@ const char * Shader::global_uniform_names_[] = {
 const char * Shader::local_uniform_names_[] = {
    "texture1",
    "texture2",
-	 "texture_array1"
+	 "texture_array1",
+	 "texture_cube1"
 };
 
 
@@ -267,6 +268,7 @@ void Shader::init_uniforms() {
 	if ( local_uniform_locations_[UNIFORM_TEXTURE1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE1], 0);
 	if ( local_uniform_locations_[UNIFORM_TEXTURE2] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE2], 1);
 	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY1], 0);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE1], 0);
 
 	checkForGLErrors("Upload texture locations");
 
