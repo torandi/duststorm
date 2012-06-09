@@ -18,19 +18,19 @@ class WaterScene: public Scene {
 public:
 	WaterScene(const glm::ivec2& size)
 		: Scene(size)
-		, quad(1.f, true, true)
+		, quad(5.f, true, true)
 		, water(Texture2D::from_filename("water.png"))
-		, skybox("night")
+		, skybox("skydark")
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
 		, time(0.f) {
 
-		camera.set_position(glm::vec3(0.f, 0.f, -1.f));
-		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
-		quad.set_position(glm::vec3(-0.5f, -0.5f, 0.f));
+		camera.set_position(glm::vec3(0.f, 0.5f, 0.f));
+		camera.look_at(glm::vec3(0.f, 0.f, 4.f));
+		quad.set_position(glm::vec3(-25.f, 0.0f, 0.f));
 		quad.set_rotation(glm::vec3(1.f, 0, 0), 90.f);
-		quad.set_scale(10.f);
+		quad.set_scale(50.f);
 
-		lights.ambient_intensity() = glm::vec3(0.01f);
+		lights.ambient_intensity() = glm::vec3(0.05f);
 		lights.num_lights() = 1;
 		lights.lights[0]->set_position(glm::vec3(0, 0.5f, 0.f));
 		lights.lights[0]->intensity = glm::vec3(0.8f);
@@ -54,12 +54,12 @@ public:
 	}
 
 	virtual void render(){
-		clear(Color::green);
+		clear(Color::black);
 
 		Shader::upload_lights(lights);
 
-		shaders[SHADER_SKYBOX]->bind();
-		skybox.render(camera);
+		//shaders[SHADER_SKYBOX]->bind();
+		//skybox.render(camera);
 
 		Shader::upload_camera(camera);
 

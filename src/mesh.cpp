@@ -203,7 +203,7 @@ void Mesh::set_scale(const glm::vec3 &scale) {
 }
 
 const glm::mat4 Mesh::matrix() const{
-	if(translation_matrix_dirty_ || rotation_matrix_dirty_ || scale_matrix_dirty_) matrix_ = scale_matrix()*translation_matrix()*rotation_matrix();
+	if(translation_matrix_dirty_ || rotation_matrix_dirty_ || scale_matrix_dirty_) matrix_ = translation_matrix()*rotation_matrix()*scale_matrix();
 	return matrix_;
 }
 

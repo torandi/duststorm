@@ -44,7 +44,7 @@ void main() {
 	vec3 r = reflect(-camera_dir, normal_map);
 	vec4 originalColor;
 	originalColor.rgb = skybox_color(r)*water_tint;
-	originalColor.rgb = water_tint;
+	//originalColor.rgb = water_tint;
 
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.0) *1.5;
 
