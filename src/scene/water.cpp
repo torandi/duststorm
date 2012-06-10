@@ -21,8 +21,7 @@ public:
 		, quad(5.f, true, true)
 		, water(Texture2D::from_filename("water.png"))
 		, skybox("skydark")
-		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
-		, time(0.f) {
+		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f) {
 
 		camera.set_position(glm::vec3(0.f, 0.5f, 0.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 4.f));
@@ -80,18 +79,13 @@ public:
 		water->texture_unbind();
 	}
 
-	virtual void update(float t, float dt){
-		time+=dt;
-	}
-
 private:
 	Quad quad;
 	Texture2D* water;
 	Skybox skybox;
 	Camera camera;
-	float time;
 	glm::vec2 wave1, wave2;
-	GLint u_time, u_wave1, u_wave2;
+	GLint u_wave1, u_wave2;
 };
 
 REGISTER_SCENE_TYPE(WaterScene, "Water");
