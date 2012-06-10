@@ -8,90 +8,50 @@
 #include <glm/glm.hpp>
 
 class ParticleSystem : public MovableObject {
+	public:
 
-   const int max_num_particles_;
+		/**
+		 * Creates a particle system with max_num_particles (the actual number can be decreased later)
+		 * the particles are initialy spawned with 0..start_delay s delay
+		 */
+		ParticleSystem(const int max_num_particles, TextureArray* texture, float start_delay=5.f);
+		~ParticleSystem();
 
-   //Texture * texture_;
+		void update(float dt);
+		void render();
 
-   // Buffer 0: position buffer 1: color.
-   // Both are set in the opencl-kernel
-   GLuint gl_buffer_;
-   std::vector<cl::Memory> cl_gl_buffers_;
-   cl::Buffer particles_, config_, random_;
+		//Limit the spawing of particles
+		void limit_particles(int limit);
+		void update_config();
 
-   cl::Program program_;
-   cl::Kernel kernel_;
+		//Change values in this struct and call update_config() to update
+		struct {
 
-   struct particle_t {
-      glm::vec4 direction;
+			glm::vec4 birth_color;
 
-      float ttl;
-      float speed;
-      float acc;
-			float rotation_speed;
+			glm::vec4 death_color;
 
-			float initial_scale;
-			float final_scale;
-			float org_ttl;
-			int dead;
-   } __attribute__ ((aligned (16))) ;
+			glm::vec4 motion_rand;
 
-	struct vertex_t {
-		glm::vec4 position;
-		glm::vec4 color;
-		float scale;
-		int texture_index;
-	} __attribute__ ((aligned (16)));
+			glm::vec4 spawn_direction;
+			glm::vec4 direction_var;
 
-   std::vector<cl::Event> update_blocking_events_;
-   std::vector<cl::Event> render_blocking_events_;
+			glm::vec4 spawn_position;
+			glm::vec4 spawn_area;
 
-	 TextureArray* texture_;
+			//Time to live
+			float avg_ttl;
+			float ttl_var;
+			//Spawn speed
+			float avg_spawn_speed;
+			float spawn_speed_var;
 
-   public:
-
-	 /**
-		* Creates a particle system with max_num_particles (the actual number can be decreased later)
-		* the particles are initialy spawned with 0..start_delay s delay
-		*/
-   ParticleSystem(const int max_num_particles, TextureArray* texture, float start_delay=5.f);
-   ~ParticleSystem();
-
-   void update(float dt);
-   void render();
-
-   //Limit the spawing of particles
-   void limit_particles(int limit);
-   void update_config();
-
-   //Change values in this struct and call update_config() to update
-   struct {
-
-      glm::vec4 birth_color;
-
-      glm::vec4 death_color;
-
-      glm::vec4 motion_rand;
-
-      glm::vec4 spawn_direction;
-      glm::vec4 direction_var;
-
-      glm::vec4 spawn_position;
-      glm::vec4 spawn_area;
-
-      //Time to live
-      float avg_ttl;
-      float ttl_var;
-      //Spawn speed
-      float avg_spawn_speed;
-      float spawn_speed_var;
-
-      //Acceleration
-      float avg_acc;
-      float acc_var;
-      //Scale
-      float avg_scale;
-      float scale_var;
+			//Acceleration
+			float avg_acc;
+			float acc_var;
+			//Scale
+			float avg_scale;
+			float scale_var;
 			float avg_scale_change;
 			float scale_change_var;
 
@@ -105,7 +65,49 @@ class ParticleSystem : public MovableObject {
 			//These two should not be manually changed!
 			int num_textures;
 			int max_num_particles;
-   } config __attribute__ ((aligned (16)));
+		} config __attribute__ ((aligned (16)));
+
+	private:
+
+		const int max_num_particles_;
+
+		//Texture * texture_;
+
+		// Buffer 0: position buffer 1: color.
+		// Both are set in the opencl-kernel
+		GLuint gl_buffer_;
+		std::vector<cl::Memory> cl_gl_buffers_;
+		cl::Buffer particles_, config_, random_;
+
+		cl::Program program_;
+		cl::Kernel kernel_;
+
+		struct particle_t {
+			glm::vec4 direction;
+
+			float ttl;
+			float speed;
+			float acc;
+			float rotation_speed;
+
+			float initial_scale;
+			float final_scale;
+			float org_ttl;
+			int dead;
+		} __attribute__ ((aligned (16))) ;
+
+		struct vertex_t {
+			glm::vec4 position;
+			glm::vec4 color;
+			float scale;
+			int texture_index;
+		} __attribute__ ((aligned (16)));
+
+		std::vector<cl::Event> update_blocking_events_;
+		std::vector<cl::Event> render_blocking_events_;
+
+		TextureArray* texture_;
 };
+
 
 #endif
