@@ -67,6 +67,8 @@ class ParticleSystem : public MovableObject {
 			int max_num_particles;
 		} config __attribute__ ((aligned (16)));
 
+		virtual void callback_position(const glm::vec3 &position);
+
 	private:
 
 		const int max_num_particles_;

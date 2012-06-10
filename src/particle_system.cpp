@@ -145,6 +145,12 @@ void ParticleSystem::update_config() {
 	opencl->queue().flush();
 }
 
+
+void ParticleSystem::callback_position(const glm::vec3 &position) {
+	config.spawn_position = glm::vec4(position,1.f);
+	update_config();
+}
+
 void ParticleSystem::update(float dt) {
 	cl_int err;
 	//Ensure there are no pending writes active
