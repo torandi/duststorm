@@ -4,7 +4,7 @@
 #include "movable_object.hpp"
 #include <glm/glm.hpp>
 
-class Camera : private MovableObject {
+class Camera : public MovableObject {
 public:
 	Camera(float fov, float aspect, float near, float far);
 	Camera(float fov, const glm::ivec2& size, float near, float far);

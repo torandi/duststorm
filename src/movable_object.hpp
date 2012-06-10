@@ -3,7 +3,12 @@
 	#include <glm/glm.hpp>
 	#include <glm/gtc/quaternion.hpp>
 
-	class MovableObject {
+	#include <vector>
+	#include <utility>
+
+	#include "bindable.hpp"
+
+class MovableObject : public Bindable {
 	protected:
 		mutable glm::mat4 rot_matrix_, trans_mat_, scale_matrix_, matrix_;
 		mutable bool rotation_matrix_dirty_, translation_matrix_dirty_, scale_matrix_dirty_;
@@ -13,6 +18,10 @@
 
 
 		glm::vec3 orient_vector(const glm::vec3 &vec) const;
+
+		void orientation_changed();
+		void position_changed();
+		void scale_changed();
 
 	public:
 		MovableObject();
@@ -49,5 +58,28 @@
 		virtual const glm::vec3 local_y() const;
 		virtual const glm::vec3 local_z() const;
 
-	};
+		virtual void callback_position(const glm::vec3 &position);
+		virtual void callback_rotation(const glm::fquat &rotation);
+		virtual void callback_scale(const glm::vec3 &scale);
+
+		/**
+		 * Add callback for position changes. Offset are added before the call
+		 */
+		virtual void add_position_callback(Bindable * obj, const glm::vec3 &offset);
+		/**
+		 * Add callback for scale changes. Scale is multiplied with factor before the call
+		 */
+		virtual void add_scale_callback(Bindable * obj, const glm::vec3 &factor);
+		/**
+		 * Add callback for rotation changes
+		 */
+		virtual void add_rotation_callback(Bindable * obj);
+
+	private:
+		std::vector<std::pair<Bindable*, glm::vec3> > position_callbacks;
+		std::vector<std::pair<Bindable*, glm::vec3> > scale_callbacks;
+		std::vector<Bindable*> rotation_callbacks;
+	
+};
+
 #endif

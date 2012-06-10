@@ -127,3 +127,51 @@ const glm::vec3 MovableObject::local_x() const {
 glm::vec3 MovableObject::orient_vector(const glm::vec3 &vec) const {
    return glm::vec3(rotation_matrix()*glm::vec4(vec, 1.f));
 }
+
+void MovableObject::callback_position(const glm::vec3 &position) {
+	position_ = position;
+	translation_matrix_dirty_ = true;
+	position_changed();
+}
+
+void MovableObject::callback_rotation(const glm::fquat &rotation) {
+	orientation_ = rotation;
+	rotation_matrix_dirty_ = true;
+	orientation_changed();
+}
+
+void MovableObject::callback_scale(const glm::vec3 &scale) {
+	scale_ = scale;
+	scale_matrix_dirty_ = true;
+	scale_changed();
+}
+
+void MovableObject::orientation_changed() {
+	for(auto callback : rotation_callbacks) {
+		callback->callback_rotation(orientation_);
+	}
+}
+
+void MovableObject::position_changed() {
+	for(auto callback : position_callbacks) {
+		callback.first->callback_position(position_ + callback.second);
+	}
+}
+
+void MovableObject::scale_changed() {
+	for(auto callback : scale_callbacks) {
+		callback.first->callback_scale(scale_ * callback.second);
+	}
+}
+
+void MovableObject::add_position_callback(Bindable * obj, const glm::vec3 &offset) {
+	position_callbacks.push_back(std::pair<Bindable*, glm::vec3>(obj, offset));
+}
+
+void MovableObject::add_scale_callback(Bindable * obj, const glm::vec3 &factor) {
+	scale_callbacks.push_back(std::pair<Bindable*, glm::vec3>(obj, factor));
+}
+
+void MovableObject::add_rotation_callback(Bindable * obj) {
+	rotation_callbacks.push_back(obj);
+}

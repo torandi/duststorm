@@ -5,6 +5,7 @@ noinst_LIBRARIES = libfrob.a
 bin_PROGRAMS = demo
 
 libfrob_a_SOURCES = \
+	src/bindable.hpp \
 	src/camera.cpp src/camera.hpp \
 	src/cl.cpp src/cl.hpp \
 	src/color.cpp src/color.hpp \
