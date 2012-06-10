@@ -48,6 +48,7 @@ public:
 
 		wave1 = glm::vec2(0.01, 0);
 		wave2 = glm::vec2(0.005, 0.03);
+
 	}
 
 	virtual void render(){
@@ -82,6 +83,9 @@ public:
 	virtual void update(float t, float dt) {
 		#ifdef ENABLE_INPUT
 			input.update_object(camera, dt);
+			if(input.current_value(Input::ACTION_0) > 0.5f) {
+				printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
+			}
 		#endif
 	}
 

@@ -57,7 +57,7 @@ void Camera::recalculate() {
 
 	pitch(-rotation*glm::sign(direction.y));
 
-	roll(roll_);
+	MovableObject::roll(roll_);
 }
 
 
