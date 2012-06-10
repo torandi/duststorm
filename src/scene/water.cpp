@@ -35,7 +35,7 @@ public:
 
 		lights.ambient_intensity() = glm::vec3(0.05f);
 		lights.num_lights() = 1;
-		lights.lights[0]->set_position(glm::vec3(0, 0.5f, 0.f));
+		lights.lights[0]->set_position(glm::vec3(5, 0.8f, 6.f));
 		lights.lights[0]->intensity = glm::vec3(0.8f);
 		lights.lights[0]->type = Light::POINT_LIGHT;
 
@@ -54,6 +54,10 @@ public:
 		wave2 = glm::vec2(0.005, 0.03);
 
 		cube.set_scale(0.1f);
+		cube.set_position(lights.lights[0]->position());
+		cube.add_position_callback(lights.lights[0]);
+
+		ctrl = &camera;
 	}
 
 	virtual void render(){
@@ -66,7 +70,7 @@ public:
 
 		Shader::upload_camera(camera);
 
-		shaders[SHADER_NORMAL]->bind();
+		shaders[SHADER_PASSTHRU]->bind();
 		{
 			cube.render();
 		}
@@ -92,8 +96,17 @@ public:
 
 	virtual void update(float t, float dt) {
 		#ifdef ENABLE_INPUT
-			input.update_object(camera, dt);
+			input.update_object(*ctrl, dt);
 			if(input.current_value(Input::ACTION_0) > 0.5f) {
+				if(ctrl == &camera) {
+					printf("Switch controll to light\n");
+					ctrl = &cube;
+				} else {
+					printf("Switch controll to camera\n");
+					ctrl = &camera;
+				}
+			}
+			if(input.current_value(Input::ACTION_1) > 0.5f) {
 				printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
 			}
 		#endif
@@ -107,6 +120,7 @@ private:
 	RenderObject cube, nox;
 	glm::vec2 wave1, wave2;
 	GLint u_wave1, u_wave2;
+	MovableObject * ctrl;
 };
 
 REGISTER_SCENE_TYPE(WaterScene, "Water");

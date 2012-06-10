@@ -65,11 +65,11 @@ class MovableObject : public Bindable {
 		/**
 		 * Add callback for position changes. Offset are added before the call
 		 */
-		virtual void add_position_callback(Bindable * obj, const glm::vec3 &offset);
+		virtual void add_position_callback(Bindable * obj, const glm::vec3 offset=glm::vec3(0.f));
 		/**
 		 * Add callback for scale changes. Scale is multiplied with factor before the call
 		 */
-		virtual void add_scale_callback(Bindable * obj, const glm::vec3 &factor);
+		virtual void add_scale_callback(Bindable * obj, const glm::vec3 factor=glm::vec3(1.f));
 		/**
 		 * Add callback for rotation changes
 		 */

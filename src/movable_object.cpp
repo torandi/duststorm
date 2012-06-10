@@ -54,20 +54,23 @@ const glm::mat4 MovableObject::scale_matrix() const {
 void MovableObject::relative_move(const glm::vec3 &move) {
 	translation_matrix_dirty_ = true;
 	position_+= orient_vector(move);
+	position_changed();
 }
 
 void MovableObject::absolute_rotate(const glm::vec3 &axis, const float &angle) {
 	rotation_matrix_dirty_ = true;
-   glm::vec3 n_axis = glm::normalize(axis) * sinf(angle/2.f);
-   glm::fquat offset = glm::fquat(cosf(angle/2.f), n_axis.x, n_axis.y, n_axis.z);
+	glm::vec3 n_axis = glm::normalize(axis) * sinf(angle/2.f);
+	glm::fquat offset = glm::fquat(cosf(angle/2.f), n_axis.x, n_axis.y, n_axis.z);
 
 	orientation_ = offset * orientation_ ;
-   orientation_ = glm::normalize(orientation_);
+	orientation_ = glm::normalize(orientation_);
+	orientation_changed();
 }
 
 void MovableObject::absolute_move(const glm::vec3 &move) {
 	translation_matrix_dirty_ = true;
 	position_ += move;
+	position_changed();
 }
 
 void MovableObject::relative_rotate(const glm::vec3 &axis, const float &angle) {
@@ -77,27 +80,32 @@ void MovableObject::relative_rotate(const glm::vec3 &axis, const float &angle) {
 
    orientation_ = orientation_  * offset;
    orientation_ = glm::normalize(orientation_);
+	orientation_changed();
 }
 
 const glm::vec3 &MovableObject::scale() const { return scale_; }
 
 void MovableObject::set_scale(const float &scale) {
 	set_scale(glm::vec3(scale));
+	scale_changed();
 }
 
 void MovableObject::set_scale(const glm::vec3 &scale) {
 	scale_ = scale;
 	scale_matrix_dirty_ = true;
+	scale_changed();
 }
 
 void MovableObject::set_position(const glm::vec3 &pos) {
 	position_ = pos;
 	translation_matrix_dirty_ = true;
+	position_changed();
 }
 
 void MovableObject::set_rotation(const glm::vec3 &axis, const float angle) {
 	rotation_matrix_dirty_ = true;
 	orientation_ = glm::rotate(glm::fquat(1.f, 0.f, 0.f, 0.f), angle, axis);
+	orientation_changed();
 }
 
 void MovableObject::roll(const float angle) {
@@ -164,11 +172,11 @@ void MovableObject::scale_changed() {
 	}
 }
 
-void MovableObject::add_position_callback(Bindable * obj, const glm::vec3 &offset) {
+void MovableObject::add_position_callback(Bindable * obj, const glm::vec3 offset) {
 	position_callbacks.push_back(std::pair<Bindable*, glm::vec3>(obj, offset));
 }
 
-void MovableObject::add_scale_callback(Bindable * obj, const glm::vec3 &factor) {
+void MovableObject::add_scale_callback(Bindable * obj, const glm::vec3 factor) {
 	scale_callbacks.push_back(std::pair<Bindable*, glm::vec3>(obj, factor));
 }
 
