@@ -1,8 +1,8 @@
 #ifndef RENDER_OBJECT_H
 #define RENDER_OBJECT_H
 
-#include "shader.hpp"
 #include "movable_object.hpp"
+#include "shader.hpp"
 
 #include <string>
 #include <assimp/assimp.h>
@@ -26,7 +26,7 @@ class RenderObject : public MovableObject {
 	void pre_render();
 	void recursive_pre_render(const aiNode* node);
 
-	void recursive_render(const aiNode* node, const Shader * shader, const glm::mat4 &matrix);
+	void recursive_render(const aiNode* node, const glm::mat4 &matrix);
 
 public:
 	const aiScene* scene;
@@ -85,7 +85,7 @@ public:
 	std::map<const aiMesh*, mesh_data_t > mesh_data;
 
 
-	void render(const Shader  * shader);
+	void render();
 
 	const glm::mat4 matrix() const;
 

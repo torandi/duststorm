@@ -238,7 +238,6 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 }
 
 void RenderObject::recursive_render(const aiNode* node,
-		const Shader * shader,
 		const glm::mat4 &parent_matrix) {
 
 
@@ -249,7 +248,7 @@ void RenderObject::recursive_render(const aiNode* node,
 
 	matrix *= glm::make_mat4((float*)&m);
 
-	shader->upload_model_matrix(matrix);
+	Shader::upload_model_matrix(matrix);
 
 	for(unsigned int i=0; i<node->mNumMeshes; ++i) {
 		const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -283,14 +282,14 @@ void RenderObject::recursive_render(const aiNode* node,
 	}
 
 	for(unsigned int i=0; i<node->mNumChildren; ++i) {
-		recursive_render(node->mChildren[i], shader, matrix);
+		recursive_render(node->mChildren[i], matrix);
 	}
 
 }
 
-void RenderObject::render(const Shader * shader) {
+void RenderObject::render() {
 	if ( !scene ) return;
-	recursive_render(scene->mRootNode, shader, matrix());
+	recursive_render(scene->mRootNode, matrix());
 }
 
 const glm::mat4 RenderObject::matrix() const {

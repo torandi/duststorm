@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "render_object.hpp"
 #include "scene.hpp"
 #include "globals.hpp"
 #include "shader.hpp"
@@ -21,7 +22,10 @@ public:
 		, quad(5.f, true, true)
 		, water(Texture2D::from_filename("water.png"))
 		, skybox("skydark")
-		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f) {
+		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
+		, cube("cube.obj")
+		, nox("nox.obj")
+		{
 
 		camera.set_position(glm::vec3(0.f, 0.5f, 0.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 4.f));
@@ -49,6 +53,7 @@ public:
 		wave1 = glm::vec2(0.01, 0);
 		wave2 = glm::vec2(0.005, 0.03);
 
+		cube.set_scale(0.1f);
 	}
 
 	virtual void render(){
@@ -61,7 +66,12 @@ public:
 
 		Shader::upload_camera(camera);
 
-		//Shader::upload_blank_material();
+		shaders[SHADER_NORMAL]->bind();
+		{
+			cube.render();
+		}
+
+		Shader::upload_blank_material();
 		glActiveTexture(GL_TEXTURE0);
 		water->texture_bind();
 		glActiveTexture(GL_TEXTURE2);
@@ -94,6 +104,7 @@ private:
 	Texture2D* water;
 	Skybox skybox;
 	Camera camera;
+	RenderObject cube, nox;
 	glm::vec2 wave1, wave2;
 	GLint u_wave1, u_wave2;
 };

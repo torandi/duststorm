@@ -45,8 +45,8 @@ public:
 		Shader::upload_camera(camera);
 		shaders[SHADER_NORMAL]->bind();
 		{
-			tv_test.render(shaders[SHADER_NORMAL]);
-			tv_room.render(shaders[SHADER_NORMAL]);
+			tv_test.render();
+			tv_room.render();
 		}
 		Shader::unbind();
 	}
