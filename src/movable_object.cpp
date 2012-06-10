@@ -6,12 +6,13 @@
 
 #include <cstdio>
 
-MovableObject::MovableObject() : orientation_(1.f, 0.f, 0.f,0.f) {
+MovableObject::MovableObject() : orientation_(1.f, 0.f, 0.f,0.f), scale_(1.f) {
 	rotation_matrix_dirty_ = true;
 	translation_matrix_dirty_ = true;
+	scale_matrix_dirty_ = true;
 };
 
-MovableObject::MovableObject(glm::vec3 position) : position_(position), orientation_(1.f, 0.f, 0.f,0.f) { 
+MovableObject::MovableObject(glm::vec3 position) : position_(position), orientation_(1.f, 0.f, 0.f,0.f), scale_(1.f) { 
 	MovableObject();	
 }
 
@@ -34,8 +35,20 @@ const glm::mat4 MovableObject::rotation_matrix() const{
 }
 
 const glm::mat4 MovableObject::matrix() const{
-	if(translation_matrix_dirty_ || rotation_matrix_dirty_) matrix_ = translation_matrix()*rotation_matrix();
+	if(translation_matrix_dirty_ 
+			|| rotation_matrix_dirty_ 
+			|| scale_matrix_dirty_)  {
+		matrix_ = translation_matrix()*rotation_matrix()*scale_matrix();
+	}
 	return matrix_;
+}
+
+const glm::mat4 MovableObject::scale_matrix() const {
+	if(scale_matrix_dirty_) {
+		scale_matrix_ = glm::scale(glm::mat4(1.f), scale_);
+		scale_matrix_dirty_ = false;
+	}
+	return scale_matrix_;
 }
 
 void MovableObject::relative_move(const glm::vec3 &move) {
@@ -64,6 +77,17 @@ void MovableObject::relative_rotate(const glm::vec3 &axis, const float &angle) {
 
    orientation_ = orientation_  * offset;
    orientation_ = glm::normalize(orientation_);
+}
+
+const glm::vec3 &MovableObject::scale() const { return scale_; }
+
+void MovableObject::set_scale(const float &scale) {
+	set_scale(glm::vec3(scale));
+}
+
+void MovableObject::set_scale(const glm::vec3 &scale) {
+	scale_ = scale;
+	scale_matrix_dirty_ = true;
 }
 
 void MovableObject::set_position(const glm::vec3 &pos) {

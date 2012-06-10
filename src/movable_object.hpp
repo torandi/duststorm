@@ -5,13 +5,12 @@
 
 	class MovableObject {
 	protected:
-		mutable glm::mat4 rot_matrix_, trans_mat_, matrix_;
-		mutable bool rotation_matrix_dirty_, translation_matrix_dirty_;
+		mutable glm::mat4 rot_matrix_, trans_mat_, scale_matrix_, matrix_;
+		mutable bool rotation_matrix_dirty_, translation_matrix_dirty_, scale_matrix_dirty_;
 		glm::vec3 position_;
 		glm::fquat orientation_;
+		glm::vec3 scale_;
 
-		virtual const glm::mat4 rotation_matrix() const;
-		virtual const glm::mat4 translation_matrix() const;
 
 		glm::vec3 orient_vector(const glm::vec3 &vec) const;
 
@@ -20,6 +19,10 @@
 		MovableObject(glm::vec3 position);
 
 		virtual ~MovableObject();
+
+		virtual const glm::mat4 rotation_matrix() const;
+		virtual const glm::mat4 translation_matrix() const;
+		virtual const glm::mat4 scale_matrix() const;
 
 		virtual const glm::vec3 &position() const { return position_; };
 		virtual const glm::mat4 matrix() const;
@@ -36,6 +39,11 @@
 
 		virtual void set_position(const glm::vec3 &pos);
 		virtual void set_rotation(const glm::vec3 &axis, const float angle);
+
+		virtual const glm::vec3 &scale() const;
+		virtual void set_scale(const glm::vec3 &scale);
+		virtual void set_scale(const float &scale);
+
 
 		virtual const glm::vec3 local_x() const;
 		virtual const glm::vec3 local_y() const;

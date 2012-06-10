@@ -42,13 +42,6 @@ class Mesh : public MovableObject {
 		void render();
 		unsigned long num_faces() { return num_faces_; };
 
-		const glm::vec3 &scale() const;
-		void set_scale(const glm::vec3 &scale);
-		void set_scale(const float &scale);
-
-		virtual const glm::mat4 scale_matrix() const;
-		virtual const glm::mat4 matrix() const;
-
 	private:
 		GLenum buffers_[2]; //0:vertex buffer, 1: index buffer
 		bool vbos_generated_, has_normals_, has_tangents_;
@@ -56,8 +49,6 @@ class Mesh : public MovableObject {
 		glm::vec3 scale_;
 		std::vector<vertex_t> vertices_;
 		std::vector<unsigned int> indices_;
-		mutable glm::mat4 scale_matrix_;
-		mutable bool scale_matrix_dirty_;
 
 		void verify_immutable(const char * where); //Checks that vbos_generated == false
 

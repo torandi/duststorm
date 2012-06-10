@@ -11,11 +11,11 @@
 #include <vector>
 #include <cassert>
 
-Mesh::Mesh() : MovableObject(), vbos_generated_(false), has_tangents_(false), scale_(1.f), scale_matrix_dirty_(true)	{ }
+Mesh::Mesh() : MovableObject(), vbos_generated_(false), has_tangents_(false){ }
 
 Mesh::Mesh(const std::vector<vertex_t> &vertices, const std::vector<unsigned int> &indices) :
 	MovableObject(), 
-	vbos_generated_(false),has_tangents_(false), scale_(1.f), vertices_(vertices), indices_(indices), scale_matrix_dirty_(true){
+	vbos_generated_(false),has_tangents_(false), vertices_(vertices), indices_(indices){
 	assert((indices.size()%3)==0);
 }
 
@@ -191,26 +191,3 @@ void Mesh::render() {
 	checkForGLErrors("Mesh::render(): Teardown ");
 }
 
-const glm::vec3 &Mesh::scale() const { return scale_; }
-
-void Mesh::set_scale(const float &scale) {
-	set_scale(glm::vec3(scale));
-}
-
-void Mesh::set_scale(const glm::vec3 &scale) {
-	scale_ = scale;
-	scale_matrix_dirty_ = true;
-}
-
-const glm::mat4 Mesh::matrix() const{
-	if(translation_matrix_dirty_ || rotation_matrix_dirty_ || scale_matrix_dirty_) matrix_ = translation_matrix()*rotation_matrix()*scale_matrix();
-	return matrix_;
-}
-
-const glm::mat4 Mesh::scale_matrix() const {
-	if(scale_matrix_dirty_) {
-		scale_matrix_ = glm::scale(glm::mat4(1.f), scale_);
-		scale_matrix_dirty_ = false;
-	}
-	return scale_matrix_;
-}
