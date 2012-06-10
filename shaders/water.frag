@@ -30,9 +30,9 @@ void main() {
 	vec3 camera_direction = normalize(camera_pos - position);
 	//Convert to tangent space:
 	vec3 camera_dir;
-	camera_dir.x = dot(camera_direction, norm_tangent); 
-	camera_dir.y = dot(camera_direction, norm_bitangent); 
-	camera_dir.z = dot(camera_direction, norm_normal); 
+	camera_dir.x = dot(camera_direction, norm_tangent);
+	camera_dir.y = dot(camera_direction, norm_bitangent);
+	camera_dir.z = dot(camera_direction, norm_normal);
 	camera_dir = normalize(camera_dir);
 
 
@@ -58,7 +58,7 @@ void main() {
 		light_dir.z = dot(dir, norm_normal);
 		accumLighting += computeLighting(
 				Lgt.lights[light], originalColor, normal_map,
-				light_dir, camera_dir, light_distance, 
+				light_dir, camera_dir, light_distance,
 				shininess, specular, 1.0,
 				true, true);
 	}
