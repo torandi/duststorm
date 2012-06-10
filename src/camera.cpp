@@ -49,15 +49,15 @@ void Camera::recalculate() {
 	float dot = glm::dot(xz_projection, glm::vec2(0.f, 1.f));
 
 	float rotation = acosf(glm::clamp(dot / glm::length(xz_projection), -1.f, 1.f));
-	absolute_rotate(glm::vec3(0.f, 1.f, 0.f), rotation*glm::sign(direction.x));
+	MovableObject::absolute_rotate(glm::vec3(0.f, 1.f, 0.f), rotation*glm::sign(direction.x));
 
 	glm::vec3 lz = local_z();
 
 	rotation = acosf(glm::clamp(glm::dot(direction, lz) / (glm::length(direction) * glm::length(lz)), -1.f, 1.f));
 
-	pitch(-rotation*glm::sign(direction.y));
+	MovableObject::relative_rotate(glm::vec3(1.f, 0.f, 0.f),-rotation*glm::sign(direction.y));
 
-	MovableObject::roll(roll_);
+	MovableObject::relative_rotate(glm::vec3(0.f, 0.f, 1.f), roll_);
 }
 
 
@@ -86,7 +86,7 @@ void Camera::set_fov(float fov) {
 }
 
 void Camera::set_roll(const float r) {
-	roll(r-roll_);
+	MovableObject::roll(r-roll_);
 	roll_ = r;
 }
 
@@ -114,7 +114,6 @@ void Camera::absolute_move(const glm::vec3 &move) {
 
 void Camera::relative_rotate(const glm::vec3 &axis, const float &angle) {
 	MovableObject::relative_rotate(axis, angle);
-	//Move look at:
 	look_at_ = position() + local_z();
 }
 

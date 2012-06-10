@@ -19,7 +19,7 @@ public:
 		, v("scene/tv_cam1.txt")
 		, skybox("skydark") {
 
-		camera.set_position(glm::vec3(0.f, 0.f, -1.f));
+		camera.set_position(glm::vec3(-5.f, 0.f, 10.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
 
 		lights.ambient_intensity() = glm::vec3(0.01f);
