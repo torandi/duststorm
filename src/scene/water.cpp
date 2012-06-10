@@ -44,13 +44,11 @@ public:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 4.0f);
 		water->texture_unbind();
 
-		u_time = shaders[SHADER_WATER]->uniform_location("time");
 		u_wave1 = shaders[SHADER_WATER]->uniform_location("wave1");
 		u_wave2 = shaders[SHADER_WATER]->uniform_location("wave2");
 
 		wave1 = glm::vec2(0.01, 0);
 		wave2 = glm::vec2(0.005, 0.03);
-
 	}
 
 	virtual void render(){
@@ -71,7 +69,6 @@ public:
 
 		shaders[SHADER_WATER]->bind();
 		{
-			glUniform1f(u_time, time);
 			glUniform2fv(u_wave1, 1, glm::value_ptr(wave1));
 			glUniform2fv(u_wave2, 1, glm::value_ptr(wave2));
 			quad.render();

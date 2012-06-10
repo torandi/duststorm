@@ -3,7 +3,6 @@
 
 #include "uniforms.glsl"
 
-uniform float time;
 uniform vec2 wave1;
 uniform vec2 wave2;
 
@@ -32,8 +31,8 @@ void main() {
 	tangent = (normalMatrix * in_tangent).xyz;
 	bitangent = (normalMatrix * in_bitangent).xyz;
 
-	tex_coord1 = in_texcoord + time*wave1;
-	tex_coord2 = in_texcoord + time*wave2;
+	tex_coord1 = in_texcoord + state.time*wave1;
+	tex_coord2 = in_texcoord + state.time*wave2;
 
 }
 
