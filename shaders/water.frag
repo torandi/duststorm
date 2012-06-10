@@ -48,7 +48,7 @@ void main() {
 
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.0) *1.5;
 
-	for(int light = 0; uint(light) < Lgt.num_lights; ++light) {
+	for(int light = 0; int(light) < Lgt.num_lights; ++light) {
 		vec3 light_distance = Lgt.lights[light].position.xyz - position;
 		vec3 dir = normalize(light_distance);
 		vec3 light_dir;
