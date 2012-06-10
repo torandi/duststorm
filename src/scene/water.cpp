@@ -1,5 +1,5 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+	#include "config.h"
 #endif
 
 #include <GL/glew.h>
@@ -77,6 +77,12 @@ public:
 		skybox.texture->texture_bind();
 		glActiveTexture(GL_TEXTURE0);
 		water->texture_unbind();
+	}
+
+	virtual void update(float t, float dt) {
+		#ifdef ENABLE_INPUT
+			input.update_object(camera, dt);
+		#endif
 	}
 
 private:

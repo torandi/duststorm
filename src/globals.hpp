@@ -1,15 +1,25 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#ifdef HAVE_CONFIG_H
+	#include "config.h"
+#endif
+
 #include "shader.hpp"
 #include "time.hpp"
 #include <glm/glm.hpp>
 
 #include "cl.hpp"
 
+#ifdef ENABLE_INPUT 
+	#include "input.hpp"
+	extern Input input;
+#endif
+
 extern FILE* verbose;                    /* stderr if verbose output is enabled or /dev/null if not */
 extern Time global_time;                 /* current time */
 extern glm::ivec2 resolution;            /* current resolution */
+
 
 enum shader_t {
 	SHADER_SIMPLE=0,
@@ -31,5 +41,6 @@ enum shader_t {
 
 extern Shader* shaders[];                /* all shader programs */
 extern CL * opencl;
+
 
 #endif /* GLOBALS_H */

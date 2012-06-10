@@ -33,6 +33,11 @@ libfrob_a_SOURCES = \
 	src/scene/water.cpp \
 	autoload.cpp autoload.h
 
+
+if INPUT_ENABLED
+libfrob_a_SOURCES += src/input.cpp src/input.hpp
+endif
+
 demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image
 demo_SOURCES = src/main.cpp
 

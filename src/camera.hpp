@@ -29,9 +29,12 @@ public:
 	virtual void roll(const float angle);
 	void set_roll(const float angle);
 
-	virtual void relative_move(const glm::vec3 &move);
-
 	virtual void set_position(const glm::vec3 &pos);
+
+	virtual void absolute_rotate(const glm::vec3 &axis, const float &angle);
+	virtual void absolute_move(const glm::vec3 &move);
+	virtual void relative_move(const glm::vec3 &move);
+	virtual void relative_rotate(const glm::vec3 &axis, const float &angle);
 
 	virtual const glm::vec3 &position() const;
 

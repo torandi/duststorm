@@ -97,10 +97,28 @@ void Camera::roll(const float r) {
 
 void Camera::relative_move(const glm::vec3 &move) {
 	MovableObject::relative_move(move);
+	look_at_ += orient_vector(move);
 	recalculate();
 }
 
 void Camera::set_position(const glm::vec3 &pos) {
 	MovableObject::set_position(pos);
 	recalculate();
+}
+
+void Camera::absolute_move(const glm::vec3 &move) {
+	MovableObject::absolute_move(move);
+	look_at_ += move;
+	recalculate();
+}
+
+void Camera::relative_rotate(const glm::vec3 &axis, const float &angle) {
+	MovableObject::relative_rotate(axis, angle);
+	//Move look at:
+	look_at_ = position() + local_z();
+}
+
+void Camera::absolute_rotate(const glm::vec3 &axis, const float &angle) {
+	MovableObject::absolute_rotate(axis, angle);
+	look_at_ = position() + local_z();
 }
