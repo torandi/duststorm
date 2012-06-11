@@ -37,8 +37,9 @@ namespace Editor {
 	enum TYPE: gint {
 		TYPE_UNKNOWN, /* should be first */
 		TYPE_CAT = 0,
-		TYPE_SCENE,
-		TYPE_COMPOSITION,
+		TYPE_CAT_SCENE,
+		TYPE_CAT_COMPOSITION,
+		TYPE_CAT_MODELS,
 		TYPE_PATH,
 		TYPE_MODEL,
 		TYPE_LIGHT,

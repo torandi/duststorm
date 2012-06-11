@@ -6,6 +6,8 @@
 #include "scene.hpp"
 #include <cstring>
 #include <gtk/gtk.h>
+#include <dirent.h>
+#include <fnmatch.h>
 
 enum COL {
 	COL_ICON = 0,
@@ -87,7 +89,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		}
 		break;
 
-	case Editor::TYPE_SCENE:
+	case Editor::TYPE_CAT_SCENE:
 		Editor::mode = Editor::MODE_SCENE;
 		delete scene;
 		Editor::scene_name = name;
@@ -121,8 +123,9 @@ namespace Editor {
 	void scenelist_populate(){
 		static GdkPixbuf* type_icon[Editor::TYPE_MAX] = {
 			NULL,           /* TYPE_CAT */
-			icon_cat_scene, /* TYPE_SCENE, */
-			NULL,           /* TYPE_COMPOSITION, */
+			icon_cat_scene, /* TYPE_CAT_SCENE, */
+			NULL,           /* TYPE_CAT_COMPOSITION, */
+			NULL,           /* TYPE_CAT_MODELS */
 			icon_path,      /* TYPE_PATH, */
 			icon_model,     /* TYPE_MODEL, */
 			icon_light,     /* TYPE_LIGHT, */
@@ -148,7 +151,7 @@ namespace Editor {
 			gtk_tree_store_set(scenestore, &child,
 			                   COL_ICON, icon_scene,
 			                   COL_TITLE, it->first.c_str(),
-			                   COL_TYPE, Editor::TYPE_SCENE,
+			                   COL_TYPE, Editor::TYPE_CAT_SCENE,
 			                   -1);
 
 			SceneFactory::Metadata* meta = it->second.meta;
@@ -180,6 +183,27 @@ namespace Editor {
 
 		gtk_tree_store_append(scenestore, &toplevel, NULL);
 		gtk_tree_store_set(scenestore, &toplevel, COL_TITLE, "<b>Compositions</b>", -1);
+
+		gtk_tree_store_append(scenestore, &toplevel, NULL);
+		gtk_tree_store_set(scenestore, &toplevel, COL_TITLE, "<b>Models</b>", -1);
+		{
+			GtkTreeIter child;
+			struct dirent **namelist;
+			int n = scandir(PATH_MODELS, &namelist,
+			                [](const struct dirent* d) -> int { return fnmatch("*.obj", d->d_name, 0) == 0; },
+			                alphasort);
+			while ( n --> 0 ) {
+				gtk_tree_store_append(scenestore, &child, &toplevel);
+				gtk_tree_store_set(scenestore, &child,
+				                   COL_ICON, icon_model,
+				                   COL_TITLE, namelist[n]->d_name,
+				                   COL_FILENAME, namelist[n]->d_name,
+				                   COL_TYPE, TYPE_MODEL,
+				                   -1);
+				free(namelist[n]);
+			}
+			free(namelist);
+		}
 	}
 
 }
