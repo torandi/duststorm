@@ -13,11 +13,11 @@ class Skybox {
 		~Skybox();
 
 		TextureCubemap * texture;
-	
+
 		void render(const Camera &camera) const;
 
 	private:
-		GLuint buffer_;
+		static GLuint vbo;
 		static const float vertices[2*3*36];
 		static const char * texture_names[];
 };

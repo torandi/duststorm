@@ -23,10 +23,14 @@ Skybox::Skybox(std::string skybox_path) {
 	texture = TextureCubemap::from_filename(files);
 
 	//Generate skybox buffers:
-	glGenBuffers(1, &buffer_);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	static bool initialized = false;
+	if ( !initialized ){
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		initialized = true;
+	}
 }
 
 Skybox::~Skybox() {
@@ -50,7 +54,7 @@ void Skybox::render(const Camera &camera) const{
 		glDisableVertexAttribArray(i);
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, buffer_);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float)*3*36) );
 
@@ -69,6 +73,8 @@ void Skybox::render(const Camera &camera) const{
 
 	checkForGLErrors("Skybox::render(): post");
 }
+
+GLuint Skybox::vbo = 0;
 
 //Data:
 const float Skybox::vertices[] = {
