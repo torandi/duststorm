@@ -5,7 +5,7 @@
 #include "scene.hpp"
 
 Scene::Scene(const glm::ivec2& size)
-	: RenderTarget(size, false, true)
+	: RenderTarget(size, GL_RGB8, true)
 	, current(timetable.end())
 	, match(false) {
 }

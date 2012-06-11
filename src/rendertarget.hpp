@@ -12,7 +12,7 @@ class RenderTarget: public TextureBase {
 public:
 	static RenderTarget* stack;
 
-	RenderTarget(const glm::ivec2& size, bool alpha, bool depth, GLenum filter = GL_NEAREST);
+	explicit RenderTarget(const glm::ivec2& size, GLenum format, bool depth, GLenum filter = GL_NEAREST);
 	~RenderTarget();
 
 	void bind();

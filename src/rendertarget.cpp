@@ -11,7 +11,7 @@
 
 RenderTarget* RenderTarget::stack = nullptr;
 
-RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer, GLenum filter)
+RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuffer, GLenum filter)
 	: TextureBase()
 	, id(0)
 	, current(0){
@@ -34,7 +34,7 @@ RenderTarget::RenderTarget(const glm::ivec2& size, bool alpha, bool depthbuffer,
 	/* bind color buffers */
 	for ( int i = 0; i < 2; i++ ){
 		glBindTexture(GL_TEXTURE_2D, color[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, alpha ? GL_RGBA8 : GL_RGB8, size.x, size.y, 0, alpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, size.x, size.y, 0, format == GL_RGB8 ? GL_RGB : GL_RGBA, GL_UNSIGNED_INT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);

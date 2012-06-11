@@ -147,10 +147,10 @@ static void init(bool fullscreen){
 	tv_pos       = new XYLerpTable("scene/tv_pos.txt");
 	test_pos     = new XYLerpTable("scene/test_pos.txt");
 
-	composition   = new RenderTarget(resolution, false, false);
-	downsample[0] = new RenderTarget(glm::ivec2(200, 200), false, false, GL_LINEAR);
-	downsample[1] = new RenderTarget(glm::ivec2(100, 100), false, false, GL_LINEAR);
-	downsample[2] = new RenderTarget(glm::ivec2( 50,  50), false, false, GL_LINEAR);
+	composition   = new RenderTarget(resolution,           GL_RGB8, false);
+	downsample[0] = new RenderTarget(glm::ivec2(200, 200), GL_RGB8, false, GL_LINEAR);
+	downsample[1] = new RenderTarget(glm::ivec2(100, 100), GL_RGB8, false, GL_LINEAR);
+	downsample[2] = new RenderTarget(glm::ivec2( 50,  50), GL_RGB8, false, GL_LINEAR);
 
 	global_time.set_paused(false); /* start time */
 	checkForGLErrors("post init()");
