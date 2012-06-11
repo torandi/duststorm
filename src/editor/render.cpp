@@ -22,8 +22,31 @@ static Camera camera(60.f, 1.0f, 0.1f, 100.0f);
 static glm::vec2 track_ref;
 static glm::vec2 track_angle(0.0f, M_PI*0.5);
 static float track_distance = 1.0f;
-static RenderObject* model = nullptr;
 static glm::mat4 projection;
+
+struct uniform {
+	GLuint index;
+	bool value;
+};
+
+static void upload(const struct uniform& u){
+	glUniform1i(u.index, u.value ? 1 : 0);
+}
+
+static struct {
+	RenderObject* model;
+	struct uniform use_light_a;
+	struct uniform use_light_b;
+	struct uniform show_texture;
+	struct uniform show_uv;
+	struct uniform show_normal;
+	struct uniform show_normalmap;
+	struct uniform show_tangent;
+	struct uniform show_bitangent;
+	struct uniform show_color;
+	struct uniform show_diffuse;
+	struct uniform show_specular;
+} modelview;
 
 namespace Editor {
 	void reset(){
@@ -34,8 +57,8 @@ namespace Editor {
 	}
 
 	void load_model(const std::string& filename){
-		delete model;
-		model = new RenderObject(filename, true);
+		delete modelview.model;
+		modelview.model = new RenderObject(filename, true);
 	}
 }
 
@@ -60,9 +83,20 @@ static void render_scene(){
 static void render_model(){
 	frame->bind();
 	shaders[SHADER_MODELVIEWER]->bind();
+	upload(modelview.use_light_a);
+	upload(modelview.use_light_b);
+	upload(modelview.show_texture);
+	upload(modelview.show_uv);
+	upload(modelview.show_normal);
+	upload(modelview.show_normalmap);
+	upload(modelview.show_tangent);
+	upload(modelview.show_bitangent);
+	upload(modelview.show_color);
+
 	frame->clear(Color::white);
 	Shader::upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
-	model->render();
+	modelview.model->render();
+
 	Shader::unbind();
 	frame->unbind();
 }
@@ -76,6 +110,42 @@ extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data)
 	aspect = (float)w / (float)h;
 
 	gtk_widget_queue_resize(drawing);
+}
+
+extern "C" G_MODULE_EXPORT void show_texture(GtkWidget* widget, gpointer data){
+	modelview.show_texture.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));;
+}
+
+extern "C" G_MODULE_EXPORT void show_uv(GtkWidget* widget, gpointer data){
+	modelview.show_uv.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));
+}
+
+extern "C" G_MODULE_EXPORT void show_normal(GtkWidget* widget, gpointer data){
+	modelview.show_normal.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));
+}
+
+extern "C" G_MODULE_EXPORT void show_normalmap(GtkWidget* widget, gpointer data){
+	modelview.show_normalmap.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));
+}
+
+extern "C" G_MODULE_EXPORT void show_tangent(GtkWidget* widget, gpointer data){
+	modelview.show_tangent.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));
+}
+
+extern "C" G_MODULE_EXPORT void show_bitangent(GtkWidget* widget, gpointer data){
+	modelview.show_bitangent.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));
+}
+
+extern "C" G_MODULE_EXPORT void show_color(GtkWidget* widget, gpointer data){
+	modelview.show_color.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));
+}
+
+extern "C" G_MODULE_EXPORT void show_diffuse(GtkWidget* widget, gpointer data){
+	modelview.show_diffuse.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));
+}
+
+extern "C" G_MODULE_EXPORT void show_specular(GtkWidget* widget, gpointer data){
+	modelview.show_specular.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));
 }
 
 static void recalc_camera(){
@@ -192,6 +262,21 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
 	}
 
 	camera.set_aspect(aspect);
+
+	/* initialize modelviewer */
+	Shader* s = shaders[SHADER_MODELVIEWER];
+	modelview.model = nullptr;
+	modelview.use_light_a    = {s->uniform_location("use_light_a"), true};
+	modelview.use_light_b    = {s->uniform_location("use_light_b"), true};
+	modelview.show_texture   = {s->uniform_location("show_texture"), true};
+	modelview.show_uv        = {s->uniform_location("show_uv"), false};
+	modelview.show_normal    = {s->uniform_location("show_normal"), false};
+	modelview.show_normalmap = {s->uniform_location("show_normalmap"), false};
+	modelview.show_tangent   = {s->uniform_location("show_tangent"), false};
+	modelview.show_bitangent = {s->uniform_location("show_bitangent"), false};
+	modelview.show_color     = {s->uniform_location("show_color"), false};
+	modelview.show_diffuse   = {s->uniform_location("show_diffuse"), false};
+	modelview.show_specular  = {s->uniform_location("show_specular"), false};
 
   gtk_widget_end_gl (widget, FALSE);
   return TRUE;
