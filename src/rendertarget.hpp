@@ -12,7 +12,27 @@ class RenderTarget: public TextureBase {
 public:
 	static RenderTarget* stack;
 
-	explicit RenderTarget(const glm::ivec2& size, GLenum format, bool depth, GLenum filter = GL_NEAREST);
+	/**
+	 * RenderTarget is a framebuffer object which you can render to.
+	 *
+	 * Typical usage:
+	 *
+	 *   RenderTarget foo(ivec2(200,200), GL_RGB8, true);
+	 *   foo.bind();
+	 *   // render code here..
+	 *   foo.unbind();
+	 *   foo.draw()
+	 *
+	 * Color attachment is double-buffered so it is safe to bind itself as texture
+	 * unit when rendering. Depth-buffer is not double buffered and should not be
+	 * used the same way.
+	 *
+	 * @param size Size of the final textures.
+	 * @param format Format of the color attachment.
+	 * @param depth If true, it enables depth buffer/write for the framebuffer.
+	 * @param filter Texture filtering of color attachment.
+	 */
+	explicit RenderTarget(const glm::ivec2& size, GLenum format, bool depth, GLenum filter = GL_NEAREST) throw();
 	~RenderTarget();
 
 	void bind();
@@ -42,10 +62,14 @@ public:
 	 */
 	GLuint depthbuffer() const;
 
+	/**
+	 * Short for: glClearColor(..); glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	 */
 	static void clear(const Color& color);
 
 	/**
-	 * Render the RenderTarget on current framebuffer.
+	 * Render the RenderTarget on current framebuffer. Caller should ensure an
+	 * orthographic projection is bound before calling draw.
 	 */
 	void draw(Shader* shader);
 	void draw(Shader* shader, const glm::vec2& pos);

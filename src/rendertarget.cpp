@@ -12,7 +12,7 @@
 RenderTarget* RenderTarget::stack = nullptr;
 GLuint RenderTarget::vbo[2] = {0,0};
 
-RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuffer, GLenum filter)
+RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuffer, GLenum filter) throw()
 	: TextureBase()
 	, id(0)
 	, current(0){
