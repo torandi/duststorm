@@ -182,7 +182,7 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 
 		md.mtl_index = mesh->mMaterialIndex;
 
-		std::vector<vertex_t> vertexData;
+		std::vector<Shader::vertex_t> vertexData;
 		std::vector<unsigned int> indexData;
 
 		for(unsigned int n = 0; n<mesh->mNumVertices; ++n) {
@@ -200,7 +200,15 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 			}
 			if(!mesh->HasNormals())
 				normal = &zero_3d;
-			vertexData.push_back(vertex_t(pos, texCoord, normal, tangent, bitangent));
+
+			/* still hate c++ for not using designated initializes */
+			vertexData.push_back((Shader::vertex_t){
+				/* .pos       = */ glm::vec3(pos->x, pos->y, pos->z),
+				/* .uv        = */ glm::vec2(texCoord->x, texCoord->y),
+				/* .normal    = */ glm::vec3(normal->x, normal->y, normal->z),
+				/* .tangent   = */ glm::vec3(tangent->x, tangent->y, tangent->z),
+				/* .bitangent = */ glm::vec3(bitangent->x, bitangent->y, bitangent->z),
+				/* .color     = */ glm::vec4(0.0f)});
 		}
 
 		for(unsigned int n = 0 ; n<mesh->mNumFaces; ++n) {
@@ -221,7 +229,7 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 		glGenBuffers(1, &md.vb);
 
 		glBindBuffer(GL_ARRAY_BUFFER, md.vb);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_t)*vertexData.size(), &vertexData.front(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Shader::vertex_t)*vertexData.size(), &vertexData.front(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glGenBuffers(1, &md.ib);
@@ -259,11 +267,12 @@ void RenderObject::recursive_render(const aiNode* node,
 			glBindBuffer(GL_ARRAY_BUFFER, md->vb);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md->ib);
 
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*)offsetof(struct vertex_t, pos));
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*)offsetof(struct vertex_t, texCoord));
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*)offsetof(struct vertex_t, normal));
-			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*)offsetof(struct vertex_t, tangent));
-			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*)offsetof(struct vertex_t, bitangent));
+			glVertexAttribPointer(Shader::ATTR_POSITION,  3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, pos));
+			glVertexAttribPointer(Shader::ATTR_TEXCOORD,  2, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, uv));
+			glVertexAttribPointer(Shader::ATTR_NORMAL,    3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, normal));
+			glVertexAttribPointer(Shader::ATTR_TANGENT,   3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, tangent));
+			glVertexAttribPointer(Shader::ATTR_BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, bitangent));
+			glVertexAttribPointer(Shader::ATTR_COLOR,     4, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, color));
 
 			checkForGLErrors("set attrib pointers");
 

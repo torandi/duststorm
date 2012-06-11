@@ -51,8 +51,20 @@ public:
 		ATTR_NORMAL,
 		ATTR_TANGENT,
 		ATTR_BITANGENT,
-		ATTR_COLOR
+		ATTR_COLOR,
+
+		NUM_ATTR,
 	};
+
+	struct vertex {
+		glm::vec3 pos;
+		glm::vec2 uv;
+		glm::vec3 normal;
+		glm::vec3 tangent;
+		glm::vec3 bitangent;
+		glm::vec4 color;
+	};
+	typedef struct vertex vertex_t;
 
 	struct material_t {
 		float shininess;
