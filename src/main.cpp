@@ -204,7 +204,7 @@ static void poll(){
 				SDL_WM_SetCaption(title, NULL);
 			}
 		}
-		#ifdef ENABLE_INPUT 
+		#ifdef ENABLE_INPUT
 			input.parse_event(event);
 		#endif
 	}
