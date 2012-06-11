@@ -104,11 +104,11 @@ RenderTarget::~RenderTarget(){
 }
 
 void RenderTarget::init_vbo(){
-	static const float vertices[][5] = { /* x,y,z,u,v */
-		{0, 0, 0, 0, 1},
-		{0, 1, 0, 0, 0},
-		{1, 1, 0, 1, 0},
-		{1, 0, 0, 1, 1},
+	static const Shader::vertex_t vertices[4] = {
+		{/* .pos = */ glm::vec3(0, 0, 0), /* .uv = */ glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec4(1)},
+		{/* .pos = */ glm::vec3(0, 1, 0), /* .uv = */ glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec4(1)},
+		{/* .pos = */ glm::vec3(1, 1, 0), /* .uv = */ glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec4(1)},
+		{/* .pos = */ glm::vec3(1, 0, 0), /* .uv = */ glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec4(1)},
 	};
 	static const unsigned int indices[4] = {0,1,2,3};
 
@@ -213,7 +213,12 @@ void RenderTarget::draw(Shader* shader, const glm::vec2& pos, const glm::vec2& s
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5,  (const GLvoid*)(sizeof(float)*0));
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5,  (const GLvoid*)(sizeof(float)*3));
+	glVertexAttribPointer(Shader::ATTR_POSITION,  3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, pos));
+	glVertexAttribPointer(Shader::ATTR_TEXCOORD,  2, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, uv));
+	glVertexAttribPointer(Shader::ATTR_NORMAL,    3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, normal));
+	glVertexAttribPointer(Shader::ATTR_TANGENT,   3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, tangent));
+	glVertexAttribPointer(Shader::ATTR_BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, bitangent));
+	glVertexAttribPointer(Shader::ATTR_COLOR,     4, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, color));
+
 	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
 }
