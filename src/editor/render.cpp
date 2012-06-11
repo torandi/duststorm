@@ -183,7 +183,7 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
   }
 
 	delete frame;
-	frame = new RenderTarget(size, false, true, GL_NEAREST);
+	frame = new RenderTarget(size, GL_RGB8, true, GL_NEAREST);
 
 	if ( scene ){
 		delete scene;
