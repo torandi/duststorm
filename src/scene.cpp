@@ -4,8 +4,8 @@
 
 #include "scene.hpp"
 
-Scene::Scene(const glm::ivec2& size)
-	: RenderTarget(size, GL_RGB8, true)
+Scene::Scene(const glm::ivec2& size, GLenum format)
+	: RenderTarget(size, format, true)
 	, current(timetable.end())
 	, match(false) {
 }

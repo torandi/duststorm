@@ -14,7 +14,7 @@
  */
 class Scene: public RenderTarget {
 public:
-	Scene(const glm::ivec2& size);
+	Scene(const glm::ivec2& size, GLenum format = GL_RGB8);
 	virtual ~Scene();
 
 	/**
