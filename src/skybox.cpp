@@ -48,9 +48,14 @@ void Skybox::render(const Camera &camera) const{
 			glm::lookAt(glm::vec3(0.0), camera.look_at()-camera.position(), camera.up())
 	);
 
+	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+
+	/* Disable most attribs from Shader::vertex_x */
+	for ( int i = 2; i < Shader::NUM_ATTR; ++i ) {
+		glDisableVertexAttribArray(i);
+	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float)*3*36) );
 
@@ -64,9 +69,7 @@ void Skybox::render(const Camera &camera) const{
 
 	texture->texture_unbind();
 
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-
+	glPopClientAttrib();
 	glPopAttrib();
 
 	checkForGLErrors("Skybox::render(): post");
