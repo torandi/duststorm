@@ -89,6 +89,11 @@ void Shader::initialize() {
 	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	checkForGLErrors("Bind and allocate global uniforms");
+
+	/* Enable all attribs for Shader::vertex_x */
+	for ( int i = 0; i < NUM_ATTR; ++i ) {
+		glEnableVertexAttribArray(i);
+	}
 }
 
 Shader::Shader(const std::string &name_, GLuint program) :
@@ -294,12 +299,6 @@ void Shader::bind() {
 
 	glUseProgram(program_);
 	checkForGLErrors("Bind shader");
-
-	for(int i=0; i<num_attributes_; ++i) {
-		glEnableVertexAttribArray(i);
-		checkForGLErrors("Enable vertex attrib");
-	}
-
 	current = this;
 }
 
@@ -307,11 +306,6 @@ void Shader::unbind() {
 	if ( !current ){
 		fprintf(stderr, "Shader nesting problem, no shader is bound.\n");
 		abort();
-	}
-
-	for( int i = 0; i < current->num_attributes_; ++i ) {
-		glDisableVertexAttribArray(i);
-		checkForGLErrors("Shader::unbind glDisableVertexAttribArray");
 	}
 
 	glUseProgram(0);
