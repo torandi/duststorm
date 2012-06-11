@@ -125,6 +125,8 @@ void RenderObject::pre_render() {
 			mtl->GetTexture(aiTextureType_HEIGHT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.normal_map = load_texture(p);
+		} else {
+			mtl_data.normal_map = load_texture("default_normalmap.jpg");
 		}
 
 		aiString name;

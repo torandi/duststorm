@@ -122,6 +122,7 @@ static void init(bool fullscreen){
 	/* Preload common textures */
 	fprintf(verbose, "Preloading textures\n");
 	Texture2D::preload("default.jpg");
+	Texture2D::preload("default_normalmap.jpg");
 
 	/* Instantiate all scenes */
 	scene["Test"]     = SceneFactory::create("Test",      glm::ivec2(resolution.x, resolution.y/3));
