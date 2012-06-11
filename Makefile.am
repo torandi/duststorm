@@ -52,8 +52,8 @@ endif
 demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image
 demo_SOURCES = src/main.cpp
 
-editor_CXXFLAGS = ${AM_CXXFLAGS} $$(pkg-config gtk+-3.0 gtkglext-3.0 --cflags)
-editor_LDFLAGS = $$(pkg-config gtk+-3.0 gtkglext-3.0 --libs) -Wl,--export-dynamic
+editor_CXXFLAGS = ${AM_CXXFLAGS} $(gtk3_CFLAGS)
+editor_LDFLAGS = $(gtk3_LIBS) -Wl,--export-dynamic
 editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} -lSDL_image
 editor_SOURCES = \
 	src/editor.cpp \
@@ -62,7 +62,7 @@ editor_SOURCES = \
 	src/editor/scenelist.cpp \
 	src/editor/timecontrol.cpp
 
-test_editor_classify_CXXFLAGS = ${AM_CXXFLAGS} $(CPPUNIT_CFLAGS) $$(pkg-config gtk+-3.0 gtkglext-3.0 --cflags)
+test_editor_classify_CXXFLAGS = ${AM_CXXFLAGS} $(CPPUNIT_CFLAGS) $(gtk3_CFLAGS)
 test_editor_classify_LDFLAGS = $(CPPUNIT_LIBS)
 test_editor_classify_SOURCES = test/editor_classify.cpp src/editor/classify.cpp
 

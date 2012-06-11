@@ -29,6 +29,7 @@ AS_IF([test "x$enable_input" = "xyes"],
 AM_CONDITIONAL(INPUT_ENABLED, test "x$enable_input" = "xyes")
 
 AC_ARG_ENABLE([editor], [AS_HELP_STRING([--enable-editor], [Build editor. @<:@default=disabled@:>@])])
+AS_IF([test "x$enable_editor" = "xyes"], [PKG_CHECK_MODULES([gtk3], [gtk+-3.0 gtkglext-3.0])])
 AM_CONDITIONAL([BUILD_EDITOR], [test "x$enable_editor" = "xyes"])
 
 AC_DEFINE_UNQUOTED([PATH_BASE],    ["${srcdir}/"],             [Base path])
