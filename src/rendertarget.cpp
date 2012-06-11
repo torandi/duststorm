@@ -10,6 +10,7 @@
 #include <cstdio>
 
 RenderTarget* RenderTarget::stack = nullptr;
+GLuint RenderTarget::vbo[2] = {0,0};
 
 RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuffer, GLenum filter)
 	: TextureBase()
@@ -18,6 +19,9 @@ RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuff
 
 	checkForGLErrors("RenderTarget()");
 	this->size = size;
+
+	/* init_vbo is a no-op if it already is initialized */
+	init_vbo();
 
 	/* generate projection matrix for this target */
 	projection = glm::ortho(0.0f, (float)size.x, 0.0f, (float)size.y, -1.0f, 1.0f);
@@ -99,6 +103,32 @@ RenderTarget::~RenderTarget(){
 	glDeleteTextures(1, &depth);
 }
 
+void RenderTarget::init_vbo(){
+	static const float vertices[][5] = { /* x,y,z,u,v */
+		{0, 0, 0, 0, 1},
+		{0, 1, 0, 0, 0},
+		{1, 1, 0, 1, 0},
+		{1, 0, 0, 1, 1},
+	};
+	static const unsigned int indices[4] = {0,1,2,3};
+
+	/* don't reinitialize */
+	static int initialized = false;
+	if ( initialized ) return;
+	initialized = true;
+
+	/** @todo memory leak when closing application */
+	glGenBuffers(2, vbo);
+
+	/* upload data */
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 void RenderTarget::bind(){
 	if ( stack ){
 		fprintf(stderr, "Nesting problem with RenderTarget, another target already bound.\n");
@@ -171,14 +201,6 @@ void RenderTarget::draw(Shader* shader, const glm::ivec2& pos, const glm::ivec2&
 }
 
 void RenderTarget::draw(Shader* shader, const glm::vec2& pos, const glm::vec2& size){
-	static const float vertices[][5] = { /* x,y,z,u,v */
-		{0, 0, 0, 0, 1},
-		{0, 1, 0, 0, 0},
-		{1, 1, 0, 1, 0},
-		{1, 0, 0, 1, 1},
-	};
-	static const unsigned int indices[4] = {0,1,2,3};
-
 	glm::mat4 model(1.f);
 
 	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
@@ -188,7 +210,10 @@ void RenderTarget::draw(Shader* shader, const glm::vec2& pos, const glm::vec2& s
 
 	shader->bind();
 	glBindTexture(GL_TEXTURE_2D, texture());
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5,  &vertices[0][0]);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5,  &vertices[0][3]);
-	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, indices);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5,  (const GLvoid*)(sizeof(float)*0));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5,  (const GLvoid*)(sizeof(float)*3));
+	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
 }

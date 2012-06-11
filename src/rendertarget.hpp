@@ -54,6 +54,9 @@ public:
 	void draw(Shader* shader, const glm::vec2& pos, const glm::vec2& size);
 
 private:
+	static GLuint vbo[2];
+	static void init_vbo();
+
 	glm::mat4 projection;
 	GLuint id;
 	GLuint current;
