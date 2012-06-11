@@ -26,6 +26,7 @@ namespace Engine {
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		glEnable(GL_BLEND);
 		glCullFace(GL_BACK);
 		glDepthFunc(GL_LEQUAL);

@@ -20,17 +20,12 @@ Skybox::Skybox(std::string skybox_path) {
 		files.push_back(skybox_path+texture_names[i]);
 	}
 
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
 	texture = TextureCubemap::from_filename(files);
 
 	//Generate skybox buffers:
-
 	glGenBuffers(1, &buffer_);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
