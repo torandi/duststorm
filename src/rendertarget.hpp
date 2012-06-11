@@ -53,6 +53,7 @@ public:
 	void draw(Shader* shader, const glm::ivec2& pos, const glm::ivec2& size);
 	void draw(Shader* shader, const glm::vec2& pos, const glm::vec2& size);
 
+private:
 	glm::mat4 projection;
 	GLuint id;
 	GLuint current;
