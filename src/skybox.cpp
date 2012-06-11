@@ -35,7 +35,7 @@ Skybox::Skybox(std::string skybox_path) {
 }
 
 Skybox::~Skybox() {
-	delete texture;		
+	delete texture;
 }
 
 void Skybox::render(const Camera &camera) const{
@@ -44,7 +44,7 @@ void Skybox::render(const Camera &camera) const{
 	glDisable(GL_CULL_FACE);
 
 	Shader::upload_projection_view_matrices(
-			camera.projection_matrix(), 
+			camera.projection_matrix(),
 			glm::lookAt(glm::vec3(0.0), camera.look_at()-camera.position(), camera.up())
 	);
 
@@ -81,20 +81,20 @@ const float Skybox::vertices[] = {
 	-0.5f, 0.5f, 0.5f,
 
 	0.5f, -0.5f, 0.5f,
-	-0.5f, -0.5f, 0.5f, 
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, -0.5f, 0.5f,
+	-0.5f, 0.5f, 0.5f,
 
 	//Back
 	0.5f, 0.5f, -0.5f,
 	0.5f, -0.5f, -0.5f,
-	-0.5f, 0.5f, -0.5f, 
+	-0.5f, 0.5f, -0.5f,
 
 	0.5f, -0.5f, -0.5f,
 	-0.5f, -0.5f, -0.5f,
 	-0.5f, 0.5f, -0.5f,
 
 	//Left
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, 0.5f, 0.5f,
 	-0.5f, 0.5f, -0.5f,
 	-0.5f, -0.5f, 0.5f,
 
@@ -103,7 +103,7 @@ const float Skybox::vertices[] = {
 	-0.5f, -0.5f, 0.5f,
 
 	//Right
-	0.5f, 0.5f, 0.5f, 
+	0.5f, 0.5f, 0.5f,
 	0.5f, 0.5f, -0.5f,
 	0.5f, -0.5f, 0.5f,
 
@@ -118,7 +118,7 @@ const float Skybox::vertices[] = {
 
 	0.5f, 0.5f, -0.5f,
 	-0.5f, 0.5f, -0.5f,
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, 0.5f, 0.5f,
 
 	//Bottom
 	0.5f, -0.5f, 0.5f,
@@ -137,20 +137,20 @@ const float Skybox::vertices[] = {
 	-0.5f, 0.5f, 0.5f,
 
 	0.5f, -0.5f, 0.5f,
-	-0.5f, -0.5f, 0.5f, 
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, -0.5f, 0.5f,
+	-0.5f, 0.5f, 0.5f,
 
 	//Back
 	0.5f, 0.5f, -0.5f,
 	0.5f, -0.5f, -0.5f,
-	-0.5f, 0.5f, -0.5f, 
+	-0.5f, 0.5f, -0.5f,
 
 	0.5f, -0.5f, -0.5f,
 	-0.5f, -0.5f, -0.5f,
 	-0.5f, 0.5f, -0.5f,
 
 	//Left
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, 0.5f, 0.5f,
 	-0.5f, 0.5f, -0.5f,
 	-0.5f, -0.5f, 0.5f,
 
@@ -159,7 +159,7 @@ const float Skybox::vertices[] = {
 	-0.5f, -0.5f, 0.5f,
 
 	//Right
-	0.5f, 0.5f, 0.5f, 
+	0.5f, 0.5f, 0.5f,
 	0.5f, 0.5f, -0.5f,
 	0.5f, -0.5f, 0.5f,
 
@@ -174,7 +174,7 @@ const float Skybox::vertices[] = {
 
 	0.5f, 0.5f, -0.5f,
 	-0.5f, 0.5f, -0.5f,
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, 0.5f, 0.5f,
 
 	//Bottom
 	0.5f, -0.5f, 0.5f,
