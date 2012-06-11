@@ -35,7 +35,7 @@ namespace Editor {
 
 	void load_model(const std::string& filename){
 		delete model;
-		model = new RenderObject(filename);
+		model = new RenderObject(filename, true);
 	}
 }
 
