@@ -20,6 +20,7 @@ extern RenderTarget* frame;
 
 /* icons */
 extern GdkPixbuf* icon_cat_scene;
+extern GdkPixbuf* icon_cat_model;
 extern GdkPixbuf* icon_scene;
 extern GdkPixbuf* icon_model;
 extern GdkPixbuf* icon_path;

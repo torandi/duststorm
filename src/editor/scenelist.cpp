@@ -185,7 +185,7 @@ namespace Editor {
 		gtk_tree_store_set(scenestore, &toplevel, COL_TITLE, "<b>Compositions</b>", -1);
 
 		gtk_tree_store_append(scenestore, &toplevel, NULL);
-		gtk_tree_store_set(scenestore, &toplevel, COL_TITLE, "<b>Models</b>", -1);
+		gtk_tree_store_set(scenestore, &toplevel, COL_ICON, icon_cat_model, COL_TITLE, "<b>Models</b>", -1);
 		{
 			GtkTreeIter child;
 			struct dirent **namelist;

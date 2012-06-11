@@ -44,6 +44,7 @@ RenderTarget* frame = nullptr;
 
 /* icons */
 GdkPixbuf* icon_cat_scene = nullptr;
+GdkPixbuf* icon_cat_model = nullptr;
 GdkPixbuf* icon_scene     = nullptr;
 GdkPixbuf* icon_model     = nullptr;
 GdkPixbuf* icon_path      = nullptr;
@@ -118,6 +119,7 @@ int main (int argc, char* argv[]){
 
 	/* load icons */
 	icon_cat_scene = gdk_pixbuf_new_from_file(PATH_ICON "pictures.png", NULL);
+	icon_cat_model = gdk_pixbuf_new_from_file(PATH_ICON "bricks.png", NULL);
 	icon_scene     = gdk_pixbuf_new_from_file(PATH_ICON "picture.png", NULL);
 	icon_model     = gdk_pixbuf_new_from_file(PATH_ICON "brick.png", NULL);
 	icon_path      = gdk_pixbuf_new_from_file(PATH_ICON "map.png", NULL);
