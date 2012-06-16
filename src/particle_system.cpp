@@ -66,14 +66,10 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 		rnd[i] = frand();
 	}
 
-	cl::Event e;
-
-	cl_int err = opencl->queue().enqueueWriteBuffer(particles_, CL_TRUE, 0, sizeof(particle_t)*max_num_particles, initial_particles, NULL, &e);
+	cl_int err = opencl->queue().enqueueWriteBuffer(particles_, CL_TRUE, 0, sizeof(particle_t)*max_num_particles, initial_particles, NULL, NULL);
 	CL::check_error(err, "[ParticleSystem] Write particles buffer");
-	update_blocking_events_.push_back(e);
-	err = opencl->queue().enqueueWriteBuffer(random_, CL_TRUE, 0, sizeof(float)*max_num_particles, rnd, NULL, &e);
+	err = opencl->queue().enqueueWriteBuffer(random_, CL_TRUE, 0, sizeof(float)*max_num_particles, rnd, NULL, NULL);
 	CL::check_error(err, "[ParticleSystem] Write random data buffer");
-	update_blocking_events_.push_back(e);
 
 	opencl->queue().flush();
 
@@ -134,15 +130,8 @@ ParticleSystem::~ParticleSystem() {
 }
 
 void ParticleSystem::update_config() {
-
-	cl::Event e;
-
-
-	cl_int err = opencl->queue().enqueueWriteBuffer(config_, CL_TRUE, 0, sizeof(config), &config, NULL, &e);
+	cl_int err = opencl->queue().enqueueWriteBuffer(config_, CL_TRUE, 0, sizeof(config), &config, NULL, NULL);
 	CL::check_error(err, "[ParticleSystem] Write config");
-
-	update_blocking_events_.push_back(e);
-	opencl->queue().flush();
 }
 
 
@@ -153,9 +142,6 @@ void ParticleSystem::callback_position(const glm::vec3 &position) {
 
 void ParticleSystem::update(float dt) {
 	cl_int err;
-	//Ensure there are no pending writes active
-	CL::waitForEvent(update_blocking_events_);
-	update_blocking_events_.clear();
 
 	//Make sure opengl is done with our vbos
 	glFinish();
@@ -166,14 +152,11 @@ void ParticleSystem::update(float dt) {
 	cl_int current_spawn_rate = (cl_int) round((avg_spawn_rate + 2.f*frand()*spawn_rate_var - spawn_rate_var)*dt);
 	//printf("spawn rate: %d\n", current_spawn_rate);
 	current_spawn_rate = 1;
-	err = opencl->queue().enqueueWriteBuffer(spawn_rate_, CL_FALSE, 0, sizeof(cl_int), &current_spawn_rate, NULL, &e);
-
-	update_blocking_events_.push_back(e);
+	err = opencl->queue().enqueueWriteBuffer(spawn_rate_, CL_TRUE, 0, sizeof(cl_int), &current_spawn_rate, NULL, NULL);
 
 	err = opencl->queue().enqueueAcquireGLObjects(&cl_gl_buffers_, NULL, &lock_e);
 	CL::check_error(err, "[ParticleSystem] acquire gl objects");
 
-	update_blocking_events_.push_back(lock_e);
 
 	err = kernel_.setArg(5, dt);
 	CL::check_error(err, "[ParticleSystem] set dt");
@@ -182,17 +165,22 @@ void ParticleSystem::update(float dt) {
 
 	opencl->queue().flush();
 
-	err = opencl->queue().enqueueNDRangeKernel(kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, &update_blocking_events_, &e2);
+	lock_e.wait();
+
+	err = opencl->queue().enqueueNDRangeKernel(kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, NULL, &e);
 	CL::check_error(err, "[ParticleSystem] Execute kernel");
 
-	render_blocking_events_.push_back(e2);
+	//render_blocking_events_.push_back(e2);
 
-	err = opencl->queue().enqueueReleaseGLObjects(&cl_gl_buffers_, &render_blocking_events_, &e3);
+	err = opencl->queue().enqueueReleaseGLObjects(&cl_gl_buffers_, NULL, &e2);
 	CL::check_error(err, "[ParticleSystem] Release GL objects");
 
 	opencl->queue().flush();
 
-	render_blocking_events_.push_back(e3);
+	e.wait();
+	e2.wait();
+
+	//render_blocking_events_.push_back(e3);
 
 
 	//BEGIN DEBUG
@@ -218,7 +206,6 @@ void ParticleSystem::update(float dt) {
 	opencl->queue().finish();*/
 
 	//END DEBUG
-
 }
 
 void ParticleSystem::render() {
@@ -226,10 +213,6 @@ void ParticleSystem::render() {
 	glDisable(GL_CULL_FACE);
 
 	Shader::upload_model_matrix(matrix());
-
-	//Ensure there are no pending updates
-	CL::waitForEvent(render_blocking_events_);
-	render_blocking_events_.clear();
 
 	glBindBuffer(GL_ARRAY_BUFFER, gl_buffer_);
 

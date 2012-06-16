@@ -46,6 +46,7 @@ class ParticleSystem : public MovableObject {
 			//Scale
 			float avg_scale;
 			float scale_var;
+
 			float avg_scale_change;
 			float scale_change_var;
 
@@ -56,6 +57,7 @@ class ParticleSystem : public MovableObject {
 			//These two should not be manually changed!
 			int num_textures;
 			int max_num_particles;
+
 		} config __attribute__ ((aligned (16)));
 
 		float avg_spawn_rate; //Number of particles to spawn per second
@@ -98,9 +100,6 @@ class ParticleSystem : public MovableObject {
 			float scale;
 			int texture_index;
 		} __attribute__ ((aligned (16)));
-
-		std::vector<cl::Event> update_blocking_events_;
-		std::vector<cl::Event> render_blocking_events_;
 
 		TextureArray* texture_;
 };
