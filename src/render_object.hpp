@@ -65,6 +65,11 @@ public:
 			, normal_map(nullptr)
 			, two_sided(false){
 
+			attr.shininess = 1;
+			attr.diffuse   = glm::vec4(1);
+			attr.specular  = glm::vec4(1);
+			attr.ambient   = glm::vec4(1);
+			attr.emission  = glm::vec4(1);
 		};
 
 		TextureBase* texture;
