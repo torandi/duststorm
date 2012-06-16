@@ -54,7 +54,7 @@ void main() {
       accumLighting += computeLighting(
             Lgt.lights[light], originalColor, normal_map,
             light_dir, camera_dir, length(light_distance),
-            Mtl.shininess, Mtl.specular, 1.0,
+            Mtl.shininess, Mtl.specular,
             true, true);
    }
 

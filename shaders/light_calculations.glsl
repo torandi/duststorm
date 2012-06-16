@@ -6,7 +6,7 @@ vec4 computeLighting(
 	in light_data light, in vec4 originalColor,
 	in vec3 normal_map, in vec3 light_dir,
 	in vec3 camera_dir, in float distance,
-	float shininess, vec4 specular, float specular_intensity,
+	float shininess, vec4 specular,
 	bool use_diffuse, bool use_specular
 	) {
 	vec3 lightIntensity;
@@ -28,7 +28,7 @@ vec4 computeLighting(
 	}
 
 	vec3 diffuse = originalColor.rgb * LambertTerm * lightIntensity;
-	vec3 specular_color = specular.rgb * specular_amount * specular_intensity * length(diffuse);
+	vec3 specular_color = specular.rgb * specular_amount * length(diffuse);
 
 	vec4 color = vec4(0.0);
 	if(use_diffuse)
