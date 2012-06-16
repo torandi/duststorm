@@ -100,7 +100,7 @@ void RenderObject::pre_render() {
 	//Init materials:
 	for(unsigned int i= 0; i < scene->mNumMaterials; ++i) {
 		const aiMaterial * mtl = scene->mMaterials[i];
-		material_t mtl_data;
+		Material mtl_data;
 
 		aiString path;
 		if(mtl->GetTextureCount(aiTextureType_DIFFUSE) > 0 &&
@@ -131,41 +131,34 @@ void RenderObject::pre_render() {
 		if(AI_SUCCESS == mtl->Get(AI_MATKEY_NAME, name))
 			fprintf(verbose, "Loaded material %d %s\n", i, name.data);
 
-		aiColor4D diffuse;
-		aiColor4D specular;
-		aiColor4D ambient;
-		aiColor4D emission;
-		mtl_data.attr.diffuse = glm::vec4( 0.8f, 0.8f, 0.8f, 1.0f);
-		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
-			color4_to_vec4(&diffuse, mtl_data.attr.diffuse);
+		aiColor4D value;
+		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &value))
+			color4_to_vec4(&value, mtl_data.diffuse);
 
-		mtl_data.attr.specular = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f);
-		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular))
-			color4_to_vec4(&specular, mtl_data.attr.specular);
+		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &value))
+			color4_to_vec4(&value, mtl_data.specular);
 
-		mtl_data.attr.ambient = glm::vec4( 0.2f, 0.2f, 0.2f, 1.0f);
-		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient))
-			color4_to_vec4(&ambient, mtl_data.attr.ambient);
+		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &value))
+			color4_to_vec4(&value, mtl_data.ambient);
 
-		mtl_data.attr.emission = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f);
-		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emission))
-			color4_to_vec4(&emission, mtl_data.attr.emission);
+		if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &value))
+			color4_to_vec4(&value, mtl_data.emission);
 
 		unsigned int max = 1;
 		float strength;
-		int ret1 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &mtl_data.attr.shininess, &max);
+		int ret1 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &mtl_data.shininess, &max);
 		if(ret1 == AI_SUCCESS) {
 			max = 1;
 			int ret2 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS_STRENGTH, &strength, &max);
 			if(ret2 == AI_SUCCESS)
-				mtl_data.attr.shininess *= strength;
+				mtl_data.shininess *= strength;
 		} else {
-			mtl_data.attr.shininess = 0.0f;
+			mtl_data.shininess = 0.0f;
 		}
 
-		if ( mtl_data.attr.shininess < 0.001 ){ /* arbitrary small value */
-			mtl_data.attr.shininess = 0.001; /* in glsl pow(x,0) is undefined */
-			mtl_data.attr.specular = glm::vec4(0.f, 0.f, 0.f, 0.f);
+		if ( mtl_data.shininess < 0.001 ){ /* arbitrary small value */
+			mtl_data.shininess = 0.001; /* in glsl pow(x,0) is undefined */
+			mtl_data.specular = glm::vec4(0.f, 0.f, 0.f, 0.f);
 		}
 
 		max = 1;
@@ -301,27 +294,6 @@ const glm::mat4 RenderObject::matrix() const {
 	//Apply scale and normalization matrix
 	return MovableObject::matrix() * glm::scale(normalization_matrix_, scale);
 }
-
-void RenderObject::material_t::activate() {
-	glPushAttrib(GL_ENABLE_BIT);
-	if(two_sided)
-		glDisable(GL_CULL_FACE);
-
-	glActiveTexture(GL_TEXTURE0);
-	texture->texture_bind();
-
-	/*
-		 glActiveTexture(GL_TEXTURE1);
-		 glBindTexture(GL_TEXTURE_2D, normal_map);
-		 */
-
-	Shader::upload_material(attr);
-}
-
-void RenderObject::material_t::deactivate() {
-	glPopAttrib();
-}
-
 
 void RenderObject::get_bounding_box_for_node (const struct aiNode* nd,
 	struct aiVector3D* min,

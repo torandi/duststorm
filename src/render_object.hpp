@@ -2,6 +2,7 @@
 #define RENDER_OBJECT_H
 
 #include "movable_object.hpp"
+#include "material.hpp"
 #include "shader.hpp"
 
 #include <string>
@@ -59,33 +60,11 @@ public:
 		}
 	};
 
-	struct material_t {
-		material_t()
-			: texture(nullptr)
-			, normal_map(nullptr)
-			, two_sided(false){
-
-			attr.shininess = 1;
-			attr.diffuse   = glm::vec4(1);
-			attr.specular  = glm::vec4(1);
-			attr.ambient   = glm::vec4(1);
-			attr.emission  = glm::vec4(1);
-		};
-
-		TextureBase* texture;
-		TextureBase* normal_map;
-		Shader::material_t attr;
-		bool two_sided;
-
-		void activate();
-		void deactivate();
-	};
-
 	//Set normalize_scale to false to not scale down to 1.0
 	RenderObject(std::string model, bool normalize_scale=true, unsigned int aiOptions=0);
 	~RenderObject();
 
-	std::vector<material_t> materials;
+	std::vector<Material> materials;
 
 	std::map<const aiMesh*, mesh_data_t > mesh_data;
 
