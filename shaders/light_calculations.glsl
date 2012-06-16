@@ -4,7 +4,7 @@ float attenuation(in light_data light, float d){
 
 vec4 computeLighting(
 	in light_data light, in vec4 originalColor,
-	in vec3 normal_map, in vec3 light_dir,
+	in vec3 N, in vec3 L,
 	in vec3 camera_dir, in float distance,
 	float shininess, vec4 specular,
 	bool use_diffuse, bool use_specular
@@ -19,12 +19,12 @@ vec4 computeLighting(
 		lightIntensity =  lightAttenuation * light.intensity.rgb;
 	}
 
-	float LambertTerm = max( dot(light_dir, normal_map), 0.0);
+	float LambertTerm = max( dot(L, N), 0.0);
 	float specular_amount = 0.0;
 
 	if( LambertTerm > 0.0) {
 		//Apply specular
-		specular_amount = pow(clamp(dot(reflect(-light_dir, normal_map), camera_dir), 0.0, 1.0), shininess);
+		specular_amount = pow(clamp(dot(reflect(-L, N), camera_dir), 0.0, 1.0), shininess);
 	}
 
 	vec3 diffuse = originalColor.rgb * LambertTerm * lightIntensity;
