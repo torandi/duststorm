@@ -58,7 +58,7 @@ void main() {
 		light_dir.z = dot(dir, norm_normal);
 		accumLighting += computeLighting(
 				Lgt.lights[light], originalColor, normal_map,
-				light_dir, camera_dir, light_distance,
+				light_dir, camera_dir, length(light_distance),
 				shininess, specular, 1.0,
 				true, true);
 	}

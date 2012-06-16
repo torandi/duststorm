@@ -25,20 +25,20 @@ void main() {
 
 	//Convert to tangent space:
 	vec3 camera_dir;
-	camera_dir.x = dot(camera_direction, norm_tangent); 
-	camera_dir.y = dot(camera_direction, norm_bitangent); 
-	camera_dir.z = dot(camera_direction, norm_normal); 
+	camera_dir.x = dot(camera_direction, norm_tangent);
+	camera_dir.y = dot(camera_direction, norm_bitangent);
+	camera_dir.z = dot(camera_direction, norm_normal);
 
-	vec4 originalColor; 
+	vec4 originalColor;
    originalColor = texture(texture1, texcoord);
    //originalColor*=Mtl.diffuse;
 
 	vec3 normal_map = vec3(0.0, 0.0, 1.0);
-	
+
 	/* //Normal map
 		normal_map = normalize(texture(texture2, texcoord).xyz * 2.0 - 1.0);
 	*/
-	
+
    vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity, 1.0);
 
    for(int light = 0; int(light) < Lgt.num_lights; ++light) {
@@ -53,12 +53,12 @@ void main() {
 
       accumLighting += computeLighting(
             Lgt.lights[light], originalColor, normal_map,
-            light_dir, camera_dir, light_distance, 
+            light_dir, camera_dir, length(light_distance),
             Mtl.shininess, Mtl.specular, 1.0,
             true, true);
    }
 
 
    ocolor= clamp(accumLighting,0.0, 1.0);
-	
+
 }
