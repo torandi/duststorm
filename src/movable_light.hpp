@@ -13,9 +13,9 @@ class MovableLight : public MovableObject {
 		float &constant_attenuation;
 		float &linear_attenuation;
 		float &quadratic_attenuation;
-		int &type;
+		Light::light_type_t& type;
 		glm::vec3 &intensity;
-	
+
 	private:
 		Light * data;
 };

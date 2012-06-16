@@ -3,11 +3,10 @@
 
 #include <glm/glm.hpp>
 
-struct Light{
-	
+struct Light {
 	Light();
 
-	enum light_type_t {
+	enum light_type_t: int {
 		DIRECTIONAL_LIGHT = 0, //No attenuation
 		POINT_LIGHT = 1
 	};
@@ -15,10 +14,9 @@ struct Light{
 	float constant_attenuation;
 	float linear_attenuation;
 	float quadratic_attenuation;
-	int type; //light_type_t
+	light_type_t type;
 	glm::vec3 intensity;
-		float padding;
-	glm::vec3 position;
-		float padding_2;
+	glm::vec3 position __attribute__ ((aligned (16)));
 };
+
 #endif
