@@ -91,11 +91,11 @@ float3 _random3(float3 m, bool dual, uint *time, int id, __global const float * 
 void update_particle (
 											__global vertex_t * const vertex, 
 											__global particle_t * const particle, 
-											__constant config_t * config, 
-											__global const float * rnd,
-											float dt,
-											uint * time,
-											uint id
+											__constant config_t * const config, 
+											__global const float * const rnd,
+											float const dt,
+											uint * const time,
+											uint const id
 											)
 {
 	particle->ttl -= dt;
@@ -117,11 +117,11 @@ void update_particle (
 void respawn_particle (
 											 __global vertex_t * const vertex, 
 											 __global particle_t * const particle, 
-											 __constant config_t * config, 
-											 __global const float * rnd,
-											 float dt,
-											 uint * time,
-											 uint id
+											 __constant config_t * const config, 
+											 __global const float * const rnd,
+											 const float dt,
+											 uint * const time,
+											 uint const id
 											 )
 {
 	vertex->position.xyz = config->spawn_position + random3(config->spawn_area.xyz, false);
@@ -157,8 +157,9 @@ __kernel void run_particles (
 														 uint time
 														 )
 {
-	uint id = get_global_id(0);    
-		//First check if particle is alive:
+	uint id = get_global_id(0);
+
+	//First check if particle is alive:
 	if(particles[id].dead == 0) {
 		//It lives
 		update_particle(&vertices[id], &particles[id], config, rnd, dt, &time, id);
