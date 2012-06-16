@@ -25,6 +25,7 @@ libfrob_a_SOURCES = \
 	src/lights_data.cpp src/lights_data.hpp \
 	src/material.cpp src/material.hpp \
 	src/mesh.cpp src/mesh.hpp \
+	src/meta.cpp src/meta.hpp \
 	src/movable_light.cpp src/movable_light.hpp \
 	src/movable_object.cpp src/movable_object.hpp \
 	src/particle_system.cpp src/particle_system.hpp \
