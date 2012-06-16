@@ -17,7 +17,7 @@ public:
 			camera.set_position(glm::vec3(0.f, 0.f, -1));
 			camera.look_at(glm::vec3(0.f, 0.f, 0.f));
 			fire.config.spawn_position = glm::vec4(0.f, -0.5f, -0.2f, 1.f);
-			fire.config.spawn_area = glm::vec4(0.4f, 0.f, 0.4f, 0.f);
+			fire.config.spawn_area = glm::vec4(0.0f, 0.f, 0.0f, 0.2f);
 			fire.config.spawn_direction = glm::vec4(0, 1.f, 0.f, 0.f);
 			fire.config.direction_var = glm::vec4(0.1f, 0.f, 0.1f, 0.f);
 			fire.config.avg_spawn_speed= 0.001f;
@@ -38,7 +38,7 @@ public:
 			fire.update_config();
 
 			smoke.config.spawn_position = glm::vec4(0.f, -0.5f, -0.2f, 1.f);
-			smoke.config.spawn_area = glm::vec4(0.4f, 0.f, 0.4f, 0.f);
+			smoke.config.spawn_area = glm::vec4(0.0f, 0.f, 0.0f, 0.2f);
 			smoke.config.spawn_direction = glm::vec4(0, 1.f, 0.f, 0.f);
 			smoke.config.direction_var = glm::vec4(0.1f, 0.f, 0.1f, 0.f);
 			smoke.config.avg_spawn_speed= 0.003f;
@@ -75,6 +75,13 @@ public:
 	virtual void update(float t, float dt){
 		fire.update(dt);
 		smoke.update(dt);
+
+		#ifdef ENABLE_INPUT
+			input.update_object(camera, dt);
+			if(input.current_value(Input::ACTION_1) > 0.5f) {
+				printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
+			}
+		#endif
 	}
 
 private:

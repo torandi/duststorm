@@ -30,7 +30,7 @@ typedef struct config_t {
 	float3 direction_var;
 
 	float3 spawn_position;
-	float3 spawn_area;
+	float4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
 
 	float avg_ttl;
 	float ttl_var;
@@ -128,7 +128,10 @@ void respawn_particle (
 											 uint id
 											 )
 {
-	vertex->position.xyz = config->spawn_position + random3(config->spawn_area, false);
+	vertex->position.xyz = config->spawn_position + random3(config->spawn_area.xyz, false);
+	float a = random1(2*M_PI, false);
+	vertex->position.x += random1(config->spawn_area.w,false) * cos(a);
+	vertex->position.z += random1(config->spawn_area.w,false) * sin(a);
 	vertex->position.w = 0.f;
 
 	vertex->texture_index = (int)floor(random1((float)config->num_textures-0.1, false));
