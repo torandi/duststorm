@@ -20,37 +20,40 @@ Skybox::Skybox(std::string skybox_path) {
 		files.push_back(skybox_path+texture_names[i]);
 	}
 
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
 	texture = TextureCubemap::from_filename(files);
 
 	//Generate skybox buffers:
-
-	glGenBuffers(1, &buffer_);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	static bool initialized = false;
+	if ( !initialized ){
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		initialized = true;
+	}
 }
 
 Skybox::~Skybox() {
-	delete texture;		
+	delete texture;
 }
 
 void Skybox::render(const Camera &camera) const{
+	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 	glPushAttrib(GL_ENABLE_BIT|GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 
 	Shader::upload_projection_view_matrices(
-			camera.projection_matrix(), 
+			camera.projection_matrix(),
 			glm::lookAt(glm::vec3(0.0), camera.look_at()-camera.position(), camera.up())
 	);
 
-	glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+	/* Disable most attribs from Shader::vertex_x */
+	for ( int i = 2; i < Shader::NUM_ATTR; ++i ) {
+		glDisableVertexAttribArray(i);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float)*3*36) );
 
@@ -64,13 +67,13 @@ void Skybox::render(const Camera &camera) const{
 
 	texture->texture_unbind();
 
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-
 	glPopAttrib();
+	glPopClientAttrib();
 
 	checkForGLErrors("Skybox::render(): post");
 }
+
+GLuint Skybox::vbo = 0;
 
 //Data:
 const float Skybox::vertices[] = {
@@ -81,20 +84,20 @@ const float Skybox::vertices[] = {
 	-0.5f, 0.5f, 0.5f,
 
 	0.5f, -0.5f, 0.5f,
-	-0.5f, -0.5f, 0.5f, 
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, -0.5f, 0.5f,
+	-0.5f, 0.5f, 0.5f,
 
 	//Back
 	0.5f, 0.5f, -0.5f,
 	0.5f, -0.5f, -0.5f,
-	-0.5f, 0.5f, -0.5f, 
+	-0.5f, 0.5f, -0.5f,
 
 	0.5f, -0.5f, -0.5f,
 	-0.5f, -0.5f, -0.5f,
 	-0.5f, 0.5f, -0.5f,
 
 	//Left
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, 0.5f, 0.5f,
 	-0.5f, 0.5f, -0.5f,
 	-0.5f, -0.5f, 0.5f,
 
@@ -103,7 +106,7 @@ const float Skybox::vertices[] = {
 	-0.5f, -0.5f, 0.5f,
 
 	//Right
-	0.5f, 0.5f, 0.5f, 
+	0.5f, 0.5f, 0.5f,
 	0.5f, 0.5f, -0.5f,
 	0.5f, -0.5f, 0.5f,
 
@@ -118,7 +121,7 @@ const float Skybox::vertices[] = {
 
 	0.5f, 0.5f, -0.5f,
 	-0.5f, 0.5f, -0.5f,
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, 0.5f, 0.5f,
 
 	//Bottom
 	0.5f, -0.5f, 0.5f,
@@ -137,20 +140,20 @@ const float Skybox::vertices[] = {
 	-0.5f, 0.5f, 0.5f,
 
 	0.5f, -0.5f, 0.5f,
-	-0.5f, -0.5f, 0.5f, 
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, -0.5f, 0.5f,
+	-0.5f, 0.5f, 0.5f,
 
 	//Back
 	0.5f, 0.5f, -0.5f,
 	0.5f, -0.5f, -0.5f,
-	-0.5f, 0.5f, -0.5f, 
+	-0.5f, 0.5f, -0.5f,
 
 	0.5f, -0.5f, -0.5f,
 	-0.5f, -0.5f, -0.5f,
 	-0.5f, 0.5f, -0.5f,
 
 	//Left
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, 0.5f, 0.5f,
 	-0.5f, 0.5f, -0.5f,
 	-0.5f, -0.5f, 0.5f,
 
@@ -159,7 +162,7 @@ const float Skybox::vertices[] = {
 	-0.5f, -0.5f, 0.5f,
 
 	//Right
-	0.5f, 0.5f, 0.5f, 
+	0.5f, 0.5f, 0.5f,
 	0.5f, 0.5f, -0.5f,
 	0.5f, -0.5f, 0.5f,
 
@@ -174,7 +177,7 @@ const float Skybox::vertices[] = {
 
 	0.5f, 0.5f, -0.5f,
 	-0.5f, 0.5f, -0.5f,
-	-0.5f, 0.5f, 0.5f, 
+	-0.5f, 0.5f, 0.5f,
 
 	//Bottom
 	0.5f, -0.5f, 0.5f,

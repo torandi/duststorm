@@ -45,29 +45,29 @@ const char * Shader::global_uniform_names_[] = {
 };
 
 const char * Shader::local_uniform_names_[] = {
-   "texture1",
-   "texture2",
-	 "texture_array1",
-	 "texture_cube1"
+	"texture1",
+	"texture2",
+	"texture_array1",
+	"texture_cube1"
 };
 
 
 const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
-   sizeof(glm::mat4)*3,
-   sizeof(glm::mat4)*2,
-   sizeof(glm::vec3),
-   sizeof(Shader::material_t),
-   sizeof(Shader::lights_data_t),
-   sizeof(struct state_data),
+	sizeof(glm::mat4)*3,
+	sizeof(glm::mat4)*2,
+	sizeof(glm::vec3),
+	sizeof(Shader::material_t),
+	sizeof(Shader::lights_data_t),
+	sizeof(struct state_data),
 };
 
 const GLenum Shader::global_uniform_usage_[] = {
-   GL_DYNAMIC_DRAW,
-   GL_DYNAMIC_DRAW,
-   GL_DYNAMIC_DRAW,
-   GL_DYNAMIC_DRAW,
-   GL_DYNAMIC_DRAW,
-   GL_DYNAMIC_DRAW
+	GL_DYNAMIC_DRAW,
+	GL_DYNAMIC_DRAW,
+	GL_DYNAMIC_DRAW,
+	GL_DYNAMIC_DRAW,
+	GL_DYNAMIC_DRAW,
+	GL_DYNAMIC_DRAW
 };
 
 GLuint Shader::global_uniform_buffers_[Shader::NUM_GLOBAL_UNIFORMS];
@@ -75,34 +75,39 @@ GLuint Shader::global_uniform_buffers_[Shader::NUM_GLOBAL_UNIFORMS];
 Shader* Shader::current = nullptr;
 
 void Shader::initialize() {
-   //Generate global uniforms:
-   glGenBuffers(NUM_GLOBAL_UNIFORMS, (GLuint*)&global_uniform_buffers_);
+	//Generate global uniforms:
+	glGenBuffers(NUM_GLOBAL_UNIFORMS, (GLuint*)&global_uniform_buffers_);
 
-   checkForGLErrors("Generate global uniform buffers");
+	checkForGLErrors("Generate global uniform buffers");
 
-   for( int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
-      //Allocate memory in the buffer:A
-      glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[i]);
-      glBufferData(GL_UNIFORM_BUFFER, global_uniform_buffer_sizes_[i], NULL, global_uniform_usage_[i]);
-      //Bind buffers to range
-      glBindBufferRange(GL_UNIFORM_BUFFER, i, global_uniform_buffers_[i], 0, global_uniform_buffer_sizes_[i]);
-   }
-   glBindBuffer(GL_UNIFORM_BUFFER, 0);
-   checkForGLErrors("Bind and allocate global uniforms");
+	for( int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
+		//Allocate memory in the buffer:A
+		glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[i]);
+		glBufferData(GL_UNIFORM_BUFFER, global_uniform_buffer_sizes_[i], NULL, global_uniform_usage_[i]);
+		//Bind buffers to range
+		glBindBufferRange(GL_UNIFORM_BUFFER, i, global_uniform_buffers_[i], 0, global_uniform_buffer_sizes_[i]);
+	}
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	checkForGLErrors("Bind and allocate global uniforms");
+
+	/* Enable all attribs for Shader::vertex_x */
+	for ( int i = 0; i < NUM_ATTR; ++i ) {
+		glEnableVertexAttribArray(i);
+	}
 }
 
-Shader::Shader(const std::string &name_, GLuint program) : 
-		program_(program) 
+Shader::Shader(const std::string &name_, GLuint program) :
+	program_(program)
 	,	name(name_) {
-   glGetProgramiv(program_, GL_ACTIVE_ATTRIBUTES, &num_attributes_);
-   fprintf(verbose, "Created shader %s\n"
-           "  ID %d\n"
-           "  Active attrib: %d\n",
-           name_.c_str(), program, num_attributes_);
+	glGetProgramiv(program_, GL_ACTIVE_ATTRIBUTES, &num_attributes_);
+	fprintf(verbose, "Created shader %s\n"
+	        "  ID %d\n"
+	        "  Active attrib: %d\n",
+	        name_.c_str(), program, num_attributes_);
 
-   glUseProgram(program_);
-   init_uniforms();
-   glUseProgram(0);
+	glUseProgram(program_);
+	init_uniforms();
+	glUseProgram(0);
 }
 
 
@@ -121,10 +126,10 @@ void Shader::load_file(const std::string &filename, std::stringstream &shaderDat
 }
 
 std::string Shader::parse_shader(
-			const std::string &filename,
-			std::set<std::string> included_files,
-			std::string included_from
-		) {
+	const std::string &filename,
+	std::set<std::string> included_files,
+	std::string included_from
+	) {
 	char buffer[2048];
 
 	std::pair<std::set<std::string>::iterator, bool> ret = included_files.insert(filename);
@@ -223,7 +228,7 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 	}
 
 #ifdef VALIDATE_SHADERS
-   glValidateProgram(program);
+	glValidateProgram(program);
 
 	glGetProgramiv(program, GL_VALIDATE_STATUS, &gl_tmp);
 
@@ -294,12 +299,6 @@ void Shader::bind() {
 
 	glUseProgram(program_);
 	checkForGLErrors("Bind shader");
-
-	for(int i=0; i<num_attributes_; ++i) {
-      glEnableVertexAttribArray(i);
-      checkForGLErrors("Enable vertex attrib");
-	}
-
 	current = this;
 }
 
@@ -309,21 +308,16 @@ void Shader::unbind() {
 		abort();
 	}
 
-	for( int i = 0; i < current->num_attributes_; ++i ) {
-		glDisableVertexAttribArray(i);
-		checkForGLErrors("Shader::unbind glDisableVertexAttribArray");
-	}
-
 	glUseProgram(0);
 	checkForGLErrors("Shader::unbind");
 	current = nullptr;
 }
 
 void Shader::upload_lights(const Shader::lights_data_t &lights) {
-   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_LIGHTS]);
-   glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(lights_data_t), &lights);
-   glBindBuffer(GL_UNIFORM_BUFFER, 0);
-   checkForGLErrors("upload lights");
+	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_LIGHTS]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(lights_data_t), &lights);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	checkForGLErrors("upload lights");
 }
 
 void Shader::upload_lights(LightsData &lights) {
@@ -331,9 +325,9 @@ void Shader::upload_lights(LightsData &lights) {
 }
 
 void Shader::upload_camera_position(const Camera &camera) {
-   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_CAMERA]);
-   glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(camera.position()));
-   glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_CAMERA]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(camera.position()));
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	checkForGLErrors("upload camera position");
 }
 
@@ -365,12 +359,12 @@ void Shader::upload_model_matrix(const glm::mat4 &model) {
 }
 
 void Shader::upload_material(const Shader::material_t &material) {
-   glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_MATERIAL]);
+	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_MATERIAL]);
 
-   glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(material_t), &material);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(material_t), &material);
 
-   glBindBuffer(GL_UNIFORM_BUFFER, 0);
-   checkForGLErrors("upload material");
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	checkForGLErrors("upload material");
 }
 
 void Shader::upload_blank_material() {
@@ -385,8 +379,8 @@ void Shader::upload_blank_material() {
 }
 
 void Shader::upload_camera(const Camera &camera) {
-   upload_camera_position(camera);
-   upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
+	upload_camera_position(camera);
+	upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
 }
 
 void Shader::upload_state(const glm::ivec2& size){
