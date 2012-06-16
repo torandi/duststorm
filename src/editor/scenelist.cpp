@@ -25,6 +25,12 @@ enum {
 	PROP_COLOR,
 	PROP_POINTER,
 	PROP_OFFSET,
+	PROP_TYPE,
+};
+
+enum {
+	PROP_UNSET = 0,
+	PROP_FLOAT,
 };
 
 static unsigned int add_property(GtkTreeIter* parent, const glm::vec3& v, const std::string& name, Meta* variable, unsigned int offset){
@@ -38,13 +44,13 @@ static unsigned int add_property(GtkTreeIter* parent, const glm::vec3& v, const 
 	gtk_tree_store_set(propstore, &cur, PROP_KEY, name.c_str(), PROP_VALUE, s.str().c_str(), PROP_COLOR, "#ddd", -1);
 
 	gtk_tree_store_append(propstore, &child, &cur);
-	gtk_tree_store_set(propstore, &child, PROP_KEY, "x", PROP_VALUE, x.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 1, -1);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "x", PROP_VALUE, x.str().c_str(), PROP_EDITABLE, TRUE, PROP_TYPE, PROP_FLOAT, PROP_POINTER, variable, PROP_OFFSET, offset + 1, -1);
 
 	gtk_tree_store_append(propstore, &child, &cur);
-	gtk_tree_store_set(propstore, &child, PROP_KEY, "y", PROP_VALUE, y.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 2, -1);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "y", PROP_VALUE, y.str().c_str(), PROP_EDITABLE, TRUE, PROP_TYPE, PROP_FLOAT, PROP_POINTER, variable, PROP_OFFSET, offset + 2, -1);
 
 	gtk_tree_store_append(propstore, &child, &cur);
-	gtk_tree_store_set(propstore, &child, PROP_KEY, "z", PROP_VALUE, z.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 3, -1);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "z", PROP_VALUE, z.str().c_str(), PROP_EDITABLE, TRUE, PROP_TYPE, PROP_FLOAT, PROP_POINTER, variable, PROP_OFFSET, offset + 3, -1);
 
 	return offset + 3;
 }
@@ -60,17 +66,17 @@ static unsigned int add_property(GtkTreeIter* parent, const Color& c, unsigned i
 	gtk_tree_store_set(propstore, &cur, PROP_KEY, name.c_str(), PROP_VALUE, "Color", PROP_COLOR, "#ddd", -1);
 
 	gtk_tree_store_append(propstore, &child, &cur);
-	gtk_tree_store_set(propstore, &child, PROP_KEY, "r", PROP_VALUE, r.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 1, -1);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "r", PROP_VALUE, r.str().c_str(), PROP_EDITABLE, TRUE, PROP_TYPE, PROP_FLOAT, PROP_POINTER, variable, PROP_OFFSET, offset + 1, -1);
 
 	gtk_tree_store_append(propstore, &child, &cur);
-	gtk_tree_store_set(propstore, &child, PROP_KEY, "g", PROP_VALUE, g.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 2, -1);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "g", PROP_VALUE, g.str().c_str(), PROP_EDITABLE, TRUE, PROP_TYPE, PROP_FLOAT, PROP_POINTER, variable, PROP_OFFSET, offset + 2, -1);
 
 	gtk_tree_store_append(propstore, &child, &cur);
-	gtk_tree_store_set(propstore, &child, PROP_KEY, "b", PROP_VALUE, b.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 3, -1);
+	gtk_tree_store_set(propstore, &child, PROP_KEY, "b", PROP_VALUE, b.str().c_str(), PROP_EDITABLE, TRUE, PROP_TYPE, PROP_FLOAT, PROP_POINTER, variable, PROP_OFFSET, offset + 3, -1);
 
 	if ( components == 4 ){
 		gtk_tree_store_append(propstore, &child, &cur);
-		gtk_tree_store_set(propstore, &child, PROP_KEY, "a", PROP_VALUE, a.str().c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, PROP_OFFSET, offset + 4, -1);
+		gtk_tree_store_set(propstore, &child, PROP_KEY, "a", PROP_VALUE, a.str().c_str(), PROP_EDITABLE, TRUE, PROP_TYPE, PROP_FLOAT, PROP_POINTER, variable, PROP_OFFSET, offset + 4, -1);
 	}
 
 	return offset + components;
@@ -94,6 +100,30 @@ static void add_light_property(GtkTreeIter* parent, const MovableLight& light, c
 	offset += 2;
 	offset = add_property(&cur, Color(light.intensity), 3, "Color", NULL, offset);
 	offset = add_property(&cur, light.position(), "Position", NULL, offset);
+}
+
+static void notify_update(GtkTreeIter* iter, const char* new_text, unsigned int offset){
+	/* locate meta variable by searching parents */
+	GtkTreeIter cur = *iter;
+	GtkTreeIter prev = cur;
+	gpointer pointer;
+	Meta* variable = nullptr;
+	do {
+		gtk_tree_model_get(GTK_TREE_MODEL(propstore), &cur, PROP_POINTER, &pointer, -1);
+
+		variable = static_cast<Meta*>(pointer);
+		if ( variable ) break;
+
+		prev = cur;
+	} while ( gtk_tree_model_iter_parent(GTK_TREE_MODEL(propstore), &cur, &prev) == TRUE );
+
+	if ( !variable ){
+		fprintf(stderr, "Cell does not have an associated metadata variable assigned, edit ignored.\n");
+		return;
+	}
+
+	variable->set_string(scene, std::string(new_text), offset);
+	gtk_tree_store_set(propstore, iter, PROP_VALUE, variable->get_string(scene, offset).c_str(), -1);
 }
 
 static void populate_sceneprops(Scene* scene, const std::string& name){
@@ -139,32 +169,13 @@ static void populate_sceneprops(Scene* scene, const std::string& name){
 }
 
 extern "C" G_MODULE_EXPORT void property_edited_cb (GtkCellRendererText* cell, gchar* path, gchar* new_text, gpointer user_data){
-	GtkTreeIter iter, prev, child;
+	GtkTreeIter iter;
 	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(propstore), &iter, path);
-	child = iter;
 
-	gpointer pointer;
 	guint offset;
 	gtk_tree_model_get(GTK_TREE_MODEL(propstore), &iter, PROP_OFFSET, &offset, -1);
 
-	/* locate meta variable by searching parents */
-	Meta* variable = nullptr;
-	do {
-		gtk_tree_model_get(GTK_TREE_MODEL(propstore), &iter, PROP_POINTER, &pointer, -1);
-
-		variable = static_cast<Meta*>(pointer);
-		if ( variable ) break;
-
-		prev = iter;
-	} while ( gtk_tree_model_iter_parent(GTK_TREE_MODEL(propstore), &iter, &prev) == TRUE );
-
-	if ( !variable ){
-		fprintf(stderr, "Cell at %s does not have an associated metadata variable assigned, edit ignored.\n", path);
-		return;
-	}
-
-	variable->set_string(scene, std::string(new_text), offset);
-	gtk_tree_store_set(propstore, &child, PROP_VALUE, variable->get_string(scene, offset).c_str(), -1);
+	notify_update(&iter, new_text, offset);
 }
 
 extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column, gpointer user_data){
@@ -218,6 +229,27 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 
 	g_free(name);
 	g_free(filename);
+}
+
+extern "C" G_MODULE_EXPORT void properties_scroll_event_cb(GtkWidget* widget, GdkEventScroll* event, gpointer data){
+	GtkTreeIter iter;
+	GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
+	if ( !gtk_tree_selection_get_selected(selection, nullptr, &iter) ) return;
+
+	guint type, offset;
+	gchar* value;
+	gtk_tree_model_get(GTK_TREE_MODEL(propstore), &iter, PROP_VALUE, &value, PROP_TYPE, &type, PROP_OFFSET, &offset, -1);
+
+	static char buf[64];
+
+	switch ( type ){
+	case PROP_FLOAT:
+		snprintf(buf, 64, "%f", atof(value) + (event->direction == GDK_SCROLL_UP ? 0.1 : -0.1));
+		notify_update(&iter, buf, offset);
+		break;
+	}
+
+	g_free(value);
 }
 
 namespace Editor {
