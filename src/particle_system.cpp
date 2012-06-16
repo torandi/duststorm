@@ -150,8 +150,6 @@ void ParticleSystem::update(float dt) {
 
 	//Write number of particles to spawn this round:
 	cl_int current_spawn_rate = (cl_int) round((avg_spawn_rate + 2.f*frand()*spawn_rate_var - spawn_rate_var)*dt);
-	//printf("spawn rate: %d\n", current_spawn_rate);
-	current_spawn_rate = 1;
 	err = opencl->queue().enqueueWriteBuffer(spawn_rate_, CL_TRUE, 0, sizeof(cl_int), &current_spawn_rate, NULL, NULL);
 
 	err = opencl->queue().enqueueAcquireGLObjects(&cl_gl_buffers_, NULL, &lock_e);
