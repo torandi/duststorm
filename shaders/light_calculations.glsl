@@ -1,6 +1,10 @@
+float attenuation(in light_data light, float d){
+	return 1.0 / ( light.constant_attenuation + light.linear_attenuation * d + light.quadratic_attenuation * d * d);
+}
+
 vec4 computeLighting(
-	in light_data light, in vec4 originalColor, 
-	in vec3 normal_map, in vec3 light_dir, 
+	in light_data light, in vec4 originalColor,
+	in vec3 normal_map, in vec3 light_dir,
 	in vec3 camera_dir, in vec3 light_distance,
 	float shininess, vec4 specular, float specular_intensity,
 	bool use_diffuse, bool use_specular
@@ -9,10 +13,9 @@ vec4 computeLighting(
 
 	//Light attenuation on if type == 1 (point light)
 	if(light.type == 0) {
-		lightIntensity = light.intensity.rgb;	
-	} else { 
-		float d = length(light_distance);
-		float lightAttenuation = 1.0 / ( light.constant_attenuation + light.linear_attenuation * d + light.quadratic_attenuation * d * d);
+		lightIntensity = light.intensity.rgb;
+	} else {
+		float lightAttenuation = attenuation(light, length(light_distance));
 		lightIntensity =  lightAttenuation * light.intensity.rgb;
 	}
 
@@ -24,7 +27,7 @@ vec4 computeLighting(
 		specular_amount = pow(clamp(dot(reflect(-light_dir, normal_map), camera_dir), 0.0, 1.0), shininess);
 	}
 
-	vec3 diffuse = originalColor.rgb * LambertTerm * lightIntensity;	
+	vec3 diffuse = originalColor.rgb * LambertTerm * lightIntensity;
 	vec3 specular_color = specular.rgb * specular_amount * specular_intensity * length(diffuse);
 
 	vec4 color = vec4(0.0);
