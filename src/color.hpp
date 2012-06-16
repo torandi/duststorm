@@ -2,6 +2,7 @@
 #define COLOR_H
 
 #include <cstdio>
+#include <glm/glm.hpp>
 
 class Color {
 public:
@@ -13,6 +14,20 @@ public:
 
 	}
 	Color(const Color& color)
+		: r(color.r)
+		, g(color.g)
+		, b(color.b)
+		, a(color.a){
+
+	}
+	Color(const glm::vec3& color)
+		: r(color.r)
+		, g(color.g)
+		, b(color.b)
+		, a(1.0f){
+
+	}
+	Color(const glm::vec4& color)
 		: r(color.r)
 		, g(color.g)
 		, b(color.b)
@@ -60,6 +75,14 @@ public:
 		        static_cast<unsigned int>(g / 1.0f * 0xFF),
 		        static_cast<unsigned int>(b / 1.0f * 0xFF));
 		return buffer;
+	}
+
+	glm::vec3 to_vec3() const {
+		return glm::vec3(r,g,b);
+	}
+
+	glm::vec4 to_vec4() const {
+		return glm::vec4(r,g,b,a);
 	}
 
 	static Color lerp(const Color& c1, const Color& c2, float s){
