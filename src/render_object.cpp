@@ -161,8 +161,13 @@ void RenderObject::pre_render() {
 				mtl_data.attr.shininess *= strength;
 		} else {
 			mtl_data.attr.shininess = 0.0f;
+		}
+
+		if ( mtl_data.attr.shininess < 0.001 ){ /* arbitrary small value */
+			mtl_data.attr.shininess = 0.001; /* in glsl pow(x,0) is undefined */
 			mtl_data.attr.specular = glm::vec4(0.f, 0.f, 0.f, 0.f);
 		}
+
 		max = 1;
 		int two_sided;
 		if((AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_TWOSIDED, &two_sided, &max)) && two_sided)
