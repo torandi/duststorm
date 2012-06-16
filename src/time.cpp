@@ -48,13 +48,16 @@ int Time::current_scale() const {
 }
 
 void Time::toggle_pause(){
-	scale = paused ? 100 : 0;
-	paused = !paused;
+	set_paused(!paused);
 }
 
 void Time::set_paused(bool state){
 	paused = state;
-	scale = paused ? 0 : 100;
+	if ( paused ){
+		scale = 0;
+	} else if ( scale == 0 ){
+		scale = 100;
+	}
 }
 
 float Time::get() const {
