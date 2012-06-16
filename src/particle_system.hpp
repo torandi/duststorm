@@ -61,7 +61,14 @@ class ParticleSystem : public MovableObject {
 		} config __attribute__ ((aligned (16)));
 
 		float avg_spawn_rate; //Number of particles to spawn per second
-		float spawn_rate_var; 
+		float spawn_rate_var;
+
+		struct vertex_t {
+			glm::vec4 position;
+			glm::vec4 color;
+			float scale;
+			int texture_index;
+		} __attribute__ ((aligned (16)));
 
 		virtual void callback_position(const glm::vec3 &position);
 
@@ -93,13 +100,6 @@ class ParticleSystem : public MovableObject {
 			float org_ttl;
 			int dead;
 		} __attribute__ ((aligned (16))) ;
-
-		struct vertex_t {
-			glm::vec4 position;
-			glm::vec4 color;
-			float scale;
-			int texture_index;
-		} __attribute__ ((aligned (16)));
 
 		TextureArray* texture_;
 };
