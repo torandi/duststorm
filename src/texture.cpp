@@ -171,6 +171,10 @@ void Texture2D::texture_unbind() const {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+const GLint Texture2D::gl_texture() const {
+	return _texture;
+}
+
 TextureCubemap* TextureCubemap::from_filename(
 	const std::string& px, const std::string& nx,
 	const std::string& py, const std::string& ny,
@@ -300,4 +304,84 @@ void TextureArray::texture_bind() const {
 
 void TextureArray::texture_unbind() const {
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+}
+
+/*
+ * 3D texture
+ */
+
+Texture3D* Texture3D::from_filename(const char* filename, ...){
+	std::vector<std::string> paths;
+	va_list ap;
+	va_start(ap, filename);
+	while ( filename ){
+		paths.push_back(filename);
+		filename = va_arg(ap, const char*);
+	}
+	va_end(ap);
+
+	return new Texture3D(paths);
+}
+
+Texture3D* Texture3D::from_filename(const std::vector<std::string>& paths) {
+	return new Texture3D(paths);
+}
+
+Texture3D::Texture3D(std::vector<std::string> path)
+	: TextureBase()
+	, _texture(0) 
+	, _depth(path.size()) {
+
+	if ( path.size() == 0 ){
+		fprintf(stderr, "Texture3D must have at least one image, got 0.\n");
+		path.push_back("default.jpg");
+		_depth++;
+	}
+
+	/* hack to get size */
+	{
+		SDL_Surface* surface = load_image(path[0], &size);
+		SDL_FreeSurface(surface);
+	}
+
+	fprintf(verbose, "Creating Texture3D with %zd images at %dx%d\n", path.size(), size.x, size.y);
+
+	glGenTextures(1, &_texture);
+	glBindTexture(GL_TEXTURE_3D, _texture);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, size.x, size.y, depth(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+	int n = 0;
+	for ( const std::string& filename: path) {
+		glm::ivec2 cur_size;
+		SDL_Surface* surface = load_image(filename, &cur_size);
+		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, n++, cur_size.x, cur_size.y, 1, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+		SDL_FreeSurface(surface);
+	}
+
+	glBindTexture(GL_TEXTURE_3D, 0);
+}
+
+Texture3D::~Texture3D(){
+	glDeleteTextures(1, &_texture);
+}
+
+const int Texture3D::depth() const {
+	return _depth;
+}
+
+void Texture3D::texture_bind() const {
+	glBindTexture(GL_TEXTURE_3D, _texture);
+}
+
+void Texture3D::texture_unbind() const {
+	glBindTexture(GL_TEXTURE_3D, 0);
+}
+
+const GLint Texture3D::gl_texture() const {
+	return _texture;
 }

@@ -43,6 +43,8 @@ public:
 	 */
 	static Texture2D* default_texture();
 
+	const GLint gl_texture() const;
+
 	virtual void texture_bind() const;
 	virtual void texture_unbind() const;
 
@@ -51,6 +53,27 @@ private:
 
 	GLuint _texture;
 	size_t _mipmap_count;
+};
+
+class Texture3D: public TextureBase {
+public:
+
+	virtual ~Texture3D();
+
+	static Texture3D * from_filename(const char* filename, ...) __attribute__((sentinel));
+	static Texture3D * from_filename(const std::vector<std::string>& paths);
+
+	const GLint gl_texture() const;
+
+	virtual void texture_bind() const;
+	virtual void texture_unbind() const;
+
+	const int depth() const;
+private:
+	Texture3D(std::vector<std::string> path);
+
+	GLuint _texture;
+	int _depth;
 };
 
 class TextureCubemap: public TextureBase {
