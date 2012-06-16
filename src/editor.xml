@@ -226,8 +226,20 @@
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Use light B</property>
                                 <property name="use_underline">True</property>
-                                <property name="active">True</property>
                                 <signal name="toggled" handler="light_b_toggle" swapped="no"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkRadioMenuItem" id="radiomenuitem9">
+                                <property name="use_action_appearance">False</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Show shaded</property>
+                                <property name="use_underline">True</property>
+                                <property name="active">True</property>
+                                <property name="draw_as_radio">True</property>
+                                <property name="group">modelview_show</property>
+                                <signal name="toggled" handler="show_shaded" swapped="no"/>
                               </object>
                             </child>
                             <child>
@@ -237,7 +249,6 @@
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Show texture</property>
                                 <property name="use_underline">True</property>
-                                <property name="active">True</property>
                                 <property name="draw_as_radio">True</property>
                                 <signal name="toggled" handler="show_texture" swapped="no"/>
                               </object>

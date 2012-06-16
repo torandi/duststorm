@@ -38,6 +38,7 @@ static struct {
 	RenderObject* model;
 	struct uniform use_light_a;
 	struct uniform use_light_b;
+	struct uniform show_shaded;
 	struct uniform show_texture;
 	struct uniform show_uv;
 	struct uniform show_normal;
@@ -87,6 +88,7 @@ static void render_model(){
 	shaders[SHADER_MODELVIEWER]->bind();
 	upload(modelview.use_light_a);
 	upload(modelview.use_light_b);
+	upload(modelview.show_shaded);
 	upload(modelview.show_texture);
 	upload(modelview.show_uv);
 	upload(modelview.show_normal);
@@ -94,6 +96,8 @@ static void render_model(){
 	upload(modelview.show_tangent);
 	upload(modelview.show_bitangent);
 	upload(modelview.show_color);
+	upload(modelview.show_diffuse);
+	upload(modelview.show_specular);
 
 	frame->clear(Color::white);
 	Shader::upload_lights(lights);
@@ -114,6 +118,18 @@ extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data)
 	aspect = (float)w / (float)h;
 
 	gtk_widget_queue_resize(drawing);
+}
+
+extern "C" G_MODULE_EXPORT void light_a_toggle(GtkWidget* widget, gpointer data){
+	modelview.use_light_a.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));;
+}
+
+extern "C" G_MODULE_EXPORT void light_b_toggle(GtkWidget* widget, gpointer data){
+	modelview.use_light_b.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));;
+}
+
+extern "C" G_MODULE_EXPORT void show_shaded(GtkWidget* widget, gpointer data){
+	modelview.show_shaded.value = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM(widget));;
 }
 
 extern "C" G_MODULE_EXPORT void show_texture(GtkWidget* widget, gpointer data){
@@ -270,17 +286,18 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
 	/* initialize modelviewer */
 	Shader* s = shaders[SHADER_MODELVIEWER];
 	modelview.model = nullptr;
-	modelview.use_light_a    = {s->uniform_location("use_light_a"), true};
-	modelview.use_light_b    = {s->uniform_location("use_light_b"), true};
-	modelview.show_texture   = {s->uniform_location("show_texture"), true};
+	modelview.use_light_a    = {s->uniform_location("use_light[0]"), true};
+	modelview.use_light_b    = {s->uniform_location("use_light[1]"), false};
+	modelview.show_shaded    = {s->uniform_location("show_shaded"), true};
+	modelview.show_texture   = {s->uniform_location("show_texture"), false};
 	modelview.show_uv        = {s->uniform_location("show_uv"), false};
 	modelview.show_normal    = {s->uniform_location("show_normal"), false};
 	modelview.show_normalmap = {s->uniform_location("show_normalmap"), false};
 	modelview.show_tangent   = {s->uniform_location("show_tangent"), false};
 	modelview.show_bitangent = {s->uniform_location("show_bitangent"), false};
 	modelview.show_color     = {s->uniform_location("show_color"), false};
-	modelview.show_diffuse   = {s->uniform_location("show_diffuse"), false};
-	modelview.show_specular  = {s->uniform_location("show_specular"), false};
+	modelview.show_diffuse   = {s->uniform_location("show_diffuse"), true};
+	modelview.show_specular  = {s->uniform_location("show_specular"), true};
 
   gtk_widget_end_gl (widget, FALSE);
   return TRUE;
@@ -307,15 +324,15 @@ extern "C" G_MODULE_EXPORT void drawingarea_realize_cb(GtkWidget* widget, gpoint
 	lights.lights[0].linear_attenuation = 0.01f;
 	lights.lights[0].quadratic_attenuation = 0.002f;
 	lights.lights[0].type = Light::POINT_LIGHT;
-	lights.lights[0].intensity = glm::vec3(0.8f);
-	lights.lights[0].position = glm::vec3(2.f, 0.2f, 1.f);
+	lights.lights[0].intensity = glm::vec3(0.7f);
+	lights.lights[0].position = glm::vec3(2.0f, 1.5f, 2.0f);
 
-	lights.lights[1].constant_attenuation = 1.0f;
-	lights.lights[1].linear_attenuation = 0.01f;
-	lights.lights[1].quadratic_attenuation = 0.002f;
+	lights.lights[1].constant_attenuation = 0.1f;
+	lights.lights[1].linear_attenuation = 0.1f;
+	lights.lights[1].quadratic_attenuation = 0.0f;
 	lights.lights[1].type = Light::POINT_LIGHT;
-	lights.lights[1].intensity = glm::vec3(0.4f, 0.8f, 0.8f);
-	lights.lights[1].position = glm::vec3(-2.f, 1.f, 1.f);
+	lights.lights[1].intensity = glm::vec3(0.3f, 0.3f, 0.9f);
+	lights.lights[1].position = glm::vec3(-2.0f, 1.3f, 4.0f);
 
   gtk_widget_end_gl(widget, FALSE);
   gtk_widget_queue_resize(widget);
