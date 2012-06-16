@@ -10,6 +10,7 @@
 #include <fstream>
 
 extern FILE* verbose; /* because globals.hpp fails due to libX11 containing Time which collides with our Time class */
+std::map<const char *, cl::Program> CL::cache;
 
 CL::CL() {
 	cl_int err;
@@ -88,6 +89,11 @@ CL::CL() {
 }
 
 cl::Program CL::create_program(const char * source_file) const{
+	auto it = cache.find(source_file);
+	if(it != cache.end()) {
+		return it->second;
+	}
+
 	std::ifstream file(source_file);
 	if(file.fail()) {
 		fprintf(stderr, "[OpenCL] Failed to open program %s\n", source_file);
@@ -127,6 +133,8 @@ cl::Program CL::create_program(const char * source_file) const{
 		fprintf(stderr, "[OpenCL] Failed to build program: %s\n", errorString(err));
 		abort();
 	}
+
+	cache[source_file] = program;
 
 	return program;
 }

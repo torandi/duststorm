@@ -48,9 +48,6 @@ typedef struct config_t {
 	float avg_rotation_speed;
 	float rotation_speed_var;
 
-	float avg_spawn_delay;
-	float spawn_delay_var;
-
 	int num_textures;
 	int max_num_particles;
 
@@ -114,7 +111,6 @@ void update_particle (
 		//Dead!
 		vertex->color.w = 0.0;
 		particle->dead = 1;
-		particle->ttl = -(config->avg_spawn_delay + random1(config->spawn_delay_var, true));
 	}
 }
 
@@ -156,7 +152,7 @@ __kernel void run_particles (
 														 __global particle_t * particles, 
 														 __constant config_t * config, 
 														 __global const float * rnd,
-														 int particle_limit,
+														 __global int * to_spawn, //Number of particles left to spawn, use atomic operations!
 														 float dt,
 														 uint time
 														 )
@@ -166,11 +162,9 @@ __kernel void run_particles (
 	if(particles[id].dead == 0) {
 		//It lives
 		update_particle(&vertices[id], &particles[id], config, rnd, dt, &time, id);
-	} else if(id < particle_limit && particles[id].ttl > 0) {
+	} else if ( to_spawn[0] > 0 && atomic_dec(&to_spawn[0]) > 0 ) {
 		//Respawn!
 		respawn_particle(&vertices[id], &particles[id], config, rnd, dt, &time, id);
-	} else if(id < particle_limit) {
-		particles[id].ttl += dt;
 	}
 }
 

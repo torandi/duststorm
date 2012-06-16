@@ -19,6 +19,7 @@
 #include "texture.hpp"
 
 #include <vector>
+#include <map>
 
 class CL {
    public:
@@ -40,12 +41,14 @@ class CL {
 
       static const char * errorString(cl_int error);
 
-		static void waitForEvent(const std::vector<cl::Event> &events);
+			static void waitForEvent(const std::vector<cl::Event> &events);
 
       cl::CommandQueue &queue();
       cl::Context  &context();
 
    private:
+
+			static std::map<const char *, cl::Program> cache;
 
       cl::Context context_;
 

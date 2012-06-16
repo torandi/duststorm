@@ -10,18 +10,12 @@
 class ParticleSystem : public MovableObject {
 	public:
 
-		/**
-		 * Creates a particle system with max_num_particles (the actual number can be decreased later)
-		 * the particles are initialy spawned with 0..start_delay s delay
-		 */
-		ParticleSystem(const int max_num_particles, TextureArray* texture, float start_delay=5.f);
+		ParticleSystem(const int max_num_particles, TextureArray* texture);
 		~ParticleSystem();
 
 		void update(float dt);
 		void render();
 
-		//Limit the spawing of particles
-		void limit_particles(int limit);
 		void update_config();
 
 		//Change values in this struct and call update_config() to update
@@ -59,13 +53,13 @@ class ParticleSystem : public MovableObject {
 			float avg_rotation_speed;
 			float rotation_speed_var;
 
-			float avg_spawn_delay;
-			float spawn_delay_var;
-
 			//These two should not be manually changed!
 			int num_textures;
 			int max_num_particles;
 		} config __attribute__ ((aligned (16)));
+
+		float avg_spawn_rate; //Number of particles to spawn per second
+		float spawn_rate_var; 
 
 		virtual void callback_position(const glm::vec3 &position);
 
@@ -79,7 +73,7 @@ class ParticleSystem : public MovableObject {
 		// Both are set in the opencl-kernel
 		GLuint gl_buffer_;
 		std::vector<cl::Memory> cl_gl_buffers_;
-		cl::Buffer particles_, config_, random_;
+		cl::Buffer particles_, config_, random_, spawn_rate_;
 
 		cl::Program program_;
 		cl::Kernel kernel_;

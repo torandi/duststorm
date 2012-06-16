@@ -21,7 +21,7 @@ public:
 		, v("scene/tv_cam1.txt")
 		, skybox("skydark")
 		, fire(2000,  TextureArray::from_filename("fire1.png", "fire2.png", "fire3.png", nullptr))
-		, smoke(2000, TextureArray::from_filename("fog.png", nullptr), 20)
+		, smoke(2000, TextureArray::from_filename("fog.png", nullptr))
 		, int_test(42)
 		, vec3_test(1.0f, 2,3)
 		, clear_color(Color::green) {
@@ -41,7 +41,7 @@ public:
 		lights.lights[1].set_position(glm::vec3(-2.f, 1.f, 1.f));
 		lights.lights[1].intensity = glm::vec3(0.4f, 0.8f, 0.8f);
 		lights.lights[1].type = Light::POINT_LIGHT;
-
+/*
 		//Fire configuration:
 		fire.config.spawn_position = glm::vec4(0.f, 0.f, 0.f, 1.f);
 		fire.config.spawn_area = glm::vec4(0.4f, 0.f, 0.4f, 0.f);
@@ -87,6 +87,7 @@ public:
 		smoke.config.death_color = glm::vec4(0.8 ,0.8, 0.8, 0.f);
 		smoke.config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
 		smoke.update_config();
+		*/
 	}
 
 	virtual bool meta_set(const std::string& key, const std::string& value){
@@ -101,24 +102,27 @@ public:
 		{
 			skybox.render(camera);
 		}
+		
 		Shader::upload_camera(camera);
 		shaders[SHADER_NORMAL]->bind();
 		{
 			tv_test.render();
 			tv_room.render();
 		}
+		/*
 		shaders[SHADER_PARTICLES]->bind();
 		{
 			smoke.render();
 			fire.render();
 		}
+		*/
 		Shader::unbind();
 	}
 
 	virtual void update(float t, float dt){
 		camera.set_position(v.at(t));
-		fire.update(dt);
-		smoke.update(dt);
+		//fire.update(dt);
+		//smoke.update(dt);
 	}
 
 	RenderObject tv_test;
