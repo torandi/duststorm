@@ -19,6 +19,7 @@
 static bool initialized = false;
 static float aspect = 16.0f / 9.0f;
 static Camera camera(60.f, 1.0f, 0.1f, 100.0f);
+static Shader::lights_data_t lights;
 static glm::vec2 track_ref;
 static glm::vec2 track_angle(0.0f, M_PI*0.5);
 static float track_distance = 1.0f;
@@ -81,6 +82,7 @@ static void render_scene(){
 }
 
 static void render_model(){
+
 	frame->bind();
 	shaders[SHADER_MODELVIEWER]->bind();
 	upload(modelview.use_light_a);
@@ -94,6 +96,8 @@ static void render_model(){
 	upload(modelview.show_color);
 
 	frame->clear(Color::white);
+	Shader::upload_lights(lights);
+	Shader::upload_camera(camera);
 	Shader::upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
 	modelview.model->render();
 
@@ -295,6 +299,23 @@ extern "C" G_MODULE_EXPORT void drawingarea_realize_cb(GtkWidget* widget, gpoint
 	Engine::load_shaders();
 	delete opencl;
 	opencl = new CL();
+
+	lights.ambient_intensity = glm::vec3(0.0f);
+	lights.num_lights = 2;
+
+	lights.lights[0].constant_attenuation = 1.0f;
+	lights.lights[0].linear_attenuation = 0.01f;
+	lights.lights[0].quadratic_attenuation = 0.002f;
+	lights.lights[0].type = Light::POINT_LIGHT;
+	lights.lights[0].intensity = glm::vec3(0.8f);
+	lights.lights[0].position = glm::vec3(2.f, 0.2f, 1.f);
+
+	lights.lights[1].constant_attenuation = 1.0f;
+	lights.lights[1].linear_attenuation = 0.01f;
+	lights.lights[1].quadratic_attenuation = 0.002f;
+	lights.lights[1].type = Light::POINT_LIGHT;
+	lights.lights[1].intensity = glm::vec3(0.4f, 0.8f, 0.8f);
+	lights.lights[1].position = glm::vec3(-2.f, 1.f, 1.f);
 
   gtk_widget_end_gl(widget, FALSE);
   gtk_widget_queue_resize(widget);
