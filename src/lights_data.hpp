@@ -10,7 +10,7 @@ public:
 	LightsData();
 	~LightsData();
 
-	MovableLight *lights[MAX_NUM_LIGHTS];
+	MovableLight lights[MAX_NUM_LIGHTS];
 
 	glm::vec3 &ambient_intensity() { return data_.ambient_intensity; };
 	int &num_lights() { return data_.num_lights; };

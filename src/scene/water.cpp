@@ -35,9 +35,9 @@ public:
 
 		lights.ambient_intensity() = glm::vec3(0.05f);
 		lights.num_lights() = 1;
-		lights.lights[0]->set_position(glm::vec3(5, 0.8f, 6.f));
-		lights.lights[0]->intensity = glm::vec3(0.8f);
-		lights.lights[0]->type = Light::POINT_LIGHT;
+		lights.lights[0].set_position(glm::vec3(5, 0.8f, 6.f));
+		lights.lights[0].intensity = glm::vec3(0.8f);
+		lights.lights[0].type = Light::POINT_LIGHT;
 
 		water->texture_bind();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -54,8 +54,8 @@ public:
 		wave2 = glm::vec2(0.005, 0.03);
 
 		cube.set_scale(0.1f);
-		cube.set_position(lights.lights[0]->position());
-		cube.add_position_callback(lights.lights[0]);
+		cube.set_position(lights.lights[0].position());
+		cube.add_position_callback(&lights.lights[0]);
 
 		ctrl = &camera;
 	}
