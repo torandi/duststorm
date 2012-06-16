@@ -45,7 +45,7 @@ void main() {
 			dot(tmp, normalize(mul_bitangent)),
 			dot(tmp, normalize(mul_normal)));
 
-		vec3 normal_map = vec3(0.0, 0.0, 1.0);
+		vec3 normal_map = normalize(t2.xyz * 2.0 - 1.0);
 
 		vec4 lit = vec4(0,0,0,1);
 		ocolor = t1;
