@@ -37,6 +37,11 @@ public:
 	virtual void render();
 
 	/**
+	 * Render all scene geometry seen from camera.
+	 */
+	virtual void render_geometry(const Camera& camera) = 0;
+
+	/**
 	 * Update scene if active.
 	 * Do not override.
 	 */

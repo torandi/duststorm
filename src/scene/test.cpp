@@ -14,6 +14,10 @@ public:
 
 	}
 
+	virtual void render_geometry(const Camera& cam){
+
+	}
+
 	virtual void render(){
 		clear(Color::blue);
 	}

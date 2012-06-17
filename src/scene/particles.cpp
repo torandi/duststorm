@@ -57,17 +57,17 @@ public:
 			smoke.update_config();
 	}
 
+	virtual void render_geometry(const Camera& cam){
+		Shader::upload_camera(camera);
+		shaders[SHADER_PARTICLES]->bind();
+		smoke.render();
+		fire.render();
+	}
+
 	virtual void render(){
 		clear(Color::black);
-		Shader::upload_camera(camera);
-
-		shaders[SHADER_PARTICLES]->bind();
-		{
-			smoke.render();
-			fire.render();
-		}
-		shaders[SHADER_PARTICLES]->unbind();
-
+		render_geometry(camera);
+		Shader::unbind();
 	}
 
 	virtual void update(float t, float dt){

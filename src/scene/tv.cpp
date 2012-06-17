@@ -94,21 +94,25 @@ public:
 		return false;
 	}
 
-	virtual void render(){
-		clear(clear_color);
-
+	virtual void render_geometry(const Camera& cam){
 		Shader::upload_lights(lights);
 		shaders[SHADER_SKYBOX]->bind();
 		{
 			skybox.render(camera);
 		}
-		
+
 		Shader::upload_camera(camera);
 		shaders[SHADER_NORMAL]->bind();
-		{
-			tv_test.render();
-			tv_room.render();
-		}
+
+		tv_test.render();
+		tv_room.render();
+	}
+
+	virtual void render(){
+		clear(clear_color);
+
+		render_geometry(camera);
+
 		/*
 		shaders[SHADER_PARTICLES]->bind();
 		{

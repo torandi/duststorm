@@ -46,18 +46,21 @@ public:
 		return false;
 	}
 
-	virtual void render(){
-		clear(Color::white);
-
+	virtual void render_geometry(const Camera& cam){
 		Shader::upload_lights(lights);
-		shaders[SHADER_SKYBOX]->bind();
-		skybox.render(camera);
 
-		Shader::upload_camera(camera);
+		shaders[SHADER_SKYBOX]->bind();
+		skybox.render(cam);
+
 		shaders[SHADER_NORMAL]->bind();
+		Shader::upload_camera(cam);
 		tunnel.render();
 		logo.render();
+	}
 
+	virtual void render(){
+		clear(Color::white);
+		render_geometry(camera);
 		Shader::unbind();
 	}
 

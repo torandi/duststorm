@@ -60,15 +60,13 @@ public:
 		ctrl = &camera;
 	}
 
-	virtual void render(){
-		clear(Color::black);
-
+	virtual void render_geometry(const Camera& cam){
 		Shader::upload_lights(lights);
 
 		//shaders[SHADER_SKYBOX]->bind();
 		//skybox.render(camera);
 
-		Shader::upload_camera(camera);
+		Shader::upload_camera(cam);
 
 		shaders[SHADER_PASSTHRU]->bind();
 		{
@@ -87,11 +85,16 @@ public:
 			glUniform2fv(u_wave2, 1, glm::value_ptr(wave2));
 			quad.render();
 		}
-		Shader::unbind();
 
 		skybox.texture->texture_bind();
 		glActiveTexture(GL_TEXTURE0);
 		water->texture_unbind();
+	}
+
+	virtual void render(){
+		clear(Color::black);
+		render_geometry(camera);
+		Shader::unbind();
 	}
 
 	virtual void update(float t, float dt) {
