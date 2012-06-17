@@ -46,6 +46,8 @@ namespace Engine {
 	void load_timetable(const std::string& filename){
 		int ret;
 		const char* tablename = filename.c_str();
+		fprintf(verbose, "Loading timetable from `%s'\n", tablename);
+
 		auto func = [](const std::string& name, float begin, float end){
 			RenderTarget* target = rendertarget_by_name("scene:" + name);
 			Scene* scene = nullptr;
