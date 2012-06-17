@@ -8,9 +8,12 @@
 #include "cl.hpp"
 #include <vector>
 #include <fstream>
+#include <sstream>
+
+#define PP_INCLUDE "#include"
 
 extern FILE* verbose; /* because globals.hpp fails due to libX11 containing Time which collides with our Time class */
-std::map<const char *, cl::Program> CL::cache;
+std::map<std::string, cl::Program> CL::cache;
 
 CL::CL() {
 	cl_int err;
@@ -88,27 +91,76 @@ CL::CL() {
 	}
 }
 
-cl::Program CL::create_program(const char * source_file) const{
+void CL::load_file(const std::string &filename, std::stringstream &data, const std::string &included_from) {
+	std::ifstream file(filename.c_str());
+	if(file.fail()) {
+		if(included_from.empty())
+			fprintf(stderr, "[OpenCL] Kernel preprocessor error: File %s not found\n", filename.c_str());
+		else
+			fprintf(stderr, "[OpenCL] Kernel preprocessor error: File %s not found (included from %s)\n", filename.c_str(), included_from.c_str());
+		abort();
+	}
+	data << file.rdbuf();
+	file.close();
+	fprintf(verbose, "[OpenCL] Loaded %s\n", filename.c_str());
+}
+
+std::string CL::parse_file(
+		const std::string &filename,
+		std::set<std::string> included_files,
+		const std::string &included_from
+	) {
+
+	std::pair<std::set<std::string>::iterator, bool> ret = included_files.insert(filename);
+	if(ret.second == false) {
+		fprintf(stderr, "[OpenCL] Kernel preprocessor error: Found include loop when including %s from %s\n", filename.c_str(), included_from.c_str());
+		abort();
+	}
+
+	std::stringstream raw_content, parsed_content;
+
+	load_file(filename, raw_content, included_from);
+
+	int linenr = 0;
+	char buffer[2048];
+	while(!raw_content.eof()) {
+		++linenr;
+		raw_content.getline(buffer, 2048);
+		std::string line(buffer);
+		if(line.find(PP_INCLUDE) == 0) {
+			line = line.substr(line.find_first_not_of(" ", strlen(PP_INCLUDE)));
+
+			size_t first_quote = line.find_first_of('"');
+			if(first_quote != std::string::npos) {
+				size_t end_quote = line.find_last_of('"');
+				if(end_quote == std::string::npos || end_quote == first_quote) {
+					fprintf(stderr, "%s\n[OpenCL] Kernel preprocessor error in %s:%d: Missing closing quote for #include command\n", buffer, filename.c_str(),  linenr);
+					abort();
+				}
+				//Trim quotes
+				line = line.substr(first_quote+1, (end_quote - first_quote)-1);
+			}
+
+			//Include the file:
+			char loc[256];
+			sprintf(loc, "%s:%d", filename.c_str(), linenr);
+			parsed_content << parse_file(PATH_OPENCL+line, included_files, std::string(loc));
+		} else {
+			parsed_content << line << std::endl;
+		}
+	}
+	return parsed_content.str();
+}
+
+cl::Program CL::create_program(const std::string &source_file) const{
 	auto it = cache.find(source_file);
 	if(it != cache.end()) {
 		return it->second;
 	}
 
-	std::ifstream file(source_file);
-	if(file.fail()) {
-		fprintf(stderr, "[OpenCL] Failed to open program %s\n", source_file);
-		abort();
-	}
+	fprintf(verbose, "Building CL program %s\n", source_file.c_str());
 
-	fprintf(verbose, "Building CL program %s\n", source_file);
-
-	std::string src = "";
-	char buffer[2048];
-	while(!file.eof()) {
-		file.getline(buffer, 2048);
-		src += std::string(buffer)+"\n";
-	}
-	file.close();
+	std::string src = parse_file(PATH_OPENCL+source_file, std::set<std::string>(), "");
 
 	cl_int err;
 	cl::Program::Sources source(1, std::make_pair(src.c_str(), src.size()));
@@ -130,6 +182,8 @@ cl::Program CL::create_program(const char * source_file) const{
 	}
 
 	if(err != CL_SUCCESS) {
+		printf("%s\n", src.c_str());
+
 		fprintf(stderr, "[OpenCL] Failed to build program: %s\n", errorString(err));
 		abort();
 	}

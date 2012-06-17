@@ -19,7 +19,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	,	max_num_particles_(max_num_particles)
 	,	texture_(texture) {
 
-	program_ = opencl->create_program(PATH_OPENCL "particles.cl");
+	program_ = opencl->create_program("particles.cl");
 	kernel_  = opencl->load_kernel(program_, "run_particles");
 
 	//Empty vec4s:
