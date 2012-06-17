@@ -148,8 +148,8 @@ Texture2D::Texture2D(const std::string& filename, unsigned int num_mipmap_levels
 
 	glGenTextures(1, &_texture);
 	glBindTexture(GL_TEXTURE_2D, _texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
@@ -329,7 +329,7 @@ Texture3D* Texture3D::from_filename(const std::vector<std::string>& paths) {
 
 Texture3D::Texture3D(std::vector<std::string> path)
 	: TextureBase()
-	, _texture(0) 
+	, _texture(0)
 	, _depth(path.size()) {
 
 	if ( path.size() == 0 ){
