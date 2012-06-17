@@ -36,6 +36,7 @@ enum shader_t {
 	SHADER_DISTORT,                        /* distorts the view by offsetting UV */
 	SHADER_BLUR,                           /* gaussian blur */
 	SHADER_FILMGRAIN,                      /* slightly random offsets + noise */
+	SHADER_BLEND,                          /* mixes texture unit 1-4 using unit 5 */
 
 	NUM_SHADERS
 };
