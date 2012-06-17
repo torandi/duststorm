@@ -1,17 +1,16 @@
-float random(uint *time, uint id, __global const float * rnd, int max_num_particles) {
-	int i = (int)((*time)+id) % max_num_particles;
-	float r = rnd[i];
+float random(uint *time, const uint id, __global const float * const rnd, const int max_num_particles) {
+	float r = rnd[(int)((*time)+id) % max_num_particles];
 	//Change time to not get same value next call:
 	*time += (uint)floor(rnd[*time%max_num_particles]*1000.0);
 	return r;
 }
 
 //Set dual to true to get a number in range -m..m (otherwise 0..m)
-float _random1(float m, bool dual, uint *time, uint id, __global const float * rnd, int max_num_particles) {
+float _random1(const float m, const bool dual, uint *time, const uint id, __global const float * const rnd, const int max_num_particles) {
 	return random(time, id, rnd, max_num_particles)*m*(1+dual) - m*dual;
 }
 
-float4 _random4(float4 m, bool dual, uint *time, uint id, __global const float * rnd, int max_num_particles) {
+float4 _random4(const float4 m, const bool dual, uint *time, const uint id, __global const float * const rnd, const int max_num_particles) {
 	return (float4) (
 								 _random1(m.x, dual, time, id, rnd, max_num_particles),
 								 _random1(m.y, dual, time, id, rnd, max_num_particles),
@@ -20,7 +19,7 @@ float4 _random4(float4 m, bool dual, uint *time, uint id, __global const float *
 								 );
 }
 
-float3 _random3(float3 m, bool dual, uint *time, int id, __global const float * rnd, int max_num_particles) {
+float3 _random3(const float3 m, const bool dual, uint *time, const int id, __global const float * const rnd, const int max_num_particles) {
 	return (float3) (
 								 _random1(m.x, dual, time, id, rnd, max_num_particles),
 								 _random1(m.y, dual, time, id, rnd, max_num_particles),
