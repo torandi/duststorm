@@ -60,12 +60,6 @@ public:
 		logo.render();
 	}
 
-	virtual void render(){
-		clear(Color::white);
-		render_geometry(camera);
-		Shader::unbind();
-	}
-
 	virtual const Camera& get_current_camera(){
 		return camera;
 	}
