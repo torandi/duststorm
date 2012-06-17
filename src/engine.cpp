@@ -52,8 +52,10 @@ namespace Engine {
 
 			if ( !target ){
 				fprintf(stderr, "Timetable entry for missing scene `%s', ignored.\n", name.c_str());
+				return;
 			} else if ( !(scene=dynamic_cast<Scene*>(target)) ){
 				fprintf(stderr, "Timetable entry for RenderTarget `%s', ignored.\n", name.c_str());
+				return;
 			}
 
 			scene->add_time(begin, end);
