@@ -4,7 +4,9 @@
 
 #include "engine.hpp"
 #include "globals.hpp"
+#include "scene.hpp"
 #include "shader.hpp"
+#include "utils.hpp"
 
 static const char* shader_programs[NUM_SHADERS] = {
 	"simple",
@@ -38,6 +40,27 @@ namespace Engine {
 		Shader::initialize();
 		for(int i=0; i < NUM_SHADERS; ++i) {
 			shaders[i] = Shader::create_shader(shader_programs[i]);
+		}
+	}
+
+	void load_timetable(const std::string& filename){
+		int ret;
+		const char* tablename = filename.c_str();
+		auto func = [](const std::string& name, float begin, float end){
+			RenderTarget* target = rendertarget_by_name("scene:" + name);
+			Scene* scene = nullptr;
+
+			if ( !target ){
+				fprintf(stderr, "Timetable entry for missing scene `%s', ignored.\n", name.c_str());
+			} else if ( !(scene=dynamic_cast<Scene*>(target)) ){
+				fprintf(stderr, "Timetable entry for RenderTarget `%s', ignored.\n", name.c_str());
+			}
+
+			scene->add_time(begin, end);
+		};
+		if ( (ret=timetable_parse(tablename, func)) != 0 ){
+			fprintf(stderr, "Failed to read `%s': %s\n", tablename, strerror(ret));
+			abort();
 		}
 	}
 

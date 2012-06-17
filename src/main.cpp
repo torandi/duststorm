@@ -30,19 +30,12 @@
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
 Time global_time(per_frame);
+glm::mat4 screen_ortho;
 
 static volatile bool running = true;
 static const char* program_name;
 static bool resolution_given = false;
-
 static int frames = 0;
-static RenderTarget* composition;
-static RenderTarget* downsample[3];
-static glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
-static XYLerpTable* particle_pos = nullptr;
-static XYLerpTable* tv_pos = nullptr;
-static XYLerpTable* test_pos = nullptr;
-static std::map<std::string, Scene*> scene;
 
 static void handle_sigint(int signum){
 	if ( !running ){
@@ -59,28 +52,7 @@ static void show_fps(int signum){
 	frames = 0;
 }
 
-namespace Engine {
-	RenderTarget* rendertarget_by_name(const std::string& fullname){
-		const size_t offset = fullname.find_first_of(":");
-		if ( offset == std::string::npos ){
-			return nullptr;
-		}
-
-		const std::string prefix = fullname.substr(0, offset);
-		const std::string name   = fullname.substr(offset+1);
-
-		if ( prefix == "scene" ){
-			auto it = scene.find(name);
-			if ( it == scene.end() ) return nullptr;
-			return it->second;
-		}
-
-		return nullptr;
-	}
-}
-
 static void init(bool fullscreen){
-
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		exit(1);
@@ -113,6 +85,11 @@ static void init(bool fullscreen){
 	Engine::setup_opengl();
 	Engine::load_shaders();
 
+#ifdef ENABLE_INPUT
+	fprintf(stderr, "Input enabled\n");
+#endif
+
+
 	screen_ortho = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
 	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
@@ -124,44 +101,14 @@ static void init(bool fullscreen){
 	Texture2D::preload("default.jpg");
 	Texture2D::preload("default_normalmap.jpg");
 
-	/* Instantiate all scenes */
-	scene["Test"]     = SceneFactory::create("Test",      glm::ivec2(resolution.x, resolution.y/3));
-	scene["particle"] = SceneFactory::create("Particles", glm::ivec2(resolution.x, resolution.y));
-	//scene["TV"]       = SceneFactory::create("TV",        glm::ivec2(resolution.x/2, 2*resolution.y/3));
-	scene["TV"]       = SceneFactory::create("TV",        glm::ivec2(resolution.x, resolution.y));
-	scene["NOX"]      = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
-	scene["Water"]    = SceneFactory::create("Water",     glm::ivec2(resolution.x, resolution.y));
-
-	/* Setup timetable */
-	const char* tablename = PATH_SRC "timetable.txt";
-	auto func = [](const std::string& name, float begin, float end){
-		auto it = scene.find(name);
-		if ( it != scene.end() ){
-			it->second->add_time(begin, end);
-		} else {
-			fprintf(stderr, "Timetable entry for missing scene `%s', ignored.\n", name.c_str());
-		}
-	};
-	if ( (ret=timetable_parse(tablename, func)) != 0 ){
-		fprintf(stderr, "%s: failed to read `%s': %s\n", program_name, tablename, strerror(ret));
-	}
-	particle_pos = new XYLerpTable("scene/particles_pos.txt");
-	tv_pos       = new XYLerpTable("scene/tv_pos.txt");
-	test_pos     = new XYLerpTable("scene/test_pos.txt");
-
-	composition   = new RenderTarget(resolution,           GL_RGB8, false);
-	downsample[0] = new RenderTarget(glm::ivec2(200, 200), GL_RGB8, false, GL_LINEAR);
-	downsample[1] = new RenderTarget(glm::ivec2(100, 100), GL_RGB8, false, GL_LINEAR);
-	downsample[2] = new RenderTarget(glm::ivec2( 50,  50), GL_RGB8, false, GL_LINEAR);
+	Engine::init();
 
 	global_time.set_paused(false); /* start time */
 	checkForGLErrors("post init()");
 }
 
 static void cleanup(){
-	for ( std::pair<std::string,Scene*> p : scene ){
-		delete p.second;
-	}
+	Engine::cleanup();
 }
 
 static void poll(){
@@ -212,48 +159,10 @@ static void poll(){
 	}
 }
 
-static void render_scene(){
-	for ( std::pair<std::string,Scene*> p: scene ){
-		p.second->render_scene();
-	}
-}
-
-static void downsample_tv(){
-	RenderTarget* prev = scene["TV"];
-	for ( int i = 0; i < 3; i++ ){
-		Shader::upload_state(downsample[i]->texture_size());
-		Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
-		downsample[i]->with([prev,i](){
-			prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->texture_size());
-		});
-		prev = downsample[i];
-	}
-}
-
-static void render_composition(){
-	RenderTarget::clear(Color::black);
-	const float t = global_time.get();
-
-	Shader::upload_state(resolution);
-	Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
-	glViewport(0, 0, resolution.x, resolution.y);
-
-	scene["NOX"]->draw(shaders[SHADER_PASSTHRU], screen_pos(glm::vec2(0,0), glm::vec2(scene["NOX"]->texture_size())));
-}
-
-static void render_display(){
-	RenderTarget::clear(Color::magenta);
-	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
-	composition->draw(shaders[SHADER_PASSTHRU]);
-}
-
 static void render(){
 	checkForGLErrors("Frame begin");
 
-	render_scene();
-	downsample_tv();
-	composition->with(render_composition);
-	render_display();
+	Engine::render();
 
 	SDL_GL_SwapBuffers();
 	checkForGLErrors("Frame end");
@@ -261,9 +170,7 @@ static void render(){
 
 static void update(float dt){
 	float t = global_time.get();
-	for ( std::pair<std::string,Scene*> p: scene ){
-		p.second->update_scene(t, dt);
-	}
+	Engine::update(t, dt);
 }
 
 static void magic_stuff(){
@@ -336,10 +243,6 @@ int main(int argc, char* argv[]){
 	} else {
 		program_name = argv[0];
 	}
-
-#ifdef ENABLE_INPUT
-	printf("Input enabled\n");
-#endif
 
 	/* parse arguments */
 	int op, option_index;

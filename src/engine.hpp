@@ -5,6 +5,11 @@
 
 namespace Engine {
 
+	void init();
+	void cleanup();
+	void update(float t, float dt);
+	void render();
+
 	/**
 	 * Enable and disable settings.
 	 */
@@ -25,6 +30,11 @@ namespace Engine {
 	 * @return nullptr if not found.
 	 */
 	RenderTarget* rendertarget_by_name(const std::string& name);
+
+	/**
+	 * Load timetable from file. Uses rendertaget_by_name to locate scenes.
+	 */
+	void load_timetable(const std::string& filename);
 };
 
 #endif /* ENGINE_H */

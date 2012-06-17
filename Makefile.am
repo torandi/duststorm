@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS}
 
 noinst_LIBRARIES = libfrob.a
-bin_PROGRAMS = demo
+bin_PROGRAMS = demo nox2
 TESTS =
 
 if BUILD_EDITOR
@@ -52,7 +52,10 @@ libfrob_a_SOURCES += src/input.cpp src/input.hpp
 endif
 
 demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image
-demo_SOURCES = src/main.cpp
+demo_SOURCES = src/main.cpp src/testing.cpp
+
+nox2_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image
+nox2_SOURCES = src/main.cpp src/nox2.cpp
 
 editor_CXXFLAGS = ${AM_CXXFLAGS} $(gtk3_CFLAGS)
 editor_LDFLAGS = $(gtk3_LIBS) -Wl,--export-dynamic
