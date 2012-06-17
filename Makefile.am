@@ -58,8 +58,8 @@ nox2_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_
 nox2_SOURCES = src/main.cpp src/nox2.cpp
 
 editor_CXXFLAGS = ${AM_CXXFLAGS} $(gtk3_CFLAGS)
-editor_LDFLAGS = $(gtk3_LIBS) -Wl,--export-dynamic
-editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} -lSDL_image
+editor_LDFLAGS = -Wl,--export-dynamic
+editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} $(gtk3_LIBS) -lSDL_image
 editor_SOURCES = \
 	src/editor.cpp \
 	src/editor/classify.cpp \
