@@ -71,7 +71,7 @@ public:
 		fog.avg_spawn_rate = 50000.f;
 		fog.spawn_rate_var = 0.f;
 
-		fog.config.spawn_position = glm::vec4(-50.f, -0.8f, -30.f, 1.f);
+		fog.config.spawn_position = glm::vec4(-50.f, -1.f, -30.f, 1.f);
 	//	fog.config.spawn_position = glm::vec4(0.f, 0.f, 0.f, 1.f);
 		fog.config.spawn_area = glm::vec4(50.0f, 0.f, 60.0f, 0.0f);
 		fog.config.spawn_direction = glm::vec4(0, 0.f, 0.f, 1.f);
@@ -80,13 +80,13 @@ public:
 		fog.config.spawn_speed_var = 0.0003f;
 		fog.config.avg_ttl = 20.f;
 		fog.config.ttl_var = 10.f;
-		fog.config.avg_scale = 10.f;
+		fog.config.avg_scale = 15.f;
 		fog.config.scale_var = 5.f;
 		fog.config.avg_scale_change = 0.5f;
 		fog.config.scale_change_var = 0.1f;
 		fog.config.avg_rotation_speed = 0.02f;
 		fog.config.rotation_speed_var = 0.005f;
-		fog.config.birth_color = glm::vec4(0.3f, 0.3f, 0.3f, 0.1);
+		fog.config.birth_color = glm::vec4(0.3f, 0.3f, 0.3f, 0.05);
 		fog.config.death_color = glm::vec4(0.3f ,0.3f, 0.3f, 0.0f);
 		fog.config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
 		fog.update_config();
