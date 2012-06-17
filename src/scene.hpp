@@ -42,6 +42,11 @@ public:
 	virtual void render_geometry(const Camera& camera) = 0;
 
 	/**
+	 * Find out where the camera currently is.
+	 */
+	virtual const Camera& get_current_camera() = 0;
+
+	/**
 	 * Update scene if active.
 	 * Do not override.
 	 */

@@ -9,8 +9,9 @@
 
 class TestScene: public Scene {
 public:
-	TestScene(const glm::ivec2& size):
-		Scene(size){
+	TestScene(const glm::ivec2& size)
+		: Scene(size)
+		, camera(60, 1, 0.1, 100) {
 
 	}
 
@@ -21,6 +22,12 @@ public:
 	virtual void render(){
 		clear(Color::blue);
 	}
+
+	virtual const Camera& get_current_camera(){
+		return camera;
+	}
+
+	Camera camera;
 };
 
 REGISTER_SCENE_TYPE(TestScene, "Test", "test.meta");

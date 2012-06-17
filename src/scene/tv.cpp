@@ -108,19 +108,8 @@ public:
 		tv_room.render();
 	}
 
-	virtual void render(){
-		clear(clear_color);
-
-		render_geometry(camera);
-
-		/*
-		shaders[SHADER_PARTICLES]->bind();
-		{
-			smoke.render();
-			fire.render();
-		}
-		*/
-		Shader::unbind();
+	virtual const Camera& get_current_camera(){
+		return camera;
 	}
 
 	virtual void update(float t, float dt){

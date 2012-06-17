@@ -64,6 +64,10 @@ public:
 		Shader::unbind();
 	}
 
+	virtual const Camera& get_current_camera(){
+		return camera;
+	}
+
 	virtual void update(float t, float dt){
 		camera.set_position(v.at(t));
 	}

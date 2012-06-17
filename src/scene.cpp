@@ -27,7 +27,8 @@ void Scene::update(float t, float dt){
 }
 
 void Scene::render(){
-
+	render_geometry(get_current_camera());
+	Shader::unbind();
 }
 
 void Scene::update_scene(float t, float dt){

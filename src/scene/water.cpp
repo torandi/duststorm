@@ -97,6 +97,10 @@ public:
 		Shader::unbind();
 	}
 
+	virtual const Camera& get_current_camera(){
+		return camera;
+	}
+
 	virtual void update(float t, float dt) {
 		#ifdef ENABLE_INPUT
 			input.update_object(*ctrl, dt);
