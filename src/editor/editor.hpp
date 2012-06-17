@@ -13,6 +13,7 @@ extern Scene* scene;
 /* editor widgets */
 extern GtkWidget* drawing;
 extern GtkLabel* timelabel;
+extern GtkLabel* message;
 extern GtkToggleButton* playbutton;
 extern GtkTreeStore* scenestore;
 extern GtkTreeStore* propstore;

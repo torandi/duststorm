@@ -57,6 +57,7 @@ namespace Editor {
 		track_angle = glm::vec2(0.0f, M_PI*0.5);
 		track_distance = 1.0f;
 		Editor::camera_control = Editor::CAMERA_AUTO;
+		gtk_label_set_text(message, "");
 		camera.set_fov(60.0f);
 		camera.set_position(glm::vec3(1.f, 0.f, 0.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
@@ -255,12 +256,20 @@ extern "C" G_MODULE_EXPORT void drawingarea_button_release_event_cb(GtkWidget* w
 
 extern "C" G_MODULE_EXPORT void drawingarea_key_event_cb(GtkWidget* widget, GdkEventKey* event, gpointer data){
 	if ( Editor::mode != Editor::MODE_SCENE ) return;
-	if ( event->hardware_keycode > 255 ) return;
+	if ( event->hardware_keycode > 255 || event->is_modifier ) return;
 
 	/* Reset camera */
 	if ( event->hardware_keycode == 65 ){
 		for ( int i = 0; i < 256; i++ ) keystate[i] = false;
 		Editor::camera_control = Editor::CAMERA_AUTO;
+		gtk_label_set_text(message, "");
+		return;
+	}
+
+	/* Print camera coordinates */
+	if ( event->hardware_keycode == 36 && event->type == GDK_KEY_PRESS ){
+		fprintf(stderr, "Camera position=(%f,%f%f)\n",
+		        camera.position().x, camera.position().y, camera.position().z);
 		return;
 	}
 
@@ -268,6 +277,7 @@ extern "C" G_MODULE_EXPORT void drawingarea_key_event_cb(GtkWidget* widget, GdkE
 	if ( Editor::camera_control == Editor::CAMERA_AUTO ){
 		Editor::camera_control = Editor::CAMERA_MANUAL;
 		camera = scene->get_current_camera();
+		gtk_label_set_text(message, "Manual camera control (press SPACE to reset, ENTER to print coordinates)");
 	}
 
 	keystate[event->hardware_keycode] = event->type == GDK_KEY_PRESS;

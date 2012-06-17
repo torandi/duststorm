@@ -39,6 +39,7 @@ Scene* scene = nullptr;
 /* editor widgets */
 GtkWidget* drawing = nullptr;
 GtkLabel* timelabel = nullptr;
+GtkLabel* message = nullptr;
 GtkToggleButton* playbutton = nullptr;
 GtkTreeStore* scenestore = nullptr;
 GtkTreeStore* propstore = nullptr;
@@ -99,9 +100,18 @@ int main (int argc, char* argv[]){
 	GtkWidget* window  = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
 	drawing            = GTK_WIDGET(gtk_builder_get_object(builder, "drawingarea"));
 	timelabel          = GTK_LABEL(gtk_builder_get_object(builder, "timelabel"));
+	message            = GTK_LABEL(gtk_builder_get_object(builder, "message"));
 	playbutton         = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "play"));
 	scenestore         = GTK_TREE_STORE(gtk_builder_get_object(builder, "scenestore"));
 	propstore          = GTK_TREE_STORE(gtk_builder_get_object(builder, "propstore"));
+
+	/* style message label */
+	GdkColor color;
+	gdk_color_parse ("#000000", &color);
+	gtk_widget_modify_bg(GTK_WIDGET(gtk_builder_get_object(builder, "messagebox")), GTK_STATE_NORMAL, &color);
+	gdk_color_parse ("#ffff00", &color);
+	gtk_widget_modify_fg(GTK_WIDGET(message), GTK_STATE_NORMAL, &color);
+	gtk_label_set_text(message, "");
 
 	/* enable opengl on drawingarea */
 	int attrib[] = {
