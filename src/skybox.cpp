@@ -57,7 +57,7 @@ void Skybox::render(const Camera &camera) const{
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float)*3*36) );
 
-	glActiveTexture(GL_TEXTURE2);
+	glActiveTexture(Shader::TEXTURE_CUBEMAP_0);
 
 	texture->texture_bind();
 

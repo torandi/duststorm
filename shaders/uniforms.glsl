@@ -1,7 +1,19 @@
+uniform sampler2D texture0;
 uniform sampler2D texture1;
 uniform sampler2D texture2;
+uniform sampler2D texture3;
+uniform sampler2D texture4;
+uniform sampler2D texture5;
+uniform sampler2D texture6;
+uniform sampler2D texture7;
+uniform sampler2DArray texture_array0;
 uniform sampler2DArray texture_array1;
+uniform sampler2DArray texture_array2;
+uniform sampler2DArray texture_array3;
+uniform samplerCube texture_cube0;
 uniform samplerCube texture_cube1;
+uniform samplerCube texture_cube2;
+uniform samplerCube texture_cube3;
 
 const int maxNumberOfLights = 4;
 

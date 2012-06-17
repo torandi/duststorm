@@ -23,9 +23,9 @@ public:
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
 		, cam_pos1("scene/nox_cam1.txt")
 		, cam_pos2("scene/nox_cam2.txt")
-		, skybox("skydark") 
+		, skybox("skydark")
 		, water_quad(10.f, true, true)
-		, water_texture(Texture2D::from_filename("water.png")) 
+		, water_texture(Texture2D::from_filename("water.png"))
 		, fog(100000, TextureArray::from_filename("fog.png", nullptr))
 	{
 
@@ -107,7 +107,7 @@ public:
 
 		glActiveTexture(GL_TEXTURE0);
 		water_texture->texture_bind();
-		glActiveTexture(GL_TEXTURE2);
+		glActiveTexture(Shader::TEXTURE_CUBEMAP_0);
 		skybox.texture->texture_bind();
 
 		shaders[SHADER_WATER]->bind();

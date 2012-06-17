@@ -76,7 +76,7 @@ public:
 		Shader::upload_blank_material();
 		glActiveTexture(GL_TEXTURE0);
 		water->texture_bind();
-		glActiveTexture(GL_TEXTURE2);
+		glActiveTexture(Shader::TEXTURE_CUBEMAP_0);
 		skybox.texture->texture_bind();
 
 		shaders[SHADER_WATER]->bind();

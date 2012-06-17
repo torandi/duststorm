@@ -45,13 +45,22 @@ const char * Shader::global_uniform_names_[] = {
 };
 
 const char * Shader::local_uniform_names_[] = {
+	"texture0",
 	"texture1",
 	"texture2",
 	"texture3",
 	"texture4",
 	"texture5",
+	"texture6",
+	"texture7",
+	"texture_array0",
 	"texture_array1",
-	"texture_cube1"
+	"texture_array2",
+	"texture_array3",
+	"texture_cube0",
+	"texture_cube1",
+	"texture_cube2",
+	"texture_cube3",
 };
 
 
@@ -272,14 +281,23 @@ void Shader::init_uniforms() {
 		checkForGLErrors((std::string("load uniform ")+local_uniform_names_[i]+" from shader "+name).c_str());
 	}
 
-	/* setup samplers */
-	if ( local_uniform_locations_[UNIFORM_TEXTURE1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE1], 0);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE2] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE2], 1);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE3] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE3], 2);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE4] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE4], 3);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE5] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE5], 4);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY1], 0);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE1], 2);
+	/* setup samplers (first has unit 7 to maintain compatibility with legacy code */
+	if ( local_uniform_locations_[UNIFORM_TEXTURE0]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE0], 7);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE1]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE1], 0);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE2]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE2], 1);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE3]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE3], 2);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE4]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE4], 3);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE5]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE5], 4);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE6]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE6], 5);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE7]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE7], 6);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY0] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY0], 8);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY1], 9);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY2] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY2], 10);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY3] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY3], 11);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE0] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE0], 12);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE1], 13);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE2] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE2], 14);
+	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE3] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE3], 15);
 
 	checkForGLErrors("Upload texture locations");
 

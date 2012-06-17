@@ -256,7 +256,7 @@ void ParticleSystem::render() {
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) (2*sizeof(glm::vec4)));
 	glVertexAttribPointer(3, 1, GL_INT, GL_FALSE, sizeof(vertex_t), (GLvoid*)		(2*sizeof(glm::vec4)+sizeof(float)));
 
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(Shader::TEXTURE_ARRAY_0);
 	texture_->texture_bind();
 
 	glDepthMask(GL_FALSE);
