@@ -26,6 +26,7 @@ public:
 		, skybox("skydark") 
 		, water_quad(10.f, true, true)
 		, water_texture(Texture2D::from_filename("water.png")) 
+		, fog(100000, TextureArray::from_filename("fog.png", nullptr))
 	{
 
 		logo.set_scale(0.1f);
@@ -66,16 +67,41 @@ public:
 		lights.lights[1].set_position(glm::vec3(-2.0f, 1.0f, 0.0f));
 		lights.lights[1].intensity = glm::vec3(0.3f, 0.6f, 0.8f);
 		lights.lights[1].type = Light::POINT_LIGHT;
+
+		fog.avg_spawn_rate = 50000.f;
+		fog.spawn_rate_var = 0.f;
+
+		fog.config.spawn_position = glm::vec4(-50.f, -0.8f, -30.f, 1.f);
+	//	fog.config.spawn_position = glm::vec4(0.f, 0.f, 0.f, 1.f);
+		fog.config.spawn_area = glm::vec4(50.0f, 0.f, 60.0f, 0.0f);
+		fog.config.spawn_direction = glm::vec4(0, 0.f, 0.f, 1.f);
+		fog.config.direction_var = glm::vec4(0.3f, 0.3f, 0.3f, 0.f);
+		fog.config.avg_spawn_speed= 0.0001f;
+		fog.config.spawn_speed_var = 0.0003f;
+		fog.config.avg_ttl = 20.f;
+		fog.config.ttl_var = 10.f;
+		fog.config.avg_scale = 10.f;
+		fog.config.scale_var = 5.f;
+		fog.config.avg_scale_change = 0.5f;
+		fog.config.scale_change_var = 0.1f;
+		fog.config.avg_rotation_speed = 0.02f;
+		fog.config.rotation_speed_var = 0.005f;
+		fog.config.birth_color = glm::vec4(0.3f, 0.3f, 0.3f, 0.1);
+		fog.config.death_color = glm::vec4(0.3f ,0.3f, 0.3f, 0.0f);
+		fog.config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
+		fog.update_config();
 	}
 
 	virtual void render_geometry(const Camera& cam){
+		clear(Color::black);
 		Shader::upload_lights(lights);
 
-		shaders[SHADER_SKYBOX]->bind();
-		skybox.render(cam);
+		/*shaders[SHADER_SKYBOX]->bind();
+		skybox.render(cam);*/
 
-		shaders[SHADER_NORMAL]->bind();
 		Shader::upload_camera(cam);
+		shaders[SHADER_NORMAL]->bind();
+
 		tunnel.render();
 		logo.render();
 
@@ -94,6 +120,10 @@ public:
 		skybox.texture->texture_unbind();
 		glActiveTexture(GL_TEXTURE0);
 		water_texture->texture_unbind();
+
+		shaders[SHADER_PARTICLES]->bind();
+		fog.render();
+
 	}
 
 	virtual const Camera& get_current_camera(){
@@ -103,6 +133,8 @@ public:
 	virtual void update(float t, float dt){
 		camera.set_position(cam_pos1.at(t));
 		camera.look_at(cam_pos2.at(t));
+
+		fog.update(dt);
 	}
 
 	RenderObject tunnel;
@@ -116,7 +148,7 @@ public:
 	Texture2D* water_texture;
 	glm::vec2 wave1, wave2;
 	GLint u_wave1, u_wave2;
-	//ParticleSystem fog;
+	ParticleSystem fog;
 };
 
 template <>
