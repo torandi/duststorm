@@ -20,7 +20,8 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	,	texture_(texture) {
 
 	program_ = opencl->create_program("particles.cl");
-	kernel_  = opencl->load_kernel(program_, "run_particles");
+	run_kernel_  = opencl->load_kernel(program_, "run_particles");
+	spawn_kernel_  = opencl->load_kernel(program_, "spawn_particles");
 
 	//Empty vec4s:
 	vertex_t * empty = new vertex_t[max_num_particles];
@@ -76,16 +77,25 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	delete[] initial_particles;
 	delete[] rnd;
 
-	err = kernel_.setArg(0, cl_gl_buffers_[0]);
-	CL::check_error(err, "[ParticleSystem] Set arg 0");
-	err = kernel_.setArg(1, particles_);
-	CL::check_error(err, "[ParticleSystem] Set arg 1");
-	err = kernel_.setArg(2, config_);
-	CL::check_error(err, "[ParticleSystem] Set arg 2");
-	err = kernel_.setArg(3, random_);
-	CL::check_error(err, "[ParticleSystem] Set arg 3");
-	err = kernel_.setArg(4, spawn_rate_);
-	CL::check_error(err, "[ParticleSystem] Set arg 4");
+	err = run_kernel_.setArg(0, cl_gl_buffers_[0]);
+	CL::check_error(err, "[ParticleSystem] run: Set arg 0");
+	err = run_kernel_.setArg(1, particles_);
+	CL::check_error(err, "[ParticleSystem] run: Set arg 1");
+	err = run_kernel_.setArg(2, config_);
+	CL::check_error(err, "[ParticleSystem] run: Set arg 2");
+	err = run_kernel_.setArg(3, random_);
+	CL::check_error(err, "[ParticleSystem] run: Set arg 3");
+
+	err = spawn_kernel_.setArg(0, cl_gl_buffers_[0]);
+	CL::check_error(err, "[ParticleSystem] spawn: Set arg 0");
+	err = spawn_kernel_.setArg(1, particles_);
+	CL::check_error(err, "[ParticleSystem] spawn: Set arg 1");
+	err = spawn_kernel_.setArg(2, config_);
+	CL::check_error(err, "[ParticleSystem] spawn: Set arg 2");
+	err = spawn_kernel_.setArg(3, random_);
+	CL::check_error(err, "[ParticleSystem] spawn: Set arg 3");
+	err = spawn_kernel_.setArg(4, spawn_rate_);
+	CL::check_error(err, "[ParticleSystem] spawn: Set arg 4");
 
 	//Set default values in config:
 
@@ -156,17 +166,28 @@ void ParticleSystem::update(float dt) {
 	CL::check_error(err, "[ParticleSystem] acquire gl objects");
 
 
-	err = kernel_.setArg(5, dt);
-	CL::check_error(err, "[ParticleSystem] set dt");
-	err = kernel_.setArg(6, (int)(time(0)%UINT_MAX));
-	CL::check_error(err, "[ParticleSystem] set time");
+	err = run_kernel_.setArg(4, dt);
+	CL::check_error(err, "[ParticleSystem] run: set dt");
+	err = run_kernel_.setArg(5, (int)(time(0)%UINT_MAX));
+	CL::check_error(err, "[ParticleSystem] run: set time");
+
+	err = spawn_kernel_.setArg(5, (int)(time(0)%UINT_MAX));
+	CL::check_error(err, "[ParticleSystem] spawn: set time");
 
 	opencl->queue().flush();
 
 	lock_e.wait();
 
-	err = opencl->queue().enqueueNDRangeKernel(kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, NULL, &e);
-	CL::check_error(err, "[ParticleSystem] Execute kernel");
+	std::vector<cl::Event> queue;
+	queue.push_back(cl::Event());
+
+	err = opencl->queue().enqueueNDRangeKernel(spawn_kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, NULL, &queue[0]);
+	CL::check_error(err, "[ParticleSystem] Execute spawn_kernel");
+
+	opencl->queue().flush();
+
+	err = opencl->queue().enqueueNDRangeKernel(run_kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, &queue, &e);
+	CL::check_error(err, "[ParticleSystem] Execute run_kernel");
 
 	//render_blocking_events_.push_back(e2);
 

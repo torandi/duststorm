@@ -182,7 +182,6 @@ cl::Program CL::create_program(const std::string &source_file) const{
 	}
 
 	if(err != CL_SUCCESS) {
-		printf("%s\n", src.c_str());
 
 		fprintf(stderr, "[OpenCL] Failed to build program: %s\n", errorString(err));
 		abort();

@@ -85,7 +85,7 @@ class ParticleSystem : public MovableObject {
 		cl::Buffer particles_, config_, random_, spawn_rate_;
 
 		cl::Program program_;
-		cl::Kernel kernel_;
+		cl::Kernel run_kernel_, spawn_kernel_;
 
 		struct particle_t {
 			glm::vec4 direction;
