@@ -20,6 +20,7 @@ public:
 		: Scene(size)
 		, tunnel("nox2/tunnel.obj", false)
 		, logo("nox.obj", false)
+		, geometry(size, GL_RGB8, true)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
 		, cam_pos1("scene/nox_cam1.txt")
 		, cam_pos2("scene/nox_cam2.txt")
@@ -137,8 +138,23 @@ public:
 		fog.update(dt);
 	}
 
+	void render_scene(){
+		if ( !match ) return;
+
+		geometry.bind();
+		geometry.clear(Color::black);
+		shaders[SHADER_NORMAL]->bind();
+		Shader::upload_camera(get_current_camera());
+		tunnel.render();
+		logo.render();
+		geometry.unbind();
+
+		with(std::bind(&Scene::render, this));
+	}
+
 	RenderObject tunnel;
 	RenderObject logo;
+	RenderTarget geometry;
 	Camera camera;
 	PointTable cam_pos1;
 	PointTable cam_pos2;
