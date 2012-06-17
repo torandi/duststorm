@@ -44,10 +44,6 @@ public:
 		lights.lights[1].type = Light::POINT_LIGHT;
 	}
 
-	virtual bool meta_set(const std::string& key, const std::string& value){
-		return false;
-	}
-
 	virtual void render_geometry(const Camera& cam){
 		Shader::upload_lights(lights);
 
