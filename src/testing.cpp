@@ -36,7 +36,6 @@ static std::map<std::string, Scene*> scene;
 
 namespace Engine {
 	RenderTarget* rendertarget_by_name(const std::string& fullname){
-		printf("looking for %s\n", fullname.c_str());
 		const size_t offset = fullname.find_first_of(":");
 		if ( offset == std::string::npos ){
 			return nullptr;
