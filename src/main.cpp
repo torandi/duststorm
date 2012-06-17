@@ -52,7 +52,7 @@ static void show_fps(int signum){
 	frames = 0;
 }
 
-static void init(bool fullscreen){
+static void init(bool fullscreen, bool vsync){
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		exit(1);
@@ -66,7 +66,7 @@ static void init(bool fullscreen){
 		resolution.y = vi->current_h;
 	}
 
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
+	if(vsync) SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
 	SDL_EnableKeyRepeat(0, 0);
 	SDL_WM_SetCaption("Speed 100%", NULL);
@@ -216,6 +216,7 @@ void show_usage(){
 	       "                          current resolution in fullscreen.)\n"
 	       "  -f, --fullscreen        Enable fullscreen mode (default: false)\n"
 	       "  -w, --windowed          Inverse of --fullscreen.\n"
+				 "  -n, --no-vsync					Disable vsync\n"
 	       "  -v, --verbose           Enable verbose output\n"
 	       "  -q, --quiet             Inverse of --verbose.\n"
 	       "  -h, --help              This text\n",
@@ -223,12 +224,14 @@ void show_usage(){
 }
 
 static int fullscreen = 0;
+static int vsync = 1;
 static int verbose_flag = 0;
 
 static struct option options[] = {
 	{"resolution",   required_argument, 0, 'r'},
 	{"fullscreen",   no_argument,       &fullscreen, 1},
 	{"windowed",     no_argument,       &fullscreen, 0},
+	{"no-vsync",     no_argument,       &vsync, 0},
 	{"verbose",      no_argument,       &verbose_flag, 1},
 	{"quiet",        no_argument,       &verbose_flag, 0},
 	{"help",         no_argument,       0, 'h'},
@@ -246,7 +249,7 @@ int main(int argc, char* argv[]){
 
 	/* parse arguments */
 	int op, option_index;
-	while ( (op = getopt_long(argc, argv, "r:fwvqh", options, &option_index)) != -1 ){
+	while ( (op = getopt_long(argc, argv, "r:fwnvqh", options, &option_index)) != -1 ){
 		switch ( op ){
 		case 0:   /* long opt*/
 		case '?': /* invalid */
@@ -272,6 +275,10 @@ int main(int argc, char* argv[]){
 
 		case 'w': /* --windowed */
 			fullscreen = 0;
+			break;
+
+		case 'n': /* --no-vsync */
+			vsync = 0;
 			break;
 
 		case 'v': /* --verbose */
@@ -309,7 +316,7 @@ int main(int argc, char* argv[]){
 	}
 
 	/* let the magic begin */
-	init(fullscreen);
+	init(fullscreen, vsync);
 	magic_stuff();
 	cleanup();
 
