@@ -27,6 +27,7 @@ void Scene::update(float t, float dt){
 }
 
 void Scene::render(){
+	glClear(GL_DEPTH_BUFFER_BIT);
 	render_geometry(get_current_camera());
 	Shader::unbind();
 }
