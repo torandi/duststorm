@@ -27,7 +27,8 @@
 
 #include "light.hpp"
 
-static RenderTarget* composition;
+static RenderTarget* composition = nullptr;
+static RenderTarget* blend = nullptr;
 static std::map<std::string, Scene*> scene;
 
 namespace Engine {
@@ -51,7 +52,8 @@ namespace Engine {
 
 	void init(){
 		scene["NOX"] = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
-		composition   = new RenderTarget(resolution,           GL_RGB8, false);
+		composition = new RenderTarget(resolution,           GL_RGB8, false);
+		blend = new RenderTarget(glm::ivec2(1,1), GL_RGB8, false);
 
 		load_timetable(PATH_SRC "nox2.txt");
 	}
@@ -75,7 +77,10 @@ namespace Engine {
 		Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
 		glViewport(0, 0, resolution.x, resolution.y);
 
-		scene["NOX"]->draw(shaders[SHADER_PASSTHRU]);
+		glActiveTexture(GL_TEXTURE4);
+		blend->texture_bind();
+		glActiveTexture(GL_TEXTURE0);
+		scene["NOX"]->draw(shaders[SHADER_BLEND]);
 	}
 
 	static void render_display(){
@@ -86,7 +91,12 @@ namespace Engine {
 
 	void render(){
 		render_scene();
+
+		const float t = global_time.get();
+		const float s = glm::min(t / 2.5f + 0.2f, 1.0f);
+		blend->with([s](){ RenderTarget::clear(Color(s, 0.0f, 0.0f, 0.0f)); });
 		composition->with(render_composition);
+
 		render_display();
 	}
 
