@@ -54,7 +54,7 @@ public:
 
 	/**
 	 * Render scene onto target.
-	 * Do not override.
+	 * Usually you do not override this function.
 	 */
 	void render_scene();
 
@@ -81,6 +81,12 @@ public:
 protected:
 	float stage(float t) const;
 
+	/**
+	 * If true, the scene is currently active according to timetable and should
+	 * be rendered.
+	 */
+	bool match;
+
 private:
 	struct time {
 		float begin;
@@ -89,7 +95,6 @@ private:
 
 	std::vector<time> timetable;
 	std::vector<time>::iterator current;
-	bool match;
 };
 
 namespace SceneFactory {

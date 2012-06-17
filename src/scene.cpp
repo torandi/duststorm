@@ -7,8 +7,8 @@
 
 Scene::Scene(const glm::ivec2& size, GLenum format)
 	: RenderTarget(size, format, true)
-	, current(timetable.end())
-	, match(false) {
+	, match(false)
+	, current(timetable.end()){
 }
 
 Scene::~Scene(){
