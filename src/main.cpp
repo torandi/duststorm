@@ -129,6 +129,7 @@ static void init(bool fullscreen){
 	scene["particle"] = SceneFactory::create("Particles", glm::ivec2(resolution.x, resolution.y));
 	//scene["TV"]       = SceneFactory::create("TV",        glm::ivec2(resolution.x/2, 2*resolution.y/3));
 	scene["TV"]       = SceneFactory::create("TV",        glm::ivec2(resolution.x, resolution.y));
+	scene["NOX"]      = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
 	scene["Water"]    = SceneFactory::create("Water",     glm::ivec2(resolution.x, resolution.y));
 
 	/* Setup timetable */
@@ -237,22 +238,7 @@ static void render_composition(){
 	Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
 
-	/*glActiveTexture(GL_TEXTURE1);
-	  texture_test->bind();
-	  glActiveTexture(GL_TEXTURE0);
-
-	  scene["TV"]->draw(shaders[SHADER_DISTORT], glm::ivec2(400,0));*/
-
-	//scene["Test"    ]->draw(shaders[SHADER_PASSTHRU], screen_pos(test_pos->at(t), glm::vec2(scene["Test"]->texture_size())));
-	//scene["Water"   ]->draw(shaders[SHADER_PASSTHRU], screen_pos(glm::vec2(0,0), glm::vec2(scene["Water"]->texture_size())));
-	//scene["TV"      ]->draw(shaders[SHADER_PASSTHRU], screen_pos(glm::vec2(0,0), glm::vec2(scene["TV"]->texture_size())));
-	//scene["TV"      ]->draw(shaders[SHADER_PASSTHRU], screen_pos(tv_pos->at(t), glm::vec2(scene["TV"]->texture_size())));
-	scene["particle"]->draw(shaders[SHADER_PASSTHRU], screen_pos(glm::vec2(0,0), glm::vec2(scene["particle"]->texture_size())));
-
-	/*
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTexture(GL_TEXTURE0);*/
+	scene["NOX"]->draw(shaders[SHADER_PASSTHRU], screen_pos(glm::vec2(0,0), glm::vec2(scene["NOX"]->texture_size())));
 }
 
 static void render_display(){
