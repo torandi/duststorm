@@ -23,8 +23,8 @@ public:
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
 		, cam_pos1("scene/nox_cam1.txt")
 		, cam_pos2("scene/nox_cam2.txt")
-		, skybox("skydark") {
-		, water_quad(5.f, true, true)
+		, skybox("skydark") 
+		, water_quad(10.f, true, true)
 		, water_texture(Texture2D::from_filename("water.png")) 
 	{
 
@@ -32,12 +32,12 @@ public:
 		logo.set_rotation(glm::vec3(0,1,0), 90.0f);
 		logo.set_position(glm::vec3(-30,1,0));
 
-		camera.set_position(glm::vec3(-2.5,0.f,0.f));
+		camera.set_position(glm::vec3(13.f, 11.f, 0.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
 
-		water_quad.set_position(glm::vec3(-25.f, 0.0f, 0.f));
+		water_quad.set_position(glm::vec3(-100.f, -0.6f, -50.f));
 		water_quad.set_rotation(glm::vec3(1.f, 0, 0), 90.f);
-		water_quad.set_scale(50.f);
+		water_quad.set_scale(100.f);
 
 		water_texture->texture_bind();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
