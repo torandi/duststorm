@@ -52,6 +52,8 @@ namespace Engine {
 	void init(){
 		scene["NOX"] = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
 		composition   = new RenderTarget(resolution,           GL_RGB8, false);
+
+		load_timetable(PATH_SRC "nox2.txt");
 	}
 
 	void cleanup(){
