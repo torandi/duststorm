@@ -26,10 +26,6 @@ static glm::vec2 track_angle(0.0f, M_PI*0.5);
 static float track_distance = 1.0f;
 static glm::mat4 projection;
 static bool keystate[256] = {false, };
-static enum {
-	CAMERA_AUTO,
-	CAMERA_MANUAL,
-} camera_control = CAMERA_AUTO;
 
 struct uniform {
 	GLuint index;
@@ -60,7 +56,8 @@ namespace Editor {
 	void reset(){
 		track_angle = glm::vec2(0.0f, M_PI*0.5);
 		track_distance = 1.0f;
-		camera = Camera(60.f, 1.0f, 0.1f, 100.0f);
+		Editor::camera_control = Editor::CAMERA_AUTO;
+		camera.set_fov(60.0f);
 		camera.set_position(glm::vec3(1.f, 0.f, 0.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
 	}
@@ -82,11 +79,11 @@ static void render_placeholder(){
 static void render_scene(){
 	/* Render scene */
 	scene->bind();
-	switch ( camera_control ){
-	case CAMERA_AUTO:
+	switch ( Editor::camera_control ){
+	case Editor::CAMERA_AUTO:
 		scene->render();
 		break;
-	case CAMERA_MANUAL:
+	case Editor::CAMERA_MANUAL:
 		scene->clear(Color::white);
 		scene->render_geometry(camera);
 		Shader::unbind();
@@ -260,12 +257,21 @@ extern "C" G_MODULE_EXPORT void drawingarea_key_event_cb(GtkWidget* widget, GdkE
 	if ( Editor::mode != Editor::MODE_SCENE ) return;
 	if ( event->hardware_keycode > 255 ) return;
 
-	if ( camera_control == CAMERA_AUTO ){
-		camera_control = CAMERA_MANUAL;
+	/* Reset camera */
+	if ( event->hardware_keycode == 65 ){
+		for ( int i = 0; i < 256; i++ ) keystate[i] = false;
+		Editor::camera_control = Editor::CAMERA_AUTO;
+		return;
+	}
+
+	/* Enable manual control of camera */
+	if ( Editor::camera_control == Editor::CAMERA_AUTO ){
+		Editor::camera_control = Editor::CAMERA_MANUAL;
 		camera = scene->get_current_camera();
 	}
 
 	keystate[event->hardware_keycode] = event->type == GDK_KEY_PRESS;
+
 }
 
 extern "C" G_MODULE_EXPORT gboolean drawingarea_draw_cb(GtkWidget* widget, gpointer data){

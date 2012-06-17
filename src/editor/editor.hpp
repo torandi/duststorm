@@ -53,7 +53,13 @@ namespace Editor {
 		TYPE_MAX, /* should be last */
 	};
 
+	enum CAMERA_MODE {
+		CAMERA_AUTO,
+		CAMERA_MANUAL,
+	};
+
 	extern MODE mode;
+	extern CAMERA_MODE camera_control;
 	extern unsigned int frames;
 	extern std::string scene_name;
 

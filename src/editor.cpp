@@ -26,6 +26,7 @@ void drawingarea_update(); /* hack */
 
 namespace Editor {
 	MODE mode = MODE_BLANK;
+	CAMERA_MODE camera_control = CAMERA_AUTO;
 	unsigned int frames = 0;
 	std::string scene_name;
 }
