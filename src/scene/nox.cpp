@@ -18,7 +18,8 @@ public:
 		, tunnel("nox2/tunnel.obj", false)
 		, logo("nox.obj", false)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
-		, v("scene/nox_cam1.txt")
+		, cam_pos1("scene/nox_cam1.txt")
+		, cam_pos2("scene/nox_cam2.txt")
 		, skybox("skydark") {
 
 		logo.set_scale(0.1f);
@@ -69,13 +70,15 @@ public:
 	}
 
 	virtual void update(float t, float dt){
-		camera.set_position(v.at(t));
+		camera.set_position(cam_pos1.at(t));
+		camera.look_at(cam_pos2.at(t));
 	}
 
 	RenderObject tunnel;
 	RenderObject logo;
 	Camera camera;
-	PointTable v;
+	PointTable cam_pos1;
+	PointTable cam_pos2;
 	Skybox skybox;
 };
 
