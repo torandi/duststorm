@@ -21,9 +21,15 @@ static float aspect = 16.0f / 9.0f;
 static Camera camera(60.f, 1.0f, 0.1f, 100.0f);
 static Shader::lights_data_t lights;
 static glm::vec2 track_ref;
+static glm::vec2 track_delta;
 static glm::vec2 track_angle(0.0f, M_PI*0.5);
 static float track_distance = 1.0f;
 static glm::mat4 projection;
+static bool keystate[256] = {false, };
+static enum {
+	CAMERA_AUTO,
+	CAMERA_MANUAL,
+} camera_control = CAMERA_AUTO;
 
 struct uniform {
 	GLuint index;
@@ -54,6 +60,7 @@ namespace Editor {
 	void reset(){
 		track_angle = glm::vec2(0.0f, M_PI*0.5);
 		track_distance = 1.0f;
+		camera = Camera(60.f, 1.0f, 0.1f, 100.0f);
 		camera.set_position(glm::vec3(1.f, 0.f, 0.f));
 		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
 	}
@@ -73,8 +80,20 @@ static void render_placeholder(){
 }
 
 static void render_scene(){
-	scene->render_scene();
+	/* Render scene */
+	scene->bind();
+	switch ( camera_control ){
+	case CAMERA_AUTO:
+		scene->render();
+		break;
+	case CAMERA_MANUAL:
+		scene->clear(Color::white);
+		scene->render_geometry(camera);
+		Shader::unbind();
+	}
+	scene->unbind();
 
+	/* Display on framebuffer */
 	Shader::upload_projection_view_matrices(frame->ortho(), glm::mat4());
 	frame->with([](){
 		RenderTarget::clear(Color::magenta);
@@ -107,6 +126,13 @@ static void render_model(){
 
 	Shader::unbind();
 	frame->unbind();
+}
+
+void drawingarea_update(){
+	if ( keystate[25] /* W */ )	camera.relative_move(glm::vec3( 0.0, 0, 0.1));
+	if ( keystate[39] /* S */ )	camera.relative_move(glm::vec3( 0.0, 0,-0.1));
+	if ( keystate[38] /* A */ )	camera.relative_move(glm::vec3( 0.1, 0, 0.0));
+	if ( keystate[40] /* D */ )	camera.relative_move(glm::vec3(-0.1, 0, 0.0));
 }
 
 extern "C" G_MODULE_EXPORT void aspect_changed(GtkWidget* widget, gpointer data){
@@ -169,17 +195,28 @@ extern "C" G_MODULE_EXPORT void show_specular(GtkWidget* widget, gpointer data){
 }
 
 static void recalc_camera(){
-	const glm::vec3 point(
-		track_distance * sinf(track_angle.y) * cosf(-track_angle.x),
-		track_distance * cosf(track_angle.y),
-		track_distance * sinf(track_angle.y) * sinf(-track_angle.x));
-	camera.set_position(point);
+	switch ( Editor::mode ){
+	case Editor::MODE_MODEL:
+		camera.set_position(glm::vec3(
+			track_distance * sinf(track_angle.y) * cosf(-track_angle.x),
+			track_distance * cosf(track_angle.y),
+			track_distance * sinf(track_angle.y) * sinf(-track_angle.x)));
+		break;
+
+	case Editor::MODE_SCENE:
+		camera.absolute_rotate(glm::vec3(0,1,0),  track_delta.x * 0.01);
+		camera.relative_rotate(glm::vec3(1,0,0), -track_delta.y * 0.01);
+		break;
+
+	default:
+		break;
+	}
 }
 
 extern "C" G_MODULE_EXPORT void drawingarea_motion_notify_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data){
 	const glm::vec2 p = glm::vec2(event->motion.x, event->motion.y);
-	const glm::vec2 d = (track_ref - p) * 0.3f;
-	track_angle += glm::radians(d);
+	track_delta  = (track_ref - p) * 0.3f;
+	track_angle += glm::radians(track_delta);
 	while ( track_angle.x < 0.0f   ) track_angle.x += 2*M_PI;
 	while ( track_angle.x > 2*M_PI ) track_angle.x -= 2*M_PI;
 	track_angle.y = glm::clamp(track_angle.y, 0.01f, (float)(M_PI-0.01f));
@@ -197,6 +234,9 @@ extern "C" G_MODULE_EXPORT void drawingarea_scroll_event_cb(GtkWidget* widget, G
 }
 
 extern "C" G_MODULE_EXPORT void drawingarea_button_press_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data){
+	/* grab focus so keyboard events goes to drawingarea */
+	gtk_widget_grab_focus(widget);
+
 	if ( event->button.button != 1 ) return;
 
 	track_ref.x = event->button.x;
@@ -214,6 +254,18 @@ extern "C" G_MODULE_EXPORT void drawingarea_button_release_event_cb(GtkWidget* w
 	track_angle.y = glm::clamp(track_angle.y, 0.01f, (float)(M_PI-0.01f));
 
 	gdk_device_ungrab(gdk_event_get_device(event), event->button.time);
+}
+
+extern "C" G_MODULE_EXPORT void drawingarea_key_event_cb(GtkWidget* widget, GdkEventKey* event, gpointer data){
+	if ( Editor::mode != Editor::MODE_SCENE ) return;
+	if ( event->hardware_keycode > 255 ) return;
+
+	if ( camera_control == CAMERA_AUTO ){
+		camera_control = CAMERA_MANUAL;
+		camera = scene->get_current_camera();
+	}
+
+	keystate[event->hardware_keycode] = event->type == GDK_KEY_PRESS;
 }
 
 extern "C" G_MODULE_EXPORT gboolean drawingarea_draw_cb(GtkWidget* widget, gpointer data){

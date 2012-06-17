@@ -22,6 +22,7 @@
 
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
+void drawingarea_update(); /* hack */
 
 namespace Editor {
 	MODE mode = MODE_BLANK;
@@ -68,6 +69,8 @@ void update(){
 	if ( scene ){
 		scene->update_scene(global_time.get(), global_time.dt());
 	}
+
+	drawingarea_update();
 
 	char buf[64];
 	sprintf(buf, "%02.3f\n%d%%", global_time.get(), global_time.current_scale());
