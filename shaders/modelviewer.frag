@@ -17,7 +17,7 @@ uniform bool show_specular;
 in vec2 uv;
 in vec4 color;
 
-in vec4 orig_normal;
+in vec3 orig_normal;
 in vec3 orig_tangent;
 in vec3 orig_bitangent;
 in vec3 mul_position;
