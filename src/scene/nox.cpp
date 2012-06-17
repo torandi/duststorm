@@ -18,7 +18,7 @@ public:
 		, tunnel("nox2/tunnel.obj", false)
 		, logo("nox.obj", false)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
-		, v("scene/tv_cam1.txt")
+		, v("scene/nox_cam1.txt")
 		, skybox("skydark") {
 
 		logo.set_scale(0.1f);

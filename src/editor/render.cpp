@@ -268,8 +268,9 @@ extern "C" G_MODULE_EXPORT void drawingarea_key_event_cb(GtkWidget* widget, GdkE
 
 	/* Print camera coordinates */
 	if ( event->hardware_keycode == 36 && event->type == GDK_KEY_PRESS ){
-		fprintf(stderr, "Camera position=(%f,%f%f)\n",
-		        camera.position().x, camera.position().y, camera.position().z);
+		static int n = 1;
+		fprintf(stderr, "[%3d] Camera position=(%f,%f,%f)\n",
+		        n++, camera.position().x, camera.position().y, camera.position().z);
 		return;
 	}
 
