@@ -82,7 +82,7 @@ void Scene::meta_load(struct SceneInfo* info){
 	FILE* fp = fopen(filename.c_str(), "r");
 	if ( !fp ){
 		fprintf(stderr, "Failed to read metadata for scene `%s' from `%s': %s\n", info->name.c_str(), filename.c_str(), strerror(errno));
-		abort();
+		return;
 	}
 
 	char empty[] = "";
