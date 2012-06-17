@@ -89,6 +89,9 @@ static void init(bool fullscreen, bool vsync){
 	fprintf(stderr, "Input enabled\n");
 #endif
 
+	GLint max_texture_units;
+	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_texture_units);
+	fprintf(verbose, "Supports %d texture units\n", max_texture_units);
 
 	screen_ortho = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
