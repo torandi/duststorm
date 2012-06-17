@@ -31,15 +31,16 @@ public:
 
 		lights.ambient_intensity() = glm::vec3(0.01f);
 		lights.num_lights() = 2;
-		lights.lights[0].set_position(glm::vec3(2.f, 0.2f, 1.f));
-		lights.lights[0].intensity = glm::vec3(0.9f, 0.3f, 0.0f);
+
+		lights.lights[0].set_position(glm::vec3(-5.5f, 0.4f, 0.0f));
+		lights.lights[0].intensity = glm::vec3(0.0f, 0.6f, 0.4f);
 		lights.lights[0].type = Light::POINT_LIGHT;
 		lights.lights[0].constant_attenuation = 0.0f;
 		lights.lights[0].linear_attenuation = 0.1f;
-		lights.lights[0].quadratic_attenuation = 0.8f;
+		lights.lights[0].quadratic_attenuation = 0.4f;
 
-		lights.lights[1].set_position(glm::vec3(-2.f, 1.f, 1.f));
-		lights.lights[1].intensity = glm::vec3(0.4f, 0.8f, 0.8f);
+		lights.lights[1].set_position(glm::vec3(-2.0f, 1.0f, 0.0f));
+		lights.lights[1].intensity = glm::vec3(0.3f, 0.6f, 0.8f);
 		lights.lights[1].type = Light::POINT_LIGHT;
 	}
 
