@@ -48,7 +48,7 @@ bool file_exists(const std::string& filename){
 }
 
 int timetable_parse(const std::string& filename, std::function<void(const std::string&, float, float)> func){
-	const char* tablename = PATH_SRC "timetable.txt";
+	const char* tablename = filename.c_str();
 	FILE* timetable = fopen(tablename, "r");
 	if ( !timetable ){
 		return errno;
