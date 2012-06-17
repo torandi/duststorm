@@ -25,8 +25,8 @@ public:
 		, cam_pos2("scene/nox_cam2.txt")
 		, skybox("skydark")
 		, water_quad(10.f, true, true)
-		, water_texture(Texture2D::from_filename("water.png"))
-		, fog(100000, TextureArray::from_filename("fog.png", nullptr))
+		, water_texture(Texture2D::from_filename("water.png")) 
+		, fog(10000, TextureArray::from_filename("fog.png", nullptr))
 	{
 
 		logo.set_scale(0.1f);
