@@ -1,10 +1,10 @@
 #version 330
-#extension GL_ARB_explicit_attrib_location: enable
+#include "uniforms.glsl"
+#include "screenspace.glsl"
 
-uniform sampler2D texture1;
-in vec2 uv;
 out vec4 ocolor;
 
 void main(){
+	vec2 uv = screenspace_uv();
 	ocolor = texture2D(texture1, uv);
 }
