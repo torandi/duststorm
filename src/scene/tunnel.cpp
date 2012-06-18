@@ -41,6 +41,18 @@ static float arc[][3] = {
 };
 static constexpr size_t per_segment = sizeof(arc) / (3*sizeof(float));
 
+static float noise_x(float s, unsigned int i){
+	return sin(s * 28.0 + i % (per_segment-1)) * 0.2f + sin(s * 943.0f) * 0.7f;
+}
+
+static float noise_y(float s, unsigned int i){
+	return sin(s * 138.0 + i % (per_segment-1)) * 0.2f + sin(s * 24.0f) * 0.3f;
+}
+
+static float noise_z(float s, unsigned int i){
+	return 0.0f;
+}
+
 class TunnelScene: public Scene {
 public:
 	TunnelScene(const glm::ivec2& size)
@@ -66,9 +78,9 @@ public:
 			for ( unsigned int c = 0; c < per_segment; c++ ){
 				const unsigned int i = seg * per_segment + c;
 
-				vertices[i].pos.x = arc[c][1];
-				vertices[i].pos.y = arc[c][0];
-				vertices[i].pos.z = seg * 5.0f;
+				vertices[i].pos.x = arc[c][1]  + noise_x(seg, i);
+				vertices[i].pos.y = arc[c][0]  + noise_y(seg, i);
+				vertices[i].pos.z = seg * 5.0f + noise_z(seg, i);
 				vertices[i].uv.x = arc[c][2];
 				vertices[i].uv.y = seg * 0.25f;
 			}
