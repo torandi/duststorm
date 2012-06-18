@@ -88,7 +88,7 @@ namespace Editor {
 
 		scene = SceneFactory::create(name, frame->texture_size());
 		if ( !scene ){
-			set_message("Failed to load scene `%s'\n", name.c_str());
+			set_message("Failed to load scene \"%s\"", name.c_str());
 			Editor::mode = Editor::MODE_BLANK;
 			return;
 		}
@@ -373,10 +373,16 @@ extern "C" G_MODULE_EXPORT gboolean drawingarea_configure_event_cb(GtkWidget* wi
 	delete frame;
 	frame = new RenderTarget(size, GL_RGB8, true, GL_NEAREST);
 
-	if ( scene ){
+	if ( Editor::scene_name != "" ){
 		delete scene;
 		scene = SceneFactory::create(Editor::scene_name, frame->texture_size());
-		scene->add_time(0,60);
+		if ( scene ){
+			Editor::mode = Editor::MODE_SCENE; /* may not be set, for instance when loaded from main */
+			scene->add_time(0,60);
+		} else {
+			Editor::set_message("Failed to load scene \"%s\"", Editor::scene_name.c_str());
+			Editor::mode = Editor::MODE_BLANK;
+		}
 	}
 
 	camera.set_aspect(aspect);

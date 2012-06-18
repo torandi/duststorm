@@ -142,6 +142,10 @@ int main (int argc, char* argv[]){
 	/* setup scene-list */
 	Editor::scenelist_populate();
 
+	if ( argc > 1 ){
+		Editor::scene_name = std::string(argv[1]);
+	}
+
 	g_timeout_add(per_frame/1000, [](gpointer data) -> gboolean {
 		update();
 		gtk_widget_queue_draw(drawing);
