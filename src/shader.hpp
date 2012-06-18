@@ -36,26 +36,6 @@ public:
 		NUM_GLOBAL_UNIFORMS
 	};
 
-	enum local_uniforms_t {
-		UNIFORM_TEXTURE0=0,
-		UNIFORM_TEXTURE1,
-		UNIFORM_TEXTURE2,
-		UNIFORM_TEXTURE3,
-		UNIFORM_TEXTURE4,
-		UNIFORM_TEXTURE5,
-		UNIFORM_TEXTURE6,
-		UNIFORM_TEXTURE7,
-		UNIFORM_TEXTURE_ARRAY0,
-		UNIFORM_TEXTURE_ARRAY1,
-		UNIFORM_TEXTURE_ARRAY2,
-		UNIFORM_TEXTURE_ARRAY3,
-		UNIFORM_TEXTURE_CUBE0,
-		UNIFORM_TEXTURE_CUBE1,
-		UNIFORM_TEXTURE_CUBE2,
-		UNIFORM_TEXTURE_CUBE3,
-		NUM_LOCAL_UNIFORMS
-	};
-
 	enum {
 		TEXTURE_2D_0 = GL_TEXTURE0,
 		TEXTURE_2D_1,
@@ -117,7 +97,6 @@ private:
 	Shader(const std::string &name_, GLuint program);
 
 	static const char *global_uniform_names_[];
-	static const char *local_uniform_names_[];
 	static const GLsizeiptr global_uniform_buffer_sizes_[];
 	static const GLenum global_uniform_usage_[];
 
@@ -127,7 +106,6 @@ private:
 	static void load_file(const std::string &filename, std::stringstream &shaderData, std::string included_from);
 	static std::string parse_shader(const std::string &filename, std::set<std::string> included_files=std::set<std::string>(), std::string included_from="");
 
-	GLint local_uniform_locations_[NUM_LOCAL_UNIFORMS];
 	GLint global_uniform_block_index_[NUM_GLOBAL_UNIFORMS];
 	static GLuint global_uniform_buffers_[NUM_GLOBAL_UNIFORMS];
 
@@ -195,7 +173,5 @@ public:
 	 * Upload white material
 	 */
 	static void upload_blank_material();
-
-	const GLint uniform(local_uniforms_t uniform) const;
 };
 #endif

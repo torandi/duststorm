@@ -44,26 +44,6 @@ const char * Shader::global_uniform_names_[] = {
 	"StateData",
 };
 
-const char * Shader::local_uniform_names_[] = {
-	"texture0",
-	"texture1",
-	"texture2",
-	"texture3",
-	"texture4",
-	"texture5",
-	"texture6",
-	"texture7",
-	"texture_array0",
-	"texture_array1",
-	"texture_array2",
-	"texture_array3",
-	"texture_cube0",
-	"texture_cube1",
-	"texture_cube2",
-	"texture_cube3",
-};
-
-
 const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
 	sizeof(glm::mat4)*3,
 	sizeof(glm::mat4)*2,
@@ -276,31 +256,6 @@ Shader * Shader::create_shader(std::string base_name) {
 }
 
 void Shader::init_uniforms() {
-	for(int i=0; i<NUM_LOCAL_UNIFORMS; ++i) {
-		local_uniform_locations_[i] = glGetUniformLocation(program_, local_uniform_names_[i]);
-		checkForGLErrors((std::string("load uniform ")+local_uniform_names_[i]+" from shader "+name).c_str());
-	}
-
-	/* setup samplers (first has unit 7 to maintain compatibility with legacy code */
-	if ( local_uniform_locations_[UNIFORM_TEXTURE0]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE0], 7);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE1]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE1], 0);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE2]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE2], 1);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE3]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE3], 2);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE4]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE4], 3);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE5]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE5], 4);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE6]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE6], 5);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE7]       != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE7], 6);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY0] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY0], 8);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY1], 9);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY2] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY2], 10);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_ARRAY3] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_ARRAY3], 11);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE0] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE0], 12);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE1] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE1], 13);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE2] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE2], 14);
-	if ( local_uniform_locations_[UNIFORM_TEXTURE_CUBE3] != -1 )	glUniform1i(local_uniform_locations_[UNIFORM_TEXTURE_CUBE3], 15);
-
-	checkForGLErrors("Upload texture locations");
-
 	//Bind global uniforms to blocks:
 	for(int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
 		global_uniform_block_index_[i] = glGetUniformBlockIndex(program_, global_uniform_names_[i]);
@@ -421,10 +376,6 @@ void Shader::upload_state(const glm::ivec2& size){
 }
 
 const GLint Shader::num_attributes() const { return num_attributes_; }
-
-const GLint Shader::uniform(local_uniforms_t uniform) const {
-	return local_uniform_locations_[uniform];
-}
 
 GLint Shader::uniform_location(const char * uniform_name) const{
 	GLint l = glGetUniformLocation(program_, uniform_name);
