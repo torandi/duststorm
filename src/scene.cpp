@@ -112,14 +112,6 @@ void Scene::meta_load(struct SceneInfo* info){
 	free(buffer);
 }
 
-bool Scene::meta_set(const std::string& key, const std::string& value){
-	return false;
-}
-
-std::string Scene::meta_get(const std::string& key) const {
-	return "";
-}
-
 void Scene::meta_persist(){
 
 }

@@ -66,14 +66,6 @@ public:
 	 */
 	void meta_load(struct SceneInfo* info);
 
-	/**
-	 * Update metadata.
-	 * @return true if successful.
-	 */
-	virtual bool meta_set(const std::string& key, const std::string& value);
-
-	virtual std::string meta_get(const std::string& key) const;
-
 	void meta_persist();
 
 	LightsData lights;
