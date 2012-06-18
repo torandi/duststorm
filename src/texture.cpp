@@ -163,7 +163,8 @@ Texture2D::~Texture2D(){
 	glDeleteTextures(1, &_texture);
 }
 
-void Texture2D::texture_bind() const {
+void Texture2D::texture_bind(Shader::TextureUnit unit) const {
+	glActiveTexture(unit);
 	glBindTexture(GL_TEXTURE_2D, _texture);
 }
 
@@ -226,7 +227,8 @@ TextureCubemap::~TextureCubemap(){
 	glDeleteTextures(1, &_texture);
 }
 
-void TextureCubemap::texture_bind() const {
+void TextureCubemap::texture_bind(Shader::TextureUnit unit) const {
+	glActiveTexture(unit);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _texture);
 }
 
@@ -298,7 +300,8 @@ size_t TextureArray::num_textures() const {
 	return _num;
 }
 
-void TextureArray::texture_bind() const {
+void TextureArray::texture_bind(Shader::TextureUnit unit) const {
+	glActiveTexture(unit);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, _texture);
 }
 
@@ -374,7 +377,8 @@ const int Texture3D::depth() const {
 	return _depth;
 }
 
-void Texture3D::texture_bind() const {
+void Texture3D::texture_bind(Shader::TextureUnit unit) const {
+	glActiveTexture(unit);
 	glBindTexture(GL_TEXTURE_3D, _texture);
 }
 

@@ -26,11 +26,8 @@ void Material::activate() {
 	if(two_sided)
 		glDisable(GL_CULL_FACE);
 
-	glActiveTexture(GL_TEXTURE1);
-	normal_map->texture_bind();
-
-	glActiveTexture(GL_TEXTURE0);
-	texture->texture_bind();
+	texture->texture_bind(Shader::TEXTURE_COLORMAP);
+	normal_map->texture_bind(Shader::TEXTURE_NORMALMAP);
 
 	Shader::upload_material(*this);
 }

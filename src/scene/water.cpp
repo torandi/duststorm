@@ -39,13 +39,10 @@ public:
 		lights.lights[0].intensity = glm::vec3(0.8f);
 		lights.lights[0].type = Light::POINT_LIGHT;
 
-		water->texture_bind();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		water->texture_bind(Shader::TEXTURE_2D_0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 4.0f);
-		water->texture_unbind();
 
 		u_wave1 = shaders[SHADER_WATER]->uniform_location("wave1");
 		u_wave2 = shaders[SHADER_WATER]->uniform_location("wave2");
@@ -74,10 +71,8 @@ public:
 		}
 
 		Shader::upload_blank_material();
-		glActiveTexture(GL_TEXTURE0);
-		water->texture_bind();
-		glActiveTexture(Shader::TEXTURE_CUBEMAP_0);
-		skybox.texture->texture_bind();
+		water->texture_bind(Shader::TEXTURE_NORMALMAP);
+		skybox.texture->texture_bind(Shader::TEXTURE_CUBEMAP_0);
 
 		shaders[SHADER_WATER]->bind();
 		{
@@ -85,10 +80,6 @@ public:
 			glUniform2fv(u_wave2, 1, glm::value_ptr(wave2));
 			quad.render();
 		}
-
-		skybox.texture->texture_bind();
-		glActiveTexture(GL_TEXTURE0);
-		water->texture_unbind();
 	}
 
 	virtual void render(){

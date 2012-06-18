@@ -171,7 +171,8 @@ const glm::mat4& RenderTarget::ortho() const {
 	return projection;
 }
 
-void RenderTarget::texture_bind() const {
+void RenderTarget::texture_bind(Shader::TextureUnit unit) const {
+	glActiveTexture(unit);
 	glBindTexture(GL_TEXTURE_2D, texture());
 }
 
@@ -209,7 +210,7 @@ void RenderTarget::draw(Shader* shader, const glm::vec2& pos, const glm::vec2& s
 	Shader::upload_model_matrix(model);
 
 	shader->bind();
-	glBindTexture(GL_TEXTURE_2D, texture());
+	texture_bind(Shader::TEXTURE_2D_0);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
 

@@ -56,16 +56,11 @@ void Skybox::render(const Camera &camera) const{
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float)*3*36) );
-
-	glActiveTexture(Shader::TEXTURE_CUBEMAP_0);
-
-	texture->texture_bind();
+	texture->texture_bind(Shader::TEXTURE_CUBEMAP_0);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	checkForGLErrors("Skybox::render(): render");
-
-	texture->texture_unbind();
 
 	glPopAttrib();
 	glPopClientAttrib();

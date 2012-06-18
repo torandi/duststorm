@@ -54,7 +54,7 @@ public:
 	 */
 	GLuint texture() const;
 
-	virtual void texture_bind() const;
+	virtual void texture_bind(Shader::TextureUnit unit) const;
 	virtual void texture_unbind() const;
 
 	/**
@@ -70,6 +70,8 @@ public:
 	/**
 	 * Render the RenderTarget on current framebuffer. Caller should ensure an
 	 * orthographic projection is bound before calling draw.
+	 *
+	 * Always passes colormap as texture unit 0.
 	 */
 	void draw(Shader* shader);
 	void draw(Shader* shader, const glm::vec2& pos);

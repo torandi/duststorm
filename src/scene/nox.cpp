@@ -41,9 +41,7 @@ public:
 		water_quad.set_rotation(glm::vec3(1.f, 0, 0), 90.f);
 		water_quad.set_scale(100.f);
 
-		water_texture->texture_bind();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		water_texture->texture_bind(Shader::TEXTURE_2D_0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 4.0f);
@@ -106,10 +104,8 @@ public:
 		tunnel.render();
 		logo.render();
 
-		glActiveTexture(GL_TEXTURE0);
-		water_texture->texture_bind();
-		glActiveTexture(Shader::TEXTURE_CUBEMAP_0);
-		skybox.texture->texture_bind();
+		water_texture->texture_bind(Shader::TEXTURE_NORMALMAP);
+		skybox.texture->texture_bind(Shader::TEXTURE_CUBEMAP_0);
 
 		shaders[SHADER_WATER]->bind();
 		{
@@ -118,13 +114,8 @@ public:
 			water_quad.render();
 		}
 
-		skybox.texture->texture_unbind();
-		glActiveTexture(GL_TEXTURE0);
-		water_texture->texture_unbind();
-
 		shaders[SHADER_PARTICLES]->bind();
 		fog.render();
-
 	}
 
 	virtual const Camera& get_current_camera(){

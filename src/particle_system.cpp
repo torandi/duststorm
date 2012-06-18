@@ -230,6 +230,7 @@ void ParticleSystem::update(float dt) {
 void ParticleSystem::render() {
 	glPushAttrib(GL_ENABLE_BIT|GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_CULL_FACE);
+	glDepthMask(GL_FALSE);
 
 	Shader::upload_model_matrix(matrix());
 
@@ -255,15 +256,9 @@ void ParticleSystem::render() {
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) sizeof(glm::vec4));
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) (2*sizeof(glm::vec4)));
 	glVertexAttribPointer(3, 1, GL_INT, GL_FALSE, sizeof(vertex_t), (GLvoid*)		(2*sizeof(glm::vec4)+sizeof(float)));
-
-	glActiveTexture(Shader::TEXTURE_ARRAY_0);
-	texture_->texture_bind();
-
-	glDepthMask(GL_FALSE);
+	texture_->texture_bind(Shader::TEXTURE_ARRAY_0);
 
 	glDrawArrays(GL_POINTS, 0, max_num_particles_);
-
-	texture_->texture_unbind();
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glPopAttrib();

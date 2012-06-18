@@ -77,9 +77,7 @@ namespace Engine {
 		Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
 		glViewport(0, 0, resolution.x, resolution.y);
 
-		glActiveTexture(GL_TEXTURE4);
-		blend->texture_bind();
-		glActiveTexture(GL_TEXTURE0);
+		blend->texture_bind(Shader::TEXTURE_BLEND_S);
 		scene["NOX"]->draw(shaders[SHADER_BLEND]);
 	}
 

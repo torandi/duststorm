@@ -1,6 +1,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include "shader.hpp"
 #include <string>
 #include <vector>
 #include <GL/glew.h>
@@ -10,7 +11,7 @@ class TextureBase {
 public:
 	virtual const glm::ivec2& texture_size();
 
-	virtual void texture_bind() const = 0;
+	virtual void texture_bind(Shader::TextureUnit unit) const = 0;
 	virtual void texture_unbind() const = 0;
 
 protected:
@@ -45,7 +46,7 @@ public:
 
 	const GLint gl_texture() const;
 
-	virtual void texture_bind() const;
+	virtual void texture_bind(Shader::TextureUnit unit) const;
 	virtual void texture_unbind() const;
 
 private:
@@ -65,7 +66,7 @@ public:
 
 	const GLint gl_texture() const;
 
-	virtual void texture_bind() const;
+	virtual void texture_bind(Shader::TextureUnit unit) const;
 	virtual void texture_unbind() const;
 
 	const int depth() const;
@@ -95,7 +96,7 @@ public:
 		const std::string& pz, const std::string& nz);
 	static TextureCubemap* from_filename(const std::vector<std::string>& paths);
 
-	virtual void texture_bind() const;
+	virtual void texture_bind(Shader::TextureUnit unit) const;
 	virtual void texture_unbind() const;
 
 private:
@@ -112,7 +113,7 @@ public:
 	static TextureArray* from_filename(const std::vector<std::string>& paths);
 
 	size_t num_textures() const;
-	virtual void texture_bind() const;
+	virtual void texture_bind(Shader::TextureUnit unit) const;
 	virtual void texture_unbind() const;
 
 private:
