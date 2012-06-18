@@ -23,5 +23,4 @@ public:
 	bool two_sided;
 };
 
-
 #endif /* MATERIAL_H */
