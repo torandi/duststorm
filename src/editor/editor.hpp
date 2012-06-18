@@ -67,6 +67,7 @@ namespace Editor {
 	TYPE classify_name(const std::string&name, std::string& data);
 
 	void scenelist_populate();
+	void sceneprops_populate(Scene* scene);
 
 	void reset();
 	void load_model(const std::string& filename);

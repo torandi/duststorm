@@ -126,7 +126,7 @@ static void notify_update(GtkTreeIter* iter, const char* new_text, unsigned int 
 	gtk_tree_store_set(propstore, iter, PROP_VALUE, variable->get_string(scene, offset).c_str(), -1);
 }
 
-static void populate_sceneprops(Scene* scene){
+namespace Editor { void sceneprops_populate(Scene* scene){
 	GtkTreeIter parent;
 	gtk_tree_store_clear(propstore);
 	for ( std::pair<std::string, Meta*> p: scene->metadata() ){
@@ -165,7 +165,7 @@ static void populate_sceneprops(Scene* scene){
 			gtk_tree_store_set(propstore, &parent, PROP_KEY, key.c_str(), PROP_VALUE, variable->get_string(scene, 0).c_str(), PROP_EDITABLE, TRUE, PROP_POINTER, variable, -1);
 		}
 	}
-}
+}}
 
 extern "C" G_MODULE_EXPORT void property_edited_cb (GtkCellRendererText* cell, gchar* path, gchar* new_text, gpointer user_data){
 	GtkTreeIter iter;
@@ -209,7 +209,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		assert(scene);
 		scene->add_time(0,60);
 		global_time.reset();
-		populate_sceneprops(scene);
+		Editor::sceneprops_populate(scene);
 		break;
 
 	case Editor::TYPE_PATH:
