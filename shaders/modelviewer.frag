@@ -28,8 +28,8 @@ in vec3 mul_bitangent;
 out vec4 ocolor;
 
 void main() {
-	vec4 t1 = texture(texture1, uv);
-	vec4 t2 = texture(texture2, uv);
+	vec4 t1 = texture(texture0, uv);
+	vec4 t2 = texture(texture1, uv);
 
 	if ( show_texture        ) ocolor = t1;
 	else if ( show_uv        ) ocolor = vec4(uv.x, 1-uv.y, 0.0f, 1.0f);
