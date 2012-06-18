@@ -64,6 +64,7 @@ namespace Editor {
 	}
 
 	void reset(){
+		global_time.reset();
 		track_angle = glm::vec2(0.0f, M_PI*0.5);
 		track_distance = 1.0f;
 		Editor::camera_control = Editor::CAMERA_AUTO;
@@ -76,6 +77,24 @@ namespace Editor {
 	void load_model(const std::string& filename){
 		delete modelview.model;
 		modelview.model = new RenderObject(filename, true);
+	}
+
+	void load_scene(const std::string& name){
+		delete scene;
+		scene = nullptr;
+
+		Editor::scene_name = name;
+		Editor::mode = Editor::MODE_SCENE;
+
+		scene = SceneFactory::create(name, frame->texture_size());
+		if ( !scene ){
+			set_message("Failed to load scene `%s'\n", name.c_str());
+			Editor::mode = Editor::MODE_BLANK;
+			return;
+		}
+
+		scene->add_time(0,3600);
+		Editor::sceneprops_populate(scene);
 	}
 }
 

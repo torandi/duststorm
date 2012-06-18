@@ -202,14 +202,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		break;
 
 	case Editor::TYPE_CAT_SCENE:
-		Editor::mode = Editor::MODE_SCENE;
-		delete scene;
-		Editor::scene_name = name;
-		scene = SceneFactory::create(std::string(name), frame->texture_size());
-		assert(scene);
-		scene->add_time(0,60);
-		global_time.reset();
-		Editor::sceneprops_populate(scene);
+		Editor::load_scene(std::string(name));
 		break;
 
 	case Editor::TYPE_PATH:

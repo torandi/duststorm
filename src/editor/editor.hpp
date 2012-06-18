@@ -72,6 +72,7 @@ namespace Editor {
 	void set_message(const char* fmt, ...) __attribute__((format(printf,1,2)));
 	void reset();
 	void load_model(const std::string& filename);
+	void load_scene(const std::string& name);
 }
 
 #endif /* EDITOR_GLOBALS_H */
