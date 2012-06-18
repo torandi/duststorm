@@ -58,6 +58,7 @@ public:
 	}
 
 	virtual void render_geometry(const Camera& cam){
+		clear(Color::black);
 		Shader::upload_lights(lights);
 
 		//shaders[SHADER_SKYBOX]->bind();
@@ -80,12 +81,6 @@ public:
 			glUniform2fv(u_wave2, 1, glm::value_ptr(wave2));
 			quad.render();
 		}
-	}
-
-	virtual void render(){
-		clear(Color::black);
-		render_geometry(camera);
-		Shader::unbind();
 	}
 
 	virtual const Camera& get_current_camera(){
