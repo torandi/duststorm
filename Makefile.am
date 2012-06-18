@@ -42,6 +42,7 @@ libfrob_a_SOURCES = \
 	src/scene/nox.cpp \
 	src/scene/particles.cpp \
 	src/scene/test.cpp \
+	src/scene/tunnel.cpp \
 	src/scene/tv.cpp \
 	src/scene/water.cpp \
 	autoload.cpp autoload.h
