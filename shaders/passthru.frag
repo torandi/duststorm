@@ -6,5 +6,5 @@ out vec4 ocolor;
 
 void main(){
 	vec2 uv = screenspace_uv();
-	ocolor = texture2D(texture1, uv);
+	ocolor = texture2D(texture0, uv);
 }
