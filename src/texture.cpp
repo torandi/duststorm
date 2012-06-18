@@ -135,8 +135,12 @@ Texture2D* Texture2D::from_filename(const std::string &path, const unsigned int 
 	return texture;
 }
 
-Texture2D* Texture2D::default_texture(){
+Texture2D* Texture2D::default_colormap(){
 	return from_filename("default.jpg");
+}
+
+Texture2D* Texture2D::default_normalmap(){
+	return from_filename("default_normalmap.jpg");
 }
 
 Texture2D::Texture2D(const std::string& filename, unsigned int num_mipmap_levels)

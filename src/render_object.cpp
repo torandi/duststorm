@@ -86,7 +86,7 @@ TextureBase* RenderObject::load_texture(const std::string& path) {
 			return target;
 		} else {
 			fprintf(stderr, "%s: no rendertarget named `%s', ignored.\n", name.c_str(), path.c_str());
-			return Texture2D::default_texture();
+			return Texture2D::default_colormap();
 		}
 	}
 
@@ -111,8 +111,6 @@ void RenderObject::pre_render() {
 			mtl->GetTexture(aiTextureType_AMBIENT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.texture = load_texture(p);
-		} else {
-			mtl_data.texture = Texture2D::default_texture();
 		}
 
 		if ( !mtl_data.texture ){
@@ -125,8 +123,6 @@ void RenderObject::pre_render() {
 			mtl->GetTexture(aiTextureType_HEIGHT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.normal_map = load_texture(p);
-		} else {
-			mtl_data.normal_map = load_texture("default_normalmap.jpg");
 		}
 
 		aiString name;

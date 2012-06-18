@@ -42,7 +42,8 @@ public:
 	 * Load a default texture.
 	 * Automatically called when a file is missing.
 	 */
-	static Texture2D* default_texture();
+	static Texture2D* default_colormap();
+	static Texture2D* default_normalmap();
 
 	const GLint gl_texture() const;
 

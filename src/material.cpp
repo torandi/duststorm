@@ -10,6 +10,9 @@ Material::Material()
 	, normal_map(nullptr)
 	, two_sided(false){
 
+	texture    = Texture2D::default_colormap();
+	normal_map = Texture2D::default_normalmap();
+
 	shininess = 1;
 	diffuse   = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
 	specular  = glm::vec4(0.0f);
