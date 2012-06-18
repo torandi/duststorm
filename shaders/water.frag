@@ -1,6 +1,6 @@
 #version 150
-
 #include "uniforms.glsl"
+#include "screenspace.glsl"
 
 //const float water_sight = 5.0;
 
@@ -62,12 +62,18 @@ void main() {
 				shininess, specular,
 				true, true);
 	}
+	vec3 surface = clamp(accumLighting,0.0, 1.0).rgb;
 
 	//angle of vision
 	float aov = 1.0-abs(dot(camera_direction, norm_normal));
 
+	/* Calculate bottom color (in screenspace) */
+	ivec2 size = textureSize(texture3, 0);
+	vec2 ss = vec2(gl_FragCoord.x / size.x, gl_FragCoord.y / size.y);
+	float depth = linear_depth(texture2, 1.0, 100.0f); /** @todo hardcoded near/far */
+	vec3 bottom = texture(texture3, ss).rgb;
 
-	ocolor = clamp(accumLighting,0.0, 1.0);
-	ocolor.a = 1.f;
-	//ocolor.a = 0.3f+0.6f*d*aov;
+	/* Mix colors together */
+	ocolor.rgb = mix(surface.rgb, bottom.rgb, min(1-depth, 0.8));
+	ocolor.a = 1.0f;
 }
