@@ -53,6 +53,16 @@ static struct {
 } modelview;
 
 namespace Editor {
+	void set_message(const char* fmt, ...){
+		char* buf = nullptr;
+		va_list ap;
+		va_start(ap, fmt);
+		vasprintf(&buf, fmt, ap);
+		va_end(ap);
+		gtk_label_set_text(message, buf);
+		free(buf);
+	}
+
 	void reset(){
 		track_angle = glm::vec2(0.0f, M_PI*0.5);
 		track_distance = 1.0f;

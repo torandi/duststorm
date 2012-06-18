@@ -69,6 +69,7 @@ namespace Editor {
 	void scenelist_populate();
 	void sceneprops_populate(Scene* scene);
 
+	void set_message(const char* fmt, ...) __attribute__((format(printf,1,2)));
 	void reset();
 	void load_model(const std::string& filename);
 }
