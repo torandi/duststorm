@@ -21,6 +21,7 @@ namespace SceneFactory {
 		}
 
 		Scene* scene = it->second.func(size);
+		scene->set_metadata(*it->second.meta);
 		scene->meta_load(&it->second);
 		return scene;
 	}

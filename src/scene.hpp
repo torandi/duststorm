@@ -10,6 +10,11 @@
 #include <vector>
 #include <map>
 
+namespace SceneFactory {
+	typedef std::map<std::string, Meta*> Metadata;
+	typedef Scene*(*factory_callback)(const glm::ivec2& size);
+}
+
 /**
  * Scene definition.
  */
@@ -68,6 +73,17 @@ public:
 
 	void meta_persist();
 
+	/**
+	 * Get metadata definition for this scene.
+	 */
+	const SceneFactory::Metadata& metadata() const;
+
+	/**
+	 * Bind metadata definition to this scene. User should
+	 * never call this. Automatically setup by SceneFactory.
+	 */
+	void set_metadata(const SceneFactory::Metadata& metadata);
+
 	LightsData lights;
 
 protected:
@@ -87,12 +103,8 @@ private:
 
 	std::vector<time> timetable;
 	std::vector<time>::iterator current;
+	const SceneFactory::Metadata* meta_definition;
 };
-
-namespace SceneFactory {
-	typedef std::map<std::string, Meta*> Metadata;
-	typedef Scene*(*factory_callback)(const glm::ivec2& size);
-}
 
 /**
  * Static information about a scene-type.

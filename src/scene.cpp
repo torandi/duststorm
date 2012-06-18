@@ -8,7 +8,8 @@
 Scene::Scene(const glm::ivec2& size, GLenum format)
 	: RenderTarget(size, format, true)
 	, match(false)
-	, current(timetable.end()){
+	, current(timetable.end())
+	, meta_definition(nullptr) {
 }
 
 Scene::~Scene(){
@@ -114,4 +115,12 @@ void Scene::meta_load(struct SceneInfo* info){
 
 void Scene::meta_persist(){
 
+}
+
+const SceneFactory::Metadata& Scene::metadata() const {
+	return *meta_definition;
+}
+
+void Scene::set_metadata(const SceneFactory::Metadata& metadata){
+	meta_definition = &metadata;
 }
