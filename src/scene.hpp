@@ -56,7 +56,7 @@ public:
 	 * Render scene onto target.
 	 * Usually you do not override this function.
 	 */
-	void render_scene();
+	virtual void render_scene();
 
 	bool is_active() const;
 
