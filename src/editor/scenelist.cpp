@@ -126,11 +126,10 @@ static void notify_update(GtkTreeIter* iter, const char* new_text, unsigned int 
 	gtk_tree_store_set(propstore, iter, PROP_VALUE, variable->get_string(scene, offset).c_str(), -1);
 }
 
-static void populate_sceneprops(Scene* scene, const std::string& name){
+static void populate_sceneprops(Scene* scene){
 	GtkTreeIter parent;
 	gtk_tree_store_clear(propstore);
-	SceneFactory::Metadata* meta = SceneFactory::find(name)->second.meta;
-	for ( std::pair<std::string, Meta*> p: *meta ){
+	for ( std::pair<std::string, Meta*> p: scene->metadata() ){
 		const std::string& key   = p.first;
 		Meta* variable = p.second;
 
@@ -210,7 +209,7 @@ extern "C" G_MODULE_EXPORT void scenelist_row_activated_cb(GtkTreeView* tree_vie
 		assert(scene);
 		scene->add_time(0,60);
 		global_time.reset();
-		populate_sceneprops(scene, name);
+		populate_sceneprops(scene);
 		break;
 
 	case Editor::TYPE_PATH:
