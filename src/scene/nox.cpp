@@ -28,7 +28,7 @@ public:
 		, cam_pos2("scene/nox_cam2.txt")
 		, cam_pos3("scene/nox_cam3.txt")
 		, skybox("skydark")
-		, water_quad(10.f, true, true)
+		, water_quad(glm::vec2(10.f, 10.0f), true, true)
 		, water_texture(Texture2D::from_filename("water.png"))
 		, fog(10000, TextureArray::from_filename("fog.png", nullptr))
 	{

@@ -4,6 +4,7 @@
 
 #include "engine.hpp"
 #include "globals.hpp"
+#include "quad.hpp"
 #include "render_object.hpp"
 #include "rendertarget.hpp"
 #include "utils.hpp"
@@ -29,6 +30,8 @@
 
 static RenderTarget* composition = nullptr;
 static RenderTarget* blend = nullptr;
+static Texture2D* text1 = nullptr;
+static Quad* textarea = nullptr;
 static std::map<std::string, Scene*> scene;
 
 namespace Engine {
@@ -54,6 +57,9 @@ namespace Engine {
 		scene["NOX"] = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
 		composition = new RenderTarget(resolution,           GL_RGB8, false);
 		blend = new RenderTarget(glm::ivec2(1,1), GL_RGBA8, false);
+		text1 = Texture2D::from_filename("nox2/text1.png");
+		textarea = new Quad(glm::vec2(1.0f, -1.0f), false);
+		textarea->set_scale(glm::vec3(512, 256, 1));
 
 		load_timetable(PATH_SRC "nox2.txt");
 	}
@@ -79,6 +85,15 @@ namespace Engine {
 
 		blend->texture_bind(Shader::TEXTURE_BLEND_S);
 		scene["NOX"]->draw(shaders[SHADER_BLEND]);
+
+		const float t = global_time.get();
+		if ( t > 30.0f ){
+			const float s = (t - 30.0f) / 40.0f;
+			textarea->set_position(glm::vec3(resolution.x - 800 + 300*s, resolution.y - 250, 0));
+			shaders[SHADER_PASSTHRU]->bind();
+			text1->texture_bind(Shader::TEXTURE_2D_0);
+			textarea->render();
+		}
 	}
 
 	static void render_display(){

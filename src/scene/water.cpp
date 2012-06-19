@@ -19,7 +19,7 @@ class WaterScene: public Scene {
 public:
 	WaterScene(const glm::ivec2& size)
 		: Scene(size)
-		, quad(5.f, true, true)
+		, quad(glm::vec2(5.f, 5.f), true, true)
 		, water(Texture2D::from_filename("water.png"))
 		, skybox("skydark")
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
