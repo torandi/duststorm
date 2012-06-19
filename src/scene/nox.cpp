@@ -21,9 +21,12 @@ public:
 		, tunnel("nox2/tunnel.obj", false)
 		, logo("nox.obj", false)
 		, geometry(size, GL_RGB8, true)
-		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
+		, camera1(75.f, size.x/(float)size.y, 0.1f, 100.0f)
+		, camera2(75.f, size.x/(float)size.y, 0.1f, 100.0f)
+		, current(camera1)
 		, cam_pos1("scene/nox_cam1.txt")
 		, cam_pos2("scene/nox_cam2.txt")
+		, cam_pos3("scene/nox_cam3.txt")
 		, skybox("skydark")
 		, water_quad(10.f, true, true)
 		, water_texture(Texture2D::from_filename("water.png"))
@@ -34,8 +37,8 @@ public:
 		logo.set_rotation(glm::vec3(0,1,0), 90.0f);
 		logo.set_position(glm::vec3(-30,1,0));
 
-		camera.set_position(glm::vec3(13.f, 11.f, 0.f));
-		camera.look_at(glm::vec3(0.f, 0.f, 0.f));
+		camera2.set_position(glm::vec3(-25.442295,0.129625,3.636643));
+		camera2.look_at(logo.position());
 
 		water_quad.set_position(glm::vec3(-100.f, -0.6f, -50.f));
 		water_quad.set_rotation(glm::vec3(1.f, 0, 0), 90.f);
@@ -122,12 +125,20 @@ public:
 	}
 
 	virtual const Camera& get_current_camera(){
-		return camera;
+		return current;
 	}
 
 	virtual void update(float t, float dt){
-		camera.set_position(cam_pos1.at(t));
-		camera.look_at(cam_pos2.at(t));
+		camera1.set_position(cam_pos1.at(t));
+		camera2.set_position(cam_pos3.at(t));
+
+		camera1.look_at(cam_pos2.at(t));
+
+		if ( t < 30.0 ){
+			current = camera1;
+		} else {
+			current = camera2;
+		}
 
 		fog.update(dt);
 	}
@@ -149,9 +160,13 @@ public:
 	RenderObject tunnel;
 	RenderObject logo;
 	RenderTarget geometry;
-	Camera camera;
+	Camera camera1;
+	Camera camera2;
+	Camera& current;;
+
 	PointTable cam_pos1;
 	PointTable cam_pos2;
+	PointTable cam_pos3;
 	Skybox skybox;
 
 	Quad water_quad;
