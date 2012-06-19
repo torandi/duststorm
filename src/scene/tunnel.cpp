@@ -117,9 +117,7 @@ public:
 
 		Shader::upload_lights(lights);
 		Shader::upload_camera(cam);
-
 		shaders[SHADER_NORMAL]->bind();
-		//glDisable(GL_CULL_FACE);
 
 		glm::mat4 model(1.f);
 		Shader::upload_model_matrix(model);
