@@ -101,7 +101,7 @@ public:
 			skybox.render(camera);
 		}
 
-		Shader::upload_camera(camera);
+		Shader::upload_camera(cam);
 		shaders[SHADER_NORMAL]->bind();
 
 		tv_test.render();
