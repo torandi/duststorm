@@ -242,7 +242,7 @@ static void recalc_camera(){
 
 extern "C" G_MODULE_EXPORT void drawingarea_motion_notify_event_cb(GtkWidget* widget, GdkEvent* event, gpointer data){
 	/* Enable manual control of camera */
-	if ( Editor::camera_control == Editor::CAMERA_AUTO ){
+	if ( Editor::mode == Editor::MODE_SCENE && Editor::camera_control == Editor::CAMERA_AUTO ){
 		Editor::camera_control = Editor::CAMERA_MANUAL;
 		camera = scene->get_current_camera();
 		gtk_label_set_text(message, "Manual camera control (press SPACE to reset, ENTER to print coordinates)");

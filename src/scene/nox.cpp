@@ -136,7 +136,11 @@ public:
 
 		if ( t < 30.0 ){
 			current = camera1;
-		} else {
+		} else if ( t < 30.2f ){
+			const float s = (t-30.0f) / 0.2f;
+			current.set_position(glm::mix(camera1.position(), camera2.position(), s));
+			current.look_at(glm::mix(camera1.look_at(), camera2.look_at(), s));
+		} else if ( t < 40.0f ){
 			current = camera2;
 		}
 
@@ -162,7 +166,7 @@ public:
 	RenderTarget geometry;
 	Camera camera1;
 	Camera camera2;
-	Camera& current;;
+	Camera current;
 
 	PointTable cam_pos1;
 	PointTable cam_pos2;
