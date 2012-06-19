@@ -14,7 +14,7 @@
 #include "timetable.hpp"
 #include "skybox.hpp"
 
-static glm::vec3 offset(0,0.3,0);
+static glm::vec3 offset(0,1.5,0);
 
 static float arc[][3] = {
 	{0.000000,  3.966543, 0.00f},
@@ -124,7 +124,6 @@ public:
 		glm::mat4 model(1.f);
 		Shader::upload_model_matrix(model);
 
-
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
 		glVertexAttribPointer(Shader::ATTR_POSITION,  3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, pos));
@@ -144,8 +143,8 @@ public:
 	}
 
 	virtual void update(float t, float dt){
-		//camera.set_position(position.at(t) + offset);
-		//camera.look_at(position.at(t+0.1)  + offset);
+		camera.set_position(position.at(t) + offset);
+		camera.look_at(position.at(t+0.1)  + offset);
 	}
 
 	Camera camera;
