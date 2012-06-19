@@ -14,6 +14,8 @@
 #include "timetable.hpp"
 #include "skybox.hpp"
 
+#define NYANHORSE_FRAMES 100
+
 class NOX: public Scene {
 public:
 	NOX(const glm::ivec2& size)
@@ -31,6 +33,7 @@ public:
 		, water_quad(glm::vec2(10.f, 10.0f), true, true)
 		, water_texture(Texture2D::from_filename("water.png"))
 		, fog(10000, TextureArray::from_filename("fog.png", nullptr))
+		, video(glm::vec2(1.f), true, true)
 	{
 
 		logo.set_scale(0.1f);
@@ -52,6 +55,7 @@ public:
 
 		u_wave1 = shaders[SHADER_WATER]->uniform_location("wave1");
 		u_wave2 = shaders[SHADER_WATER]->uniform_location("wave2");
+
 
 		wave1 = glm::vec2(0.01, 0);
 		wave2 = glm::vec2(0.005, 0.03);
@@ -92,6 +96,24 @@ public:
 		fog.config.death_color = glm::vec4(0.3f ,0.3f, 0.3f, 0.0f);
 		fog.config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
 		fog.update_config();
+
+		hologram_shader = Shader::create_shader("hologram");
+		u_video_index = hologram_shader->uniform_location("texture_index");
+		video_index = 0;
+
+		std::vector<std::string> frames;
+		char buffer[64];
+		for(int i=1;i<=NYANHORSE_FRAMES; ++i) {
+			sprintf(buffer, "nox2/videos/nyanhorse%d.png", i);
+			frames.push_back(std::string(buffer));
+		}
+
+		nyanhorse = TextureArray::from_filename(frames);
+
+
+		video.set_position(glm::vec3(-29.594385,0.275966,3.106559));
+		video.set_rotation(glm::vec3(0, 1.f, 0), 45.f);
+		video.set_scale(2.f);
 	}
 
 	virtual void render_geometry(const Camera& cam){
@@ -106,6 +128,8 @@ public:
 
 		tunnel.render();
 		logo.render();
+
+
 
 		water_texture->texture_bind(Shader::TEXTURE_NORMALMAP);
 		skybox.texture->texture_bind(Shader::TEXTURE_CUBEMAP_0);
@@ -122,6 +146,19 @@ public:
 
 		shaders[SHADER_PARTICLES]->bind();
 		fog.render();
+
+		glPushAttrib(GL_ENABLE_BIT);
+		glDisable(GL_CULL_FACE);
+
+		hologram_shader->bind();
+		glUniform1i(u_video_index, video_index);
+	
+		nyanhorse->texture_bind(Shader::TEXTURE_ARRAY_0);
+
+		video.render();
+
+		glPopAttrib();
+
 	}
 
 	virtual const Camera& get_current_camera(){
@@ -133,6 +170,8 @@ public:
 		camera2.set_position(cam_pos3.at(t));
 
 		camera1.look_at(cam_pos2.at(t));
+
+		video_index = (video_index +1) % NYANHORSE_FRAMES;
 
 		if ( t < 30.0 ){
 			current = camera1;
@@ -176,8 +215,12 @@ public:
 	Quad water_quad;
 	Texture2D* water_texture;
 	glm::vec2 wave1, wave2;
-	GLint u_wave1, u_wave2;
+	int video_index;
+	GLint u_wave1, u_wave2, u_video_index;
 	ParticleSystem fog;
+	TextureArray * nyanhorse;
+	Quad video;
+	Shader * hologram_shader;
 };
 
 template <>
