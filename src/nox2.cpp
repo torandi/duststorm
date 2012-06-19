@@ -88,8 +88,8 @@ namespace Engine {
 
 		const float t = global_time.get();
 		if ( t > 30.0f ){
-			const float s = (t - 30.0f) / 40.0f;
-			textarea->set_position(glm::vec3(resolution.x - 800 + 300*s, resolution.y - 250, 0));
+			const float s = (t - 30.0f) / 10.0f;
+			textarea->set_position(glm::vec3(resolution.x - 800 + 250*s, resolution.y - 250, 0));
 			shaders[SHADER_PASSTHRU]->bind();
 			text1->texture_bind(Shader::TEXTURE_2D_0);
 			textarea->render();

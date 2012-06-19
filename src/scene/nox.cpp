@@ -35,7 +35,7 @@ public:
 
 		logo.set_scale(0.1f);
 		logo.set_rotation(glm::vec3(0,1,0), 90.0f);
-		logo.set_position(glm::vec3(-30,1,0));
+		logo.set_position(glm::vec3(-30,0.3,0));
 
 		camera2.set_position(glm::vec3(-25.442295,0.129625,3.636643));
 		camera2.look_at(logo.position());
@@ -136,8 +136,8 @@ public:
 
 		if ( t < 30.0 ){
 			current = camera1;
-		} else if ( t < 30.2f ){
-			const float s = (t-30.0f) / 0.2f;
+		} else if ( t < 30.3f ){
+			const float s = (t-30.0f) / 0.3f;
 			current.set_position(glm::mix(camera1.position(), camera2.position(), s));
 			current.look_at(glm::mix(camera1.look_at(), camera2.look_at(), s));
 		} else if ( t < 40.0f ){
