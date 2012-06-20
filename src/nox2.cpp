@@ -35,6 +35,8 @@ static Texture2D* text1 = nullptr;
 static Quad* textarea = nullptr;
 static std::map<std::string, Scene*> scene;
 
+static Music * music;
+
 namespace Engine {
 	RenderTarget* rendertarget_by_name(const std::string& fullname){
 		const size_t offset = fullname.find_first_of(":");
@@ -63,12 +65,16 @@ namespace Engine {
 		textarea->set_scale(glm::vec3(512, 256, 1));
 
 		load_timetable(PATH_SRC "nox2.txt");
+
+		music = new Music("jumping.ogg");
+		music->play();
 	}
 
 	void cleanup(){
 		for ( std::pair<std::string,Scene*> p : scene ){
 			delete p.second;
 		}
+		delete music;
 	}
 
 	static void render_scene(){
