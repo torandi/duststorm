@@ -31,16 +31,11 @@ void Music::set_finished_callback(void (*callback)(void*), void * data) {
 
 void Music::pa_finished(void *userData) {
 	Music * m = (Music*) userData;
-	//The stream might just be inactive (due to eof)
-	if( ! Pa_IsStreamStopped ( m->stream ) ) Pa_StopStream( m->stream );
 
 	m->stop_decode();
 
 	m->playing = false;
 	if(m->finished_callback != NULL) (*(m->finished_callback)) ( m->callback_data );
-
-	printf("[Music] Finish callback called\n");
-
 }
 
 int Music::pa_callback(const void *inputBuffer,
@@ -109,13 +104,15 @@ Music::~Music() {
 	free(ogg_buffer);
 
 	ov_clear(&ogg_file);
-	fclose(source);
 
 	--pa_contexts;
 	if(pa_contexts == 0) terminate_pa();
 }
 
 void Music::play(int num_loops) {
+	//The stream might just be inactive (due to eof)
+	if( ! Pa_IsStreamStopped ( stream ) ) Pa_StopStream( stream );
+
 	if(playing) {
 		printf("[Music] Warning, called Music::play() on playing stream\n");
 		return;
