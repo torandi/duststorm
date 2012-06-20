@@ -27,12 +27,16 @@
 
 #include "light.hpp"
 
+#include "music.hpp"
+
 static RenderTarget* composition;
 static RenderTarget* downsample[3];
 static XYLerpTable* particle_pos = nullptr;
 static XYLerpTable* tv_pos = nullptr;
 static XYLerpTable* test_pos = nullptr;
 static std::map<std::string, Scene*> scene;
+
+static Music * music;
 
 namespace Engine {
 	RenderTarget* rendertarget_by_name(const std::string& fullname){
@@ -72,6 +76,8 @@ namespace Engine {
 		downsample[0] = new RenderTarget(glm::ivec2(200, 200), GL_RGB8, false, GL_LINEAR);
 		downsample[1] = new RenderTarget(glm::ivec2(100, 100), GL_RGB8, false, GL_LINEAR);
 		downsample[2] = new RenderTarget(glm::ivec2( 50, 50), GL_RGB8, false, GL_LINEAR);
+
+		music = new Music("music/jumping.ogg");
 	}
 
 	void cleanup(){

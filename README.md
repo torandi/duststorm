@@ -6,6 +6,8 @@ Dependencies
 libglm-dev
 libassim-dev
 opencl-headers
+portaudio19-dev
+libvorbis-dev
 
 Usage
 ===========
