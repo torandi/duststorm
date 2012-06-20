@@ -52,6 +52,7 @@ int Music::pa_callback(const void *inputBuffer,
 	Music * m = (Music*) userData;
 	int16_t * next;
 	int16_t * out = (int16_t*) outputBuffer;
+	
 	for(unsigned long i = 0; i < framesCount*m->num_channels; ++i) {
 		next = m->next_ptr(m->buffer_read);
 		if(next == m->buffer_write) {
@@ -68,7 +69,7 @@ int Music::pa_callback(const void *inputBuffer,
 			}
 		} else {
 			*out++ = *(m->buffer_read);
-			++(m->buffer_read);
+			m->buffer_read = next;
 		}
 	}
 	return paContinue;
@@ -217,7 +218,9 @@ void Music::start_decode() {
 
 void Music::stop_decode() {
 	decode = false;
+	printf("Waiting for decoder thread to terminate\n");
 	pthread_join(decoder_thread, nullptr);
+	printf("done\n");
 }
 
 void * Music::decode_thread_helper(void * data) {
@@ -264,7 +267,6 @@ bool Music::buffer_data() {
 		while(decode && bytes > 0) {
 			int16_t * next = next_ptr(buffer_write);
 			while(decode && next == buffer_read) {
-				printf("Buffer overfilled\n");
 				usleep(OVERFILL_SLEEP);
 			}
 			if(!decode) return false;

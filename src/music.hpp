@@ -10,7 +10,7 @@
 #define OGG_BUFFER_SIZE 4096
 
 //Time to sleep when hitting a full sound buffer
-#define OVERFILL_SLEEP 100 
+#define OVERFILL_SLEEP 500 
 
 #define ENDIAN 0
 
