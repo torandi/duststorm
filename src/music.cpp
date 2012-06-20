@@ -134,6 +134,10 @@ void Music::stop() {
 	print_pa_error("stop stream", err);
 }
 
+double Music::time() {
+	return Pa_GetStreamTime( stream );
+}
+
 void Music::reset_ogg_position() {
 	int seek=ov_time_seek(&ogg_file,0);
 	if(seek!=0) {
@@ -229,7 +233,7 @@ void * Music::decode_thread_helper(void * data) {
 void Music::run_decode() {
 	while(decode) {
 		if(!buffer_data()) {
-			if(loops_remaining > 0)
+			if(loops_remaining > 0 || loops_remaining < 0)
 				reset_ogg_position();
 			else
 				eof_reached = true;

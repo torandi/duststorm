@@ -27,6 +27,7 @@
 #include <map>
 
 #include "light.hpp"
+#include "music.hpp"
 
 static RenderTarget* composition = nullptr;
 static RenderTarget* blend = nullptr;

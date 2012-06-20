@@ -57,7 +57,7 @@ demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_
 demo_SOURCES = src/main.cpp src/testing.cpp
 demo_LDFLAGS = -pthread
 
-nox2_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image 
+nox2_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} ${VORBISFILE_LIBS} -lSDL_image -lportaudio
 nox2_LDFLAGS = -pthread
 nox2_SOURCES = src/main.cpp src/nox2.cpp
 

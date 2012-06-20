@@ -19,11 +19,25 @@
  */
 class Music {
 	public:
+		/*
+		 * Create a music player for the selected file.
+		 * Optional: Specify buffer size in bytes
+		 */
 		Music(const char * file, int buffer_size_ = DEFAULT_BUFFER_SIZE);
 		~Music();
 
+		/**
+		 * Start playing the file.
+		 * @param num_loops: Number of times to loop the file, -1 loops forever
+		 */
 		void play(int num_loops = 0);
+		/*
+		 * Stop the playback
+		 */
 		void stop();
+		/**
+		 * Returns the time since playback started
+		 */
 		double time();
 
 		/*
