@@ -1,0 +1,4 @@
+#!/bin/bash
+for f in `ls textures/nox2/videos/*.png`; do
+	convert $f -geometry 128x96 -bordercolor "#000" -border 0x16 small/$f
+done
