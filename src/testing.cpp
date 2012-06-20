@@ -77,7 +77,7 @@ namespace Engine {
 		downsample[1] = new RenderTarget(glm::ivec2(100, 100), GL_RGB8, false, GL_LINEAR);
 		downsample[2] = new RenderTarget(glm::ivec2( 50, 50), GL_RGB8, false, GL_LINEAR);
 
-		music = new Music("music/jumping.ogg");
+		music = new Music("jumping.ogg");
 		music->play();
 	}
 

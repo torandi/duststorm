@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+	#include "config.h"
+#endif
+
 #include "music.hpp"
 #include "globals.hpp"
 
@@ -82,7 +86,11 @@ Music::Music(const char * file, int buffer_size_) :
 	buffer = (int16_t*) malloc(sizeof(int16_t)*buffer_size);
 	ogg_buffer = (char*) malloc(sizeof(char)*OGG_BUFFER_SIZE);
 
-	load_ogg(file);
+	char real_path[strlen(file)+strlen(PATH_MUSIC)+1];
+
+	sprintf(real_path, "%s%s", PATH_MUSIC, file);
+
+	load_ogg(real_path);
 
 	PaError err = Pa_OpenDefaultStream(&stream,
 			0,
@@ -233,11 +241,16 @@ void * Music::decode_thread_helper(void * data) {
 void Music::run_decode() {
 	while(decode) {
 		if(!buffer_data()) {
-			if(loops_remaining > 0 || loops_remaining < 0)
+			if(loops_remaining > 0) {
 				reset_ogg_position();
-			else
+				--loops_remaining;
+			} else if (loops_remaining == -1) {
+				reset_ogg_position();
+			} else {
 				eof_reached = true;
-			--loops_remaining;
+				decode = false;
+				return;
+			}
 		}
 	}
 }
