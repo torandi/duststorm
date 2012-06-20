@@ -28,14 +28,16 @@ void Music::set_finished_callback(void (*callback)(void*), void * data) {
 	callback_data = data;
 }
 
+
 void Music::pa_finished(void *userData) {
+	Music * m = (Music*) userData;
 	//The stream might just be inactive (due to eof)
-	if( ! Pa_IsStreamStopped ( stream ) ) Pa_StopStream( stream );
+	if( ! Pa_IsStreamStopped ( m->stream ) ) Pa_StopStream( m->stream );
 
-	stop_decode();
+	m->stop_decode();
 
-	playing = false;
-	if(finished_callback != NULL) (*finished_callback) ( callback_data );
+	m->playing = false;
+	if(m->finished_callback != NULL) (*(m->finished_callback)) ( m->callback_data );
 
 	printf("[Music] Finish callback called\n");
 
@@ -43,12 +45,33 @@ void Music::pa_finished(void *userData) {
 
 int Music::pa_callback(const void *inputBuffer,
 													void *outputBuffer,
-													unsigned long framesPerBuffer,
+													unsigned long framesCount,
 													const PaStreamCallbackTimeInfo* timeInfo,
 													PaStreamCallbackFlags statusFlags,
 													void *userData ) {
+	Music * m = (Music*) userData;
+	int16_t * next;
+	int16_t * out = (int16_t*) outputBuffer;
+	for(unsigned long i = 0; i < framesCount*m->num_channels; ++i) {
+		next = m->next_ptr(m->buffer_read);
+		if(next == m->buffer_write) {
+			//Fill the rest with silence:
+			for(;i < framesCount*m->num_channels; ++i) {
+				*out++ = 0;
+			}
 
-	return 0;
+			if(m->eof_reached) {
+				return paComplete; //We have played all data
+			} else {
+				fprintf(stderr, "[Music] Critical error: No data left in buffer\n");
+				return paAbort;
+			}
+		} else {
+			*out++ = *(m->buffer_read);
+			++(m->buffer_read);
+		}
+	}
+	return paContinue;
 }
 
 Music::Music(const char * file, int buffer_size_) :
@@ -74,6 +97,7 @@ Music::Music(const char * file, int buffer_size_) :
 			&Music::pa_callback,
 			this);
 	print_pa_error("create stream", err);
+	err = Pa_SetStreamFinishedCallback(stream, &Music::pa_finished);
 }
 
 Music::~Music() {
@@ -101,6 +125,7 @@ void Music::play(int num_loops) {
 	buffer_write = buffer;
 	buffer_read = buffer + buffer_size - 1;
 
+	eof_reached = false;
 	playing = true;
 	start_decode();
 	Pa_StartStream( stream );
@@ -206,6 +231,8 @@ void Music::run_decode() {
 		if(!buffer_data()) {
 			if(loops_remaining > 0)
 				reset_ogg_position();
+			else
+				eof_reached = true;
 			--loops_remaining;
 		}
 	}
@@ -243,7 +270,7 @@ bool Music::buffer_data() {
 			if(!decode) return false;
 			*buffer_write = *((int16_t*) pos); //Write
 			buffer_write = next; //Advance pointer
-			bytes += sizeof(int16_t)/sizeof(char);
+			bytes -= sizeof(int16_t)/sizeof(char);
 			pos += sizeof(int16_t)/sizeof(char);
 		}
 		return true;

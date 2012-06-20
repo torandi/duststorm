@@ -78,12 +78,14 @@ namespace Engine {
 		downsample[2] = new RenderTarget(glm::ivec2( 50, 50), GL_RGB8, false, GL_LINEAR);
 
 		music = new Music("music/jumping.ogg");
+		music->play();
 	}
 
 	void cleanup(){
 		for ( std::pair<std::string,Scene*> p : scene ){
 			delete p.second;
 		}
+		delete music;
 	}
 
 	static void render_scene(){

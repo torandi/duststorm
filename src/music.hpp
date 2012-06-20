@@ -64,6 +64,7 @@ class Music {
 		void start_decode();
 		void stop_decode();
 		void reset_ogg_position();
+		bool eof_reached;
 
 		int16_t * next_ptr(int16_t *ptr) const;
 
@@ -74,7 +75,7 @@ class Music {
 										PaStreamCallbackFlags statusFlags,
 										void *userData );
 
-		void pa_finished(void *userData);
+		static void pa_finished(void *userData);
 
 		static void print_pa_error(const char * context, const PaError &err);
 };
