@@ -14,7 +14,7 @@
 #include "timetable.hpp"
 #include "skybox.hpp"
 
-#define NYANHORSE_FRAMES 100
+#define NYANHORSE_FRAMES 95
 
 class NOX: public Scene {
 public:
