@@ -102,6 +102,8 @@ Music::Music(const char * file, int buffer_size_) :
 			this);
 	print_pa_error("create stream", err);
 	err = Pa_SetStreamFinishedCallback(stream, &Music::pa_finished);
+	print_pa_error("set finish callback", err);
+	PaAlsa_EnableRealtimeScheduling( stream, 1 );
 }
 
 Music::~Music() {
@@ -142,7 +144,7 @@ void Music::stop() {
 	print_pa_error("stop stream", err);
 }
 
-double Music::time() {
+double Music::time() const {
 	return Pa_GetStreamTime( stream );
 }
 

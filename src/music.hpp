@@ -38,7 +38,7 @@ class Music {
 		/**
 		 * Returns the time since playback started
 		 */
-		double time();
+		double time() const;
 
 		/*
 		 * This function will be called when the music finishes to play
@@ -92,5 +92,7 @@ class Music {
 		static void pa_finished(void *userData);
 
 		static void print_pa_error(const char * context, const PaError &err);
+
+		static PaStreamParameters output_params;
 };
 #endif
