@@ -100,7 +100,7 @@ public:
 		hologram_shader = Shader::create_shader("hologram");
 		u_video_index = hologram_shader->uniform_location("texture_index");
 		video_index = 0;
-
+/*
 		std::vector<std::string> frames;
 		char buffer[64];
 		for(int i=1;i<=NYANHORSE_FRAMES; ++i) {
@@ -113,7 +113,7 @@ public:
 
 		video.set_position(glm::vec3(-29.594385,0.275966,3.106559));
 		video.set_rotation(glm::vec3(0, 1.f, 0), 45.f);
-		video.set_scale(2.f);
+		video.set_scale(2.f);*/
 	}
 
 	virtual void render_geometry(const Camera& cam){
@@ -150,12 +150,12 @@ public:
 		glPushAttrib(GL_ENABLE_BIT);
 		glDisable(GL_CULL_FACE);
 
-		hologram_shader->bind();
+/*		hologram_shader->bind();
 		glUniform1i(u_video_index, video_index);
 	
 		nyanhorse->texture_bind(Shader::TEXTURE_ARRAY_0);
 
-		video.render();
+		video.render();*/
 
 		glPopAttrib();
 

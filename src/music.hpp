@@ -51,6 +51,8 @@ class Music {
 		static void initialize_pa();
 		static void terminate_pa();
 
+		static int device_index;
+		static PaTime device_latency;
 
 		FILE * source;
 		OggVorbis_File ogg_file;
@@ -63,7 +65,8 @@ class Music {
 		int16_t * buffer;
 		int16_t * buffer_write;
 		int16_t * buffer_read;
-		
+	
+		double start_time;
 		int loops_remaining;
 		bool playing;
 		bool decode;

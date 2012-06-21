@@ -10,10 +10,23 @@
 #include <vorbis/vorbisfile.h>
 
 int Music::pa_contexts = 0;
+int Music::device_index = 3;
+PaTime Music::device_latency;
 
 void Music::initialize_pa() {
 	PaError err = Pa_Initialize();
 	print_pa_error("initialize", err);
+
+	const PaDeviceInfo * device_info;
+	const PaHostApiInfo * host_info;
+
+	for(int i=0; i < Pa_GetDeviceCount(); ++i) {
+		device_info = Pa_GetDeviceInfo( i );
+		host_info = Pa_GetHostApiInfo( device_info->hostApi );
+		fprintf(verbose, "[Music] [ %d ] %s ( %s ) channels: %d\n", i, device_info->name, host_info->name, device_info->maxOutputChannels);
+		if(device_index == i)
+			device_latency = device_info->defaultLowOutputLatency;
+	}
 }
 
 void Music::terminate_pa() {
@@ -77,7 +90,7 @@ int Music::pa_callback(const void *inputBuffer,
 Music::Music(const char * file, int buffer_size_) :
 		buffer_size(buffer_size_)
 	, playing(false) 
-	, decode(false) 
+	, decode(false)
 	, finished_callback(nullptr)
 	, callback_data(nullptr) {
 	if(pa_contexts == 0) initialize_pa();
@@ -92,18 +105,24 @@ Music::Music(const char * file, int buffer_size_) :
 
 	load_ogg(real_path);
 
-	PaError err = Pa_OpenDefaultStream(&stream,
-			0,
-			num_channels,
-			paInt16,
+	PaStreamParameters params;
+	params.channelCount = num_channels;
+	params.device = device_index;
+	params.hostApiSpecificStreamInfo = NULL;
+	params.sampleFormat = paInt16;
+	params.suggestedLatency = device_latency;
+
+	PaError err = Pa_OpenStream(&stream,
+			nullptr,
+			&params,
 			sample_rate,
 			paFramesPerBufferUnspecified,
+			paNoFlag,
 			&Music::pa_callback,
 			this);
 	print_pa_error("create stream", err);
 	err = Pa_SetStreamFinishedCallback(stream, &Music::pa_finished);
 	print_pa_error("set finish callback", err);
-	PaAlsa_EnableRealtimeScheduling( stream, 1 );
 }
 
 Music::~Music() {
@@ -133,6 +152,8 @@ void Music::play(int num_loops) {
 	buffer_write = buffer;
 	buffer_read = buffer + buffer_size - 1;
 
+	start_time = Pa_GetStreamTime(stream);
+
 	eof_reached = false;
 	playing = true;
 	start_decode();
@@ -145,7 +166,7 @@ void Music::stop() {
 }
 
 double Music::time() const {
-	return Pa_GetStreamTime( stream );
+	return Pa_GetStreamTime( stream ) - start_time;
 }
 
 void Music::reset_ogg_position() {

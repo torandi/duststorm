@@ -144,5 +144,6 @@ namespace Engine {
 		for ( std::pair<std::string,Scene*> p: scene ){
 			p.second->update_scene(t, dt);
 		}
+		printf("TIME: %lf\n", music->time());
 	}
 }
