@@ -31,7 +31,8 @@
 
 static RenderTarget* composition = nullptr;
 static RenderTarget* blend = nullptr;
-static Texture2D* text1 = nullptr;
+#define NUM_TEXT_TEXTURES 4
+static Texture2D* text[NUM_TEXT_TEXTURES]; 
 static Quad* textarea = nullptr;
 static std::map<std::string, Scene*> scene;
 
@@ -60,7 +61,11 @@ namespace Engine {
 		scene["NOX"] = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
 		composition = new RenderTarget(resolution,           GL_RGB8, false);
 		blend = new RenderTarget(glm::ivec2(1,1), GL_RGBA8, false);
-		text1 = Texture2D::from_filename("nox2/text1.png");
+		char filename[64];
+		for(int i=0; i < NUM_TEXT_TEXTURES; ++i) {
+			sprintf(filename, "nox2/text%d.png", i+1);
+			text[i] = Texture2D::from_filename(filename);
+		}
 		textarea = new Quad(glm::vec2(1.0f, -1.0f), false);
 		textarea->set_scale(glm::vec3(512, 256, 1));
 
@@ -97,11 +102,11 @@ namespace Engine {
 		scene["NOX"]->draw(shaders[SHADER_BLEND]);
 
 		const float t = global_time.get();
-		if ( t > 30.0f ){
-			const float s = (t - 30.0f) / 10.0f;
-			textarea->set_position(glm::vec3(resolution.x - 800 + 250*s, resolution.y - 250, 0));
+		if ( t > 23.1f ){
+			const float s = (t - 23.1f) / 7.0f;
+			textarea->set_position(glm::vec3( resolution.x - ((resolution.x - 525)/5.1f)*s, resolution.y - 250, 0));
 			shaders[SHADER_PASSTHRU]->bind();
-			text1->texture_bind(Shader::TEXTURE_2D_0);
+			text[0]->texture_bind(Shader::TEXTURE_2D_0);
 			textarea->render();
 		}
 	}
