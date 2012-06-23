@@ -31,7 +31,7 @@
 
 static RenderTarget* composition = nullptr;
 static RenderTarget* blend = nullptr;
-#define NUM_TEXT_TEXTURES 4
+#define NUM_TEXT_TEXTURES 8
 static Texture2D* text[NUM_TEXT_TEXTURES]; 
 static Quad* textarea = nullptr;
 static std::map<std::string, Scene*> scene;
@@ -137,6 +137,34 @@ namespace Engine {
 			textarea->set_position(glm::vec3( scale_text_position( (t - 50.f), 10.f, 60) , resolution.y - 250, 0));
 			shaders[SHADER_PASSTHRU]->bind();
 			text[3]->texture_bind(Shader::TEXTURE_2D_0);
+			textarea->render();
+		}
+		if( t > 60.0f && t < 66.f) {
+			//last years entries
+			textarea->set_position(glm::vec3( scale_text_position( (t - 60.f), 6.f, 60) , resolution.y - 250, 0));
+			shaders[SHADER_PASSTHRU]->bind();
+			text[4]->texture_bind(Shader::TEXTURE_2D_0);
+			textarea->render();
+		}
+		if( t > 66.0f && t < 75.f) {
+			//spacehorse
+			textarea->set_position(glm::vec3( scale_text_position( (t - 66.f), 9.f, 60) , resolution.y - 250, 0));
+			shaders[SHADER_PASSTHRU]->bind();
+			text[5]->texture_bind(Shader::TEXTURE_2D_0);
+			textarea->render();
+		}
+		if( t > 75.0f && t < 85.f) {
+			//omgspace
+			textarea->set_position(glm::vec3( scale_text_position( (t - 75.f), 10.f, 0) , resolution.y - 250, 0));
+			shaders[SHADER_PASSTHRU]->bind();
+			text[6]->texture_bind(Shader::TEXTURE_2D_0);
+			textarea->render();
+		}
+		if( t > 85.0f && t < 95.f) {
+			//trollgame
+			textarea->set_position(glm::vec3( scale_text_position( (t - 85.f), 10.f, 60) , resolution.y - 250, 0));
+			shaders[SHADER_PASSTHRU]->bind();
+			text[7]->texture_bind(Shader::TEXTURE_2D_0);
 			textarea->render();
 		}
 	}

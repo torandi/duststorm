@@ -15,8 +15,8 @@
 #include "skybox.hpp"
 
 #define HOLOGRAM_SCALE 2.f
-#define HOLOGRAM_FRAMERATE 4
-#define NYANHORSE_FRAMES 95
+#define HOLOGRAM_FRAMERATE 30
+#define HOLOGRAM_FRAMES 900
 
 class NOX: public Scene {
 public:
@@ -103,12 +103,12 @@ public:
 
 		std::vector<std::string> frames;
 		char buffer[64];
-		for(int i=1;i<=NYANHORSE_FRAMES; ++i) {
-			sprintf(buffer, "nox2/videos/nyanhorse%d.png", i);
+		for(int i=1;i<=HOLOGRAM_FRAMES; ++i) {
+			sprintf(buffer, "nox2/videos/entries%d.png", i);
 			frames.push_back(std::string(buffer));
 		}
 
-		nyanhorse = TextureArray::from_filename(frames);
+		hologram = TextureArray::from_filename(frames);
 
 
 		video.set_rotation(glm::vec3(0, 1.f, 0), 45.f);
@@ -148,13 +148,13 @@ public:
 
 		const float t = global_time.get();
 
-		if( t  > 64 && t < 89.5) {
+		if( t  > 64 && t < 96) {
 			glPushAttrib(GL_ENABLE_BIT);
 			glDisable(GL_CULL_FACE);
 			hologram_shader->bind();
 			glUniform1i(u_video_index, video_index);
 		
-			nyanhorse->texture_bind(Shader::TEXTURE_ARRAY_0);
+			hologram->texture_bind(Shader::TEXTURE_ARRAY_0);
 
 			video.render();
 
@@ -197,9 +197,13 @@ public:
 			const float s = (t - 64);
 			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
 			video.set_position(glm::vec3(-29.59,-(HOLOGRAM_SCALE/2.f)*s,3.10));
-		} else if( t > 65 ) {
+		} else if( t > 65 && t < 95) {
 			const float s = (t - 65);
 			video_index = s*HOLOGRAM_FRAMERATE;
+		} else if ( t > 95 && t < 96) {
+			const float s = 1.f - (t - 95);
+			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
+			video.set_position(glm::vec3(-29.59,-(HOLOGRAM_SCALE/2.f)*s,3.10));
 		}
 	}
 
@@ -233,7 +237,7 @@ public:
 	int video_index;
 	GLint u_wave1, u_wave2, u_video_index;
 	ParticleSystem fog;
-	TextureArray * nyanhorse;
+	TextureArray * hologram;
 	Quad video;
 	Shader * hologram_shader;
 };
