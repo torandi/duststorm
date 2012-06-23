@@ -57,6 +57,7 @@ class Music {
 
 		//Find hw device to use
 		static void find_default_device();
+		static char * hw_card;
 		static short hw_device[2];
 
 		static int device_index;

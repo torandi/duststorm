@@ -11,9 +11,10 @@
 #include <pulse/pulseaudio.h>
 
 int Music::pa_contexts = 0;
-int Music::device_index = 3;
+int Music::device_index = -1;
 PaTime Music::device_latency;
 pa_mainloop * Music::pulse_main;
+char * Music::hw_card;
 short Music::hw_device[2];
 
 void Music::initialize_pa() {
@@ -40,17 +41,59 @@ void Music::find_default_device() {
 	//Run the main loop
 	pa_mainloop_run( pulse_main , &retval);
 
-	printf("[Music] Mainloop exited with status %d\n", retval);
+	device_index = -1;
 
-	const PaDeviceInfo * device_info;
-	const PaHostApiInfo * host_info;
+	if(retval == -1) {
+		printf("[Music] Falling back to default device, syncing might not work\n");
+	} else {
 
-	for(int i=0; i < Pa_GetDeviceCount(); ++i) {
-		device_info = Pa_GetDeviceInfo( i );
-		host_info = Pa_GetHostApiInfo( device_info->hostApi );
-		fprintf(verbose, "[Music] [ %d ] %s ( %s ) channels: %d\n", i, device_info->name, host_info->name, device_info->maxOutputChannels);
-		if(device_index == i)
+		char card_only[32];
+		char with_device[32];
+		char with_subdevice[32];
+
+
+		sprintf(card_only, "(hw:%s)", hw_card);
+		sprintf(with_device, "(hw:%s,%d)", hw_card,hw_device[0]);
+		sprintf(with_subdevice, "(hw:%s,%d,%d)", hw_card,hw_device[0], hw_device[1]);
+
+		bool device_match = false; 
+		/*
+		 * The matching works as follows:
+		 * if card_only matches and device_match is false, it is concidered a match
+		 * if with_device matches device_match is set to true and it is concidered a match
+		 * if with_subdevice matches the loop breaks directly and it is a perfect match
+		 */
+
+		const PaDeviceInfo * device_info;
+		const PaHostApiInfo * host_info;
+
+		for(int i=0; i < Pa_GetDeviceCount(); ++i) {
+			device_info = Pa_GetDeviceInfo( i );
+			host_info = Pa_GetHostApiInfo( device_info->hostApi );
+			fprintf(verbose, "[Music] [ %d ] %s ( %s ) channels: %d\n", i, device_info->name, host_info->name, device_info->maxOutputChannels);
+			std::string name(device_info->name);
+			if(name.find(with_subdevice) != std::string::npos) {
+				fprintf(verbose, "[Music] Devices matches perfectly.\n");
+				device_index = i;
+				break;
+			} else if(name.find(with_device) != std::string::npos) {
+				fprintf(verbose, "[Music] card and device matches\n");
+				device_index = i;
+				device_match = true;
+			} else if(!device_match && name.find(card_only) != std::string::npos) {
+				fprintf(verbose, "[Music] Card matches\n");
+				device_index = i;
+			}
+		}
+
+		if(device_index == -1) {
+			printf("[Music] No device match default device from pulse, falling back to default device, syncing might not work\n");
+		} else {
+			device_info = Pa_GetDeviceInfo( device_index );
+			fprintf(verbose, "[Music] Using %s as device\n", device_info->name);
 			device_latency = device_info->defaultLowOutputLatency;
+		}
+
 	}
 
 	pa_context_disconnect( pa_context );
@@ -103,20 +146,16 @@ void Music::pulse_sink_info_callback (pa_context *c, const pa_sink_info *i, int 
 		}
 
 		//We must copy the data since the returned pointer is invalid after the subsequent call to proplist_get
-		prop = pa_proplist_gets(i->proplist, "alsa.name");
-		char device_name[strlen(prop)+1];
-		memcpy(device_name, prop, (strlen(prop)+1)*sizeof(char));
-
-		prop = pa_proplist_gets(i->proplist, "alsa.card_name");
-		char card_name[strlen(prop)+1];
-		memcpy(card_name, prop, (strlen(prop)+1)*sizeof(char));
-
 		prop = pa_proplist_gets(i->proplist, "alsa.card");
-		hw_device[0] = atoi(prop);
+		hw_card = new char[strlen(prop)+1];
+		memcpy(hw_card, prop, (strlen(prop)+1)*sizeof(char));
+
 		prop = pa_proplist_gets(i->proplist, "alsa.device");
+		hw_device[0] = atoi(prop);
+		prop = pa_proplist_gets(i->proplist, "alsa.subdevice");
 		hw_device[1] = atoi(prop);
 
-		fprintf(verbose,"[Music] Default device: %s:  %s (hw:%d,%d)\n", card_name, device_name, hw_device[0], hw_device[1]);
+		fprintf(verbose,"[Music] Default device: (hw:%s,%d,%d)\n", hw_card, hw_device[0], hw_device[1]);
 
 		pa_mainloop_quit( pulse_main, 1 );
 	} else {
