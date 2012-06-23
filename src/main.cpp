@@ -37,6 +37,10 @@ static const char* program_name;
 static bool resolution_given = false;
 static int frames = 0;
 
+void terminate() {
+	running = false;
+}
+
 static void handle_sigint(int signum){
 	if ( !running ){
 		fprintf(stderr, "\rgot SIGINT again, aborting\n");
