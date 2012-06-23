@@ -205,8 +205,8 @@ namespace Engine {
 
 		const float t = global_time.get();
 		float s = glm::min(t / 2.5f + 0.2f, 1.0f);
-		if(t > 110) {
-			s = 1.f - (t - 110.f);
+		if(t > 115) {
+			s = 1.f - (t - 115.f)/5.f;
 		}
 		blend->with([s](){ RenderTarget::clear(Color(s, 0.0f, 0.0f, 0.0f)); });
 		composition->with(render_composition);
@@ -215,7 +215,7 @@ namespace Engine {
 	}
 
 	void update(float t, float dt){
-		if(t >= 112) {
+		if(t >= 120) {
 			terminate();
 		}
 		for ( std::pair<std::string,Scene*> p: scene ){
