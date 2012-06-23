@@ -92,6 +92,18 @@ namespace Engine {
 		}
 	}
 
+	static float scale_text_position(const float &t, const float &duration, short direction) {
+		float s = t / duration;
+		if(s > 1.f) {
+			s += (s-1.f)*(s-1.f);
+		}
+		if(direction == 1) {
+			return (resolution.x - 512.f - (resolution.x)*s);
+		} else {
+			return ((resolution.x)*s);
+		}
+	}
+
 	static void render_composition(){
 		RenderTarget::clear(Color::black);
 
@@ -103,11 +115,16 @@ namespace Engine {
 		scene["NOX"]->draw(shaders[SHADER_BLEND]);
 
 		const float t = global_time.get();
-		if ( t > 23.1f ){
-			const float s = (t - 23.1f) / 7.0f;
-			textarea->set_position(glm::vec3( resolution.x - ((resolution.x - 525)/5.1f)*s, resolution.y - 250, 0));
+		if ( t > 23.1f && t < 35.f ){
+			textarea->set_position(glm::vec3( scale_text_position( (t - 23.1f), 7.f, 1) , resolution.y - 250, 0));
 			shaders[SHADER_PASSTHRU]->bind();
 			text[0]->texture_bind(Shader::TEXTURE_2D_0);
+			textarea->render();
+		}
+		if( t > 30.5f ) {
+			textarea->set_position(glm::vec3( scale_text_position( (t - 30.5f), 9.5f, -1) , resolution.y - 250, 0));
+			shaders[SHADER_PASSTHRU]->bind();
+			text[1]->texture_bind(Shader::TEXTURE_2D_0);
 			textarea->render();
 		}
 	}

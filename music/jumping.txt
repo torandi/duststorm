@@ -17,3 +17,11 @@ sidovinkel Camera position=(-27.901295,-0.007981,3.963586)
 sidovinkel 2 Camera position=(-27.536636,0.112183,-4.417109)
 sidovindel 1, fast uppifrån Camera position=(-26.293278,1.007398,5.809681)
 vinkel nerifrån (sv2) Camera position=(-26.715853,3.533684,4.454080)
+
+Move along the axis: 
+pos[  1] Camera position=(-28.982880,0.021749,-3.286693)
+look_at[  2] Camera position=(-29.743034,0.288257,-2.538018)
+pos[  3] Camera position=(-29.153040,0.343992,0.525910)
+pos[  4] Camera position=(-29.236765,0.325309,4.169028)
+look_at[  5] Camera position=(-29.606407,0.415111,3.142055)
+

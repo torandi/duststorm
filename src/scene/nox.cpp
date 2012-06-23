@@ -26,6 +26,7 @@ public:
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.0f)
 		, cam_pos1("scene/nox_cam1.txt")
 		, cam_pos2("scene/nox_cam2.txt")
+		, light_pos("scene/nox_extra_light.txt")
 		, skybox("skydark")
 		, water_quad(glm::vec2(10.f, 10.0f), true, true)
 		, water_texture(Texture2D::from_filename("water.png"))
@@ -67,6 +68,9 @@ public:
 		lights.lights[1].set_position(glm::vec3(-2.0f, 1.0f, 0.0f));
 		lights.lights[1].intensity = glm::vec3(0.3f, 0.6f, 0.8f);
 		lights.lights[1].type = Light::POINT_LIGHT;
+
+		lights.lights[2].type = Light::POINT_LIGHT;
+
 
 		fog.avg_spawn_rate = 50000.f;
 		fog.spawn_rate_var = 0.f;
@@ -167,6 +171,22 @@ public:
 		video_index = (video_index +1) % NYANHORSE_FRAMES;
 
 		fog.update(dt);
+
+		
+		if(t > 30 && t < 40) {
+			float s = (t-30.f)/10.f;
+			lights.lights[2].intensity = glm::vec3(0.1f, 0.3f, 0.2f)*s;
+		} else if( t > 50 && t < 60) {
+			float s = (1.f-(t-50.f)/10.f);
+			lights.lights[2].intensity = glm::vec3(0.1f, 0.3f, 0.2f)*s;
+		}
+
+		if(t > 30 && t < 60) {
+			lights.num_lights() = 3;
+			lights.lights[2].set_position(light_pos.at(t));
+		} else if( t > 60) {
+			lights.num_lights() = 2;
+		}
 	}
 
 	void render_scene(){
@@ -190,6 +210,7 @@ public:
 
 	PointTable cam_pos1;
 	PointTable cam_pos2;
+	PointTable light_pos;
 	Skybox skybox;
 
 	Quad water_quad;
@@ -212,6 +233,7 @@ SceneFactory::Metadata* SceneTraits<NOX>::metadata(){
 	m["Logo"]       = new MetaModel("nox.obj");
 	m["Light[0]"]   = new MetaLight<NOX>(&NOX::lights, 0, "tv_light0.txt");
 	m["Light[1]"]   = new MetaLight<NOX>(&NOX::lights, 1, "tv_light1.txt");
+	m["Light[2]"]   = new MetaLight<NOX>(&NOX::lights, 2, "nox_extra_light.txt");
 	//m["fog"]				= new MetaParticles<NOX>(&NOX::fog
 	return _;
 }
