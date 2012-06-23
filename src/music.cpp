@@ -65,23 +65,21 @@ void Music::find_default_device() {
 		 */
 
 		const PaDeviceInfo * device_info;
-		const PaHostApiInfo * host_info;
 
 		for(int i=0; i < Pa_GetDeviceCount(); ++i) {
 			device_info = Pa_GetDeviceInfo( i );
-			host_info = Pa_GetHostApiInfo( device_info->hostApi );
-			fprintf(verbose, "[Music] [ %d ] %s ( %s ) channels: %d\n", i, device_info->name, host_info->name, device_info->maxOutputChannels);
+			//fprintf(verbose, "[Music] [ %d ] %s channels: %d\n", i, device_info->name, device_info->maxOutputChannels);
 			std::string name(device_info->name);
 			if(name.find(with_subdevice) != std::string::npos) {
-				fprintf(verbose, "[Music] Devices matches perfectly.\n");
+				//fprintf(verbose, "[Music] Devices matches perfectly.\n");
 				device_index = i;
 				break;
 			} else if(name.find(with_device) != std::string::npos) {
-				fprintf(verbose, "[Music] card and device matches\n");
+				//fprintf(verbose, "[Music] Card and device matches\n");
 				device_index = i;
 				device_match = true;
 			} else if(!device_match && name.find(card_only) != std::string::npos) {
-				fprintf(verbose, "[Music] Card matches\n");
+				//fprintf(verbose, "[Music] Card matches\n");
 				device_index = i;
 			}
 		}
@@ -126,7 +124,6 @@ void Music::pulse_context_callback(pa_context * c, void * userdata) {
 }
 
 void Music::pulse_server_info_callback (pa_context *c, const pa_server_info *i, void *userdata) {
-	fprintf(verbose, "[Music] Default sink name: %s\n", i->default_sink_name);
 	pa_context_get_sink_info_by_name(c, i->default_sink_name, &Music::pulse_sink_info_callback, NULL );
 }
 
@@ -134,7 +131,6 @@ void Music::pulse_sink_info_callback (pa_context *c, const pa_sink_info *i, int 
 	if(eol == 1)
 		return;
 	if(i->flags & PA_SINK_HARDWARE) {
-		fprintf(verbose,"[Music] eol: %d Default sink is a hardware sink, driver: %s\n", eol, i->driver);
 		const char * prop;
 
 		prop = pa_proplist_gets(i->proplist, "device.api");
@@ -155,7 +151,7 @@ void Music::pulse_sink_info_callback (pa_context *c, const pa_sink_info *i, int 
 		prop = pa_proplist_gets(i->proplist, "alsa.subdevice");
 		hw_device[1] = atoi(prop);
 
-		fprintf(verbose,"[Music] Default device: (hw:%s,%d,%d)\n", hw_card, hw_device[0], hw_device[1]);
+		fprintf(verbose,"[Music] Default device from pulse: (hw:%s,%d,%d)\n", hw_card, hw_device[0], hw_device[1]);
 
 		pa_mainloop_quit( pulse_main, 1 );
 	} else {
@@ -240,21 +236,35 @@ Music::Music(const char * file, int buffer_size_) :
 
 	load_ogg(real_path);
 
-	PaStreamParameters params;
-	params.channelCount = num_channels;
-	params.device = device_index;
-	params.hostApiSpecificStreamInfo = NULL;
-	params.sampleFormat = paInt16;
-	params.suggestedLatency = device_latency;
 
-	PaError err = Pa_OpenStream(&stream,
-			nullptr,
-			&params,
-			sample_rate,
-			paFramesPerBufferUnspecified,
-			paNoFlag,
-			&Music::pa_callback,
-			this);
+	PaError err;
+	if(device_index != -1) {
+		PaStreamParameters params;
+		params.channelCount = num_channels;
+		params.device = device_index;
+		params.hostApiSpecificStreamInfo = NULL;
+		params.sampleFormat = paInt16;
+		params.suggestedLatency = device_latency;
+
+		err = Pa_OpenStream(&stream,
+				nullptr,
+				&params,
+				sample_rate,
+				paFramesPerBufferUnspecified,
+				paNoFlag,
+				&Music::pa_callback,
+				this);
+	} else {
+		err = Pa_OpenDefaultStream(&stream, 
+				0,
+				num_channels,
+				paInt16,
+				sample_rate,
+				paFramesPerBufferUnspecified,
+				&Music::pa_callback,
+				this
+			);
+	}
 	print_pa_error("create stream", err);
 	err = Pa_SetStreamFinishedCallback(stream, &Music::pa_finished);
 	print_pa_error("set finish callback", err);
