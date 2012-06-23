@@ -52,7 +52,7 @@ static void show_fps(int signum){
 	frames = 0;
 }
 
-static void init(bool fullscreen, bool vsync){
+static void init(bool fullscreen, bool vsync, double seek){
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ){
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		exit(1);
@@ -104,7 +104,7 @@ static void init(bool fullscreen, bool vsync){
 	Texture2D::preload("default.jpg");
 	Texture2D::preload("default_normalmap.jpg");
 
-	Engine::init();
+	Engine::init(seek);
 
 	global_time.set_paused(false); /* start time */
 	checkForGLErrors("post init()");
@@ -219,6 +219,7 @@ void show_usage(){
 	       "                          current resolution in fullscreen.)\n"
 	       "  -f, --fullscreen        Enable fullscreen mode (default: false)\n"
 	       "  -w, --windowed          Inverse of --fullscreen.\n"
+				 "	-s, --seek=time					Seek to the given time\n"
 				 "  -n, --no-vsync					Disable vsync\n"
 	       "  -v, --verbose           Enable verbose output\n"
 	       "  -q, --quiet             Inverse of --verbose.\n"
@@ -234,6 +235,7 @@ static struct option options[] = {
 	{"resolution",   required_argument, 0, 'r'},
 	{"fullscreen",   no_argument,       &fullscreen, 1},
 	{"windowed",     no_argument,       &fullscreen, 0},
+	{"seek" ,				 required_argument, 0, 's'},
 	{"no-vsync",     no_argument,       &vsync, 0},
 	{"verbose",      no_argument,       &verbose_flag, 1},
 	{"quiet",        no_argument,       &verbose_flag, 0},
@@ -250,9 +252,11 @@ int main(int argc, char* argv[]){
 		program_name = argv[0];
 	}
 
+	double seek=0.0;
+
 	/* parse arguments */
 	int op, option_index;
-	while ( (op = getopt_long(argc, argv, "r:fwnvqh", options, &option_index)) != -1 ){
+	while ( (op = getopt_long(argc, argv, "r:fws:nvqh", options, &option_index)) != -1 ){
 		switch ( op ){
 		case 0:   /* long opt*/
 		case '?': /* invalid */
@@ -278,6 +282,11 @@ int main(int argc, char* argv[]){
 
 		case 'w': /* --windowed */
 			fullscreen = 0;
+			break;
+
+		case 's': /* --seek */
+			seek = atof(optarg);
+			printf("Seek to %lf\n", seek);
 			break;
 
 		case 'n': /* --no-vsync */
@@ -319,7 +328,7 @@ int main(int argc, char* argv[]){
 	}
 
 	/* let the magic begin */
-	init(fullscreen, vsync);
+	init(fullscreen, vsync, seek);
 	magic_stuff();
 	cleanup();
 

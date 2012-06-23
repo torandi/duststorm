@@ -240,6 +240,8 @@ Music::Music(const char * file, int buffer_size_) :
 
 	load_ogg(real_path);
 
+	pthread_mutex_init(&ogg_mutex, NULL);
+
 	PaError err;
 	if(device_index != -1) {
 		num_channels = num_hw_channels;
@@ -286,6 +288,8 @@ Music::~Music() {
 
 	ov_clear(&ogg_file);
 
+	pthread_mutex_destroy(&ogg_mutex);
+
 	--pa_contexts;
 	if(pa_contexts == 0) terminate_pa();
 }
@@ -321,6 +325,36 @@ double Music::time() const {
 	if(start_time == 0.0)
 		return -1.0;
 	return Pa_GetStreamTime( stream ) - start_time;
+}
+
+void Music::seek(double t) {
+	pthread_mutex_lock(&ogg_mutex);
+	double cur = ov_time_tell(&ogg_file);
+	int err = ov_time_seek(&ogg_file, t);
+	pthread_mutex_unlock(&ogg_mutex);
+
+	if(err != 0) {
+		switch(err) {
+			case OV_ENOSEEK:
+					printf("Bitstream is not seekable.\n");
+					break;
+			case OV_EINVAL:
+					printf("Invalid argument value; possibly called with an OggVorbis_File structure that isn't open.\n");
+					break;
+			case OV_EREAD:
+					printf("A read from media returned an error.\n");
+					break;
+			case OV_EFAULT:
+					printf("Internal logic fault; indicates a bug or heap/stack corruption.\n");
+					break;
+			case OV_EBADLINK:
+					printf("Invalid stream section supplied to libvorbisfile, or the requested link is corrupt.");
+					break;
+		}
+		abort();
+	}
+
+	start_time -= (t - cur); //We only seek in the file, not in the actual music stream
 }
 
 void Music::reset_ogg_position() {
@@ -440,13 +474,16 @@ void Music::run_decode() {
 bool Music::buffer_data() {
 	int bit_stream;
 	//Decode data
+	pthread_mutex_lock(&ogg_mutex);	
 	int bytes = ov_read(&ogg_file,ogg_buffer, OGG_BUFFER_SIZE, ENDIAN,2,1,&bit_stream);
+	pthread_mutex_unlock(&ogg_mutex);	
 
 	if(bytes < 0) {
 		switch(bytes) {
 			case OV_HOLE:
 				fprintf(stderr, "[Music] Error in vorbis decode: data interruption (OV_HOLE)\n");
-				abort();
+				usleep(OVERFILL_SLEEP);
+				return true;
 			case OV_EBADLINK:
 				fprintf(stderr, "[Music] Error in vorbis decode: invalid stream section (OV_EBADLINK)\n");
 				abort();

@@ -41,6 +41,11 @@ class Music {
 		 */
 		double time() const;
 
+		/**
+		 * Seeks to the given time
+		 */
+		void seek(double t);
+
 		/*
 		 * This function will be called when the music finishes to play
 		 * Optional argument data is passed to the function
@@ -72,6 +77,7 @@ class Music {
 		int num_channels;
 		int num_source_channels;
 		pthread_t decoder_thread;
+		pthread_mutex_t ogg_mutex;
 		int buffer_size;
 		char * ogg_buffer;
 		int16_t * buffer;

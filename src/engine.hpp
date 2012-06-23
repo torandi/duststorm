@@ -5,7 +5,10 @@
 
 namespace Engine {
 
-	void init();
+	/**
+	 * @param seek Time to start at
+	 */
+	void init(double seek);
 	void cleanup();
 	void update(float t, float dt);
 	void render();

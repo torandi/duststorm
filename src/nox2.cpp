@@ -57,7 +57,7 @@ namespace Engine {
 		return nullptr;
 	}
 
-	void init(){
+	void init(double seek){
 		scene["NOX"] = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
 		composition = new RenderTarget(resolution,           GL_RGB8, false);
 		blend = new RenderTarget(glm::ivec2(1,1), GL_RGBA8, false);
@@ -76,6 +76,7 @@ namespace Engine {
 		if(global_time.sync_to_music(music)) {
 			fprintf(verbose, "Syncinc to music!\n");
 		}
+		music->seek(seek);
 	}
 
 	void cleanup(){

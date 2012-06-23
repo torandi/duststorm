@@ -57,7 +57,7 @@ namespace Engine {
 		return nullptr;
 	}
 
-	void init(){
+	void init(double seek){
 		/* Instantiate all scenes */
 		scene["Test"] = SceneFactory::create("Test", glm::ivec2(resolution.x, resolution.y/3));
 		scene["particle"] = SceneFactory::create("Particles", glm::ivec2(resolution.x, resolution.y));
