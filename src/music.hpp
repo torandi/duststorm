@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vorbis/vorbisfile.h>
 #include <pthread.h>
+#include <pulse/pulseaudio.h>
 
 #define DEFAULT_BUFFER_SIZE 1024*512
 #define OGG_BUFFER_SIZE 4096
@@ -50,9 +51,17 @@ class Music {
 		static int pa_contexts;
 		static void initialize_pa();
 		static void terminate_pa();
+		static void pulse_context_callback(pa_context * c, void * userdata);
+		static void pulse_server_info_callback (pa_context *c, const pa_server_info *i, void *userdata);
+		static void pulse_sink_info_callback (pa_context *c, const pa_sink_info *i, int eol, void *userdata);
+
+		//Find hw device to use
+		static void find_default_device();
+		static short hw_device[2];
 
 		static int device_index;
 		static PaTime device_latency;
+		static pa_mainloop * pulse_main;
 
 		FILE * source;
 		OggVorbis_File ogg_file;

@@ -8,14 +8,39 @@
 #include <portaudio.h>
 #include <iostream>
 #include <vorbis/vorbisfile.h>
+#include <pulse/pulseaudio.h>
 
 int Music::pa_contexts = 0;
 int Music::device_index = 3;
 PaTime Music::device_latency;
+pa_mainloop * Music::pulse_main;
+short Music::hw_device[2];
 
 void Music::initialize_pa() {
 	PaError err = Pa_Initialize();
 	print_pa_error("initialize", err);
+
+		find_default_device();
+}
+
+void Music::find_default_device() {
+	/*
+	 * Here we use pulseaudio to find out which hardware device 
+	 * is default. The reason that we do this is that portaudio only supports alsa,
+	 * and when using puls through alsa we can't get current time
+	 */
+	pulse_main = pa_mainloop_new();
+	pa_mainloop_api * m_api = pa_mainloop_get_api( pulse_main );
+	pa_context * pa_context = pa_context_new( m_api , "Frobnicators Demo Engine");
+
+	pa_context_set_state_callback(pa_context, Music::pulse_context_callback, NULL);
+	pa_context_connect(pa_context, NULL, PA_CONTEXT_NOFLAGS, NULL);
+
+	int retval;
+	//Run the main loop
+	pa_mainloop_run( pulse_main , &retval);
+
+	printf("[Music] Mainloop exited with status %d\n", retval);
 
 	const PaDeviceInfo * device_info;
 	const PaHostApiInfo * host_info;
@@ -26,6 +51,77 @@ void Music::initialize_pa() {
 		fprintf(verbose, "[Music] [ %d ] %s ( %s ) channels: %d\n", i, device_info->name, host_info->name, device_info->maxOutputChannels);
 		if(device_index == i)
 			device_latency = device_info->defaultLowOutputLatency;
+	}
+
+	pa_context_disconnect( pa_context );
+	pa_context_unref( pa_context );
+
+	pa_mainloop_free( pulse_main );
+}
+
+void Music::pulse_context_callback(pa_context * c, void * userdata) {
+	switch (pa_context_get_state(c)) {
+		case PA_CONTEXT_READY:
+			{
+				fprintf(verbose,"[Music] Connected to %s\n", pa_context_get_server( c ));
+				if(!pa_context_is_local( c )) {
+					printf("[Music] Pulse is not local, can't use hardware devices directly\n");
+					pa_mainloop_quit ( pulse_main, -1 ); //If it is not local we can't use the hw devices directly
+				} else {
+					pa_context_get_server_info( c, &Music::pulse_server_info_callback, NULL );
+				}
+				break;
+			}
+		case PA_CONTEXT_FAILED:
+			printf("[Music] Connection to pulse failed: %s\n", pa_strerror( pa_context_errno ( c ) ) );
+			pa_mainloop_quit( pulse_main, -1 );
+			break;
+		default:
+			//Nope
+			break;
+	}
+}
+
+void Music::pulse_server_info_callback (pa_context *c, const pa_server_info *i, void *userdata) {
+	fprintf(verbose, "[Music] Default sink name: %s\n", i->default_sink_name);
+	pa_context_get_sink_info_by_name(c, i->default_sink_name, &Music::pulse_sink_info_callback, NULL );
+}
+
+void Music::pulse_sink_info_callback (pa_context *c, const pa_sink_info *i, int eol, void *userdata) {
+	if(eol == 1)
+		return;
+	if(i->flags & PA_SINK_HARDWARE) {
+		fprintf(verbose,"[Music] eol: %d Default sink is a hardware sink, driver: %s\n", eol, i->driver);
+		const char * prop;
+
+		prop = pa_proplist_gets(i->proplist, "device.api");
+
+		if(strcmp(prop, "alsa") != 0) {
+			printf("[Music] Device api is not alsa\n");
+			pa_mainloop_quit( pulse_main, -1 );
+			return;
+		}
+
+		//We must copy the data since the returned pointer is invalid after the subsequent call to proplist_get
+		prop = pa_proplist_gets(i->proplist, "alsa.name");
+		char device_name[strlen(prop)+1];
+		memcpy(device_name, prop, (strlen(prop)+1)*sizeof(char));
+
+		prop = pa_proplist_gets(i->proplist, "alsa.card_name");
+		char card_name[strlen(prop)+1];
+		memcpy(card_name, prop, (strlen(prop)+1)*sizeof(char));
+
+		prop = pa_proplist_gets(i->proplist, "alsa.card");
+		hw_device[0] = atoi(prop);
+		prop = pa_proplist_gets(i->proplist, "alsa.device");
+		hw_device[1] = atoi(prop);
+
+		fprintf(verbose,"[Music] Default device: %s:  %s (hw:%d,%d)\n", card_name, device_name, hw_device[0], hw_device[1]);
+
+		pa_mainloop_quit( pulse_main, 1 );
+	} else {
+		printf("[Music] Default sink is not a hardware sink\n");
+		pa_mainloop_quit( pulse_main, -1 );
 	}
 }
 
