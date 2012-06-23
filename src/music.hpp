@@ -59,6 +59,7 @@ class Music {
 		static void find_default_device();
 		static char * hw_card;
 		static short hw_device[2];
+		static int num_hw_channels;
 
 		static int device_index;
 		static PaTime device_latency;
@@ -69,6 +70,7 @@ class Music {
 		PaStream * stream;
 		double sample_rate;
 		int num_channels;
+		int num_source_channels;
 		pthread_t decoder_thread;
 		int buffer_size;
 		char * ogg_buffer;
@@ -94,6 +96,8 @@ class Music {
 		bool eof_reached;
 
 		int16_t * next_ptr(int16_t *ptr) const;
+		void mix(const int16_t *from, int16_t *to);
+		int16_t channel_mix(const int16_t * source);
 
 		static int pa_callback(const void *inputBuffer,
 										void *outputBuffer,

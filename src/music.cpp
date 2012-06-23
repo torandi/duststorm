@@ -16,6 +16,7 @@ PaTime Music::device_latency;
 pa_mainloop * Music::pulse_main;
 char * Music::hw_card;
 short Music::hw_device[2];
+int Music::num_hw_channels;
 
 void Music::initialize_pa() {
 	PaError err = Pa_Initialize();
@@ -68,7 +69,7 @@ void Music::find_default_device() {
 
 		for(int i=0; i < Pa_GetDeviceCount(); ++i) {
 			device_info = Pa_GetDeviceInfo( i );
-			//fprintf(verbose, "[Music] [ %d ] %s channels: %d\n", i, device_info->name, device_info->maxOutputChannels);
+			fprintf(verbose, "[Music] [ %d ] %s channels: %d\n", i, device_info->name, device_info->maxOutputChannels);
 			std::string name(device_info->name);
 			if(name.find(with_subdevice) != std::string::npos) {
 				//fprintf(verbose, "[Music] Devices matches perfectly.\n");
@@ -90,6 +91,7 @@ void Music::find_default_device() {
 			device_info = Pa_GetDeviceInfo( device_index );
 			fprintf(verbose, "[Music] Using %s as device\n", device_info->name);
 			device_latency = device_info->defaultLowOutputLatency;
+			num_hw_channels = device_info->maxOutputChannels;
 		}
 
 	}
@@ -163,6 +165,8 @@ void Music::pulse_sink_info_callback (pa_context *c, const pa_sink_info *i, int 
 void Music::terminate_pa() {
 	PaError err = Pa_Terminate();
 	print_pa_error("terminate", err);
+
+	delete[] hw_card;
 }
 
 void Music::print_pa_error(const char * context, const PaError &err) {
@@ -236,9 +240,10 @@ Music::Music(const char * file, int buffer_size_) :
 
 	load_ogg(real_path);
 
-
 	PaError err;
 	if(device_index != -1) {
+		num_channels = num_hw_channels;
+
 		PaStreamParameters params;
 		params.channelCount = num_channels;
 		params.device = device_index;
@@ -255,6 +260,8 @@ Music::Music(const char * file, int buffer_size_) :
 				&Music::pa_callback,
 				this);
 	} else {
+		num_channels = num_source_channels;
+
 		err = Pa_OpenDefaultStream(&stream, 
 				0,
 				num_channels,
@@ -379,11 +386,16 @@ void Music::load_ogg(const char * filename) {
 	pInfo=ov_info(&ogg_file,-1);
 
 	if(pInfo) {
-		num_channels = pInfo->channels;
+		num_source_channels = pInfo->channels;
+
+		if(num_source_channels > 8) {
+			fprintf(stderr, "[Music] Can't handle mixing of more than 8 input channels (was %d)\n", num_source_channels);
+			abort();
+		}
 
 		sample_rate = (double) pInfo->rate;
 
-		fprintf(verbose,"[Music] %s loaded. Channels: %d Freq: %f Hz \n",filename,num_channels, sample_rate);
+		fprintf(verbose,"[Music] %s loaded. Channels: %d Freq: %f Hz \n",filename,num_source_channels, sample_rate);
 
 	} else {
 		fprintf(stderr,"[Music] Failed to get ov_info from file %s\n",filename);
@@ -448,17 +460,63 @@ bool Music::buffer_data() {
 	} else {
 		//Move data to sound buffer:
 		char * pos = ogg_buffer;
+		int16_t * mixed;
+		if(device_index != -1) {
+			mixed = new int16_t[num_channels]; 
+		} else {
+			//If we couldn't get any data from pulse we don't have any channel map, and cant do any mixing
+			mixed = (int16_t*)pos;
+		}
+
+		assert(bytes % num_source_channels == 0);
+
 		while(decode && bytes > 0) {
-			int16_t * next = next_ptr(buffer_write);
-			while(decode && next == buffer_read) {
-				usleep(OVERFILL_SLEEP);
+			if(device_index == -1) {
+				mixed = (int16_t*)pos; 
+			} else {
+				mix((int16_t*)pos, mixed);
 			}
-			if(!decode) return false;
-			*buffer_write = *((int16_t*) pos); //Write
-			buffer_write = next; //Advance pointer
-			bytes -= sizeof(int16_t)/sizeof(char);
-			pos += sizeof(int16_t)/sizeof(char);
+			bytes -= (sizeof(int16_t)/sizeof(char))*num_source_channels;
+			pos += (sizeof(int16_t)/sizeof(char))*num_source_channels;
+
+			for(int i=0;i<num_channels; ++i) {
+				int16_t * next = next_ptr(buffer_write);
+				while(decode && next == buffer_read) {
+					usleep(OVERFILL_SLEEP);
+				}
+				if(!decode) return false;
+				*buffer_write = mixed[i]; //Write
+				buffer_write = next; //Advance pointer
+			}
 		}
 		return true;
 	}
+}
+
+void Music::mix(const int16_t * from, int16_t *to) {
+	//Handle the simple case of one source channel:
+	if(num_source_channels == 1) {
+		for(int c=0;c<num_channels; ++c) {
+			to[c] = from[c];	
+		}
+	} else if(num_channels == 1) {
+		for(int c=0;c<num_source_channels; ++c) {
+			to[c] += from[c]/(float)num_source_channels;
+		}
+	}
+
+	//I hate channel mapping on hardware devices, just downmix it all to 1 channel and then upmix to all channels:
+	int16_t downmix = channel_mix(from);
+	for(int i=0; i < num_channels; ++i) {
+		to[i] = downmix;
+	}
+	
+}
+
+int16_t Music::channel_mix(const int16_t * source) {
+	int16_t out = 0;
+	for(int c=0;c<num_source_channels; ++c) {
+		out += source[c]/(float)num_source_channels;
+	}
+	return out;
 }
