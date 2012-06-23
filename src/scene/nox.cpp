@@ -14,6 +14,8 @@
 #include "timetable.hpp"
 #include "skybox.hpp"
 
+#define HOLOGRAM_SCALE 2.f
+#define HOLOGRAM_FRAMERATE 4
 #define NYANHORSE_FRAMES 95
 
 class NOX: public Scene {
@@ -98,7 +100,7 @@ public:
 		hologram_shader = Shader::create_shader("hologram");
 		u_video_index = hologram_shader->uniform_location("texture_index");
 		video_index = 0;
-/*
+
 		std::vector<std::string> frames;
 		char buffer[64];
 		for(int i=1;i<=NYANHORSE_FRAMES; ++i) {
@@ -109,9 +111,7 @@ public:
 		nyanhorse = TextureArray::from_filename(frames);
 
 
-		video.set_position(glm::vec3(-29.594385,0.275966,3.106559));
 		video.set_rotation(glm::vec3(0, 1.f, 0), 45.f);
-		video.set_scale(2.f);*/
 	}
 
 	virtual void render_geometry(const Camera& cam){
@@ -145,17 +145,21 @@ public:
 		shaders[SHADER_PARTICLES]->bind();
 		fog.render();
 
-		glPushAttrib(GL_ENABLE_BIT);
-		glDisable(GL_CULL_FACE);
 
-/*		hologram_shader->bind();
-		glUniform1i(u_video_index, video_index);
-	
-		nyanhorse->texture_bind(Shader::TEXTURE_ARRAY_0);
+		const float t = global_time.get();
 
-		video.render();*/
+		if( t  > 64 && t < 89.5) {
+			glPushAttrib(GL_ENABLE_BIT);
+			glDisable(GL_CULL_FACE);
+			hologram_shader->bind();
+			glUniform1i(u_video_index, video_index);
+		
+			nyanhorse->texture_bind(Shader::TEXTURE_ARRAY_0);
 
-		glPopAttrib();
+			video.render();
+
+			glPopAttrib();
+		}
 
 	}
 
@@ -168,11 +172,11 @@ public:
 
 		camera.look_at(cam_pos2.at(t));
 
-		video_index = (video_index +1) % NYANHORSE_FRAMES;
 
 		fog.update(dt);
 
 		
+		//Extra light
 		if(t > 30 && t < 40) {
 			float s = (t-30.f)/10.f;
 			lights.lights[2].intensity = glm::vec3(0.1f, 0.3f, 0.2f)*s;
@@ -186,6 +190,16 @@ public:
 			lights.lights[2].set_position(light_pos.at(t));
 		} else if( t > 60) {
 			lights.num_lights() = 2;
+		}
+
+		//Hologram
+		if( t > 64 && t < 65) {
+			const float s = (t - 64);
+			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
+			video.set_position(glm::vec3(-29.59,-(HOLOGRAM_SCALE/2.f)*s,3.10));
+		} else if( t > 65 ) {
+			const float s = (t - 65);
+			video_index = s*HOLOGRAM_FRAMERATE;
 		}
 	}
 

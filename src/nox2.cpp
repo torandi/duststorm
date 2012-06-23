@@ -92,16 +92,12 @@ namespace Engine {
 		}
 	}
 
-	static float scale_text_position(const float &t, const float &duration, short direction) {
+	static float scale_text_position(const float &t, const float &duration, const float &trim) {
 		float s = t / duration;
 		if(s > 1.f) {
 			s += (s-1.f)*(s-1.f);
 		}
-		if(direction == 1) {
-			return (resolution.x - 512.f - (resolution.x)*s);
-		} else {
-			return ((resolution.x)*s);
-		}
+		return (resolution.x - 512.f + trim - (resolution.x)*s);
 	}
 
 	static void render_composition(){
@@ -116,15 +112,31 @@ namespace Engine {
 
 		const float t = global_time.get();
 		if ( t > 23.1f && t < 35.f ){
-			textarea->set_position(glm::vec3( scale_text_position( (t - 23.1f), 7.f, 1) , resolution.y - 250, 0));
+			//Tyngelvi
+			textarea->set_position(glm::vec3( scale_text_position( (t - 23.1f), 7.f, 24) , resolution.y - 250, 0));
 			shaders[SHADER_PASSTHRU]->bind();
 			text[0]->texture_bind(Shader::TEXTURE_2D_0);
 			textarea->render();
 		}
-		if( t > 30.5f ) {
-			textarea->set_position(glm::vec3( scale_text_position( (t - 30.5f), 9.5f, -1) , resolution.y - 250, 0));
+		if( t > 30.5f && t < 40.f) {
+			//Primary compo
+			textarea->set_position(glm::vec3( scale_text_position( (t - 30.5f), 9.5f, 128) , resolution.y - 250, 0));
 			shaders[SHADER_PASSTHRU]->bind();
 			text[1]->texture_bind(Shader::TEXTURE_2D_0);
+			textarea->render();
+		}
+		if( t > 40.0f && t < 50.f) {
+			//Barbeque
+			textarea->set_position(glm::vec3( scale_text_position( (t - 40.f), 10.f, 72) , resolution.y - 250, 0));
+			shaders[SHADER_PASSTHRU]->bind();
+			text[2]->texture_bind(Shader::TEXTURE_2D_0);
+			textarea->render();
+		}
+		if( t > 50.0f && t < 60.f) {
+			//tickets at
+			textarea->set_position(glm::vec3( scale_text_position( (t - 50.f), 10.f, 60) , resolution.y - 250, 0));
+			shaders[SHADER_PASSTHRU]->bind();
+			text[3]->texture_bind(Shader::TEXTURE_2D_0);
 			textarea->render();
 		}
 	}
