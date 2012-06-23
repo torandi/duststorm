@@ -311,6 +311,8 @@ void Music::stop() {
 }
 
 double Music::time() const {
+	if(start_time == 0.0)
+		return -1.0;
 	return Pa_GetStreamTime( stream ) - start_time;
 }
 

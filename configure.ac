@@ -23,6 +23,7 @@ AX_GLM
 AM_PATH_SDL
 
 PKG_CHECK_MODULES(VORBISFILE,vorbisfile >= 1.2.0)
+PKG_CHECK_MODULES(PULSE,libpulse)
 
 AC_ARG_ENABLE([input], [AS_HELP_STRING([--enable-input], [Enable mouse- and keyboard debugging/development. @<:@default=disabled@:>@])])
 AS_IF([test "x$enable_input" = "xyes"],

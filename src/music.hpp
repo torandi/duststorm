@@ -37,7 +37,7 @@ class Music {
 		 */
 		void stop();
 		/**
-		 * Returns the time since playback started
+		 * Returns the time since playback started or -1 if it is not available
 		 */
 		double time() const;
 

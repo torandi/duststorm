@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
-AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS}
+AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS} ${VORBISFILE_CFLAGS} ${PULSE_CFLAGS}
 
 noinst_LIBRARIES = libfrob.a
 bin_PROGRAMS = demo nox2
@@ -53,17 +53,17 @@ if INPUT_ENABLED
 libfrob_a_SOURCES += src/input.cpp src/input.hpp
 endif
 
-demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} ${VORBISFILE_LIBS} -lSDL_image -lportaudio 
+demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} ${VORBISFILE_LIBS} ${PULSE_LIBS} -lSDL_image -lportaudio 
 demo_SOURCES = src/main.cpp src/testing.cpp
 demo_LDFLAGS = -pthread
 
-nox2_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} ${VORBISFILE_LIBS} -lSDL_image -lportaudio
+nox2_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} ${VORBISFILE_LIBS} ${PULSE_LIBS} -lSDL_image -lportaudio
 nox2_LDFLAGS = -pthread
 nox2_SOURCES = src/main.cpp src/nox2.cpp
 
 editor_CXXFLAGS = ${AM_CXXFLAGS} $(gtk3_CFLAGS)
 editor_LDFLAGS = -Wl,--export-dynamic -pthread
-editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} $(gtk3_LIBS) -lSDL_image
+editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} $(gtk3_LIBS) ${VORBISFILE_LIBS} ${PULSE_LIBS} -lSDL_image -lportaudio
 editor_SOURCES = \
 	src/editor.cpp \
 	src/editor/classify.cpp \

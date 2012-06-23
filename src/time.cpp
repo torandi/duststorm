@@ -13,7 +13,8 @@ Time::Time(int delta)
 	, delta(delta)
 	, scale(0)
 	, steps(0)
-	, paused(true) {
+	, paused(true)
+	, music(nullptr) {
 
 }
 
@@ -26,11 +27,19 @@ void Time::update(){
 		return;
 	}
 
-	/* normal flow */
-	const float k = (float)scale / 100.0f;
-	const long int usec = delta * k;
-	move(usec);
+	if(music == nullptr) {
+		/* normal flow */
+		const float k = (float)scale / 100.0f;
+		const long int usec = delta * k;
+		move(usec);
+	} else {
+		double cur_time = music->time();
+		const long int usec = USDIVIDER * (cur_time - music_last_time);
+		music_last_time = cur_time;
+		move(usec);
+	}
 }
+
 
 void Time::step(int amount){
 	paused = true;
@@ -84,6 +93,17 @@ const struct timeval& Time::timeval() const {
 
 float Time::dt() const {
 	return prev;
+}
+
+bool Time::sync_to_music(const Music * m) {
+	music_last_time = m->time();
+	if(music_last_time < 0) {
+		//Syncing is not available
+		return false;
+	} else {
+		music = m;
+		return true;
+	}
 }
 
 void Time::move(long int usec){
