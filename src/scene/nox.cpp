@@ -193,13 +193,32 @@ public:
 		}
 
 		//Hologram
+		if( t > 65 && t < 95) {
+			const float s = (t - 65);
+			video_index = s*HOLOGRAM_FRAMERATE;
+		}
 		if( t > 64 && t < 65) {
 			const float s = (t - 64);
 			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
 			video.set_position(glm::vec3(-29.59,-(HOLOGRAM_SCALE/2.f)*s,3.10));
-		} else if( t > 65 && t < 95) {
-			const float s = (t - 65);
-			video_index = s*HOLOGRAM_FRAMERATE;
+		} else if(t > 74.5 && t < 75) {
+			const float s = 1.f - (t - 74.5)*2.f;
+			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
+			video.set_position(glm::vec3(-29.59,-(HOLOGRAM_SCALE/2.f)*s,3.10));
+		} else if ( t > 75 && t < 75.5) {
+			const float s = (t - 75.f)*2.f;
+			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
+			video.set_position(glm::vec3(-29.59,-(HOLOGRAM_SCALE/2.f)*s,3.10));
+
+		} else if(t > 84.5 && t < 85) {
+			const float s = 1.f - (t - 84.5)*2.f;
+			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
+			video.set_position(glm::vec3(-29.59,-(HOLOGRAM_SCALE/2.f)*s,3.10));
+		} else if ( t > 85 && t < 85.5) {
+			const float s = (t - 85)*2.f;
+			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
+			video.set_position(glm::vec3(-29.59,-(HOLOGRAM_SCALE/2.f)*s,3.10));
+
 		} else if ( t > 95 && t < 96) {
 			const float s = 1.f - (t - 95);
 			video.set_scale(glm::vec3(HOLOGRAM_SCALE, HOLOGRAM_SCALE*s, HOLOGRAM_SCALE));
