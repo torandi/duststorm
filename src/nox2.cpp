@@ -117,7 +117,9 @@ namespace Engine {
 			textarea->set_position(glm::vec3( resolution.x/2.f - 256 , resolution.y/2.f, 0));
 			shaders[SHADER_PASSTHRU]->bind();
 			text[0]->texture_bind(Shader::TEXTURE_2D_0);
-			textarea->render();
+			textarea->render(); 
+
+			//TODO: FADE!
 		}
 
 		if ( t > 23.1f && t < 35.f ){
@@ -213,7 +215,7 @@ namespace Engine {
 	}
 
 	void update(float t, float dt){
-		if(t >= 120) {
+		if(t >= 112) {
 			terminate();
 		}
 		for ( std::pair<std::string,Scene*> p: scene ){
