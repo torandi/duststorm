@@ -56,3 +56,12 @@ Data::Data(void * data, const size_t &size) :
 Data::~Data() {
 	free(_data);
 }
+
+std::ostream& operator<< (std::ostream& out, const Data &data) {
+	out.write((const char*)data.data(), (data.size()*sizeof(char)));
+	return out;
+}
+
+std::ostream& operator<< (std::ostream& out, const Data * data) {
+	return (out << *data);
+}

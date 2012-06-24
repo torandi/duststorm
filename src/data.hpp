@@ -2,6 +2,7 @@
 #define DATA_HPP
 #include <cstdio>
 #include <string>
+#include <ostream>
 /*
  * This is intended as the single point of i/o, so as to make it easy to
  * change data reading method (ex to a in-exec type)
@@ -59,5 +60,8 @@ class Data {
 		static void * load_from_file(const char * filename, size_t &size);
 
 };
+
+std::ostream& operator<< (std::ostream& out, const Data &data);
+std::ostream& operator<< (std::ostream& out, const Data * data);
 
 #endif
