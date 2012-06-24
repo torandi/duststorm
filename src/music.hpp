@@ -1,8 +1,9 @@
 #ifndef MUSIC_HPP
 #define MUSIC_HPP
 
+#include "data.hpp"
+
 #include <portaudio.h>
-#include <iostream>
 #include <vorbis/vorbisfile.h>
 #include <pthread.h>
 #include <pulse/pulseaudio.h>
@@ -60,6 +61,12 @@ class Music {
 		static void pulse_server_info_callback (pa_context *c, const pa_server_info *i, void *userdata);
 		static void pulse_sink_info_callback (pa_context *c, const pa_sink_info *i, int eol, void *userdata);
 
+		static ov_callbacks data_callbacks;
+		static size_t read_func (void *ptr, size_t size, size_t nmemb, void *datasource);
+		static int seek_func (void *datasource, ogg_int64_t offset, int whence);
+		static long tell_func (void *datasource);
+
+
 		//Find hw device to use
 		static void find_default_device();
 		static char * hw_card;
@@ -70,7 +77,7 @@ class Music {
 		static PaTime device_latency;
 		static pa_mainloop * pulse_main;
 
-		FILE * source;
+		Data * source;
 		OggVorbis_File ogg_file;
 		PaStream * stream;
 		double sample_rate;

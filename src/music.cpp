@@ -6,7 +6,6 @@
 #include "globals.hpp"
 
 #include <portaudio.h>
-#include <iostream>
 #include <vorbis/vorbisfile.h>
 #include <pulse/pulseaudio.h>
 
@@ -17,6 +16,26 @@ pa_mainloop * Music::pulse_main;
 char * Music::hw_card;
 short Music::hw_device[2];
 int Music::num_hw_channels;
+
+ov_callbacks Music::data_callbacks = {
+  /* .read_func = */  &Music::read_func,
+  /* .seek_func = */  &Music::seek_func,
+  /* .close_func = */ nullptr,
+  /* .tell_func = */  &Music::tell_func
+};
+
+size_t Music::read_func (void *ptr, size_t size, size_t nmemb, void *datasource) {
+	return ((Data*)datasource)->read(ptr, size, nmemb);
+}
+
+int Music::seek_func (void *datasource, ogg_int64_t offset, int whence) {
+	return ((Data*)datasource)->seek((long int)offset, whence);
+}
+
+long Music::tell_func (void *datasource) {
+	return ((Data*)datasource)->tell();
+}
+
 
 void Music::initialize_pa() {
 	PaError err = Pa_Initialize();
@@ -287,6 +306,7 @@ Music::~Music() {
 	free(ogg_buffer);
 
 	ov_clear(&ogg_file);
+	delete source;
 
 	pthread_mutex_destroy(&ogg_mutex);
 
@@ -392,9 +412,9 @@ int16_t * Music::next_ptr(int16_t *ptr) const{
 void Music::load_ogg(const char * filename) {
 	vorbis_info *pInfo;
 
-	source = fopen(filename,"r");
+	source = Data::open(filename);
 
-	int status=ov_open(source,&ogg_file,NULL,0);
+	int status=ov_open_callbacks(source,&ogg_file,NULL,0, data_callbacks);
 
 	if(status!=0) {
 		switch(status) {
