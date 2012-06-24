@@ -463,9 +463,9 @@ void Music::start_decode() {
 
 void Music::stop_decode() {
 	decode = false;
-	printf("Waiting for decoder thread to terminate\n");
+	fprintf(verbose, "[Music]Waiting for decoder thread to terminate\n");
 	pthread_join(decoder_thread, nullptr);
-	printf("done\n");
+	fprintf(verbose, "[Music] Decoder terminated\n");
 }
 
 void * Music::decode_thread_helper(void * data) {
