@@ -57,7 +57,7 @@ namespace Engine {
 		return nullptr;
 	}
 
-	void init(double seek){
+	void init(){
 		/* Instantiate all scenes */
 		scene["Test"] = SceneFactory::create("Test", glm::ivec2(resolution.x, resolution.y/3));
 		scene["particle"] = SceneFactory::create("Particles", glm::ivec2(resolution.x, resolution.y));
@@ -78,6 +78,12 @@ namespace Engine {
 		downsample[2] = new RenderTarget(glm::ivec2( 50, 50), GL_RGB8, false, GL_LINEAR);
 
 		music = new Music("jumping.ogg");
+	}
+
+	void start(double seek) {
+		if(seek > 0.1) {
+			music->seek(seek);
+		}
 		music->play();
 	}
 

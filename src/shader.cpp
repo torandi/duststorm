@@ -190,6 +190,7 @@ GLuint Shader::load_shader(GLenum eShaderType, const std::string &strFilename) {
 		}
 		glGetShaderInfoLog(shader, 2048, NULL, buffer);
 		fprintf(stderr, "Error in shader %s: %s\n",strFilename.c_str(),  buffer);
+		checkForGLErrors("shader");
 		abort();
 	}
 	return shader;

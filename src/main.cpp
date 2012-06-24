@@ -13,6 +13,7 @@
 #include "cl.hpp"
 #include "texture.hpp"
 #include "timetable.hpp"
+#include "quad.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -24,6 +25,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <map>
+#include <pthread.h>
 
 #include "light.hpp"
 
@@ -36,6 +38,8 @@ static volatile bool running = true;
 static const char* program_name;
 static bool resolution_given = false;
 static int frames = 0;
+
+static void poll();
 
 void terminate() {
 	running = false;
@@ -54,6 +58,122 @@ static void handle_sigint(int signum){
 static void show_fps(int signum){
 	fprintf(stderr, "FPS: %d\n", frames);
 	frames = 0;
+}
+
+static bool loading = true;
+static double loading_time = 0.f;
+static Texture2D* loading_textures[3];
+static Shader * loading_shader;
+static Quad * loading_quad[2];
+static GLint u_fade;
+static float loading_fade = 1.f;
+static RenderTarget * loading_blend[2];
+
+
+static void render_loading_scene() {
+	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
+
+	frames++;
+
+	glClearColor(0.f, 0.f, 0.f, 1.f);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	if(loading_time < 1.f) {
+		glUniform1f(u_fade, 1.f);
+		loading_textures[0]->texture_bind(Shader::TEXTURE_COLORMAP);
+		loading_quad[0]->render();
+	}
+
+	float fade;
+
+	if(loading) {
+		fade = (float)std::min((float)loading_time,1.f);
+	} else {
+		fade = (float)std::max(2.f - (float)loading_time,0.f);
+	}
+
+	glUniform1f(u_fade, fade);
+	loading_textures[1]->texture_bind(Shader::TEXTURE_COLORMAP);
+	loading_quad[0]->render();
+
+	loading_textures[2]->texture_bind(Shader::TEXTURE_COLORMAP);
+	loading_quad[1]->render();
+
+	SDL_GL_SwapBuffers();
+}
+
+/**
+ * Render the loading screen
+ */
+static void prepare_loading_scene() {
+	fprintf(verbose, "Preparing loading scene\n");
+
+	loading_textures[0] = Texture2D::from_filename("frob_nocolor.png");
+	loading_textures[1] = Texture2D::from_filename("frob_color.png");
+	loading_textures[2] = Texture2D::from_filename("loading.png");
+
+	loading_quad[0] = new Quad(glm::vec2(1.f, -1.f), false);
+	loading_quad[1] = new Quad(glm::vec2(1.f, -1.f), false);
+
+	float scale = resolution.x/1280.f;
+
+	loading_quad[0]->set_scale(glm::vec3(1024*scale,512*scale,1));
+	loading_quad[0]->set_position(glm::vec3(resolution.x/2.f - (1024*scale)/2.f, 3.f*resolution.y/10.f - (512*scale)/2.f,1.f));
+
+	loading_quad[1]->set_scale(glm::vec3(512*scale,128*scale,1));
+	loading_quad[1]->set_position(glm::vec3(resolution.x/2.f - (512*scale)/2.f, 7.f*resolution.y/10.f - (128*scale)/2.f,1.f));
+
+	loading_time = 0;
+
+};
+
+static void do_loading_scene() {
+	loading_shader = Shader::create_shader("loading");
+	u_fade = loading_shader->uniform_location("fade");
+
+	loading_shader->bind();
+	/* for calculating dt */
+	struct timeval t, last;
+	gettimeofday(&t, NULL);
+	last = t;
+
+	while(running && ( ( loading && loading_time < 1.f) || (!loading && loading_time < 2.0f))) {
+		poll();
+		/* calculate dt */
+		struct timeval cur;
+		gettimeofday(&cur, NULL);
+		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
+		const  int64_t delay = per_frame - delta;
+
+		loading_time += 1.0/framerate; 
+
+		render_loading_scene();
+
+
+		/* move time forward */
+		last = cur;
+		t.tv_usec += per_frame;
+		if ( t.tv_usec > 1000000 ){
+			t.tv_usec -= 1000000;
+			t.tv_sec++;
+		}
+
+		/* fixed framerate */
+		if ( delay > 0 ){
+			usleep(delay);
+		}
+	}
+	delete loading_shader;
+}
+
+static void free_loading() {
+	for(Texture2D *t : loading_textures) {
+		delete t;
+	}
+	for(Quad * q : loading_quad) {
+		delete q;
+	}
+	//delete loading_shader;
 }
 
 static void init(bool fullscreen, bool vsync, double seek){
@@ -85,8 +205,18 @@ static void init(bool fullscreen, bool vsync, double seek){
 		exit(1);
 	}
 
-	Engine::autoload_scenes();
 	Engine::setup_opengl();
+	Shader::initialize();
+
+	screen_ortho = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
+	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
+	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
+
+	//Start loading screen:
+	prepare_loading_scene();
+	do_loading_scene();
+
+	Engine::autoload_scenes();
 	Engine::load_shaders();
 
 #ifdef ENABLE_INPUT
@@ -97,21 +227,31 @@ static void init(bool fullscreen, bool vsync, double seek){
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_texture_units);
 	fprintf(verbose, "Supports %d texture units\n", max_texture_units);
 
-	screen_ortho = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
-	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
-	screen_ortho = glm::translate(screen_ortho, glm::vec3(0.0f, -(float)resolution.y, 0.0f));
 
 	opencl = new CL();
 
 	/* Preload common textures */
 	fprintf(verbose, "Preloading textures\n");
+
+
 	Texture2D::preload("default.jpg");
+
+
 	Texture2D::preload("default_normalmap.jpg");
 
-	Engine::init(seek);
+	Engine::init();
+
+	//Stop loading scene
+	loading = false;
+	do_loading_scene();
+
+	//Wait
+	//free_loading();
 
 	global_time.set_paused(false); /* start time */
 	checkForGLErrors("post init()");
+
+
 }
 
 static void cleanup(){

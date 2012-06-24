@@ -57,7 +57,7 @@ namespace Engine {
 		return nullptr;
 	}
 
-	void init(double seek){
+	void init(){
 		scene["NOX"] = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
 		composition = new RenderTarget(resolution,           GL_RGB8, false);
 		blend = new RenderTarget(glm::ivec2(1,1), GL_RGBA8, false);
@@ -72,13 +72,16 @@ namespace Engine {
 		load_timetable(PATH_SRC "nox2.txt");
 
 		music = new Music("jumping.ogg");
-		music->play();
 		if(global_time.sync_to_music(music)) {
 			fprintf(verbose, "Syncinc to music!\n");
 		}
+	}
+
+	void start(double seek) {
 		if(seek > 0.1) {
 			music->seek(seek);
 		}
+		music->play();
 	}
 
 	void cleanup(){
@@ -113,6 +116,7 @@ namespace Engine {
 		scene["NOX"]->draw(shaders[SHADER_BLEND]);
 
 		const float t = global_time.get();
+		/*
 		if( t < 3.f ) {
 			textarea->set_position(glm::vec3( resolution.x/2.f - 256 , resolution.y/2.f, 0));
 			shaders[SHADER_PASSTHRU]->bind();
@@ -121,6 +125,7 @@ namespace Engine {
 
 			//TODO: FADE!
 		}
+		*/
 
 		if ( t > 23.1f && t < 35.f ){
 			//Tyngelvi

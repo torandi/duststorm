@@ -38,7 +38,6 @@ namespace Engine {
 	}
 
 	void load_shaders() {
-		Shader::initialize();
 		for(int i=0; i < NUM_SHADERS; ++i) {
 			shaders[i] = Shader::create_shader(shader_programs[i]);
 		}

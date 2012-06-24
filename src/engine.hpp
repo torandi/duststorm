@@ -5,13 +5,16 @@
 
 namespace Engine {
 
-	/**
-	 * @param seek Time to start at
-	 */
-	void init(double seek);
+	void init();
 	void cleanup();
 	void update(float t, float dt);
 	void render();
+
+	/**
+	 * Called when the loading scene has faded
+	 * @param seek Time to start at
+	 */
+	void start(double seek);
 
 	/**
 	 * Enable and disable settings.
