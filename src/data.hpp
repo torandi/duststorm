@@ -31,14 +31,7 @@ class Data {
 		int seek ( long int offset, int origin ) const;
 		long int tell() const;
 
-
-		/*
-		 * Static access: 
-		 * (same signatur and behaviour as f{read,seek,tell} except Data * data instead of FILE * file )
-		 */
-		static size_t read ( void * ptr, size_t size, size_t count, const Data * data);
-		static int seek ( const Data * data, long int offset, int origin );
-		static long int tell(const Data * data);
+		bool eof() const;
 
 		~Data();
 	private:
