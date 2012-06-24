@@ -22,12 +22,14 @@ class Data {
 		 */
 		const size_t &size() const;
 
+		ssize_t getline(char **lineptr, size_t *n) const;
+		
 
 		/*
 		 * Non-static access functions:
 		 * Same behaviour as f{read,seek,tell}
 		 */
-		size_t read ( void * ptr, size_t size, size_t count) const;
+		ssize_t read ( void * ptr, size_t size, size_t count) const;
 		int seek ( long int offset, int origin ) const;
 		long int tell() const;
 

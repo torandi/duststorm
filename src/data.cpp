@@ -52,8 +52,8 @@ const size_t &Data::size() const {
 	return _size;
 }
 
-size_t Data::read(void * ptr, size_t size, size_t count) const {
-	size_t to_read = count;
+ssize_t Data::read(void * ptr, size_t size, size_t count) const {
+	ssize_t to_read = count;
 	if(((char*)_pos + size*count) > ((char*)_data + _size)) {
 		to_read = (_size - ((char*)_pos-(char*)_data)) % size;
 	}
@@ -75,6 +75,7 @@ int Data::seek(long int offset, int origin) const {
 			newpos = (void*)((char*)_data + _size + offset);
 			break;
 		default:
+			errno = EINVAL;
 			fprintf(stderr, "Warning unknown origin to Data::seek\n");
 			return -1;
 	}
@@ -88,6 +89,32 @@ int Data::seek(long int offset, int origin) const {
 
 long int Data::tell() const {
 	return (long int)((char*)_pos - (char*)_data);
+}
+
+ssize_t Data::getline(char **lineptr, size_t *n) const{
+	if(n == nullptr || lineptr == nullptr) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if(eof())
+		return -1;
+
+	//Find the next newline (or eof)
+	size_t next = 0;
+	size_t max = _size - ((char*)_pos-(char*)_data); //Bytes left until eof
+	while( next < max && *((char*)_pos+next) != '\n' ) { ++next; }
+	++next; //Include the newline
+
+	if(*lineptr == nullptr) {
+		*lineptr = (char*)malloc(sizeof(char) * (next + 1) );
+		*n = (next + 1);
+	} else if(*n < (next + 1 )) {
+		*lineptr = (char*)realloc(*lineptr, (next + 1));
+		*n = (next + 1);
+	}
+	
+	return read((void*)*lineptr, sizeof(char), next);
 }
 
 Data::Data(void * data, const size_t &size) :
