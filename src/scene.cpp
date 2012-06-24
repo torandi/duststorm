@@ -3,6 +3,7 @@
 #endif
 
 #include "scene.hpp"
+#include "data.hpp"
 #include <cstring>
 
 Scene::Scene(const glm::ivec2& size, GLenum format)
@@ -82,8 +83,8 @@ bool Scene::is_active() const {
 
 void Scene::meta_load(struct SceneInfo* info){
 	const std::string filename = PATH_SRC "scene/" + info->filename;
-	FILE* fp = fopen(filename.c_str(), "r");
-	if ( !fp ){
+	Data * file = Data::open(filename);
+	if ( !file ){
 		fprintf(stderr, "Failed to read metadata for scene `%s' from `%s': %s\n", info->name.c_str(), filename.c_str(), strerror(errno));
 		return;
 	}
@@ -91,7 +92,7 @@ void Scene::meta_load(struct SceneInfo* info){
 	char empty[] = "";
 	char* buffer = nullptr;
 	size_t len = 0;
-	while ( getline(&buffer, &len, fp) != -1 ){
+	while ( file->getline(&buffer, &len) != -1 ){
 		char* key = strtok(buffer, ":");
 		char* value = strtok(NULL, ":");
 
@@ -111,6 +112,7 @@ void Scene::meta_load(struct SceneInfo* info){
 		}
 	}
 	free(buffer);
+	delete file;
 }
 
 void Scene::meta_persist(){

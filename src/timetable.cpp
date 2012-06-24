@@ -2,6 +2,7 @@
 #include "config.h"
 #endif
 
+#include "data.hpp"
 #include "timetable.hpp"
 #include <cstdlib>
 #include <cstring>
@@ -13,15 +14,15 @@ TimeTable::TimeTable(){
 
 int TimeTable::read_file(const std::string& filename){
 	const std::string expanded = PATH_SRC + filename;
-	FILE* fp = fopen(expanded.c_str(), "r");
-	if ( !fp ){
+	Data * file = Data::open(expanded);
+	if ( !file ){
 		return errno;
 	}
 
 	char* line = nullptr;
 	size_t size;
 	unsigned int linenum = 0;
-	while ( getline(&line, &size, fp) != -1 ){
+	while ( file->getline(&line, &size) != -1 ){
 		const size_t len = strlen(line);
 		linenum++;
 
@@ -46,10 +47,7 @@ int TimeTable::read_file(const std::string& filename){
 
 		free(tmp);
 	}
-	if ( ferror(fp) ){
-		return errno;
-	}
-	fclose(fp);
+	delete file;
 	free(line);
 
 	return 0;

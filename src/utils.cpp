@@ -4,6 +4,7 @@
 
 #include "utils.hpp"
 #include "globals.hpp"
+#include "data.hpp"
 #include <GL/glew.h>
 #include <cstdio>
 #include <cstdlib>
@@ -49,15 +50,15 @@ bool file_exists(const std::string& filename){
 
 int timetable_parse(const std::string& filename, std::function<void(const std::string&, float, float)> func){
 	const char* tablename = filename.c_str();
-	FILE* timetable = fopen(tablename, "r");
-	if ( !timetable ){
+	Data * timetable = Data::open(tablename);
+	if ( timetable == NULL ){
 		return errno;
 	}
 
 	char* line = nullptr;
 	size_t size;
 	unsigned int linenum = 0;
-	while ( getline(&line, &size, timetable) != -1 ){
+	while ( timetable->getline(&line, &size) != -1 ){
 		const size_t len = strlen(line);
 		linenum++;
 
@@ -87,10 +88,7 @@ int timetable_parse(const std::string& filename, std::function<void(const std::s
 		func(std::string(name), atof(begin), atof(end));
 		free(tmp);
 	}
-	if ( ferror(timetable) ){
-		return errno;
-	}
-	fclose(timetable);
+	delete timetable;
 	free(line);
 
 	return 0;
