@@ -2,12 +2,13 @@
 #include "config.h"
 #endif
 
+#include "data.hpp"
+
 #include <GL/glew.h>
 #include <GL/glx.h>
 
 #include "cl.hpp"
 #include <vector>
-#include <fstream>
 #include <sstream>
 
 #define PP_INCLUDE "#include"
@@ -92,16 +93,16 @@ CL::CL() {
 }
 
 void CL::load_file(const std::string &filename, std::stringstream &data, const std::string &included_from) {
-	std::ifstream file(filename.c_str());
-	if(file.fail()) {
+	Data * file = Data::open(filename);
+	if(file == nullptr) {
 		if(included_from.empty())
 			fprintf(stderr, "[OpenCL] Kernel preprocessor error: File %s not found\n", filename.c_str());
 		else
 			fprintf(stderr, "[OpenCL] Kernel preprocessor error: File %s not found (included from %s)\n", filename.c_str(), included_from.c_str());
 		abort();
 	}
-	data << file.rdbuf();
-	file.close();
+	data << file;
+	delete file;
 	fprintf(verbose, "[OpenCL] Loaded %s\n", filename.c_str());
 }
 

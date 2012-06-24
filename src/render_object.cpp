@@ -40,6 +40,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 
 	const std::string real_path = PATH_MODELS + model;
 
+	//aiImportFileFromMemory
 	scene = aiImportFile(real_path.c_str(),
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals |
 		aiProcess_JoinIdenticalVertices |

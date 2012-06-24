@@ -7,8 +7,8 @@
 #include "light.hpp"
 #include "utils.hpp"
 #include "lights_data.hpp"
+#include "data.hpp"
 
-#include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
@@ -104,16 +104,16 @@ Shader::Shader(const std::string &name_, GLuint program) :
 
 
 void Shader::load_file(const std::string &filename, std::stringstream &shaderData, std::string included_from) {
-	std::ifstream shaderFile(filename.c_str());
-	if(shaderFile.fail()) {
+	Data * file = Data::open(filename);
+	if(file == nullptr) {
 		if(included_from.empty())
 			fprintf(stderr, "Shader preprocessor error: File %s not found\n", filename.c_str());
 		else
 			fprintf(stderr, "Shader preprocessor error: File %s not found (included from %s)\n", filename.c_str(), included_from.c_str());
 		abort();
 	}
-	shaderData << shaderFile.rdbuf();
-	shaderFile.close();
+	shaderData << file;
+	delete file;
 	fprintf(verbose, "Loaded %s\n", filename.c_str());
 }
 

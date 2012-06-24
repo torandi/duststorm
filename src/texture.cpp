@@ -1,6 +1,7 @@
 #include "texture.hpp"
 #include "utils.hpp"
 #include "globals.hpp"
+#include "data.hpp"
 
 #include <vector>
 #include <map>
@@ -24,7 +25,11 @@ static SDL_Surface* load_image(const std::string &path, glm::ivec2* size) {
 
 	/* Load image using SDL Image */
 	fprintf(verbose, "Loading image `%s'\n", real_path.c_str());
-	SDL_Surface* surface = IMG_Load(real_path.c_str());
+	Data * file = Data::open(real_path);
+	SDL_RWops * rw = SDL_RWFromConstMem(file->data(), file->size());
+	SDL_Surface* surface = IMG_Load_RW(rw, 1);
+	delete file;
+
 	if ( !surface ){
 		fprintf(stderr, "Failed to load texture at %s\n", real_path.c_str());
 		if ( path != "default.jpg" ){
