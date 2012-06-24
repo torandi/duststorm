@@ -19,6 +19,7 @@ libfrob_a_SOURCES = \
 	src/camera.cpp src/camera.hpp \
 	src/cl.cpp src/cl.hpp \
 	src/color.cpp src/color.hpp \
+	src/data.cpp src/data.hpp \
 	src/engine.cpp src/engine.hpp \
 	src/globals.cpp src/globals.hpp \
 	src/light.cpp src/light.hpp \
