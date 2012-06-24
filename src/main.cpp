@@ -320,8 +320,8 @@ int main(int argc, char* argv[]){
 	/* proper termination */
 	signal(SIGINT, handle_sigint);
 
-	/* setup FPS alarm handler */
-	{
+	if(verbose_flag) {
+		/* setup FPS alarm handler */
 		struct itimerval difftime;
 		difftime.it_interval.tv_sec = 1;
 		difftime.it_interval.tv_usec = 0;
