@@ -91,11 +91,11 @@ void Music::find_default_device() {
 			fprintf(verbose, "[Music] [ %d ] %s channels: %d\n", i, device_info->name, device_info->maxOutputChannels);
 			std::string name(device_info->name);
 			if(name.find(with_subdevice) != std::string::npos) {
-				//fprintf(verbose, "[Music] Devices matches perfectly.\n");
+				fprintf(verbose, "[Music] Devices matches perfectly.\n");
 				device_index = i;
 				break;
 			} else if(name.find(with_device) != std::string::npos) {
-				//fprintf(verbose, "[Music] Card and device matches\n");
+				fprintf(verbose, "[Music] Card and device matches\n");
 				device_index = i;
 				device_match = true;
 			} else if(!device_match && name.find(card_only) != std::string::npos) {
@@ -207,6 +207,7 @@ void Music::pa_finished(void *userData) {
 
 	m->playing = false;
 	if(m->finished_callback != NULL) (*(m->finished_callback)) ( m->callback_data );
+	fprintf(verbose,"[Music] Song finished\n");
 }
 
 int Music::pa_callback(const void *inputBuffer,
@@ -556,10 +557,12 @@ void Music::mix(const int16_t * from, int16_t *to) {
 		for(int c=0;c<num_channels; ++c) {
 			to[c] = from[c];	
 		}
+		return;
 	} else if(num_channels == 1) {
 		for(int c=0;c<num_source_channels; ++c) {
 			to[c] += from[c]/(float)num_source_channels;
 		}
+		return;
 	}
 
 	//I hate channel mapping on hardware devices, just downmix it all to 1 channel and then upmix to all channels:
