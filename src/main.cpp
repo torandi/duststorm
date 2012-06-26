@@ -256,7 +256,7 @@ static void init(bool fullscreen, bool vsync, double seek){
 	global_time.set_paused(false); /* start time */
 	checkForGLErrors("post init()");
 
-
+	Engine::start(seek);
 }
 
 static void cleanup(){
