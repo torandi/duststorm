@@ -34,6 +34,8 @@ static const uint64_t per_frame = 1000000 / framerate;
 Time global_time(per_frame);
 glm::mat4 screen_ortho;
 
+static int skip_load_scene = 0;
+
 static volatile bool running = true;
 static const char* program_name;
 static bool resolution_given = false;
@@ -128,6 +130,9 @@ static void prepare_loading_scene() {
 };
 
 static void do_loading_scene() {
+	if(skip_load_scene)
+		return;
+
 	loading_shader = Shader::create_shader("loading");
 	u_fade = loading_shader->uniform_location("fade");
 
@@ -367,6 +372,7 @@ void show_usage(){
 				 "  -n, --no-vsync					Disable vsync\n"
 	       "  -v, --verbose           Enable verbose output\n"
 	       "  -q, --quiet             Inverse of --verbose.\n"
+				 "  -l, --no-loading        Don't show loading scene (faster load).\n"
 	       "  -h, --help              This text\n",
 	       program_name);
 }
@@ -383,6 +389,7 @@ static struct option options[] = {
 	{"no-vsync",     no_argument,       &vsync, 0},
 	{"verbose",      no_argument,       &verbose_flag, 1},
 	{"quiet",        no_argument,       &verbose_flag, 0},
+	{"no-loading",   no_argument,       &skip_load_scene, 1},
 	{"help",         no_argument,       0, 'h'},
 	{0,0,0,0} /* sentinel */
 };
@@ -400,7 +407,7 @@ int main(int argc, char* argv[]){
 
 	/* parse arguments */
 	int op, option_index;
-	while ( (op = getopt_long(argc, argv, "r:fws:nvqh", options, &option_index)) != -1 ){
+	while ( (op = getopt_long(argc, argv, "r:fws:nvqlh", options, &option_index)) != -1 ){
 		switch ( op ){
 		case 0:   /* long opt*/
 		case '?': /* invalid */
@@ -422,6 +429,10 @@ int main(int argc, char* argv[]){
 
 		case 'f': /* --fullscreen */
 			fullscreen = 1;
+			break;
+
+		case 'l':
+			skip_load_scene = 1;
 			break;
 
 		case 'w': /* --windowed */
