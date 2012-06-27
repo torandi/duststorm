@@ -251,12 +251,12 @@ static void init(bool fullscreen, bool vsync, double seek){
 	do_loading_scene();
 
 	//Wait
-	//free_loading();
+	free_loading();
 
+	Engine::start(seek);
 	global_time.set_paused(false); /* start time */
 	checkForGLErrors("post init()");
 
-	Engine::start(seek);
 }
 
 static void cleanup(){
