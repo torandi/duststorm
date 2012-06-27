@@ -102,6 +102,7 @@ bool Time::sync_to_music(const Music * m) {
 		return false;
 	} else {
 		music = m;
+		reset();
 		return true;
 	}
 }
