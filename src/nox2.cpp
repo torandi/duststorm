@@ -72,9 +72,6 @@ namespace Engine {
 		load_timetable(PATH_SRC "nox2.txt");
 
 		music = new Music("jumping.ogg");
-		if(global_time.sync_to_music(music)) {
-			fprintf(verbose, "Syncinc to music!\n");
-		}
 	}
 
 	void start(double seek) {
@@ -82,6 +79,11 @@ namespace Engine {
 			music->seek(seek);
 		}
 		music->play();
+		if(global_time.sync_to_music(music)) {
+			fprintf(verbose, "Syncinc to music!\n");
+		} else {
+			printf("Warning! Syncing disabled!\n");
+		}
 	}
 
 	void cleanup(){
