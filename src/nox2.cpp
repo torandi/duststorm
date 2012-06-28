@@ -75,14 +75,14 @@ namespace Engine {
 	}
 
 	void start(double seek) {
-		if(seek > 0.1) {
-			music->seek(seek);
-		}
 		music->play();
 		if(global_time.sync_to_music(music)) {
 			fprintf(verbose, "Syncinc to music!\n");
 		} else {
 			printf("Warning! Syncing disabled!\n");
+		}
+		if(seek > 0.1) {
+			music->seek(seek);
 		}
 	}
 
