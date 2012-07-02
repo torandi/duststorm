@@ -12,6 +12,8 @@ libvorbis-dev
 Usage
 ===========
 
+ * [Creating a release](/ext/frobnicator_demo_maker/wiki/Release)
+
 Scenes
 -------
 TODO
