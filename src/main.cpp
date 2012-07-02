@@ -278,6 +278,7 @@ static void poll(){
 			running = false;
 			break;
 
+#ifdef ENABLE_INPUT
 		case SDL_KEYDOWN:
 			if ( event.key.keysym.sym == SDLK_ESCAPE ){
 				running = false;
@@ -311,10 +312,12 @@ static void poll(){
 				sprintf(title, "Speed: %d%%", global_time.current_scale());
 				SDL_WM_SetCaption(title, NULL);
 			}
+#endif /* ENABLE_INPUT */
 		}
-		#ifdef ENABLE_INPUT
-			input.parse_event(event);
-		#endif
+
+#ifdef ENABLE_INPUT
+		input.parse_event(event);
+#endif /* ENABLE_INPUT */
 	}
 }
 
