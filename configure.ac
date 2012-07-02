@@ -41,13 +41,16 @@ AC_ARG_ENABLE([editor], [AS_HELP_STRING([--enable-editor], [Build editor. @<:@de
 AS_IF([test "x$enable_editor" = "xyes"], [PKG_CHECK_MODULES([gtk3], [gtk+-3.0 gtkglext-3.0])])
 AM_CONDITIONAL([BUILD_EDITOR], [test "x$enable_editor" = "xyes"])
 
-AC_DEFINE_UNQUOTED([PATH_BASE],    ["${srcdir}/"],             [Base path])
-AC_DEFINE_UNQUOTED([PATH_MODELS],  ["${srcdir}/models/"],      [Path to models])
-AC_DEFINE_UNQUOTED([PATH_SRC],     ["${srcdir}/src/"],         [Path to sources])
-AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${srcdir}/shaders/"],     [Path to shaders])
-AC_DEFINE_UNQUOTED([PATH_OPENCL],  ["${srcdir}/cl_programs/"], [Path to OpenCL programs])
-AC_DEFINE_UNQUOTED([PATH_ICON],    ["${srcdir}/icons/"],       [Path to editor icons])
-AC_DEFINE_UNQUOTED([PATH_MUSIC],    ["${srcdir}/music/"],       [Path to music])
+dnl Setup paths
+AC_ARG_VAR([DATA_PATH], [Data path prefix. Default is relative path to top srcdir])
+AS_IF([test "x${DATA_PATH}" == "x"], [DATA_PATH="${srcdir}"])
+AC_DEFINE_UNQUOTED([PATH_BASE],    ["${DATA_PATH}/"],             [Base path])
+AC_DEFINE_UNQUOTED([PATH_MODELS],  ["${DATA_PATH}/models/"],      [Path to models])
+AC_DEFINE_UNQUOTED([PATH_SRC],     ["${DATA_PATH}/src/"],         [Path to sources])
+AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${DATA_PATH}/shaders/"],     [Path to shaders])
+AC_DEFINE_UNQUOTED([PATH_OPENCL],  ["${DATA_PATH}/cl_programs/"], [Path to OpenCL programs])
+AC_DEFINE_UNQUOTED([PATH_ICON],    ["${DATA_PATH}/icons/"],       [Path to editor icons])
+AC_DEFINE_UNQUOTED([PATH_MUSIC],   ["${DATA_PATH}/music/"],       [Path to music])
 
 AM_PATH_CPPUNIT(1.9.6,,[AC_MSG_NOTICE([cppunit not found, tests disabled])])
 AM_CONDITIONAL([BUILD_TESTS], [test "x$no_cppunit" != "xyes"])
