@@ -68,9 +68,6 @@ static Texture2D* loading_textures[3];
 static Shader * loading_shader;
 static Quad * loading_quad[2];
 static GLint u_fade;
-static float loading_fade = 1.f;
-static RenderTarget * loading_blend[2];
-
 
 static void render_loading_scene() {
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
