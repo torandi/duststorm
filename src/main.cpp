@@ -150,7 +150,7 @@ static void do_loading_scene() {
 		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
 		const  int64_t delay = per_frame - delta;
 
-		loading_time += 1.0/framerate; 
+		loading_time += 1.0/framerate;
 
 		render_loading_scene();
 
@@ -194,6 +194,13 @@ static void init(bool fullscreen, bool vsync, double seek){
 		resolution.x = vi->current_w;
 		resolution.y = vi->current_h;
 	}
+
+	/* show configuration */
+	fprintf(verbose, "frobnicator-demo-engine-"VERSION"\n"
+	        "Configuration:\n"
+	        "  Data path: %s\n"
+	        "  Resolution: %dx%d (%s)\n",
+	        PATH_BASE, resolution.x, resolution.y, fullscreen?"fullscreen":"windowed");
 
 	if(vsync) SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
