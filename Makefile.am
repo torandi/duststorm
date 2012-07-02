@@ -100,3 +100,8 @@ autoload.cpp: autoload.lst Makefile
 	@echo ' 	fprintf(verbose, "Autoloading scenes.\n");' >> autoload.cpp
 	$(AM_V_GEN)sed 's/\(.*\):\(.*\)/	fprintf(verbose, "  %s -> %s\\n", \"\2\", \"\1\"); \1();/' autoload.lst >> autoload.cpp
 	@echo "}}" >> autoload.cpp
+
+release: all
+	@test "x${prefix}" = "x/" || (echo "Error: --prefix must be / when creating release (currently ${prefix})"; exit 1)
+	mkdir -p release-dist
+	$(MAKE) install DESTDIR=`pwd`/release-dist
