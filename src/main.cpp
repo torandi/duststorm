@@ -370,7 +370,7 @@ void show_usage(){
 	       "\n"
 	       "  -r, --resolution=SIZE   Set window resultion (default: 800x600 in windowed and\n"
 	       "                          current resolution in fullscreen.)\n"
-	       "  -f, --fullscreen        Enable fullscreen mode (default: false)\n"
+	       "  -f, --fullscreen        Enable fullscreen mode (default: %s)\n"
 	       "  -w, --windowed          Inverse of --fullscreen.\n"
 				 "	-s, --seek=time					Seek to the given time\n"
 				 "  -n, --no-vsync					Disable vsync\n"
@@ -378,10 +378,10 @@ void show_usage(){
 	       "  -q, --quiet             Inverse of --verbose.\n"
 				 "  -l, --no-loading        Don't show loading scene (faster load).\n"
 	       "  -h, --help              This text\n",
-	       program_name);
+	       program_name, FULLSCREEN ? "true":"false");
 }
 
-static int fullscreen = 0;
+static int fullscreen = FULLSCREEN;
 static int vsync = 1;
 static int verbose_flag = 0;
 

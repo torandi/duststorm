@@ -52,6 +52,11 @@ AC_DEFINE_UNQUOTED([PATH_OPENCL],  ["${DATA_PATH}/cl_programs/"], [Path to OpenC
 AC_DEFINE_UNQUOTED([PATH_ICON],    ["${DATA_PATH}/icons/"],       [Path to editor icons])
 AC_DEFINE_UNQUOTED([PATH_MUSIC],   ["${DATA_PATH}/music/"],       [Path to music])
 
+dnl Defaults
+AC_ARG_VAR([FULLSCREEN], [If non-empty fullscreen is used by default])
+AS_IF([test "x${FULLSCREEN}" == "x" -o "x${FULLSCREEN}" == "x0"], [FULLSCREEN=0], [FULLSCREEN=1])
+AC_DEFINE_UNQUOTED([FULLSCREEN], [$FULLSCREEN], [Define to 1 if fullscreen is used by default])
+
 AM_PATH_CPPUNIT(1.9.6,,[AC_MSG_NOTICE([cppunit not found, tests disabled])])
 AM_CONDITIONAL([BUILD_TESTS], [test "x$no_cppunit" != "xyes"])
 
