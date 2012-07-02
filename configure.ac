@@ -23,7 +23,10 @@ AX_GLM
 AM_PATH_SDL
 
 AS_IF([test "x$no_gl" == "xyes"], [AC_MSG_ERROR([OpenGL headers required])])
-AS_IF([test "x$no_cl" == "xyes"], [AC_MSG_ERROR([OpenCL headers required])])
+AS_IF([test "x$no_cl" == "xyes"], [AC_MSG_ERROR([OpenCL headers required.
+
+On debian/ubuntu: "apt-get install opencl-headers".
+])])
 
 PKG_CHECK_MODULES(VORBISFILE,vorbisfile >= 1.2.0)
 PKG_CHECK_MODULES(PULSE,libpulse)
