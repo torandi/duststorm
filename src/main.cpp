@@ -200,8 +200,11 @@ static void init(bool fullscreen, bool vsync, double seek){
 	        "Configuration:\n"
 	        "  Demo: " NAME " (" TITLE ")\n"
 	        "  Data path: %s\n"
-	        "  Resolution: %dx%d (%s)\n",
-	        PATH_BASE, resolution.x, resolution.y, fullscreen?"fullscreen":"windowed");
+	        "  Resolution: %dx%d (%s)\n"
+#ifdef ENABLE_INPUT
+	        "  Input is enabled\n"
+#endif
+	        , PATH_BASE, resolution.x, resolution.y, fullscreen?"fullscreen":"windowed");
 
 	if(vsync) SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
@@ -232,24 +235,15 @@ static void init(bool fullscreen, bool vsync, double seek){
 	Engine::autoload_scenes();
 	Engine::load_shaders();
 
-#ifdef ENABLE_INPUT
-	fprintf(stderr, "Input enabled\n");
-#endif
-
 	GLint max_texture_units;
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_texture_units);
 	fprintf(verbose, "Supports %d texture units\n", max_texture_units);
-
 
 	opencl = new CL();
 
 	/* Preload common textures */
 	fprintf(verbose, "Preloading textures\n");
-
-
 	Texture2D::preload("default.jpg");
-
-
 	Texture2D::preload("default_normalmap.jpg");
 
 	Engine::init();
@@ -264,7 +258,6 @@ static void init(bool fullscreen, bool vsync, double seek){
 	Engine::start(seek);
 	global_time.set_paused(false); /* start time */
 	checkForGLErrors("post init()");
-
 }
 
 static void cleanup(){
