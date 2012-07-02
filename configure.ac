@@ -34,11 +34,13 @@ PKG_CHECK_MODULES(PULSE,libpulse)
 AC_ARG_ENABLE([input], [AS_HELP_STRING([--enable-input], [Enable mouse- and keyboard debugging/development. @<:@default=disabled@:>@])])
 AS_IF([test "x$enable_input" = "xyes"],
 	[AC_DEFINE([ENABLE_INPUT],  [1], [Define to 1 to enable input])],
-)
+  [enable_input=no])
 AM_CONDITIONAL(INPUT_ENABLED, test "x$enable_input" = "xyes")
 
 AC_ARG_ENABLE([editor], [AS_HELP_STRING([--enable-editor], [Build editor. @<:@default=disabled@:>@])])
-AS_IF([test "x$enable_editor" = "xyes"], [PKG_CHECK_MODULES([gtk3], [gtk+-3.0 gtkglext-3.0])])
+AS_IF([test "x$enable_editor" = "xyes"],
+   [PKG_CHECK_MODULES([gtk3], [gtk+-3.0 gtkglext-3.0])],
+   [enable_editor=no])
 AM_CONDITIONAL([BUILD_EDITOR], [test "x$enable_editor" = "xyes"])
 
 dnl Setup paths
@@ -59,5 +61,14 @@ AC_DEFINE_UNQUOTED([FULLSCREEN], [$FULLSCREEN], [Define to 1 if fullscreen is us
 
 AM_PATH_CPPUNIT(1.9.6,,[AC_MSG_NOTICE([cppunit not found, tests disabled])])
 AM_CONDITIONAL([BUILD_TESTS], [test "x$no_cppunit" != "xyes"])
+
+dnl Show config
+echo
+echo "         Data path: $DATA_PATH"
+echo "    Editor enabled: $enable_editor"
+echo "     Input enabled: $enable_input"
+echo "          CXXFLAGS: $CXXFLAGS"
+echo "           LDFLAGS: $LDFLAGS"
+echo
 
 AC_OUTPUT
