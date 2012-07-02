@@ -198,6 +198,7 @@ static void init(bool fullscreen, bool vsync, double seek){
 	/* show configuration */
 	fprintf(verbose, "frobnicator-demo-engine-"VERSION"\n"
 	        "Configuration:\n"
+	        "  Demo: " NAME " (" TITLE ")\n"
 	        "  Data path: %s\n"
 	        "  Resolution: %dx%d (%s)\n",
 	        PATH_BASE, resolution.x, resolution.y, fullscreen?"fullscreen":"windowed");
@@ -205,7 +206,7 @@ static void init(bool fullscreen, bool vsync, double seek){
 	if(vsync) SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
 	SDL_EnableKeyRepeat(0, 0);
-	SDL_WM_SetCaption("Speed 100%", NULL);
+	SDL_WM_SetCaption(TITLE, NULL);
 
 	if ( fullscreen ){
 		SDL_ShowCursor(SDL_DISABLE);
