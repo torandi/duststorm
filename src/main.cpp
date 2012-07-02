@@ -196,7 +196,7 @@ static void init(bool fullscreen, bool vsync, double seek){
 	}
 
 	/* show configuration */
-	fprintf(verbose, "frobnicator-demo-engine-"VERSION"\n"
+	fprintf(verbose, PACKAGE_NAME"-"VERSION"\n"
 	        "Configuration:\n"
 	        "  Demo: " NAME " (" TITLE ")\n"
 	        "  Data path: %s\n"
@@ -365,7 +365,7 @@ static void magic_stuff(){
 }
 
 void show_usage(){
-	printf(PACKAGE_NAME "-" VERSION "\n"
+	printf(NAME " ("PACKAGE_NAME"-" VERSION ")\n"
 	       "usage: %s [OPTIONS]\n"
 	       "\n"
 	       "  -r, --resolution=SIZE   Set window resultion (default: 800x600 in windowed and\n"

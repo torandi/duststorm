@@ -1,4 +1,4 @@
-AC_INIT([frobnicator],[1],[ext@sidvind.com])
+AC_INIT([frobnicator-demo-engine],[1],[ext@sidvind.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([1.11 foreign color-tests subdir-objects -Wall -Werror])
