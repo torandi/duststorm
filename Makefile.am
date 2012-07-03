@@ -1,5 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4
-AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS} ${VORBISFILE_CFLAGS} ${PULSE_CFLAGS} ${portaudio_CFLAGS} 
+
+engine_CXXFLAGS = ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS} ${VORBISFILE_CFLAGS} ${PULSE_CFLAGS} ${portaudio_CFLAGS}
+engine_LIBS = ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} ${VORBISFILE_LIBS} ${PULSE_LIBS} ${portaudio_LIBS} -lSDL_image
+AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${engine_CXXFLAGS}
 
 noinst_LIBRARIES = libfrob.a
 bin_PROGRAMS = demo nox2
@@ -49,24 +52,23 @@ libfrob_a_SOURCES = \
 	src/scene/water.cpp \
 	autoload.cpp autoload.h
 
-
 if INPUT_ENABLED
 libfrob_a_SOURCES += src/input.cpp src/input.hpp
 endif
 
 demo_CXXFLAGS = ${AM_CXXFLAGS} -DNAME="\"demo\"" -DTITLE="\"Experimental demo\""
-demo_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} ${VORBISFILE_LIBS} ${PULSE_LIBS} ${portaudio_LIBS} -lSDL_image
+demo_LDADD = libfrob.a ${engine_LIBS}
 demo_SOURCES = src/main.cpp src/testing.cpp
 demo_LDFLAGS = -pthread
 
 nox2_CXXFLAGS = ${AM_CXXFLAGS} -DNAME="\"nox2\"" -DTITLE="\"NördtroXy II Invitation\""
-nox2_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} ${VORBISFILE_LIBS} ${PULSE_LIBS} ${portaudio_LIBS} -lSDL_image
+nox2_LDADD = libfrob.a ${engine_LIBS}
 nox2_LDFLAGS = -pthread
 nox2_SOURCES = src/main.cpp src/nox2.cpp
 
 editor_CXXFLAGS = ${AM_CXXFLAGS} $(gtk3_CFLAGS)
 editor_LDFLAGS = -Wl,--export-dynamic -pthread
-editor_LDADD = libfrob.a ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${CL_LIBS} $(gtk3_LIBS) ${VORBISFILE_LIBS} ${PULSE_LIBS} ${portaudio_LIBS} -lSDL_image
+editor_LDADD = libfrob.a ${engine_LIBS}
 editor_SOURCES = \
 	src/editor.cpp \
 	src/editor/classify.cpp \
