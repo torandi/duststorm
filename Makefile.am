@@ -68,7 +68,7 @@ nox2_SOURCES = src/main.cpp src/nox2.cpp
 
 editor_CXXFLAGS = ${AM_CXXFLAGS} $(gtk3_CFLAGS)
 editor_LDFLAGS = -Wl,--export-dynamic -pthread
-editor_LDADD = libfrob.a ${engine_LIBS}
+editor_LDADD = libfrob.a ${engine_LIBS} $(gtk3_LIBS)
 editor_SOURCES = \
 	src/editor.cpp \
 	src/editor/classify.cpp \
