@@ -34,7 +34,7 @@ public:
 	virtual void render_geometry(const Camera& cam){
 		terrain_shader->bind();
 		Shader::upload_lights(lights);
-		Shader::upload_camera(camera);
+		Shader::upload_camera(cam);
 		terrain->render();
 	}
 
