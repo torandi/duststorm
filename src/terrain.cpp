@@ -48,7 +48,7 @@ void Terrain::generate_terrain() {
 			glm::vec4 color = get_pixel_color(x, y);
 			float h = height_from_color(color);
 			v.position = glm::vec3(horizontal_scale_*x, h*vertical_scale_, horizontal_scale_*y); 
-			v.tex_coord = glm::vec2(v.position.x/texture_scale_, v.position.z/texture_scale_);
+			v.tex_coord = glm::vec2(1.f-v.position.x/(width_*horizontal_scale_), 1.f-v.position.z/(height_*horizontal_scale_));
 			vertices_[i] = v;
 		}
 	}

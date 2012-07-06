@@ -21,14 +21,14 @@ public:
 			TextureArray * color = TextureArray::from_filename("dirt.png","grass.png", nullptr);
 			//TextureArray * normal = TextureArray::from_filename("dirt_normal.png","grass_normal.png");
 			TextureArray * normal = TextureArray::from_filename("default_normalmap.jpg","default_normalmap.jpg", nullptr);
-			terrain = new Terrain("park", 1.f, 100.f, color, normal);
-			terrain->absolute_move(glm::vec3(0.f, -50.f, 0.f));
+			terrain = new Terrain("park", 1.f, 20.f, color, normal);
+			terrain->absolute_move(glm::vec3(0.f, -10.f, 0.f));
 
 			lights.ambient_intensity() = glm::vec3(0.05f);
 			lights.num_lights() = 1;
 			lights.lights[0].set_position(glm::vec3(5, 0.8f, 6.f));
 			lights.lights[0].intensity = glm::vec3(0.8f);
-			lights.lights[0].type = Light::POINT_LIGHT;
+			lights.lights[0].type = Light::DIRECTIONAL_LIGHT;
 	}
 
 	virtual void render_geometry(const Camera& cam){
