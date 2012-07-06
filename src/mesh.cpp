@@ -14,7 +14,7 @@
 Mesh::Mesh() : MovableObject(), vbos_generated_(false), has_tangents_(false){ }
 
 Mesh::Mesh(const std::vector<vertex_t> &vertices, const std::vector<unsigned int> &indices) :
-	MovableObject(), 
+	MovableObject(),
 	vbos_generated_(false),has_tangents_(false), vertices_(vertices), indices_(indices){
 	assert((indices.size()%3)==0);
 }
@@ -88,7 +88,7 @@ void Mesh::ortonormalize_tangent_space() {
    }
 
 	for(std::vector<vertex_t>::iterator it=vertices_.begin(); it!=vertices_.end(); ++it) {
-		it->normal = glm::normalize(it->normal);	
+		it->normal = glm::normalize(it->normal);
 		//Make sure tangent is ortogonal to normal (and normalized)
 		it->tangent = glm::normalize(it->tangent - it->normal*glm::dot(it->normal, it->tangent));
 		//Normalize bitangent
@@ -159,7 +159,7 @@ void Mesh::generate_vbos() {
 }
 
 void Mesh::render() {
-
+	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 	Shader::upload_model_matrix(matrix());
 
 	glBindBuffer(GL_ARRAY_BUFFER, buffers_[0]);
@@ -167,21 +167,20 @@ void Mesh::render() {
 
 	checkForGLErrors("Mesh::render(): Bind buffers");
 
+	/* Disable most attribs from Shader::vertex_x */
+	for ( int i = 5; i < Shader::NUM_ATTR; ++i ) {
+		glDisableVertexAttribArray(i);
+	}
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)));
-
-   if(has_normals_) {
-      glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
-   }
-
-   if(has_tangents_) {
-      glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
-      glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
-   }
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (sizeof(glm::vec3)+sizeof(glm::vec2)));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (2*sizeof(glm::vec3)+sizeof(glm::vec2)));
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid*) (3*sizeof(glm::vec3)+sizeof(glm::vec2)));
 
 	checkForGLErrors("Mesh::render(): Set vertex attribs");
 
-	glDrawElements(GL_TRIANGLES, num_faces_, GL_UNSIGNED_INT, 0);	
+	glDrawElements(GL_TRIANGLES, num_faces_, GL_UNSIGNED_INT, 0);
 
 	checkForGLErrors("Mesh::render(): glDrawElements()");
 
@@ -189,5 +188,6 @@ void Mesh::render() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	checkForGLErrors("Mesh::render(): Teardown ");
+	glPopClientAttrib();
 }
 

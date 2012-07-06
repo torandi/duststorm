@@ -91,6 +91,8 @@ static void render_loading_scene() {
 		fade = (float)std::max(2.f - (float)loading_time,0.f);
 	}
 
+	Shader::upload_blank_material();
+
 	glUniform1f(u_fade, fade);
 	loading_textures[1]->texture_bind(Shader::TEXTURE_COLORMAP);
 	loading_quad[0]->render();
