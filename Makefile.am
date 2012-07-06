@@ -83,8 +83,12 @@ test_editor_classify_LDFLAGS = $(CPPUNIT_LIBS)
 test_editor_classify_SOURCES = test/editor_classify.cpp src/editor/classify.cpp
 
 .PHONY: .autoload.tmp
-BUILT_SOURCES = .autoload.tmp autoload.h autoload.cpp
-CLEANFILES = .autoload.tmp autoload.lst autoload.cpp autoload.h stamp-autoload
+BUILT_SOURCES = autoload.h autoload.cpp
+CLEANFILES = autoload.cpp autoload.h
+
+if AUTOLOAD
+BUILT_SOURCES += .autoload.tmp
+CLEANFILES += .autoload.tmp autoload.lst stamp-autoload
 
 .autoload.tmp: Makefile
 	@grep "^[[:blank:]]*REGISTER_SCENE_TYPE" -r ${top_srcdir}/src/scene/*.cpp | sed 's/.*(\(.*\),[ \t]*\"\(.*\)\"[ \t]*,.*).*/_register_\1:\2/g' > .autoload.tmp
@@ -92,6 +96,7 @@ CLEANFILES = .autoload.tmp autoload.lst autoload.cpp autoload.h stamp-autoload
 
 autoload.lst: stamp-autoload
 	$(AM_V_GEN)cp .autoload.tmp autoload.lst
+endif
 
 autoload.h: autoload.lst Makefile
 	$(AM_V_GEN)sed 's/\(.*\):\(.*\)/void \1();/' autoload.lst > autoload.h
