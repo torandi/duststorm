@@ -424,6 +424,7 @@ extern "C" G_MODULE_EXPORT void drawingarea_realize_cb(GtkWidget* widget, gpoint
 	}
 
 	Engine::setup_opengl();
+	Shader::initialize();
 	Engine::load_shaders();
 	delete opencl;
 	opencl = new CL();
