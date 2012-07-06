@@ -92,7 +92,7 @@ namespace Engine {
 		glViewport(0, 0, resolution.x, resolution.y);
 
 		blend->texture_bind(Shader::TEXTURE_BLEND_S);
-		scene["grass"]->draw(shaders[SHADER_BLEND]);
+		scene["Winter"]->draw(shaders[SHADER_BLEND]);
 
 		const float t = global_time.get();
 	}
