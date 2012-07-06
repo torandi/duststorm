@@ -6,6 +6,7 @@
 #include <vector>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <SDL/SDL.h>
 
 class TextureBase {
 public:
@@ -13,6 +14,8 @@ public:
 
 	virtual void texture_bind(Shader::TextureUnit unit) const = 0;
 	virtual void texture_unbind() const = 0;
+
+	static SDL_Surface* load_image(const std::string &path, glm::ivec2* size);
 
 protected:
 	TextureBase();

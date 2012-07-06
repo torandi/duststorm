@@ -17,20 +17,21 @@ public:
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.f) {
 			camera.set_position(glm::vec3(0.f, 0.f, -1));
 			camera.look_at(glm::vec3(0.f, 0.f, 0.f));
-			/*terrain_shader = Shader::create_shader("terrain");
-			TextureArray * color = TextureArray::from_filename("dirt.png","grass.png");
-			TextureArray * normal = TextureArray::from_filename("dirt_normal.png","grass_normal.png");
-			terrain = new Terrain("park", 10.f, 10.f, color, normal);*/
+			terrain_shader = Shader::create_shader("terrain");
+			TextureArray * color = TextureArray::from_filename("dirt.png","grass.png", nullptr);
+			//TextureArray * normal = TextureArray::from_filename("dirt_normal.png","grass_normal.png");
+			TextureArray * normal = TextureArray::from_filename("default_normalmap.jpg","default_normalmap.jpg", nullptr);
+			terrain = new Terrain("park", 10.f, 10.f, color, normal);
 	}
 
 	virtual void render_geometry(const Camera& cam){
 		terrain_shader->bind();
 		Shader::upload_camera(camera);
-		//terrain->render();
+		terrain->render();
 	}
 
 	virtual void render(){
-		clear(Color::red);
+		clear(Color::magenta);
 		render_geometry(camera);
 		Shader::unbind();
 	}

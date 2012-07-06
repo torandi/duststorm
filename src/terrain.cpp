@@ -13,7 +13,7 @@
 
 Terrain::~Terrain() { }
 
-Terrain::Terrain(const std::string name, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_) :
+Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_) :
 		horizontal_scale_(horizontal_scale),
 		vertical_scale_(vertical_scale),
 		texture_scale_(128.0f) ,
@@ -24,7 +24,7 @@ Terrain::Terrain(const std::string name, float horizontal_scale, float vertical_
 	shader_ = Shader::create_shader("terrain");
 
 	heightmap_ = load_image();
-	terrain_map_ = Texture2D::from_filename(PATH_BASE+name+"_map.png");
+	terrain_map_ = Texture2D::from_filename(base_+"_map.png");
 	generate_terrain();	
 	SDL_FreeSurface(heightmap_);
 
@@ -125,7 +125,7 @@ glm::vec4 Terrain::get_pixel_color(int x, int y) {
 
 SDL_Surface * Terrain::load_image() {
 	/* Load image using SDL Image */
-	std::string heightmap = PATH_BASE+base_+"_map.png";
+	std::string heightmap = PATH_BASE "textures/" +  base_ + "_map.png";
 	SDL_Surface* surface = IMG_Load(heightmap.c_str());
 	if ( !surface ){
 	  fprintf(stderr, "Failed to load heightmap at %s\n", heightmap.c_str());

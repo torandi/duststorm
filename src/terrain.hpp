@@ -34,7 +34,7 @@ class Terrain : Mesh {
 		float height() { return height_; };
 		float width() { return width_; };
 		float vertical_scale() { return vertical_scale_; };
-		Terrain(const std::string name, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_);
+		Terrain(const std::string &name, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_);
 		virtual ~Terrain();
 		virtual void render();
 };

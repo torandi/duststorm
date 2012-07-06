@@ -20,7 +20,7 @@ static GLuint cube_map_index[6] = {
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 };
 
-static SDL_Surface* load_image(const std::string &path, glm::ivec2* size) {
+SDL_Surface* TextureBase::load_image(const std::string &path, glm::ivec2* size) {
 	const std::string real_path = std::string(PATH_BASE "textures/") + path;
 
 	/* Load image using SDL Image */
