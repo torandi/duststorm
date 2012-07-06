@@ -52,7 +52,7 @@ namespace Engine {
 	}
 
 	void init(){
-		scene["grass"] = SceneFactory::create("Grass", glm::ivec2(resolution.x, resolution.y));
+		scene["Winter"] = SceneFactory::create("Winter", glm::ivec2(resolution.x, resolution.y));
 		composition = new RenderTarget(resolution,           GL_RGB8, false);
 		blend = new RenderTarget(glm::ivec2(1,1), GL_RGBA8, false);
 
