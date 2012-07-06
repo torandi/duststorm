@@ -31,12 +31,12 @@
 
 static RenderTarget* composition;
 static RenderTarget* downsample[3];
-static XYLerpTable* particle_pos = nullptr;
-static XYLerpTable* tv_pos = nullptr;
-static XYLerpTable* test_pos = nullptr;
+//static XYLerpTable* particle_pos = nullptr;
+//static XYLerpTable* tv_pos = nullptr;
+//static XYLerpTable* test_pos = nullptr;
 static std::map<std::string, Scene*> scene;
 
-static Music * music;
+//static Music * music;
 
 namespace Engine {
 	RenderTarget* rendertarget_by_name(const std::string& fullname){
@@ -100,21 +100,21 @@ namespace Engine {
 		}
 	}
 
-	static void downsample_tv(){
-		RenderTarget* prev = scene["TV"];
-		for ( int i = 0; i < 3; i++ ){
-			Shader::upload_state(downsample[i]->texture_size());
-			Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
-			downsample[i]->with([prev,i](){
-					prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->texture_size());
-				});
-			prev = downsample[i];
-		}
-	}
+	// static void downsample_tv(){
+	// 	RenderTarget* prev = scene["TV"];
+	// 	for ( int i = 0; i < 3; i++ ){
+	// 		Shader::upload_state(downsample[i]->texture_size());
+	// 		Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
+	// 		downsample[i]->with([prev,i](){
+	// 				prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->texture_size());
+	// 			});
+	// 		prev = downsample[i];
+	// 	}
+	// }
 
 	static void render_composition(){
 		RenderTarget::clear(Color::black);
-		const float t = global_time.get();
+		//const float t = global_time.get();
 
 		Shader::upload_state(resolution);
 		Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
