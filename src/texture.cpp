@@ -26,15 +26,21 @@ SDL_Surface* TextureBase::load_image(const std::string &path, glm::ivec2* size) 
 	/* Load image using SDL Image */
 	fprintf(verbose, "Loading image `%s'\n", real_path.c_str());
 	Data * file = Data::open(real_path);
+
+	if ( !file ){
+		fprintf(stderr, "Failed to load texture at %s\n", real_path.c_str());
+		if ( path != "default.jpg" ){
+			return load_image("default.jpg", size);
+		}
+		abort();
+	}
+
 	SDL_RWops * rw = SDL_RWFromConstMem(file->data(), file->size());
 	SDL_Surface* surface = IMG_Load_RW(rw, 1);
 	delete file;
 
 	if ( !surface ){
-		fprintf(stderr, "Failed to load texture at %s\n", real_path.c_str());
-		if ( path != "default.jpg" ){
-			return load_image("default.jpg", size);
-		}
+		fprintf(stderr, "Failed to load surface from `%s'\n", real_path.c_str());
 		abort();
 	}
 
