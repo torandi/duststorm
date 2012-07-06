@@ -1,5 +1,6 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_ARB_explicit_attrib_location: enable
+#extension GL_EXT_texture_array : enable
 
 layout(binding=0)  uniform sampler2D texture0;
 layout(binding=1)  uniform sampler2D texture1;
