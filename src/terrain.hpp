@@ -18,7 +18,6 @@ class Terrain : Mesh {
 	int width_, height_;
 	Texture2D * texture_map_;
 
-	SDL_Surface * load_image();
 	void generate_terrain();
 
 	glm::vec4 get_pixel_color(int x, int y);

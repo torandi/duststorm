@@ -23,7 +23,10 @@ Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical
 	textures_[1] = normal_;
 	shader_ = Shader::create_shader("terrain");
 
-	heightmap_ = load_image();
+	glm::ivec2 size;
+	heightmap_ = TextureBase::load_image(base_+"_map.png", &size);
+	width_ = size.x;
+	height_ = size.y;
 	terrain_map_ = Texture2D::from_filename(base_+"_map.png");
 	generate_terrain();	
 	SDL_FreeSurface(heightmap_);
@@ -121,56 +124,6 @@ glm::vec4 Terrain::get_pixel_color(int x, int y) {
 	color.a = (float)alpha/0xFF;
 
 	return color;	
-}
-
-SDL_Surface * Terrain::load_image() {
-	/* Load image using SDL Image */
-	std::string heightmap = PATH_BASE "textures/" +  base_ + "_map.png";
-	SDL_Surface* surface = IMG_Load(heightmap.c_str());
-	if ( !surface ){
-	  fprintf(stderr, "Failed to load heightmap at %s\n", heightmap.c_str());
-		abort();
-	}
-	width_ = surface->w;
-	height_ = surface->h;
-	SDL_Surface* rgba_surface = SDL_CreateRGBSurface(
-			SDL_SWSURFACE,
-			width_, height_,
-			32,
-			0xFF000000,
-			0x00FF0000,
-			0x0000FF00,
-			0x000000FF
-	);
-
-	if ( !rgba_surface ) {
-	  fprintf(stderr, "Failed to create RGBA surface\n");
-		abort();
-	}
-
-	/* Save the alpha blending attributes */
-	Uint32 saved_flags = surface->flags&(SDL_SRCALPHA|SDL_RLEACCELOK);
-	Uint8 saved_alpha = surface->format->alpha;
-	if ( (saved_flags & SDL_SRCALPHA) == SDL_SRCALPHA ) {
-		SDL_SetAlpha(surface, 0, 0);
-	}
-
-	SDL_Rect srcrect;
-	srcrect.x = 0;
-	srcrect.y = 0;
-	srcrect.w = width_;
-	srcrect.h = height_;
-
-	SDL_BlitSurface(surface, &srcrect, rgba_surface, 0);
-
-	/* Restore the alpha blending attributes */
-	if ( (saved_flags & SDL_SRCALPHA) == SDL_SRCALPHA ) {
-		SDL_SetAlpha(surface, saved_flags, saved_alpha);
-	}
-
-
-	SDL_FreeSurface(surface);
-	return rgba_surface;
 }
 
 void Terrain::render() {
