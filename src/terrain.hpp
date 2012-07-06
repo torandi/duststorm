@@ -11,7 +11,7 @@
 #include "texture.hpp"
 #include "movable_object.hpp"
 
-class Terrain : Mesh {
+class Terrain : public Mesh {
 	float horizontal_scale_;
 	float vertical_scale_;
 	SDL_Surface * heightmap_;

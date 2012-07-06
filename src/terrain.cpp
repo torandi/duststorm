@@ -16,7 +16,7 @@ Terrain::~Terrain() { }
 Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_) :
 		horizontal_scale_(horizontal_scale),
 		vertical_scale_(vertical_scale),
-		texture_scale_(128.0f) ,
+		texture_scale_(10.f) ,
 		base_(name)
 		{
 	textures_[0] = color_;
@@ -31,14 +31,14 @@ Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical
 	generate_terrain();	
 	SDL_FreeSurface(heightmap_);
 
-	//position_-=glm::vec3(width_*horizontal_scale_, 0, height_*horizontal_scale_)/2.0f;
-		}
+	absolute_move(-glm::vec3(width_*horizontal_scale_, 0, height_*horizontal_scale_)/2.0f);
+}
 
 void Terrain::generate_terrain() {
 	unsigned long numVertices = width_*height_;
 
 	fprintf(verbose,"Generating terrain...\n");
-	fprintf(verbose,"World size: %dx%d\n", width_, height_);
+	fprintf(verbose,"World size: %dx%d, scale: %fx%f\n", width_, height_, horizontal_scale_, vertical_scale_);
 
 	vertices_ = std::vector<vertex_t>(numVertices);
 	for(int y=0; y<height_; ++y) {

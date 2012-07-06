@@ -27,12 +27,12 @@ void main() {
 	vec4 color1, color2;
 	float color_mix;
 	color1 = texture2DArray(texture_array0, vec3(texcoord, 0));
-	color1 = texture2DArray(texture_array0, vec3(texcoord, 1));
-	color_mix = texture(texture0, texcoord).r;
-
+	color2 = texture2DArray(texture_array0, vec3(texcoord, 1));
+	color_mix = texture(texture0, position).g;
 	vec4 originalColor = mix(color1, color2, color_mix);
+
 	color1 = texture2DArray(texture_array1, vec3(texcoord, 0));
-	color1 = texture2DArray(texture_array1, vec3(texcoord, 1));
+	color2 = texture2DArray(texture_array1, vec3(texcoord, 1));
 	vec4 normal_map = mix(color1, color2, color_mix);
 
 	float shininess = 1.0;
