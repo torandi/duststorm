@@ -29,6 +29,8 @@
 
 #include "light.hpp"
 
+#define LOGFILE PATH_BASE "frob.log"
+
 static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
 Time global_time(per_frame);
@@ -373,7 +375,7 @@ void show_usage(){
 	       "  -w, --windowed          Inverse of --fullscreen.\n"
 				 "  -s, --seek=time         Seek to the given time\n"
 				 "  -n, --no-vsync          Disable vsync\n"
-	       "  -v, --verbose           Enable verbose output\n"
+	       "  -v, --verbose           Enable verbose output to stdout (redirected to " LOGFILE " otherwise)\n"
 	       "  -q, --quiet             Inverse of --verbose.\n"
 				 "  -l, --no-loading        Don't show loading scene (faster load).\n"
 	       "  -h, --help              This text\n",
@@ -469,7 +471,7 @@ int main(int argc, char* argv[]){
 		}
 	};
 
-	verbose = fopen(verbose_flag ? "/dev/stderr" : "/dev/null", "w");
+	verbose = fopen(verbose_flag ? "/dev/stderr" : LOGFILE, "w");
 
 	/* proper termination */
 	signal(SIGINT, handle_sigint);
