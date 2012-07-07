@@ -19,8 +19,8 @@ public:
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.f)
 		, snow(500000, TextureArray::from_filename("snow1.png", nullptr))
 	 {
-			camera.set_position(glm::vec3(35.750710, 5.926385, 6.305542));
-			camera.look_at(glm::vec3(35.750710, 5.926385, 7.305542));
+			camera.set_position(glm::vec3(35.750710, 17.926385, 6.305542));
+			camera.look_at(glm::vec3(35.750710, 17.926385, 7.305542));
 			terrain_shader = Shader::create_shader("terrain");
 			TextureArray * color = TextureArray::from_filename("dirt.png","grass.png", nullptr);
 			color->texture_bind(Shader::TEXTURE_ARRAY_0);
