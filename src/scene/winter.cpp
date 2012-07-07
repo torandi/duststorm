@@ -17,10 +17,10 @@ public:
 	WinterScene (const glm::ivec2 &size)
 		: Scene(size)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.f)
-		, snow(300000, TextureArray::from_filename("snow.png", nullptr))
+		, snow(500000, TextureArray::from_filename("snow1.png", nullptr))
 	 {
-			camera.set_position(glm::vec3(0.f, 2.f, -50));
-			camera.look_at(glm::vec3(0.f, -10.0f, 0.f));
+			camera.set_position(glm::vec3(35.750710, 5.926385, 6.305542));
+			camera.look_at(glm::vec3(35.750710, 5.926385, 7.305542));
 			terrain_shader = Shader::create_shader("terrain");
 			TextureArray * color = TextureArray::from_filename("dirt.png","grass.png", nullptr);
 			color->texture_bind(Shader::TEXTURE_ARRAY_0);
@@ -33,7 +33,7 @@ public:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			Texture2D * blendmap = Texture2D::from_filename("park_blend.png");
 			terrain = new Terrain("park", 1.f, 20.f, blendmap, color, normal);
-			terrain->absolute_move(glm::vec3(0.f, -10.f, 0.f));
+			//terrain->absolute_move(glm::vec3(0.f, -10.f, 0.f));
 
 			lights.ambient_intensity() = glm::vec3(0.0f);
 			lights.num_lights() = 1;
@@ -42,26 +42,39 @@ public:
 			lights.lights[0].type = Light::POINT_LIGHT;
 			lights.lights[0].quadratic_attenuation = 0.00002f;
 
-			snow.avg_spawn_rate = 50000.f;
-			snow.spawn_rate_var = 1000.f;
+			snow.avg_spawn_rate = 500000.f;
+			snow.spawn_rate_var = 100000.f;
 
-			snow.config.spawn_position = glm::vec4(-128.f, 20.f, -128.f, 1.f);
-			snow.config.spawn_area = glm::vec4(256.0f, 0.f, 256.0f, 0.0f);
+			snow.config.spawn_position = glm::vec4(-100.f, 0.f, -100.f, 1.f);
+			snow.config.spawn_area = glm::vec4(200.0f, 20.f, 200.0f, 0.0f);
 			snow.config.spawn_direction = glm::vec4(0, -1.f, 0.f, 1.f);
 			snow.config.direction_var = glm::vec4(0.3f, 0.0f, 0.3f, 0.f);
 			snow.config.avg_spawn_speed= 0.03f;
 			snow.config.spawn_speed_var = 0.01f;
-			snow.config.avg_ttl = 50.f;
-			snow.config.ttl_var = 20.f;
-			snow.config.avg_scale = 0.8f;
-			snow.config.scale_var = 0.1f;
+			snow.config.avg_ttl = 10.f;
+			snow.config.ttl_var = 5.f;
+			snow.config.avg_scale = 1.0f;
+			snow.config.scale_var = 0.3f;
 			snow.config.avg_scale_change = 0.05f;
 			snow.config.scale_change_var = 0.01f;
-			snow.config.avg_rotation_speed = 0.002f;
-			snow.config.rotation_speed_var = 0.0005f;
+			snow.config.avg_rotation_speed = 0.004f;
+			snow.config.rotation_speed_var = 0.001f;
 			snow.config.birth_color = glm::vec4(1.0f, 1.0f, 1.0f, 0.8);
 			snow.config.death_color = glm::vec4(1.0f ,1.0f, 1.0f, 0.6f);
 			snow.config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
+			snow.config.directional_speed = glm::vec4(0.1f, 0.f, .1f, 0.f);
+			snow.config.directional_speed_var = glm::vec4(0.05f, 0.f, 0.05f, 0.f);
+			snow.update_config();
+			snow.update(1.f);
+			snow.update(1.f);
+			snow.update(1.f);
+
+			snow.avg_spawn_rate = 50000.f;
+			snow.spawn_rate_var = 20000.f;
+			snow.config.spawn_position.y = 20.f;
+			snow.config.spawn_area.y = 0.f;
+			/*snow.avg_spawn_rate = 30000.f;
+			snow.spawn_rate_var = 10000.f;*/
 			snow.update_config();
 	}
 

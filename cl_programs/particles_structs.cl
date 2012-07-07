@@ -32,6 +32,9 @@ typedef struct config_t {
 	float3 spawn_position;
 	float4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
 
+	float3 directional_speed;
+	float3 directional_speed_var;
+
 	float avg_ttl;
 	float ttl_var;
 	float avg_spawn_speed; 

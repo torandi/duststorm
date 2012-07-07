@@ -110,6 +110,9 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	config.spawn_position = glm::vec4(0.f, 0.f, 0.f, 0.f);
 	config.spawn_area = glm::vec4(1.0f, 1.0f, 1.f, 0);
 
+	config.directional_speed = glm::vec4(0.f);
+	config.directional_speed_var = glm::vec4(0.f);
+
 	//Time to live
 	config.avg_ttl = 2.0;
 	config.ttl_var = 1.0;

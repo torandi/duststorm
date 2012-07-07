@@ -31,7 +31,7 @@ __kernel void run_particles (
 			float life_progression = 1.0 - (particles[id].ttl/particles[id].org_ttl);
 			particles[id].speed += particles[id].acc;
 			if(particles[id].speed < 0) particles[id].speed = 0.0;
-			vertices[id].position.xyz += particles[id].direction*particles[id].speed + random3(config->motion_rand, true);
+			vertices[id].position.xyz += particles[id].direction*particles[id].speed + random3(config->motion_rand, true) + config->directional_speed + random3(config->directional_speed_var, true);
 			vertices[id].position.w += particles[id].rotation_speed;
 			vertices[id].color = mix(config->birth_color, config->death_color, life_progression);
 			vertices[id].scale = mix(particles[id].initial_scale, particles[id].final_scale, life_progression);

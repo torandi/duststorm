@@ -33,6 +33,9 @@ class ParticleSystem : public MovableObject {
 			glm::vec4 spawn_position;
 			glm::vec4 spawn_area;
 
+			glm::vec4 directional_speed;
+			glm::vec4 directional_speed_var;
+
 			//Time to live
 			float avg_ttl;
 			float ttl_var;
