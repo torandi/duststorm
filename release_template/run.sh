@@ -24,4 +24,4 @@ fi
 
 # execute demo
 export LD_LIBRARY_PATH="$libdir"
-exec $bindir/demo
+exec $bindir/BINARY
