@@ -16,6 +16,7 @@ int TimeTable::read_file(const std::string& filename){
 	const std::string expanded = PATH_BASE"/src/" + filename;
 	Data * file = Data::open(expanded);
 	if ( !file ){
+		fprintf(stderr, "Failed to open `%s': %s\n", filename.c_str(), strerror(errno));
 		return errno;
 	}
 
