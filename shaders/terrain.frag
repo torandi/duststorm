@@ -13,6 +13,9 @@ in vec2 texcoord;
 
 out vec4 ocolor;
 
+const float LOG2 = 1.442695;
+const vec3 fog_color = vec3(0.5843137254901961, 0.6980392156862745, 0.6980392156862745);
+
 void main() {
 	vec3 norm_normal, norm_tangent, norm_bitangent;
 	norm_normal = normalize(normal);
@@ -20,6 +23,11 @@ void main() {
 	norm_bitangent = normalize(bitangent);
 
 	vec3 camera_direction = normalize(camera_pos - position);
+
+	float z = gl_FragCoord.z / gl_FragCoord.w;
+	float density = 0.04;
+	float fogFactor = exp2(-density * density * z * z * LOG2);
+	fogFactor = 1.0 - clamp(fogFactor, 0.0, 1.0);
 
 	//Convert to tangent space:
 	vec3 camera_dir;
@@ -56,12 +64,11 @@ void main() {
 
 		accumLighting += computeLighting(
 				Lgt.lights[light], originalColor, normal_map.xyz,
-				light_dir, camera_dir, length(light_distance), 
+				light_dir, camera_dir, length(light_distance),
 				shininess, vec4(1.f),
 				true, true);
 	}
 
-	ocolor= clamp(accumLighting,0.0, 1.0);
-
+	ocolor.rgb = mix(clamp(accumLighting,0.0, 1.0).rgb, fog_color, fogFactor);
 	ocolor.a= 1.f;
 }
