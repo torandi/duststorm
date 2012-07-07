@@ -2,12 +2,15 @@
 #include "config.h"
 #endif
 
+#include "cl.hpp"
 #include "data.hpp"
 
 #include <GL/glew.h>
-#include <GL/glx.h>
 
-#include "cl.hpp"
+#ifdef HAVE_GL_GLX_H
+#include <GL/glx.h>
+#endif
+
 #include <vector>
 #include <sstream>
 
