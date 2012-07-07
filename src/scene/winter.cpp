@@ -14,7 +14,9 @@ class WinterScene : public Scene {
 public:
 	WinterScene (const glm::ivec2 &size)
 		: Scene(size)
-		, camera(75.f, size.x/(float)size.y, 0.1f, 100.f) {
+		, camera(75.f, size.x/(float)size.y, 0.1f, 100.f)
+		, snow(10000, TextureArray::from_filename("snow.png", nullptr))
+	{
 			camera.set_position(glm::vec3(0.f, 0.f, -1));
 			camera.look_at(glm::vec3(0.f, 0.f, 0.f));
 			terrain_shader = Shader::create_shader("terrain");
@@ -30,6 +32,28 @@ public:
 			lights.lights[0].intensity = glm::vec3(0.8f);
 			lights.lights[0].type = Light::POINT_LIGHT;
 			lights.lights[0].quadratic_attenuation = 0.00002f;
+
+			snow.avg_spawn_rate = 50000.f;
+			snow.spawn_rate_var = 1000.f;
+
+			snow.config.spawn_position = glm::vec4(-50.f, 20.f, -30.f, 1.f);
+			snow.config.spawn_area = glm::vec4(50.0f, 0.f, 60.0f, 0.0f);
+			snow.config.spawn_direction = glm::vec4(0, -1.f, 0.f, 1.f);
+			snow.config.direction_var = glm::vec4(0.3f, 0.0f, 0.3f, 0.f);
+			snow.config.avg_spawn_speed= 0.03f;
+			snow.config.spawn_speed_var = 0.01f;
+			snow.config.avg_ttl = 50.f;
+			snow.config.ttl_var = 20.f;
+			snow.config.avg_scale = 0.8f;
+			snow.config.scale_var = 0.1f;
+			snow.config.avg_scale_change = 0.05f;
+			snow.config.scale_change_var = 0.01f;
+			snow.config.avg_rotation_speed = 0.002f;
+			snow.config.rotation_speed_var = 0.0005f;
+			snow.config.birth_color = glm::vec4(1.0f, 1.0f, 1.0f, 0.8);
+			snow.config.death_color = glm::vec4(1.0f ,1.0f, 1.0f, 0.6f);
+			snow.config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
+			snow.update_config();
 	}
 
 	virtual void render_geometry(const Camera& cam){
@@ -43,6 +67,8 @@ public:
 		clear(Color::magenta);
 		glDisable(GL_CULL_FACE);
 		render_geometry(camera);
+		shaders[SHADER_PARTICLES]->bind();
+		snow.render();
 		Shader::unbind();
 	}
 
@@ -51,6 +77,7 @@ public:
 	}
 
 	virtual void update(float t, float dt){
+		snow.update(dt);
 		#ifdef ENABLE_INPUT
 			Input::movement_speed = 5.f;
 			input.update_object(camera, dt);
@@ -64,6 +91,7 @@ private:
 	Camera camera;
 	Shader * terrain_shader;
 	Terrain * terrain;
+	ParticleSystem snow;
 };
 
 REGISTER_SCENE_TYPE(WinterScene, "Winter", "winter.meta");
