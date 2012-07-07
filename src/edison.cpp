@@ -29,8 +29,9 @@
 #include "music.hpp"
 
 static RenderTarget* composition = nullptr;
-static RenderTarget* blend = nullptr;
+static RenderTarget* downsample[2] = {nullptr,};
 static std::map<std::string, Scene*> scene;
+static Shader* dof = nullptr;
 
 namespace Engine {
 	RenderTarget* rendertarget_by_name(const std::string& fullname){
@@ -52,9 +53,12 @@ namespace Engine {
 	}
 
 	void init(){
+		dof = Shader::create_shader("dof");
+
 		scene["Winter"] = SceneFactory::create("Winter", glm::ivec2(resolution.x, resolution.y));
-		composition = new RenderTarget(resolution,           GL_RGB8, false);
-		blend = new RenderTarget(glm::ivec2(1,1), GL_RGBA8, false);
+		composition = new RenderTarget(resolution,     GL_RGB8, false);
+		downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
+		downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);
 
 		load_timetable(PATH_SRC "edison.txt");
 	}
@@ -75,12 +79,23 @@ namespace Engine {
 		for ( std::pair<std::string,Scene*> p : scene ){
 			delete p.second;
 		}
+		delete dof;
 		//delete music;
 	}
 
 	static void render_scene(){
 		for ( std::pair<std::string,Scene*> p: scene ){
 			p.second->render_scene();
+		}
+
+		RenderTarget* prev = scene["Winter"];
+		for ( int i = 0; i < 2; i++ ){
+			Shader::upload_state(downsample[i]->texture_size());
+			Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
+			downsample[i]->with([prev,i](){
+					prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->texture_size());
+				});
+			prev = downsample[i];
 		}
 	}
 
@@ -91,8 +106,8 @@ namespace Engine {
 		Shader::upload_projection_view_matrices(composition->ortho(), glm::mat4());
 		glViewport(0, 0, resolution.x, resolution.y);
 
-		blend->texture_bind(Shader::TEXTURE_BLEND_S);
-		scene["Winter"]->draw(shaders[SHADER_BLEND]);
+		downsample[1]->texture_bind(Shader::TEXTURE_2D_2);
+		scene["Winter"]->draw(dof);
 	}
 
 	static void render_display(){
@@ -103,15 +118,7 @@ namespace Engine {
 
 	void render(){
 		render_scene();
-
-		const float t = global_time.get();
-		float s = glm::min(t / 2.5f + 0.2f, 1.0f);
-		if(t > 115) {
-			s = 1.f - (t - 115.f)/5.f;
-		}
-		blend->with([s](){ RenderTarget::clear(Color(s, 0.0f, 0.0f, 0.0f)); });
 		composition->with(render_composition);
-
 		render_display();
 	}
 
