@@ -10,6 +10,8 @@
 #include "texture.hpp"
 #include "terrain.hpp"
 
+static const Color skycolor = Color::rgb(149.0f / 255.0f, 178.0f / 255.0f, 178.0f / 255.0f);
+
 class WinterScene : public Scene {
 public:
 	WinterScene (const glm::ivec2 &size)
@@ -71,7 +73,7 @@ public:
 	}
 
 	virtual void render(){
-		clear(Color::magenta);
+		clear(skycolor);
 		glDisable(GL_CULL_FACE);
 		render_geometry(camera);
 		shaders[SHADER_PARTICLES]->bind();
