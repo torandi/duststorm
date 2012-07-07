@@ -19,18 +19,18 @@ in VertexData {
 out vec4 color;
 
 void main() {
-	float extra_lines_length = 0.05;
+	float extra_lines_length = 0.3;
 
 	#if RENDER_TANGENT || RENDER_NORMAL || RENDER_BITANGENT
 	//Generate normals:
 	for(int i = 0; i < gl_in.length(); ++i) {
 		#if RENDER_NORMAL
 			//normal:
-			color = vec4(0.f, 0.0f, 1.0f, 1.f);
+			color = vec4(1.f, 0.0f, 0.0f, 1.f);
 			gl_Position = projectionViewMatrix * gl_in[i].gl_Position;
 			EmitVertex();
 
-			color = vec4(0.f, 0.0f, 1.0f, 1.f);
+			color = vec4(1.f, 0.0f, 0.0f, 1.f);
 			gl_Position = projectionViewMatrix * (gl_in[i].gl_Position+ vec4(normalize(vertexData[i].normal)*extra_lines_length, 0.f));
 			EmitVertex();
 			EndPrimitive();
@@ -38,11 +38,11 @@ void main() {
 
 		#if RENDER_TANGENT
 			//tangent:
-			color = vec4(1.f, 0.0f, 0.0f, 1.f);
+			color = vec4(0.f, 0.0f, 1.0f, 1.f);
 			gl_Position = projectionViewMatrix * gl_in[i].gl_Position;
 			EmitVertex();
 
-			color = vec4(1.f, 0.0f, 0.0f, 1.f);
+			color = vec4(0.f, 0.0f, 1.0f, 1.f);
 			gl_Position = projectionViewMatrix * (gl_in[i].gl_Position+ vec4(normalize(vertexData[i].tangent)*extra_lines_length, 0.f));
 			EmitVertex();
 			EndPrimitive();

@@ -24,11 +24,12 @@ public:
 			terrain = new Terrain("park", 1.f, 20.f, color, normal);
 			terrain->absolute_move(glm::vec3(0.f, -10.f, 0.f));
 
-			lights.ambient_intensity() = glm::vec3(0.05f);
+			lights.ambient_intensity() = glm::vec3(0.0f);
 			lights.num_lights() = 1;
-			lights.lights[0].set_position(glm::vec3(5, 0.8f, 6.f));
+			lights.lights[0].set_position(glm::vec3(10, 50.f, 10.f));
 			lights.lights[0].intensity = glm::vec3(0.8f);
-			lights.lights[0].type = Light::DIRECTIONAL_LIGHT;
+			lights.lights[0].type = Light::POINT_LIGHT;
+			lights.lights[0].quadratic_attenuation = 0.00002f;
 	}
 
 	virtual void render_geometry(const Camera& cam){
