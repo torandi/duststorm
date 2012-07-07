@@ -11,12 +11,16 @@
 
 #define RENDER_DEBUG 0
 
-Terrain::~Terrain() { }
+Terrain::~Terrain() {
+	if(map_ != NULL)
+		delete map_;
+}
 
-Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_) :
+Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical_scale, Texture2D * blendmap, TextureArray * color_, TextureArray * normal_) :
 		horizontal_scale_(horizontal_scale),
 		vertical_scale_(vertical_scale),
-		texture_scale_(10.f) ,
+		map_(nullptr),
+		terrain_map_(blendmap),
 		base_(name)
 		{
 	textures_[0] = color_;
@@ -24,18 +28,25 @@ Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical
 	shader_ = Shader::create_shader("terrain");
 
 	glm::ivec2 size;
-	heightmap_ = TextureBase::load_image(base_+"_map.png", &size);
+	heightmap_ = TextureBase::load_image(base_ + "_map.png", &size);
+	height_texture_ = Texture2D::from_filename(base_ + "_map.png");
 	width_ = size.x;
 	height_ = size.y;
-	terrain_map_ = Texture2D::from_filename(base_+"_map.png");
 	generate_terrain();	
 	SDL_FreeSurface(heightmap_);
 
 	absolute_move(-glm::vec3(width_*horizontal_scale_, 0, height_*horizontal_scale_)/2.0f);
 }
 
+Texture2D * Terrain::heightmap() const {
+	return height_texture_;
+}
+Texture2D * Terrain::blendmap() const { return terrain_map_; }
+
 void Terrain::generate_terrain() {
 	unsigned long numVertices = width_*height_;
+
+	map_ = new float[numVertices];
 
 	fprintf(verbose,"Generating terrain...\n");
 	fprintf(verbose,"World size: %dx%d, scale: %fx%f\n", width_, height_, horizontal_scale_, vertical_scale_);
@@ -50,6 +61,7 @@ void Terrain::generate_terrain() {
 			v.position = glm::vec3(horizontal_scale_*x, h*vertical_scale_, horizontal_scale_*y); 
 			v.tex_coord = glm::vec2(1.f-v.position.x/(width_*horizontal_scale_), 1.f-v.position.z/(height_*horizontal_scale_));
 			vertices_[i] = v;
+			map_[i] =  h*vertical_scale_;
 		}
 	}
 	unsigned long indexCount = (height_ - 1 ) * (width_ -1) * 6;
@@ -78,11 +90,26 @@ void Terrain::generate_terrain() {
 	fprintf(verbose,"Uploading to gfx memory\n");
 	generate_vbos();
 }
-//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 float Terrain::height_from_color(const glm::vec4 &color) {
 	return color.r;
+}
+
+float Terrain::get_height_at(int x, int y) {
+	return map_[y*width_ + x];
+}
+
+float Terrain::get_height_at(float x_, float y_) {
+	int x = (int) (x_/horizontal_scale_);
+	int y = (int) (y_/horizontal_scale_);
+	float dx = (x_/horizontal_scale_) - x;
+	float dy = (y_/horizontal_scale_) - y;
+	float height=0;
+	height += (1.0-dx) * (1.0-dy) * map_[y*width_ + x];
+	height += dx * (1.0-dy) * map_[y*width_ + x+1];
+	height += (1.0-dx) * dy * map_[(y+1)*width_ + x];
+	height += dx * dy * map_[(y+1)*width_ + x+1];
+	return height;
 }
 
 glm::vec4 Terrain::get_pixel_color(int x, int y) {

@@ -15,15 +15,22 @@ public:
 	WinterScene (const glm::ivec2 &size)
 		: Scene(size)
 		, camera(75.f, size.x/(float)size.y, 0.1f, 100.f)
-		, snow(10000, TextureArray::from_filename("snow.png", nullptr))
+		, snow(300000, TextureArray::from_filename("snow.png", nullptr))
 	{
 			camera.set_position(glm::vec3(0.f, 0.f, -1));
 			camera.look_at(glm::vec3(0.f, 0.f, 0.f));
 			terrain_shader = Shader::create_shader("terrain");
 			TextureArray * color = TextureArray::from_filename("dirt.png","grass.png", nullptr);
+			color->texture_bind(Shader::TEXTURE_ARRAY_0);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			//TextureArray * normal = TextureArray::from_filename("dirt_normal.png","grass_normal.png");
 			TextureArray * normal = TextureArray::from_filename("default_normalmap.jpg","default_normalmap.jpg", nullptr);
-			terrain = new Terrain("park", 1.f, 20.f, color, normal);
+			normal->texture_bind(Shader::TEXTURE_ARRAY_0);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			Texture2D * blendmap = Texture2D::from_filename("park_blend.png");
+			terrain = new Terrain("park", 1.f, 20.f, blendmap, color, normal);
 			terrain->absolute_move(glm::vec3(0.f, -10.f, 0.f));
 
 			lights.ambient_intensity() = glm::vec3(0.0f);
@@ -36,8 +43,8 @@ public:
 			snow.avg_spawn_rate = 50000.f;
 			snow.spawn_rate_var = 1000.f;
 
-			snow.config.spawn_position = glm::vec4(-50.f, 20.f, -30.f, 1.f);
-			snow.config.spawn_area = glm::vec4(50.0f, 0.f, 60.0f, 0.0f);
+			snow.config.spawn_position = glm::vec4(-128.f, 20.f, -128.f, 1.f);
+			snow.config.spawn_area = glm::vec4(256.0f, 0.f, 256.0f, 0.0f);
 			snow.config.spawn_direction = glm::vec4(0, -1.f, 0.f, 1.f);
 			snow.config.direction_var = glm::vec4(0.3f, 0.0f, 0.3f, 0.f);
 			snow.config.avg_spawn_speed= 0.03f;
