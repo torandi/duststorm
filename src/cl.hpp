@@ -66,6 +66,7 @@ class CL {
       cl::Platform platform_;
 
       std::vector<cl::Device> devices_; 
+			cl::Device context_device_;
 
 };
 
