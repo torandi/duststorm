@@ -48,8 +48,7 @@ void main() {
 	vec4 normal_map = mix(color1, color2, color_mix);
 
 	normal_map.xyz = normalize(normal_map.xyz * 2.0 - 1.0);
-	float shininess = 1.0;
-
+	float shininess = 32.f;
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.f);
 
 	for(int light = 0; light < Lgt.num_lights; ++light) {
@@ -63,9 +62,10 @@ void main() {
 		light_dir.z = dot(dir, norm_normal);
 
 		accumLighting += computeLighting(
-				Lgt.lights[light], originalColor, normal_map.xyz,
-				light_dir, camera_dir, length(light_distance),
-				shininess, vec4(1.f),
+				Lgt.lights[light], originalColor,
+				normal_map.xyz, light_dir,
+				camera_dir, length(light_distance),
+				shininess, vec4(.03f),
 				true, true);
 	}
 
