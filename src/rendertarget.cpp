@@ -180,6 +180,15 @@ void RenderTarget::texture_unbind() const {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void RenderTarget::depth_bind(Shader::TextureUnit unit) const {
+	glActiveTexture(unit);
+	glBindTexture(GL_TEXTURE_2D, depthbuffer());
+}
+
+void RenderTarget::depth_unbind() const {
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void RenderTarget::clear(const Color& color){
 	glClearColor(color.r, color.g, color.b, color.a);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -211,6 +220,7 @@ void RenderTarget::draw(Shader* shader, const glm::vec2& pos, const glm::vec2& s
 
 	shader->bind();
 	texture_bind(Shader::TEXTURE_2D_0);
+	depth_bind(Shader::TEXTURE_2D_1);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
 

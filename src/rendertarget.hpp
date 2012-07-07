@@ -57,6 +57,9 @@ public:
 	virtual void texture_bind(Shader::TextureUnit unit) const;
 	virtual void texture_unbind() const;
 
+	void depth_bind(Shader::TextureUnit unit) const;
+	void depth_unbind() const;
+
 	/**
 	 * Get texture id of depthbuffer.
 	 */
