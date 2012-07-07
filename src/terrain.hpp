@@ -23,8 +23,6 @@ class Terrain : public Mesh {
 
 	glm::vec4 get_pixel_color(int x, int y);
 	float height_from_color(const glm::vec4 &color);
-	float get_height_at(int x, int y);
-	float get_height_at(float x, float y);
 
 	Texture2D * terrain_map_, *height_texture_;
 	TextureArray * textures_[2];
@@ -40,6 +38,10 @@ class Terrain : public Mesh {
 		Terrain(const std::string &name, float horizontal_scale, float vertical_scale, Texture2D * blendmap, TextureArray * color_, TextureArray * normal_);
 		virtual ~Terrain();
 		virtual void render();
+
+	float get_height_at(int x, int y);
+	float get_height_at(float x, float y);
+
 };
 
 #endif
