@@ -7,13 +7,7 @@
 
 #include <GL/glew.h>
 
-#ifdef HAVE_CL_CL_H
-	#include <CL/cl.hpp>
-#else
-	#ifdef HAVE_OPENCL_CL_H
-		#include <OpenCL/cl.hpp>
-	#endif
-#endif
+#include <CL/cl.hpp>
 
 #include <glm/glm.hpp>
 #include "texture.hpp"
