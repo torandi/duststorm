@@ -1,8 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4
 
 engine_CXXFLAGS = ${ASSIMP_CFLAGS} ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS} 
-engine_LIBS = ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image -L/usr/local/lib -lfmodex64
-AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${engine_CXXFLAGS}
+engine_LIBS = ${VENDOR_LIBS} ${ASSIMP_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image -lfmodex
+AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${engine_CXXFLAGS} ${VENDOR_CFLAGS}
 
 noinst_LIBRARIES = libfrob.a
 bin_PROGRAMS = demo nox2
