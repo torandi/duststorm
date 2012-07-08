@@ -40,8 +40,12 @@ Music::Music(const char * file) {
 	sprintf(real_path, "%s%s", PATH_MUSIC, file);
 	source = Data::open(real_path);
 
-	//result_ = system_->createSound((const char*) source->data(), FMOD_OPENMEMORY | FMOD_2D, 0, &sound_);
-	result_ = system_->createSound(real_path,  FMOD_DEFAULT, 0, &sound_);
+	FMOD_CREATESOUNDEXINFO info = {0, };
+	info.cbsize = sizeof(info);
+	info.length = source->size();
+
+	//result_ = system_->createSound((const char*) source->data(), FMOD_DEFAULT | FMOD_OPENMEMORY | FMOD_2D, &info, &sound_);
+	result_ = system_->createSound((const char*) source->data(), FMOD_OPENMEMORY, &info, &sound_);
 	errcheck("create sound");
 	result_ = system_->playSound(FMOD_CHANNEL_FREE, sound_, true /* paused */, &channel_);
 	errcheck("start sound (paused)");
