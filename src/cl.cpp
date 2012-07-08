@@ -148,7 +148,7 @@ std::string CL::parse_file(
 			//Include the file:
 			char loc[256];
 			sprintf(loc, "%s:%d", filename.c_str(), linenr);
-			parsed_content << parse_file(PATH_OPENCL+line, included_files, std::string(loc));
+			parsed_content << parse_file(PATH_BASE"/cl_programs/" + line, included_files, std::string(loc));
 		} else {
 			parsed_content << line << std::endl;
 		}
@@ -164,7 +164,7 @@ cl::Program CL::create_program(const std::string &source_file) const{
 
 	fprintf(verbose, "Building CL program %s\n", source_file.c_str());
 
-	std::string src = parse_file(PATH_OPENCL+source_file, std::set<std::string>(), "");
+	std::string src = parse_file(PATH_BASE"/cl_programs/" + source_file, std::set<std::string>(), "");
 
 	cl_int err;
 	cl::Program::Sources source(1, std::make_pair(src.c_str(), src.size()));

@@ -254,9 +254,10 @@ Music::Music(const char * file, int buffer_size_) :
 	buffer = (int16_t*) malloc(sizeof(int16_t)*buffer_size);
 	ogg_buffer = (char*) malloc(sizeof(char)*OGG_BUFFER_SIZE);
 
-	char real_path[strlen(file)+strlen(PATH_MUSIC)+1];
-
-	sprintf(real_path, "%s%s", PATH_MUSIC, file);
+	char* real_path;
+	if ( asprintf(&real_path, "%s%s", PATH_BASE"/music", file) != -1 ){
+		abort();
+	}
 
 	load_ogg(real_path);
 
@@ -297,6 +298,8 @@ Music::Music(const char * file, int buffer_size_) :
 	print_pa_error("create stream", err);
 	err = Pa_SetStreamFinishedCallback(stream, &Music::pa_finished);
 	print_pa_error("set finish callback", err);
+
+	free(real_path);
 }
 
 Music::~Music() {

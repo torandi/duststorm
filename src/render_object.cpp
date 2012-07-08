@@ -38,7 +38,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	, name(model)
 	, scale(1.0f) {
 
-	const std::string real_path = PATH_MODELS + model;
+	const std::string real_path = PATH_BASE"/models/" + model;
 
 	//aiImportFileFromMemory
 	scene = aiImportFile(real_path.c_str(),

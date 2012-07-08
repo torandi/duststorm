@@ -82,7 +82,7 @@ bool Scene::is_active() const {
 }
 
 void Scene::meta_load(struct SceneInfo* info){
-	const std::string filename = PATH_SRC "scene/" + info->filename;
+	const std::string filename = PATH_BASE "/src/scene/" + info->filename;
 	Data * file = Data::open(filename);
 	if ( !file ){
 		fprintf(stderr, "Failed to read metadata for scene `%s' from `%s': %s\n", info->name.c_str(), filename.c_str(), strerror(errno));

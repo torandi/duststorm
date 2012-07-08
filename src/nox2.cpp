@@ -69,7 +69,7 @@ namespace Engine {
 		textarea = new Quad(glm::vec2(1.0f, -1.0f), false);
 		textarea->set_scale(glm::vec3(512, 256, 1));
 
-		load_timetable(PATH_SRC "nox2.txt");
+		load_timetable(PATH_BASE "/src/nox2.txt");
 
 		music = new Music("jumping.ogg");
 	}

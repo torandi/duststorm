@@ -13,7 +13,7 @@ TimeTable::TimeTable(){
 }
 
 int TimeTable::read_file(const std::string& filename){
-	const std::string expanded = PATH_SRC + filename;
+	const std::string expanded = PATH_BASE"/src/" + filename;
 	Data * file = Data::open(expanded);
 	if ( !file ){
 		return errno;

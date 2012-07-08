@@ -66,7 +66,7 @@ namespace Engine {
 		scene["Water"] = SceneFactory::create("Water", glm::ivec2(resolution.x, resolution.y));
 		scene["NOX"] = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
 
-		load_timetable(PATH_SRC "timetable.txt");
+		load_timetable(PATH_BASE"/src/timetable.txt");
 
 		particle_pos = new XYLerpTable("scene/particles_pos.txt");
 		tv_pos = new XYLerpTable("scene/tv_pos.txt");
