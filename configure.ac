@@ -61,8 +61,21 @@ AC_DEFINE_UNQUOTED([FULLSCREEN], [$FULLSCREEN], [Define to 1 if fullscreen is us
 AM_PATH_CPPUNIT(1.9.6,,[AC_MSG_NOTICE([cppunit not found, tests disabled])])
 AM_CONDITIONAL([BUILD_TESTS], [test "x$no_cppunit" != "xyes"])
 
+dnl Use vendor libs
+platform=$(uname -s)
+arch=$(uname -p)
+VENDOR_CFLAGS="-I \${top_srcdir}/vendor/include"
+VENDOR_LIBS=""
+AS_IF([test "x${platform}" == "xLinux" -a "x${arch}" == "xx86_64" ], [VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/x86_64"])
+AS_IF([test "x${platform}" == "xLinux" -a "x${arch}" == "xi686" ],   [VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/i386"])
+AS_IF([test "x${platform}" == "xDarwin" ],                           [VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/osx"])
+AS_IF([test -z "${VENDOR_LIBS}"], AC_MSG_ERROR([Could not deduce platform/arch]))
+AC_SUBST(VENDOR_CFLAGS)
+AC_SUBST(VENDOR_LIBS)
+
 dnl Show config
 echo
+echo "     Platform/arch: $platform $arch"
 echo "         Data path: $DATA_PATH"
 echo "    Editor enabled: $enable_editor"
 echo "     Input enabled: $enable_input"
