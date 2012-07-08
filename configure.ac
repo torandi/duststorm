@@ -63,12 +63,9 @@ AM_CONDITIONAL([BUILD_TESTS], [test "x$no_cppunit" != "xyes"])
 dnl Use vendor libs
 platform=$(uname -s)
 arch=$(uname -p)
+AS_IF([test "x${platform}" == "xDarwin"], [arch="osx"])
 VENDOR_CFLAGS="-I \${top_srcdir}/vendor/include"
-VENDOR_LIBS=""
-AS_IF([test "x${platform}" == "xLinux" -a "x${arch}" == "xx86_64" ], [VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/x86_64"])
-AS_IF([test "x${platform}" == "xLinux" -a "x${arch}" == "xi686" ],   [VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/i386"])
-AS_IF([test "x${platform}" == "xDarwin" ],                           [VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/osx"])
-AS_IF([test -z "${VENDOR_LIBS}"], AC_MSG_ERROR([Could not deduce platform/arch]))
+VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/$arch -Wl,--rpath \${top_srcdir}/vendor/libs/$arch"
 AC_SUBST(VENDOR_CFLAGS)
 AC_SUBST(VENDOR_LIBS)
 
