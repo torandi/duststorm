@@ -32,7 +32,7 @@
 static RenderTarget* composition = nullptr;
 static RenderTarget* blend = nullptr;
 #define NUM_TEXT_TEXTURES 11
-static Texture2D* text[NUM_TEXT_TEXTURES]; 
+static Texture2D* text[NUM_TEXT_TEXTURES];
 static Quad* textarea = nullptr;
 static std::map<std::string, Scene*> scene;
 
@@ -123,7 +123,7 @@ namespace Engine {
 			textarea->set_position(glm::vec3( resolution.x/2.f - 256 , resolution.y/2.f, 0));
 			shaders[SHADER_PASSTHRU]->bind();
 			text[0]->texture_bind(Shader::TEXTURE_2D_0);
-			textarea->render(); 
+			textarea->render();
 
 			//TODO: FADE!
 		}

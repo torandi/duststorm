@@ -49,12 +49,6 @@ dnl Setup paths
 AC_ARG_VAR([DATA_PATH], [Data path prefix. Default is relative path to top srcdir])
 AS_IF([test "x${DATA_PATH}" == "x"], [DATA_PATH="${srcdir}"])
 AC_DEFINE_UNQUOTED([PATH_BASE],    ["${DATA_PATH}/"],             [Base path])
-AC_DEFINE_UNQUOTED([PATH_MODELS],  ["${DATA_PATH}/models/"],      [Path to models])
-AC_DEFINE_UNQUOTED([PATH_SRC],     ["${DATA_PATH}/src/"],         [Path to sources])
-AC_DEFINE_UNQUOTED([PATH_SHADERS], ["${DATA_PATH}/shaders/"],     [Path to shaders])
-AC_DEFINE_UNQUOTED([PATH_OPENCL],  ["${DATA_PATH}/cl_programs/"], [Path to OpenCL programs])
-AC_DEFINE_UNQUOTED([PATH_ICON],    ["${DATA_PATH}/icons/"],       [Path to editor icons])
-AC_DEFINE_UNQUOTED([PATH_MUSIC],   ["${DATA_PATH}/music/"],       [Path to music])
 
 dnl Defaults
 AC_ARG_VAR([FULLSCREEN], [If non-empty fullscreen is used by default])

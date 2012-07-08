@@ -46,7 +46,7 @@ void Music::initialize_pa() {
 
 void Music::find_default_device() {
 	/*
-	 * Here we use pulseaudio to find out which hardware device 
+	 * Here we use pulseaudio to find out which hardware device
 	 * is default. The reason that we do this is that portaudio only supports alsa,
 	 * and when using puls through alsa we can't get current time
 	 */
@@ -76,7 +76,7 @@ void Music::find_default_device() {
 		sprintf(with_device, "(hw:%s,%d)", hw_card,hw_device[0]);
 		sprintf(with_subdevice, "(hw:%s,%d,%d)", hw_card,hw_device[0], hw_device[1]);
 
-		bool device_match = false; 
+		bool device_match = false;
 		/*
 		 * The matching works as follows:
 		 * if card_only matches and device_match is false, it is concidered a match
@@ -219,7 +219,7 @@ int Music::pa_callback(const void *inputBuffer,
 	Music * m = (Music*) userData;
 	int16_t * next;
 	int16_t * out = (int16_t*) outputBuffer;
-	
+
 	for(unsigned long i = 0; i < framesCount*m->num_channels; ++i) {
 		next = m->next_ptr(m->buffer_read);
 		if(next == m->buffer_write) {
@@ -244,7 +244,7 @@ int Music::pa_callback(const void *inputBuffer,
 
 Music::Music(const char * file, int buffer_size_) :
 		buffer_size(buffer_size_)
-	, playing(false) 
+	, playing(false)
 	, decode(false)
 	, finished_callback(nullptr)
 	, callback_data(nullptr) {
@@ -284,7 +284,7 @@ Music::Music(const char * file, int buffer_size_) :
 	} else {
 		num_channels = num_source_channels;
 
-		err = Pa_OpenDefaultStream(&stream, 
+		err = Pa_OpenDefaultStream(&stream,
 				0,
 				num_channels,
 				paInt16,
@@ -495,9 +495,9 @@ void Music::run_decode() {
 bool Music::buffer_data() {
 	int bit_stream;
 	//Decode data
-	pthread_mutex_lock(&ogg_mutex);	
+	pthread_mutex_lock(&ogg_mutex);
 	int bytes = ov_read(&ogg_file,ogg_buffer, OGG_BUFFER_SIZE, ENDIAN,2,1,&bit_stream);
-	pthread_mutex_unlock(&ogg_mutex);	
+	pthread_mutex_unlock(&ogg_mutex);
 
 	if(bytes < 0) {
 		switch(bytes) {
@@ -520,7 +520,7 @@ bool Music::buffer_data() {
 		char * pos = ogg_buffer;
 		int16_t * mixed;
 		if(device_index != -1) {
-			mixed = new int16_t[num_channels]; 
+			mixed = new int16_t[num_channels];
 		} else {
 			//If we couldn't get any data from pulse we don't have any channel map, and cant do any mixing
 			mixed = (int16_t*)pos;
@@ -530,7 +530,7 @@ bool Music::buffer_data() {
 
 		while(decode && bytes > 0) {
 			if(device_index == -1) {
-				mixed = (int16_t*)pos; 
+				mixed = (int16_t*)pos;
 			} else {
 				mix((int16_t*)pos, mixed);
 			}
@@ -555,7 +555,7 @@ void Music::mix(const int16_t * from, int16_t *to) {
 	//Handle the simple case of one source channel:
 	if(num_source_channels == 1) {
 		for(int c=0;c<num_channels; ++c) {
-			to[c] = from[c];	
+			to[c] = from[c];
 		}
 		return;
 	} else if(num_channels == 1) {
@@ -570,7 +570,7 @@ void Music::mix(const int16_t * from, int16_t *to) {
 	for(int i=0; i < num_channels; ++i) {
 		to[i] = downmix;
 	}
-	
+
 }
 
 int16_t Music::channel_mix(const int16_t * source) {
