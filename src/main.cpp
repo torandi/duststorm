@@ -31,6 +31,9 @@
 
 glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
+static const unsigned int framerate = 120;
+static const uint64_t per_frame = 1000000 / framerate;
+float global_time = 0.f;
 static volatile bool running = true;
 static const char* program_name;
 static bool resolution_given = false;
@@ -138,13 +141,15 @@ static void render(){
 }
 
 static void update(float dt){
+	global_time += dt;
 	Engine::update(dt);
 }
 
 static void main_loop(){
 	/* for calculating dt */
-	struct timeval last;
-	gettimeofday(&last, NULL);
+	struct timeval t, last;
+	gettimeofday(&t, NULL);
+	last = t;
 
 	while ( running ){
 		poll();
@@ -152,6 +157,9 @@ static void main_loop(){
 		/* calculate dt */
 		struct timeval cur;
 		gettimeofday(&cur, NULL);
+		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
+		const  int64_t delay = per_frame - delta;
+
 		float dt = (cur.tv_sec - last.tv_sec)+ (cur.tv_usec - last.tv_usec)/1000000.0 ;
 
 		update(dt);
@@ -160,6 +168,16 @@ static void main_loop(){
 		/* move time forward */
 		frames++;
 		last = cur;
+		t.tv_usec += per_frame;
+		if ( t.tv_usec > 1000000 ){
+			t.tv_usec -= 1000000;
+			t.tv_sec++;
+		}
+
+		/* fixed framerate */
+		if ( delay > 0 ){
+			usleep(delay);
+		}
 
 	}
 }

@@ -8,56 +8,32 @@
 #include "quad.hpp"
 #include "terrain.hpp"
 #include "color.hpp"
-#include "lights_data.hpp"
 
 #include "input.hpp"
-
-static const Color skycolor = Color::rgb(149.0f / 255.0f, 178.0f / 255.0f, 178.0f / 255.0f);
 
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
 
 	camera.set_position(glm::vec3(35.750710, 17.926385, 6.305542));
 	camera.look_at(glm::vec3(35.750710, 17.926385, 7.305542));
 
-	lights.ambient_intensity() = glm::vec3(0.0f);
-	lights.num_lights() = 1;
-	lights.lights[0].set_position(glm::vec3(10, 50.f, 10.f));
-	lights.lights[0].intensity = glm::vec3(0.8f);
-	lights.lights[0].type = Light::POINT_LIGHT;
-	lights.lights[0].quadratic_attenuation = 0.00002f;
-
-	terrain_shader = Shader::create_shader("terrain");
-
-	//Create terrain
-	terrain_textures[0] = TextureArray::from_filename("dirt.png","grass.png", nullptr);
-	terrain_textures[0]->texture_bind(Shader::TEXTURE_ARRAY_0);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	//terrain_textures[1] = TextureArray::from_filename("dirt_normal.png","grass_normal.png", nullptr);
-	terrain_textures[1] = TextureArray::from_filename("default_normalmap.jpg","default_normalmap.jpg", nullptr);
-	terrain_textures[1]->texture_bind(Shader::TEXTURE_ARRAY_0);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	terrain_blendmap = Texture2D::from_filename("park_blend.png");
-	terrain = new Terrain("park", 1.f, 20.f, terrain_blendmap, terrain_textures[0], terrain_textures[1]);
-
 	composition = new RenderTarget(resolution, GL_RGB8, false);
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	downsample[0] = new RenderTarget(glm::ivec2(200, 200), GL_RGB8, false, GL_LINEAR);
 	downsample[1] = new RenderTarget(glm::ivec2(100, 100), GL_RGB8, false, GL_LINEAR);
 	downsample[2] = new RenderTarget(glm::ivec2( 50, 50), GL_RGB8, false, GL_LINEAR);
+
+	printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
 	
 	Input::movement_speed = 5.f;
+
+	load_areas();
+	current_area = areas["park"];
 }
 
 Game::~Game() {
-	delete terrain;
-
-	delete terrain_textures[0];
-	delete terrain_textures[1];
-	delete terrain_blendmap;
+	for(auto it : areas) {
+	delete it.second;
+	}
 
 	delete composition;
 	for(RenderTarget * ds: downsample) {
@@ -70,19 +46,21 @@ void Game::update(float dt) {
 	if(input.current_value(Input::ACTION_1) > 0.5f) {
 		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
 	}
+
+	current_area->update(dt);
 }
 
 void Game::handle_input(const SDL_Event &event) {
 	input.parse_event(event);
 }
 
+
 void Game::render() {
 	composition->bind();
 
-	RenderTarget::clear(skycolor);
 	shaders[SHADER_PASSTHRU]->bind();
-	Shader::upload_lights(lights);
 	Shader::upload_camera(camera);
+	current_area->upload_lights();
 
 	render_statics();
 
@@ -106,10 +84,7 @@ void Game::render() {
 }
 
 void Game::render_statics() {
-	glDisable(GL_CULL_FACE);
-
-	terrain_shader->bind();
-	terrain->render();
+	current_area->render();
 }
 
 void Game::render_display() {
@@ -130,4 +105,8 @@ void Game::render_composition(){
 
 	//downsample[1]->texture_bind(Shader::TEXTURE_2D_2);
 	composition->draw(shaders[SHADER_PASSTHRU]);
+}
+
+void Game::load_areas() {
+	areas["park"] = new Area("park", *this);
 }

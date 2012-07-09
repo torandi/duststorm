@@ -10,7 +10,11 @@
 #include "terrain.hpp"
 #include "lights_data.hpp"
 
+#include "area.hpp"
 #include "input.hpp"
+
+#include <map>
+#include <string>
 
 class Game {
 	public:
@@ -22,6 +26,10 @@ class Game {
 		void handle_input(const SDL_Event &event);
 
 		void render();
+
+		Area * get_area(const std::string &str) const;
+
+		void change_area(const std::string &area, const std::string &entry_point);
 	private:
 
 		Input input;
@@ -31,14 +39,14 @@ class Game {
 		void render_statics();
 		void render_dynamics();
 
+		void load_areas();
+		void add_area(const std::string &name);
+
 		Camera camera;
 		RenderTarget *screen, *composition, *downsample[3];
-		LightsData lights;
 
-		Shader * terrain_shader;
-		Terrain * terrain;
-		Texture2D * terrain_blendmap;
-		TextureArray * terrain_textures[2];
+		Area * current_area;
+		std::map<std::string, Area*> areas;
 };
 
 #endif

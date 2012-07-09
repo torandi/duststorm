@@ -1,13 +1,14 @@
 ACLOCAL_AMFLAGS = -I m4
 
-engine_CXXFLAGS = ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS}
-engine_LIBS = ${VENDOR_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} -lSDL_image -lfmodex -lassimp
+engine_CXXFLAGS = ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} 
+engine_LIBS = ${VENDOR_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} -lSDL_image -lfmodex -lassimp -lyaml-cpp
 AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${engine_CXXFLAGS} ${VENDOR_CFLAGS}
 
 bin_PROGRAMS = game
 
 game_LDADD = ${engine_LIBS}
 game_SOURCES =	src/main.cpp \
+								src/area.cpp area/area.hpp \
 								src/bindable.hpp \
 								src/camera.cpp src/camera.hpp \
 								src/color.cpp src/color.hpp \
@@ -30,8 +31,9 @@ game_SOURCES =	src/main.cpp \
 								src/terrain.cpp src/terrain.hpp \
 								src/texture.cpp src/texture.hpp \
 								src/utils.cpp src/utils.hpp \
+								src/yaml-helper.cpp src/yaml-helper.hpp \
 								src/quad.cpp 
-game_LDFLAGS = -pthread
+game_LDFLAGS = 
 
 release: all
 	@test "x${prefix}" = "x/" || (echo "Error: --prefix must be / when creating release (currently ${prefix})"; exit 1)

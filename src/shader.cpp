@@ -365,6 +365,7 @@ void Shader::upload_camera(const Camera &camera) {
 
 void Shader::upload_state(const glm::ivec2& size){
 	struct state_data data = {
+		global_time,
 		(float)size.x,
 		(float)size.y
 	};
