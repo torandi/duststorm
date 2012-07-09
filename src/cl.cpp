@@ -19,6 +19,7 @@
 extern FILE* verbose; /* because globals.hpp fails due to libX11 containing Time which collides with our Time class */
 std::map<std::string, cl::Program> CL::cache;
 
+
 CL::CL() {
 	cl_int err;
 
@@ -69,16 +70,33 @@ CL::CL() {
 	};
 #endif
 
-	platform_.getDevices(CL_DEVICE_TYPE_GPU, &devices_);
 
+	platform_.getDevices(CL_DEVICE_TYPE_GPU, &devices_);
+	cl_bool image_support, available;
+	size_t max_width, max_height;
 	for(cl::Device device : devices_) {
 		device.getInfo(CL_DEVICE_VENDOR, &name);
 		device.getInfo(CL_DEVICE_VERSION, &version);
 		device.getInfo(CL_DEVICE_EXTENSIONS, &extensions);
-		fprintf(verbose, "[OpenCL] Device: %s %s\n"
-		       "  Extensions: %s\n", name.c_str(), version.c_str(),extensions.c_str());
+		device.getInfo(CL_DEVICE_AVAILABLE, &available);
+		device.getInfo(CL_DEVICE_IMAGE_SUPPORT, &image_support);
+		device.getInfo(CL_DEVICE_IMAGE2D_MAX_WIDTH, &max_width);
+		device.getInfo(CL_DEVICE_IMAGE2D_MAX_HEIGHT, &max_height);
+		fprintf(verbose, "[OpenCL] Device (%p): %s %s\n"
+				"		Available: %s, Image support: %s, max size: %lux%lu\n"
+				"		Extensions: %s\n", (device)(),  name.c_str(), version.c_str(),available?"YES":"NO",image_support?"YES":"NO", max_width, max_height, extensions.c_str());
 
 	}
+
+	cl_device_id device_id;
+
+	static CL_API_ENTRY cl_int (CL_API_CALL
+	*clGetGLContextInfoKHR)(const cl_context_properties *properties,
+														cl_gl_context_info param_name,
+														size_t param_value_size,
+														void *param_value,
+														size_t *param_value_size_ret)=NULL;
+	clGetGLContextInfoKHR=(clGetGLContextInfoKHR_fn)clGetExtensionFunctionAddress("clGetGLContextInfoKHR");
 
 	context_ = cl::Context(devices_, properties, &CL::cl_error_callback, NULL, &err);
 
@@ -87,7 +105,16 @@ CL::CL() {
 		abort();
 	}
 
-	queue_ = cl::CommandQueue(context_, devices_[0], 0, &err);
+	err = clGetGLContextInfoKHR(properties, CL_CURRENT_DEVICE_FOR_GL_CONTEXT_KHR, sizeof(device_id), &device_id, NULL);
+	if(err != CL_SUCCESS) {
+		fprintf(stderr, "[OpenCL] Failed to get current device for context: %s\n", errorString(err));
+		abort();
+	}
+	printf("[OpenCL] Context device id: %p\n", device_id);
+
+	context_device_ = cl::Device(device_id);
+
+	queue_ = cl::CommandQueue(context_, context_device_, 0, &err);
 
 	if(err != CL_SUCCESS) {
 		fprintf(stderr, "[OpenCL] Failed to create a command queue: %s\n", errorString(err));
