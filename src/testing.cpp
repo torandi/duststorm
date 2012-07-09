@@ -36,7 +36,7 @@ static RenderTarget* downsample[3];
 //static XYLerpTable* test_pos = nullptr;
 static std::map<std::string, Scene*> scene;
 
-//static Music * music;
+static Music * music;
 
 namespace Engine {
 	RenderTarget* rendertarget_by_name(const std::string& fullname){
@@ -68,9 +68,9 @@ namespace Engine {
 
 		load_timetable(PATH_BASE"/src/timetable.txt");
 
-		particle_pos = new XYLerpTable("scene/particles_pos.txt");
+/*		particle_pos = new XYLerpTable("scene/particles_pos.txt");
 		tv_pos = new XYLerpTable("scene/tv_pos.txt");
-		test_pos = new XYLerpTable("scene/test_pos.txt");
+		test_pos = new XYLerpTable("scene/test_pos.txt");*/
 
 		composition = new RenderTarget(resolution, GL_RGB8, false);
 		downsample[0] = new RenderTarget(glm::ivec2(200, 200), GL_RGB8, false, GL_LINEAR);
@@ -141,7 +141,7 @@ namespace Engine {
 
 	void render(){
 		render_scene();
-		downsample_tv();
+		//downsample_tv();
 		composition->with(render_composition);
 		render_display();
 	}
