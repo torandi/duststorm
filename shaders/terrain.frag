@@ -25,7 +25,7 @@ void main() {
 	vec3 camera_direction = normalize(camera_pos - position);
 
 	float z = gl_FragCoord.z / gl_FragCoord.w;
-	float density = 0.04;
+	float density = 0.01;
 	float fogFactor = exp2(-density * density * z * z * LOG2);
 	fogFactor = 1.0 - clamp(fogFactor, 0.0, 1.0);
 
