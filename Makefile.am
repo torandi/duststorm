@@ -51,6 +51,7 @@ libfrob_a_SOURCES = \
 	src/scene/tunnel.cpp \
 	src/scene/tv.cpp \
 	src/scene/water.cpp \
+	src/scene/winter.cpp \
 	autoload.cpp autoload.h
 
 if INPUT_ENABLED
