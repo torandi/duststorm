@@ -14,7 +14,6 @@ AC_PROG_CXX
 AC_PROG_RANLIB
 AX_CHECK_COMPILE_FLAG([-std=c++0x], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
 
-AX_CHECK_CL
 AX_CHECK_GL
 AX_CHECK_GLU
 AX_GLEW
@@ -22,34 +21,8 @@ AX_GLM
 AM_PATH_SDL
 
 AS_IF([test "x$no_gl" == "xyes"], [AC_MSG_ERROR([OpenGL libraries required])])
-AS_IF([test "x$no_cl" == "xyes"], [AC_MSG_ERROR([OpenCL headers required.
-
-On debian/ubuntu: "apt-get install opencl-headers".
-])])
 
 AC_CHECK_HEADERS([GL/glx.h])
-
-AC_ARG_ENABLE([input], [AS_HELP_STRING([--enable-input], [Enable mouse- and keyboard debugging/development. @<:@default=disabled@:>@])])
-AS_IF([test "x$enable_input" = "xyes"],
-	[AC_DEFINE([ENABLE_INPUT],  [1], [Define to 1 to enable input])],
-  [enable_input=no])
-AM_CONDITIONAL(INPUT_ENABLED, test "x$enable_input" = "xyes")
-
-AC_ARG_ENABLE([editor], [AS_HELP_STRING([--enable-editor], [Build editor. @<:@default=disabled@:>@])])
-AS_IF([test "x$enable_editor" = "xyes"],
-   [PKG_CHECK_MODULES([gtk3], [gtk+-3.0 gtkglext-3.0])],
-   [enable_editor=no])
-AM_CONDITIONAL([BUILD_EDITOR], [test "x$enable_editor" = "xyes"])
-
-loadingscene="yes"
-AC_ARG_ENABLE([loading], [AS_HELP_STRING([--enable-loading], [Enable loadingscene. @<:@default=disabled@:>@])])
-AS_IF([test "x$enable_loading" != "xyes"], [
-  AC_DEFINE([NOLOAD],  [1], [Define to 1 to disable loadingscene])
-  loadingscene="no"
-])
-
-AC_ARG_ENABLE([autoload], [AS_HELP_STRING([--enable-autoload], [Automatically loads all scenes. If disabled you need to make autoload.lst yourself. @<:@default=enabled@:>@])], [], [enable_autoload="yes"])
-AM_CONDITIONAL([AUTOLOAD], [test "x$enable_autoload" == "xyes"])
 
 dnl Setup paths
 AC_ARG_VAR([DATA_PATH], [Data path prefix. Default is relative path to top srcdir])
@@ -60,9 +33,6 @@ dnl Defaults
 AC_ARG_VAR([FULLSCREEN], [If non-empty fullscreen is used by default])
 AS_IF([test "x${FULLSCREEN}" == "x" -o "x${FULLSCREEN}" == "x0"], [FULLSCREEN=0], [FULLSCREEN=1])
 AC_DEFINE_UNQUOTED([FULLSCREEN], [$FULLSCREEN], [Define to 1 if fullscreen is used by default])
-
-AM_PATH_CPPUNIT(1.9.6,,[AC_MSG_NOTICE([cppunit not found, tests disabled])])
-AM_CONDITIONAL([BUILD_TESTS], [test "x$no_cppunit" != "xyes"])
 
 dnl Use vendor libs
 platform=$(uname -s)
