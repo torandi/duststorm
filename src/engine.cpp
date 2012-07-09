@@ -7,6 +7,9 @@
 #include "shader.hpp"
 #include "utils.hpp"
 
+//Ah, the hack
+#include "game.cpp" 
+
 static const char* shader_programs[NUM_SHADERS] = {
 	"simple",
 	"normal",
@@ -19,6 +22,7 @@ static const char* shader_programs[NUM_SHADERS] = {
 };
 
 namespace Engine {
+	Game * game;
 
 	void setup_opengl(){
 		glEnable(GL_CULL_FACE);
@@ -33,23 +37,27 @@ namespace Engine {
 
 	void load_shaders() {
 		for(int i=0; i < NUM_SHADERS; ++i) {
-			printf("%s\n", shader_programs[i]);
 			shaders[i] = Shader::create_shader(shader_programs[i]);
 		}
 	}
 
+	void input(const SDL_Event &event) {
+
+	}
+
 	void init() {
+		game = new Game();
 	}
 
 	void cleanup() {
-
+		delete game;
 	}
 
 	void update(float dt) {
-
+		game->update(dt);	
 	}
 
 	void render() {
-		
+		game->render();
 	}
 }

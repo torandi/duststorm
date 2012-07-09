@@ -14,7 +14,6 @@ game_SOURCES =	src/main.cpp \
 								src/data.cpp src/data.hpp \
 								src/engine.cpp src/engine.hpp \
 								src/globals.cpp src/globals.hpp \
-								src/input.cpp src/input.hpp \
 								src/light.cpp src/light.hpp \
 								src/lights_data.cpp src/lights_data.hpp \
 								src/material.cpp src/material.hpp \

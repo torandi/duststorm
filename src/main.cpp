@@ -122,7 +122,7 @@ static void poll(){
 				running = false;
 			}
 		}
-		input.parse_event(event);
+		Engine::input(event);
 	}
 }
 

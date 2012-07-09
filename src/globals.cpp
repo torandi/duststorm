@@ -6,8 +6,6 @@
 #include <cstdint>
 #include <cstddef>
 
-Input input;
-
 glm::ivec2 resolution(800,600);
 Shader* shaders[NUM_SHADERS];
 FILE* verbose = nullptr;

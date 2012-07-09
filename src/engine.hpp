@@ -2,6 +2,7 @@
 #define ENGINE_H
 
 #include <string>
+#include <SDL/SDL.h>
 
 namespace Engine {
 
@@ -16,6 +17,7 @@ namespace Engine {
 	void setup_opengl();
 
 	void load_shaders();
+	void input(const SDL_Event &event);
 };
 
 #endif /* ENGINE_H */
