@@ -13,6 +13,7 @@ game_SOURCES =	src/main.cpp \
 								src/color.cpp src/color.hpp \
 								src/data.cpp src/data.hpp \
 								src/engine.cpp src/engine.hpp \
+								src/game.cpp src/game.hpp \
 								src/globals.cpp src/globals.hpp \
 								src/light.cpp src/light.hpp \
 								src/lights_data.cpp src/lights_data.hpp \

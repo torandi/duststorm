@@ -7,8 +7,7 @@
 #include "shader.hpp"
 #include "utils.hpp"
 
-//Ah, the hack
-#include "game.cpp" 
+#include "game.hpp" 
 
 static const char* shader_programs[NUM_SHADERS] = {
 	"simple",
