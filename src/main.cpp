@@ -131,6 +131,9 @@ static void prepare_loading_scene() {
 };
 
 static void do_loading_scene() {
+#ifdef NOLOAD
+	return;
+#endif
 	if(skip_load_scene)
 		return;
 

@@ -14,8 +14,10 @@
 Mesh::Mesh() : MovableObject(), vbos_generated_(false), has_tangents_(false){ }
 
 Mesh::Mesh(const std::vector<vertex_t> &vertices, const std::vector<unsigned int> &indices) :
-	MovableObject(),
-	vbos_generated_(false),has_tangents_(false), vertices_(vertices), indices_(indices){
+	MovableObject()
+	, vertices_(vertices), indices_(indices)
+	,	vbos_generated_(false),has_tangents_(false)
+{
 	assert((indices.size()%3)==0);
 }
 

@@ -110,7 +110,7 @@ CL::CL() {
 		fprintf(stderr, "[OpenCL] Failed to get current device for context: %s\n", errorString(err));
 		abort();
 	}
-	printf("[OpenCL] Context device id: %p\n", device_id);
+	fprintf(verbose,"[OpenCL] Context device id: %p\n", device_id);
 
 	context_device_ = cl::Device(device_id);
 

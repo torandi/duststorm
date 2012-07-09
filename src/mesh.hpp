@@ -39,16 +39,17 @@ class Mesh : public MovableObject {
 		void ortonormalize_tangent_space();
 		//The mesh becommes immutable when vbos have been generated
 		void generate_vbos();
-		void render();
+		virtual void render();
 		unsigned long num_faces() { return num_faces_; };
 
+	protected:
+		std::vector<vertex_t> vertices_;
+		std::vector<unsigned int> indices_;
 	private:
 		GLenum buffers_[2]; //0:vertex buffer, 1: index buffer
 		bool vbos_generated_, has_normals_, has_tangents_;
 		unsigned long num_faces_;
 		glm::vec3 scale_;
-		std::vector<vertex_t> vertices_;
-		std::vector<unsigned int> indices_;
 
 		void verify_immutable(const char * where); //Checks that vbos_generated == false
 
