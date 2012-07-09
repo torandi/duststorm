@@ -62,7 +62,7 @@ namespace Engine {
 		scene["Test"] = SceneFactory::create("Test", glm::ivec2(resolution.x, resolution.y/3));
 		scene["particle"] = SceneFactory::create("Particles", glm::ivec2(resolution.x, resolution.y));
 		//scene["TV"] = SceneFactory::create("TV", glm::ivec2(resolution.x/2, 2*resolution.y/3));
-		scene["TV"] = SceneFactory::create("TV", glm::ivec2(resolution.x, resolution.y));
+		//scene["TV"] = SceneFactory::create("TV", glm::ivec2(resolution.x, resolution.y));
 		scene["Water"] = SceneFactory::create("Water", glm::ivec2(resolution.x, resolution.y));
 		scene["NOX"] = SceneFactory::create("NördtroXy II", glm::ivec2(resolution.x, resolution.y));
 
