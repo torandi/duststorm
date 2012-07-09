@@ -10,6 +10,8 @@
 #include "terrain.hpp"
 #include "lights_data.hpp"
 
+#include "input.hpp"
+
 class Game {
 	public:
 		Game();
@@ -17,11 +19,12 @@ class Game {
 
 		void update(float dt);
 
-		void input(const SDL_Event &event);
+		void handle_input(const SDL_Event &event);
 
 		void render();
 	private:
 
+		Input input;
 		void render_composition();
 		void render_display();
 

@@ -41,7 +41,7 @@ namespace Engine {
 	}
 
 	void input(const SDL_Event &event) {
-
+		game->handle_input(event);
 	}
 
 	void init() {

@@ -71,12 +71,13 @@ void Terrain::generate_terrain() {
 	for(int x=0; x<width_- 1; ++x) {
 		for(int y=0; y<height_- 1; ++y) {
 			int i = y * (width_-1) + x;
-			indices_[i*6 + 0] = x + y*width_;
-			indices_[i*6 + 1] = x + (y+1)*width_;
 			indices_[i*6 + 2] = (x + 1) + y*width_;
-			indices_[i*6 + 3] = x + (y+1)*width_;
-			indices_[i*6 + 4] = (x+1) + (y+1)*width_;
+			indices_[i*6 + 1] = x + (y+1)*width_;
+			indices_[i*6 + 0] = x + y*width_;
+
 			indices_[i*6 + 5] = (x + 1) + y*width_;
+			indices_[i*6 + 4] = (x+1) + (y+1)*width_;
+			indices_[i*6 + 3] = x + (y+1)*width_;
 		}
 	}
 	fprintf(verbose,"Terrain generated, creating mesh\n");

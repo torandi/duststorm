@@ -10,6 +10,8 @@
 #include "color.hpp"
 #include "lights_data.hpp"
 
+#include "input.hpp"
+
 static const Color skycolor = Color::rgb(149.0f / 255.0f, 178.0f / 255.0f, 178.0f / 255.0f);
 
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
@@ -46,6 +48,8 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
 	downsample[0] = new RenderTarget(glm::ivec2(200, 200), GL_RGB8, false, GL_LINEAR);
 	downsample[1] = new RenderTarget(glm::ivec2(100, 100), GL_RGB8, false, GL_LINEAR);
 	downsample[2] = new RenderTarget(glm::ivec2( 50, 50), GL_RGB8, false, GL_LINEAR);
+	
+	Input::movement_speed = 5.f;
 }
 
 Game::~Game() {
@@ -62,11 +66,14 @@ Game::~Game() {
 }
 
 void Game::update(float dt) {
-
+	input.update_object(camera, dt);
+	if(input.current_value(Input::ACTION_1) > 0.5f) {
+		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
+	}
 }
 
-void Game::input(const SDL_Event &event) {
-
+void Game::handle_input(const SDL_Event &event) {
+	input.parse_event(event);
 }
 
 void Game::render() {
