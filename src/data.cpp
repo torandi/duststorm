@@ -1,4 +1,5 @@
 #include "data.hpp"
+#include "globals.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -21,8 +22,10 @@ Data * Data::open(const char * filename) {
 void * Data::load_from_file(const char * filename, size_t &size) {
 	FILE * file = fopen(filename, "r");
 	void * data;
-	if(file == nullptr)
+	if(file == nullptr) {
+		fprintf(verbose, "[Data] Couldn't open file %s\n", filename);
 		return nullptr;
+	}
 
 	// obtain file size:
 	fseek (file , 0 , SEEK_END);
