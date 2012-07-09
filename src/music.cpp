@@ -37,10 +37,15 @@ Music::Music(const char * file) {
 	++system_usage_;
 
 	char* real_path;
-	if ( asprintf(&real_path, "%s%s", PATH_BASE"/music", file) != -1 ){
+	if ( asprintf(&real_path, "%s%s", PATH_BASE "/music/", file) == -1 ){
 		abort();
 	}
 	source = Data::open(real_path);
+	if(source == NULL) {
+		printf("[Music] Couldn't open file %s\n", real_path);
+		abort();
+	}
+	
 	free(real_path);
 
 	FMOD_CREATESOUNDEXINFO info = {0, };
