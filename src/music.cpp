@@ -36,9 +36,12 @@ Music::Music(const char * file) {
 	if(system_usage_ == 0) initialize_fmod();
 	++system_usage_;
 
-	char real_path[strlen(file)+strlen(PATH_MUSIC)+1];
-	sprintf(real_path, "%s%s", PATH_MUSIC, file);
+	char* real_path;
+	if ( asprintf(&real_path, "%s%s", PATH_BASE"/music", file) != -1 ){
+		abort();
+	}
 	source = Data::open(real_path);
+	free(real_path);
 
 	FMOD_CREATESOUNDEXINFO info = {0, };
 	info.cbsize = sizeof(info);
