@@ -37,6 +37,8 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	Data * src = Data::open(PATH_BASE "/game/game.yaml");
 	YAML::Node config = YAML::Load((char*)(src->data()));
 
+	player = new Player(config["player"]);
+
 	load_areas();
 	current_area = areas[config["start_area"].as<std::string>()];
 

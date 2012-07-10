@@ -25,6 +25,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/movable_light.cpp src/movable_light.hpp \
 								src/movable_object.cpp src/movable_object.hpp \
 								src/music.cpp src/music.hpp \
+								src/player.cpp src/player.hpp \
 								src/rendertarget.cpp src/rendertarget.hpp \
 								src/render_object.cpp src/render_object.hpp \
 								src/shader.cpp src/shader.hpp \

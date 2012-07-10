@@ -9,6 +9,7 @@
 #include "quad.hpp"
 #include "terrain.hpp"
 #include "lights_data.hpp"
+#include "player.hpp"
 
 #include "area.hpp"
 #include "input.hpp"
@@ -30,6 +31,8 @@ class Game {
 		Area * get_area(const std::string &str) const;
 
 		void change_area(const std::string &area, const std::string &entry_point);
+
+		Player * player;
 	private:
 
 		Input input;

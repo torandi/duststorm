@@ -15,6 +15,7 @@ VFX * VFX::get_vfx(const std::string &name) {
 		Data * src = Data::open(str);
 		free(str);
 		YAML::Node node = YAML::Load((char*)(src->data()));
+		delete src;
 
 		if(node["type"].as<std::string>() == "model") {
 			VFX * r = new ModelVFX(node);
