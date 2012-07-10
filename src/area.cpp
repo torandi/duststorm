@@ -212,6 +212,41 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 					indices.push_back(index++);
 
 				}
+
+				//Face
+
+				v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y)+w, y*hscale);
+				v.tex_coord = glm::vec2(1, 0.f);
+				vertices.push_back(v);
+				indices.push_back(index++);
+
+				v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y+1)+w, (y+1)*hscale);
+				v.tex_coord = glm::vec2(1, 1);
+				vertices.push_back(v);
+				indices.push_back(index++);
+
+				v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y)+w, y*hscale);
+				v.tex_coord = glm::vec2(0, 0.f);
+				vertices.push_back(v);
+				indices.push_back(index++);
+
+
+				//Face
+
+				v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y+1)+w, (y+1)*hscale);
+				v.tex_coord = glm::vec2(0, 1);
+				vertices.push_back(v);
+				indices.push_back(index++);
+
+				v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y)+w, y*hscale);
+				v.tex_coord = glm::vec2(0, 0.f);
+				vertices.push_back(v);
+				indices.push_back(index++);
+
+				v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y+1)+w, (y+1)*hscale);
+				v.tex_coord = glm::vec2(1, 1);
+				vertices.push_back(v);
+				indices.push_back(index++);
 			}
 		}
 	}
