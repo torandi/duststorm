@@ -47,12 +47,12 @@ class Game {
 
 
 		Camera camera;
-		RenderTarget *screen, *composition, *downsample[2];
+		RenderTarget *screen, *composition;//, *downsample[2];
 
 		Area * current_area;
 		std::map<std::string, Area*> areas;
 
-		Shader * dof_shader;
+		//Shader * dof_shader;
 };
 
 #endif

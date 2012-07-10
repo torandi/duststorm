@@ -190,6 +190,7 @@ void show_usage(){
 	       "                          current resolution in fullscreen.)\n"
 	       "  -f, --fullscreen        Enable fullscreen mode (default: false)\n"
 	       "  -w, --windowed          Inverse of --fullscreen.\n"
+				 "  -c, --configure					Configure\n"
 				 "  -n, --no-vsync					Disable vsync\n"
 	       "  -v, --verbose           Enable verbose output\n"
 	       "  -q, --quiet             Inverse of --verbose.\n"
@@ -201,11 +202,13 @@ void show_usage(){
 static int fullscreen = FULLSCREEN;
 static int vsync = 1;
 static int verbose_flag = 0;
+static int configure = 0;
 
 static struct option options[] = {
 	{"resolution",   required_argument, 0, 'r'},
 	{"fullscreen",   no_argument,       &fullscreen, 1},
 	{"windowed",     no_argument,       &fullscreen, 0},
+	{"configure",		 no_argument,				&configure, 1},
 	{"no-vsync",     no_argument,       &vsync, 0},
 	{"verbose",      no_argument,       &verbose_flag, 1},
 	{"quiet",        no_argument,       &verbose_flag, 0},
@@ -224,7 +227,7 @@ int main(int argc, char* argv[]){
 
 	/* parse arguments */
 	int op, option_index;
-	while ( (op = getopt_long(argc, argv, "r:fwnvqlh", options, &option_index)) != -1 ){
+	while ( (op = getopt_long(argc, argv, "r:fwcnvqlh", options, &option_index)) != -1 ){
 		switch ( op ){
 		case 0:   /* long opt*/
 		case '?': /* invalid */
@@ -252,6 +255,9 @@ int main(int argc, char* argv[]){
 			fullscreen = 0;
 			break;
 
+		case 'c':
+			configure = 1;
+			break;
 		case 'n': /* --no-vsync */
 			vsync = 0;
 			break;
@@ -290,14 +296,17 @@ int main(int argc, char* argv[]){
 		setitimer(ITIMER_REAL, &difftime, NULL);
 	}
 
+	if(configure) {
+		SDL_Init(SDL_INIT_VIDEO);
+		SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
+		config.interactive_configure();
+		config.save();
+	} else {
+		init(fullscreen, vsync);
+		main_loop();
+		cleanup();
+	}
 	
-	init(fullscreen, vsync);
-	main_loop();
-	cleanup();
-	
-
-	Engine::init();
-
 	fclose(verbose);
 
 	return 0;

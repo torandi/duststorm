@@ -24,8 +24,8 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	composition = new RenderTarget(resolution, GL_RGB8, false);
 
 
-	downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
-	downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);
+	/*downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
+	downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);*/
 
 	
 	Input::movement_speed = 5.f;
@@ -36,7 +36,7 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	load_areas();
 	current_area = areas[config["start_area"].as<std::string>()];
 
-	dof_shader = Shader::create_shader("dof");
+	//dof_shader = Shader::create_shader("dof");
 }
 
 Game::~Game() {
@@ -46,11 +46,11 @@ Game::~Game() {
 
 	delete composition;
 	delete screen;
-	for(RenderTarget * ds: downsample) {
+	/*for(RenderTarget * ds: downsample) {
 		delete ds;
 	}
 
-	delete dof_shader;
+	delete dof_shader;*/
 }
 
 void Game::update(float dt) {
@@ -83,7 +83,7 @@ void Game::render_content() {
 void Game::render() {
 	render_content();
 
-
+/*
 	//Blur
 	RenderTarget* prev = composition;
 	for ( int i = 0; i < 2; i++ ){
@@ -94,7 +94,7 @@ void Game::render() {
 		});
 		prev = downsample[i];
 	}
-	
+*/	
 	screen->with(std::bind(&Game::render_composition, this));
 	render_display();
 }
@@ -116,8 +116,9 @@ void Game::render_composition(){
 	Shader::upload_projection_view_matrices(screen->ortho(), glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
 
-	downsample[1]->texture_bind(Shader::TEXTURE_2D_2);
-	composition->draw(dof_shader);
+	/*downsample[1]->texture_bind(Shader::TEXTURE_2D_2);
+	composition->draw(dof_shader);*/
+	composition->draw(shaders[SHADER_PASSTHRU]);
 }
 
 void Game::load_areas() {

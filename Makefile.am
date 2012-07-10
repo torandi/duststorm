@@ -12,6 +12,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/bindable.hpp \
 								src/camera.cpp src/camera.hpp \
 								src/color.cpp src/color.hpp \
+								src/config.cpp src/config.hpp \
 								src/data.cpp src/data.hpp \
 								src/engine.cpp src/engine.hpp \
 								src/game.cpp src/game.hpp \
