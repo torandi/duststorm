@@ -6,8 +6,8 @@
 #endif
 
 #include "shader.hpp"
-#include <glm/glm.hpp>
 #include "cl.hpp"
+#include <glm/glm.hpp>
 
 extern FILE* verbose;                    /* stderr if verbose output is enabled or /dev/null if not */
 extern float global_time;                 /* current time */
