@@ -35,7 +35,6 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	terrain = new Terrain(name, hscale, config["height"].as<float>(), terrain_textures[0], terrain_textures[1]);
 
 	terrain_shader->bind();
-	printf("%f\n", marker_size/terrain->size().x);
 	glUniform1f(terrain_shader->uniform_location("marker_size"), marker_size/terrain->size().x);
 
 	fog_density = config["fog"].as<float>(0.02f);

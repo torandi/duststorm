@@ -38,7 +38,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	, name(model)
 	, scale(1.0f) {
 
-	const std::string real_path = PATH_BASE"/models/" + model;
+	const std::string real_path = PATH_BASE"/game/data/" + model;
 
 	//aiImportFileFromMemory
 	scene = aiImportFile(real_path.c_str(),
@@ -286,7 +286,7 @@ void RenderObject::recursive_render(const aiNode* node,
 void RenderObject::render(const glm::mat4 * model_matrix) {
 	if ( !scene ) return;
 	if(model_matrix != nullptr)
-		recursive_render(scene->mRootNode, *model_matrix);
+		recursive_render(scene->mRootNode, *model_matrix * matrix());
 	else
 		recursive_render(scene->mRootNode, matrix());
 }

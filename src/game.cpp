@@ -38,10 +38,12 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	YAML::Node config = YAML::Load((char*)(src->data()));
 
 	player = new Player(config["player"]);
+	player->set_position(glm::vec3(33.531612, 14.147154, 180.580292));
 
 	load_areas();
 	current_area = areas[config["start_area"].as<std::string>()];
 
+	player->set_position(glm::vec3(player->position().x, current_area->height_at(glm::vec2(player->position().x, player->position().z)), player->position().z));
 	//dof_shader = Shader::create_shader("dof");
 
 	for(bool &a : sustained_action) {
@@ -127,6 +129,7 @@ void Game::render_content() {
 	current_area->upload_lights();
 
 	render_statics();
+	render_dynamics();
 
 
 	Shader::unbind();
@@ -156,6 +159,11 @@ void Game::render_statics() {
 	mouse_marker_texture->texture_bind(Shader::TEXTURE_2D_1);
 	current_area->render(glm::vec2(mouse_position.x, mouse_position.z));
 	shaders[SHADER_NORMAL]->bind();
+}
+
+void Game::render_dynamics() {
+	shaders[SHADER_NORMAL]->bind();
+	player->render();
 }
 
 void Game::render_display() {

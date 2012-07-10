@@ -18,6 +18,7 @@ VFX * VFX::get_vfx(const std::string &name) {
 		delete src;
 
 		if(node["type"].as<std::string>() == "model") {
+			fprintf(verbose, "Create ModelVFX %s\n", name.c_str());
 			VFX * r = new ModelVFX(node);
 			loaded_vfx[name] = r;
 			return r;
@@ -29,7 +30,7 @@ VFX * VFX::get_vfx(const std::string &name) {
 
 ModelVFX::ModelVFX(const YAML::Node &node) {
 	render_object_ = new RenderObject(node["model"].as<std::string>());
-	render_object_->set_scale(node["scale"].as<glm::vec3>(glm::vec3(1.f)));
+	render_object_->set_scale(node["scale"].as<glm::vec3>(glm::vec3()));
 }
 
 ModelVFX::~ModelVFX() {
@@ -43,5 +44,5 @@ void ModelVFX::render(const glm::mat4 &matrix) const {
 void * ModelVFX::update(float dt, void * state) { return state; }
 
 void * ModelVFX::create_state() {
-	return nullptr; //dont use state
+	return nullptr; 
 }
