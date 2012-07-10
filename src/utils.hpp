@@ -2,7 +2,7 @@
 #define UTILS_H
 
 #include <glm/glm.hpp>
-#include "shader.hpp"
+#include <string>
 #include <functional>
 #include <glm/glm.hpp>
 

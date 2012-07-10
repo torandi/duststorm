@@ -2,6 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "mesh.hpp"
+#include "shader.hpp"
 #include "utils.hpp"
 
 #include <GL/glew.h>
