@@ -6,10 +6,7 @@
 #include <glm/glm.hpp>
 #include <SDL/SDL.h>
 
-#include "shader.hpp"
 #include "mesh.hpp"
-#include "texture.hpp"
-#include "movable_object.hpp"
 
 class Terrain : public Mesh {
 	float horizontal_scale_;
