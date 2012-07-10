@@ -3,11 +3,10 @@ Fubar 3d engine
 
 Dependencies
 ------------
-libglm-dev
-libassim-dev
-opencl-headers
-portaudio19-dev
-libvorbis-dev
+
+* libglew-dev
+* libglm-dev
+* opencl-headers
 
 Particles
 --------
@@ -26,7 +25,3 @@ LightsData contains all you need. To handle individual lights you have access to
 To change ambient light or number of lights you call the corresponding method (returns referenses to the variables).
 
 Finally, to upload to the shader call Shader::upload_lights(lights_data). This calls the LightsData::shader_data() function, which will call update on the movable lights.
-
-
-
-
