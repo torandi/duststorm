@@ -3,6 +3,7 @@
 #endif
 
 #include "material.hpp"
+#include "texture.hpp"
 #include <GL/glew.h>
 
 Material::Material()
