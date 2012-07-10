@@ -15,17 +15,18 @@
 
 #include <dirent.h>
 
-Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
+Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
 	camera.set_position(glm::vec3(35.750710, 17.926385, 6.305542));
 	camera.look_at(glm::vec3(35.750710, 17.926385, 7.305542));
 
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	composition = new RenderTarget(resolution, GL_RGB8, false);
+
+
 	downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
 	downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);
 
-	printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
 	
 	Input::movement_speed = 5.f;
 
@@ -44,6 +45,7 @@ Game::~Game() {
 	}
 
 	delete composition;
+	delete screen;
 	for(RenderTarget * ds: downsample) {
 		delete ds;
 	}
@@ -80,6 +82,7 @@ void Game::render_content() {
 
 void Game::render() {
 	render_content();
+
 
 	//Blur
 	RenderTarget* prev = composition;

@@ -1,6 +1,8 @@
 #version 330
 #include "uniforms.glsl"
 
+uniform float fog_density;
+
 #define TEXTURE_REPEAT 16.0
 
 in vec3 position;
@@ -25,8 +27,7 @@ void main() {
 	vec3 camera_direction = normalize(camera_pos - position);
 
 	float z = gl_FragCoord.z / gl_FragCoord.w;
-	float density = 0.02;
-	float fogFactor = exp2(-density * density * z * z * LOG2);
+	float fogFactor = exp2(-fog_density * fog_density * z * z * LOG2);
 	fogFactor = 1.0 - clamp(fogFactor, 0.0, 1.0);
 
 	//Convert to tangent space:
