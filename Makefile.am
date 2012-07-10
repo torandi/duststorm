@@ -32,6 +32,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/terrain.cpp src/terrain.hpp \
 								src/texture.cpp src/texture.hpp \
 								src/utils.cpp src/utils.hpp \
+								src/vfx.cpp src/vfx.hpp \
 								src/yaml-helper.cpp src/yaml-helper.hpp \
 								src/quad.cpp 
 fubar_LDFLAGS = 

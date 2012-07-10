@@ -52,7 +52,7 @@ public:
 	std::map<const aiMesh*, mesh_data_t > mesh_data;
 
 
-	void render();
+	void render(const glm::mat4 * model_matrix=nullptr);
 
 	const glm::mat4 matrix() const;
 

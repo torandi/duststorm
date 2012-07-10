@@ -11,6 +11,29 @@ namespace YAML {
 	std::string to_string(const YAML::Node &node);
 
 	template<>
+	struct convert<glm::vec3> {
+		static Node encode(const glm::vec3 &vec) {
+			Node node;
+			node.push_back(vec.x);
+			node.push_back(vec.y);
+			node.push_back(vec.z);
+			return node;
+		}
+
+		static bool decode(const Node &node, glm::vec3 &vec) {
+			if(!node.IsSequence()) {
+				return false;
+			} else if(!node.size() == 3) {
+				return false;
+			}
+			vec.x = node[0].as<float>();
+			vec.y = node[1].as<float>();
+			vec.z = node[2].as<float>();
+			return true;
+		}
+	};
+
+	template<>
 	struct convert<glm::vec2> {
 		static Node encode(const glm::vec2 &vec) {
 			Node node;

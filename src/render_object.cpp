@@ -283,9 +283,12 @@ void RenderObject::recursive_render(const aiNode* node,
 
 }
 
-void RenderObject::render() {
+void RenderObject::render(const glm::mat4 * model_matrix) {
 	if ( !scene ) return;
-	recursive_render(scene->mRootNode, matrix());
+	if(model_matrix != nullptr)
+		recursive_render(scene->mRootNode, *model_matrix);
+	else
+		recursive_render(scene->mRootNode, matrix());
 }
 
 const glm::mat4 RenderObject::matrix() const {
