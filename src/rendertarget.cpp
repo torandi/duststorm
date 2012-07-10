@@ -95,6 +95,10 @@ RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuff
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	checkForGLErrors("RenderTarget() fin");
+
+	with([this](){ 
+		RenderTarget::clear(Color::black);
+	} );
 }
 
 RenderTarget::~RenderTarget(){

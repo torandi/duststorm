@@ -42,6 +42,9 @@ class Area {
 
 		Color skycolor;
 
+		GLint u_fog_density;
+		float fog_density;
+
 		//TODO: More properties
 		// * links to other locations
 		// * entry points

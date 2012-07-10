@@ -36,6 +36,7 @@ class Game {
 		void render_composition();
 		void render_display();
 
+		void render_content();
 		void render_statics();
 		void render_dynamics();
 
@@ -46,10 +47,12 @@ class Game {
 
 
 		Camera camera;
-		RenderTarget *screen, *composition, *downsample[3];
+		RenderTarget *screen, *composition, *downsample[2];
 
 		Area * current_area;
 		std::map<std::string, Area*> areas;
+
+		Shader * dof_shader;
 };
 
 #endif

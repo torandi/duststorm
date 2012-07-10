@@ -379,7 +379,7 @@ void Shader::upload_state(const glm::ivec2& size){
 const GLint Shader::num_attributes() const { return num_attributes_; }
 
 GLint Shader::uniform_location(const char * uniform_name) const{
-	GLint l = glGetUniformLocation(program_, uniform_name);
-	checkForGLErrors((std::string("uniform_location")+std::string(uniform_name)+" from shader "+name).c_str());
-	return l;
+	GLint loc = glGetUniformLocation(program_, uniform_name);
+	checkForGLErrors((std::string("uniform_location(")+std::string(uniform_name)+") from shader "+name).c_str());
+	return loc;
 }

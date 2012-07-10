@@ -13,6 +13,7 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	YAML::Node config = YAML::Load((char*)(src->data()));
 
 	terrain_shader = Shader::create_shader(config["shader"].as<std::string>("terrain"));
+	u_fog_density = terrain_shader->uniform_location("fog_density");
 
 	//Create terrain
 	terrain_textures[0] = TextureArray::from_filename(config["textures"][0].as<std::string>().c_str(),config["textures"][1].as<std::string>().c_str(), nullptr);
@@ -28,6 +29,8 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 
 	terrain = new Terrain(name, config["scale"].as<float>(1.f), config["height"].as<float>(), terrain_textures[0], terrain_textures[1]);
 
+	fog_density = config["fog"].as<float>(0.02f);
+
 	//TODO: Read from config
 	lights.ambient_intensity() = glm::vec3(0.0f);
 	lights.num_lights() = 1;
@@ -36,7 +39,7 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	lights.lights[0].type = Light::POINT_LIGHT;
 	lights.lights[0].quadratic_attenuation = 0.00002f;
 
-	skycolor = Color::rgb(149.0f / 255.0f, 178.0f / 255.0f, 178.0f / 255.0f);
+	skycolor = config["skycolor"].as<Color>(Color::red);
 
 }
 
@@ -52,11 +55,13 @@ void Area::upload_lights() {
 }
 
 void Area::update(float dt) {
+
 }
 
 void Area::render() {
 	RenderTarget::clear(skycolor);
 	terrain_shader->bind();
+	glUniform1f(u_fog_density, fog_density);
 	terrain->render();
 }
 
