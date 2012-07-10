@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "terrain.hpp"
 #include "texture.hpp"
 #include "mesh.hpp"
@@ -163,7 +167,7 @@ glm::vec4 Terrain::get_pixel_color(int x, int y, SDL_Surface * surface, const gl
 	color.b = (float)c.z/0xFF;
 	color.a = (float)c.w/0xFF;
 
-	return color;	
+	return color;
 }
 
 void Terrain::render() {

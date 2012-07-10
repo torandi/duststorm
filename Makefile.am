@@ -33,8 +33,6 @@ fubar_SOURCES =	src/main.cpp \
 								src/texture.cpp src/texture.hpp \
 								src/utils.cpp src/utils.hpp \
 								src/quad.cpp 
-fubar_LDFLAGS = 
-
 release: all
 	@test "x${prefix}" = "x/" || (echo "Error: --prefix must be / when creating release (currently ${prefix})"; exit 1)
 	mkdir -p release-dist

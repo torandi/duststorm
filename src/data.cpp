@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "data.hpp"
 #include "globals.hpp"
 #include <cstdio>
@@ -45,7 +49,7 @@ void * Data::load_from_file(const char * filename, size_t &size) {
 		abort();
 	}
 	fclose(file);
-	
+
 	return data;
 }
 
@@ -122,7 +126,7 @@ ssize_t Data::getline(char **lineptr, size_t *n) const{
 		*lineptr = (char*)realloc(*lineptr, (next + 1));
 		*n = (next + 1);
 	}
-	
+
 	return read((void*)*lineptr, sizeof(char), next);
 }
 
