@@ -40,7 +40,10 @@ class Game {
 		void render_dynamics();
 
 		void load_areas();
-		void add_area(const std::string &name);
+
+		static void dir_content(const char * dir, std::list<std::string> &files);
+
+
 
 		Camera camera;
 		RenderTarget *screen, *composition, *downsample[3];

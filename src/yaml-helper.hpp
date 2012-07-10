@@ -35,10 +35,10 @@ namespace YAML {
 	struct convert<Color> {
 		static Node encode(const Color &color) {
 			Node node;
-			node.push_back(color.r);
-			node.push_back(color.g);
-			node.push_back(color.b);
-			node.push_back(color.a);
+			node.push_back(color.r*255);
+			node.push_back(color.g*255);
+			node.push_back(color.b*255);
+			node.push_back(color.a*255);
 			return node;
 		}
 
@@ -46,15 +46,15 @@ namespace YAML {
 			if(!node.IsSequence()) {
 				return false;
 			} else if(node.size() == 3) {
-				color.r = node[0].as<float>();
-				color.g = node[1].as<float>();
-				color.b = node[2].as<float>();
+				color.r = node[0].as<float>()/255.0;
+				color.g = node[1].as<float>()/255.0;
+				color.b = node[2].as<float>()/255.0;
 				return true;
 			} else if(node.size() == 4) {
-				color.r = node[0].as<float>();
-				color.g = node[1].as<float>();
-				color.b = node[2].as<float>();
-				color.a = node[3].as<float>();
+				color.r = node[0].as<float>()/255.0;
+				color.g = node[1].as<float>()/255.0;
+				color.b = node[2].as<float>()/255.0;
+				color.a = node[3].as<float>()/255.0;
 				return true;
 			} else {
 				return false;

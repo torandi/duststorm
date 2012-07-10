@@ -6,6 +6,7 @@
 #include "texture.hpp"
 #include "lights_data.hpp"
 #include "color.hpp"
+#include "yaml-helper.hpp"
 
 #include <glm/glm.hpp>
 #include <string>
@@ -19,7 +20,8 @@ class Area {
 		Area(const std::string &name, Game &game_);
 		~Area();
 		
-		float height_at(float x, float z) const;
+		float height_at(const glm::ivec2 &pos) const;
+		bool collision_at(const glm::ivec2 &pos) const;
 
 		bool click_at(const glm::ivec2 &pos);
 
@@ -33,14 +35,12 @@ class Area {
 
 		Shader * terrain_shader;
 		Terrain * terrain;
-		Texture2D * terrain_blendmap;
+		Texture2D * terrain_datamap;
 		TextureArray * terrain_textures[2];
 
 		LightsData lights;
 
 		Color skycolor;
-
-		float time;
 
 		//TODO: More properties
 		// * links to other locations

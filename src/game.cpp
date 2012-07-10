@@ -8,8 +8,12 @@
 #include "quad.hpp"
 #include "terrain.hpp"
 #include "color.hpp"
+#include "data.hpp"
+#include "yaml-helper.hpp"
 
 #include "input.hpp"
+
+#include <dirent.h>
 
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
 
@@ -26,8 +30,11 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
 	
 	Input::movement_speed = 5.f;
 
+	Data * src = Data::open(PATH_BASE "/game/game.yaml");
+	YAML::Node config = YAML::Load((char*)(src->data()));
+
 	load_areas();
-	current_area = areas["park"];
+	current_area = areas[config["start_area"].as<std::string>()];
 }
 
 Game::~Game() {
@@ -108,5 +115,30 @@ void Game::render_composition(){
 }
 
 void Game::load_areas() {
-	areas["park"] = new Area("park", *this);
+	//areas["park"] = new Area("park", *this);
+	std::list<std::string> files;
+	dir_content(PATH_BASE "/game/areas", files);
+	for(std::string &f : files) {
+		size_t dot = f.find(".");
+		std::string name = f.substr(0, dot);
+		std::string type = f.substr(dot+1);
+		if(type == "yaml") {
+			fprintf(verbose, "Found area %s\n", name.c_str());
+			areas[name] = new Area(name, *this);
+		}
+	}
+}
+
+void Game::dir_content(const char * dir, std::list<std::string> &files) {
+	DIR * dp = opendir(dir);
+	dirent *dirp;
+
+	if(dir == nullptr) {
+		printf("Critical error: Couldn't open directory %s for reading\n", dir);
+		abort();
+	}
+
+	while ((dirp = readdir(dp)) != nullptr) {
+		files.push_back(std::string(dirp->d_name));
+	}
 }

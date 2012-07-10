@@ -4,10 +4,10 @@ engine_CXXFLAGS = ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_
 engine_LIBS = ${VENDOR_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} -lSDL_image -lfmodex -lassimp -lyaml-cpp
 AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${engine_CXXFLAGS} ${VENDOR_CFLAGS}
 
-bin_PROGRAMS = game
+bin_PROGRAMS = fubar
 
-game_LDADD = ${engine_LIBS}
-game_SOURCES =	src/main.cpp \
+fubar_LDADD = ${engine_LIBS}
+fubar_SOURCES =	src/main.cpp \
 								src/area.cpp area/area.hpp \
 								src/bindable.hpp \
 								src/camera.cpp src/camera.hpp \
@@ -33,7 +33,7 @@ game_SOURCES =	src/main.cpp \
 								src/utils.cpp src/utils.hpp \
 								src/yaml-helper.cpp src/yaml-helper.hpp \
 								src/quad.cpp 
-game_LDFLAGS = 
+fubar_LDFLAGS = 
 
 release: all
 	@test "x${prefix}" = "x/" || (echo "Error: --prefix must be / when creating release (currently ${prefix})"; exit 1)
