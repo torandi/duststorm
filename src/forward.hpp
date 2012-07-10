@@ -2,6 +2,7 @@ class Camera;
 class CL;
 class Color;
 struct Light;
+class Data;
 class Mesh;
 class MovableObject;
 class ParticleSystem;

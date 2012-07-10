@@ -1,8 +1,6 @@
 #ifndef SOUND_HPP
 #define SOUND_HPP
 
-#include "data.hpp"
-
 #include <fmodex/fmod.hpp>
 
 /**
@@ -60,7 +58,7 @@ class Sound {
 		FMOD::Sound * sound_;
 		int * sound_usage_count_;
 		FMOD::Channel * channel_;
-	
+
 		double start_time;
 };
 #endif

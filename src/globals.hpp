@@ -5,6 +5,8 @@
        #include "config.h"
 #endif
 
+#include <cstdio>
+
 #include "shader.hpp"
 #include "cl.hpp"
 #include <glm/glm.hpp>
