@@ -5,8 +5,12 @@
 #include "light.hpp"
 
 class MovableLight : public MovableObject {
+	private:
+		Light * data;
 	public:
 		MovableLight(Light * light);
+		MovableLight();
+		MovableLight(const MovableLight &ml);
 
 		void update(); //Must be called to update position in light
 
@@ -16,8 +20,8 @@ class MovableLight : public MovableObject {
 		Light::light_type_t& type;
 		glm::vec3 &intensity;
 
-	private:
-		Light * data;
+
+
 };
 
 #endif

@@ -6,13 +6,29 @@
 
 MovableLight::MovableLight(Light * light) : 
 		MovableObject(light->position.xyz)
-	, constant_attenuation(light->constant_attenuation)
-	, linear_attenuation(light->linear_attenuation)
-	, quadratic_attenuation(light->quadratic_attenuation)
-	, type(light->type)
-	, intensity(light->intensity)
 	, data(light)
+	, constant_attenuation(data->constant_attenuation)
+	, linear_attenuation(data->linear_attenuation)
+	, quadratic_attenuation(data->quadratic_attenuation)
+	, type(data->type)
+	, intensity(data->intensity)
 	{ }
+
+MovableLight::MovableLight() :
+	  data(new Light())
+	, constant_attenuation(data->constant_attenuation)
+	, linear_attenuation(data->linear_attenuation)
+	, quadratic_attenuation(data->quadratic_attenuation)
+	, type(data->type)
+	, intensity(data->intensity) {}
+
+MovableLight::MovableLight(const MovableLight &ml) : MovableObject(ml.position())
+	, data(ml.data)
+	, constant_attenuation(data->constant_attenuation)
+	, linear_attenuation(data->linear_attenuation)
+	, quadratic_attenuation(data->quadratic_attenuation)
+	, type(data->type)
+	, intensity(data->intensity) {}
 
 void MovableLight::update() {
 	data->position = position_;
