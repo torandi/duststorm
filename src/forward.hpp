@@ -12,6 +12,7 @@ class RenderTarget;
 class Shader;
 class TextureBase;
 class Texture2D;
+class Texture3D;
 class TextureCubemap;
 class TextureArray;
 class TimeTable;
