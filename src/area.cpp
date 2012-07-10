@@ -55,7 +55,9 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	glUniform3f(u_highlight, 0.f, 0.f, 0.f);
 	Shader::unbind();
 
-	float wall_scale = config["wall_scale"].as<float>(1.f);
+	float wall_scale = config["walls"]["scale"].as<float>(1.f);
+	glm::vec2 texture_scale = config["walls"]["texture_scale"].as<glm::vec2>(glm::vec2(1.f));
+	wall_texture = Texture2D::from_filename(config["walls"]["texture"].as<std::string>());
 
 	//Create walls:
 	std::vector<Mesh::vertex_t> vertices;
@@ -63,6 +65,8 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	for(int y=0; y < terrain->size().y; ++y) {
 		for(int x=0; x < terrain->size().x; ++x) {
 			float w = terrain->get_wall_at(x, y)*wall_scale;
+			glm::vec2 uv_x( fmod(x*texture_scale.x, 1.f), 0.f);
+			glm::vec2 uv_y(0.f, fmod(y*texture_scale.y, 1.f));
 			if( w > 0.1f ) {
 				Mesh::vertex_t v;
 				int index = vertices.size();
@@ -71,17 +75,17 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 					//Face
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y), y*hscale);
-					v.tex_coord = glm::vec2(1, 0.f);
+					v.tex_coord = uv_x + glm::vec2(1, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y)+w, y*hscale);
-					v.tex_coord = glm::vec2(1, wall_scale);
+					v.tex_coord = uv_x + glm::vec2(1, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y), y*hscale);
-					v.tex_coord = glm::vec2(0, 0.f);
+					v.tex_coord = uv_x + glm::vec2(0, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
@@ -89,17 +93,17 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 					//Face
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y)+w, y*hscale);
-					v.tex_coord = glm::vec2(0, wall_scale);
+					v.tex_coord = uv_x + glm::vec2(0, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y), y*hscale);
-					v.tex_coord = glm::vec2(0, 0.f);
+					v.tex_coord = uv_x + glm::vec2(0, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y)+w, y*hscale);
-					v.tex_coord = glm::vec2(1, wall_scale);
+					v.tex_coord = uv_x + glm::vec2(1, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
@@ -110,34 +114,34 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y+1), (y+1)*hscale);
-					v.tex_coord = glm::vec2(1, 0.f);
+					v.tex_coord = uv_x + glm::vec2(1, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, (y+1))+w, (y+1)*hscale);
-					v.tex_coord = glm::vec2(0, wall_scale);
+					v.tex_coord = uv_x + glm::vec2(0, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, (y+1)), (y+1)*hscale);
-					v.tex_coord = glm::vec2(0, 0.f);
+					v.tex_coord = uv_x + glm::vec2(0, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 					//Face
 
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, (y+1))+w, (y+1)*hscale);
-					v.tex_coord = glm::vec2(0, wall_scale);
+					v.tex_coord = uv_x + glm::vec2(0, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, (y+1)), (y+1)*hscale);
-					v.tex_coord = glm::vec2(1, 0);
+					v.tex_coord = uv_x + glm::vec2(1, 0)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, (y+1))+w, (y+1)*hscale);
-					v.tex_coord = glm::vec2(1, wall_scale);
+					v.tex_coord = uv_x + glm::vec2(1, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
@@ -146,33 +150,33 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 				if(terrain->get_wall_at(x-1, y) <= 0.1f) {
 					//Face
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y+1), (y+1)*hscale);
-					v.tex_coord = glm::vec2(1, 0.f);
+					v.tex_coord = uv_y + glm::vec2(1, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y)+w, y*hscale);
-					v.tex_coord = glm::vec2(0, wall_scale);
+					v.tex_coord = uv_y + glm::vec2(0, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y), y*hscale);
-					v.tex_coord = glm::vec2(0, 0.f);
+					v.tex_coord = uv_y + glm::vec2(0, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					//Face
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y)+w, y*hscale);
-					v.tex_coord = glm::vec2(0, wall_scale);
+					v.tex_coord = uv_y + glm::vec2(0, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y+1), (y+1)*hscale);
-					v.tex_coord = glm::vec2(1, 0.f);
+					v.tex_coord = uv_y + glm::vec2(1, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y+1)+w, (y+1)*hscale);
-					v.tex_coord = glm::vec2(1, wall_scale);
+					v.tex_coord = uv_y + glm::vec2(1, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 				}
@@ -181,33 +185,33 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 					//Face
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at((x+1), y), y*hscale);
-					v.tex_coord = glm::vec2(1, 0.f);
+					v.tex_coord = uv_y + glm::vec2(1, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at((x+1), y)+w, y*hscale);
-					v.tex_coord = glm::vec2(1, wall_scale);
+					v.tex_coord = uv_y + glm::vec2(1, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at((x+1), y+1), (y+1)*hscale);
-					v.tex_coord = glm::vec2(0, 0.f);
+					v.tex_coord = uv_y + glm::vec2(0, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					//Face
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at((x+1), y+1)+w, (y+1)*hscale);
-					v.tex_coord = glm::vec2(0, wall_scale);
+					v.tex_coord = uv_y + glm::vec2(0, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at((x+1), y+1), (y+1)*hscale);
-					v.tex_coord = glm::vec2(0, 0.f);
+					v.tex_coord = uv_y + glm::vec2(0, 0.f)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
 					v.position = glm::vec3((x+1)*hscale, terrain->get_height_at((x+1), y)+w, y*hscale);
-					v.tex_coord = glm::vec2(1, wall_scale);
+					v.tex_coord = uv_y + glm::vec2(1, wall_scale)*texture_scale;
 					vertices.push_back(v);
 					indices.push_back(index++);
 
@@ -216,17 +220,17 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 				//Face
 
 				v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y)+w, y*hscale);
-				v.tex_coord = glm::vec2(1, 0.f);
+				v.tex_coord = uv_x + uv_y + glm::vec2(1, 0.f)*texture_scale;
 				vertices.push_back(v);
 				indices.push_back(index++);
 
 				v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y+1)+w, (y+1)*hscale);
-				v.tex_coord = glm::vec2(1, 1);
+				v.tex_coord = uv_x +  uv_y +glm::vec2(1, 1)*texture_scale;
 				vertices.push_back(v);
 				indices.push_back(index++);
 
 				v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y)+w, y*hscale);
-				v.tex_coord = glm::vec2(0, 0.f);
+				v.tex_coord = uv_x +  uv_y +glm::vec2(0, 0.f)*texture_scale;
 				vertices.push_back(v);
 				indices.push_back(index++);
 
@@ -234,24 +238,23 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 				//Face
 
 				v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y+1)+w, (y+1)*hscale);
-				v.tex_coord = glm::vec2(0, 1);
+				v.tex_coord = uv_x + uv_y + glm::vec2(0, 1)*texture_scale;
 				vertices.push_back(v);
 				indices.push_back(index++);
 
 				v.position = glm::vec3((x+1)*hscale, terrain->get_height_at(x+1, y)+w, y*hscale);
-				v.tex_coord = glm::vec2(0, 0.f);
+				v.tex_coord = uv_x +  uv_y +glm::vec2(0, 0.f)*texture_scale;
 				vertices.push_back(v);
 				indices.push_back(index++);
 
 				v.position = glm::vec3(x*hscale, terrain->get_height_at(x, y+1)+w, (y+1)*hscale);
-				v.tex_coord = glm::vec2(1, 1);
+				v.tex_coord = uv_x +  uv_y +glm::vec2(1, 1)*texture_scale;
 				vertices.push_back(v);
 				indices.push_back(index++);
 			}
 		}
 	}
 
-	wall_texture = Texture2D::from_filename(config["wall_texture"].as<std::string>());
 
 	wall = new Mesh(vertices, indices);
 	wall->generate_normals();
