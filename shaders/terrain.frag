@@ -2,8 +2,11 @@
 #include "uniforms.glsl"
 
 uniform float fog_density;
+uniform vec2 marker_position;
+uniform float marker_size;
 
 #define TEXTURE_REPEAT 16.0
+
 
 in vec3 position;
 in vec3 normal;
@@ -44,6 +47,15 @@ void main() {
 	color_mix = texture(texture0, texcoord).r;
 	vec4 originalColor = mix(color1, color2, color_mix);
 
+	vec4 extra_light = vec4(0, 0, 0, 0); //added from marker
+
+	vec2 mdiff = texcoord - marker_position;
+	if(mdiff.x < marker_size && mdiff.x > 0 && mdiff.y > 0 && mdiff.y < marker_size) {
+		vec4 marker_color = texture(texture1, mdiff/marker_size);
+		originalColor.rgb = mix(originalColor.rgb,marker_color.rgb,  marker_color.a);
+		extra_light = vec4(0.8)*marker_color.a;
+	}
+
 	color1 = texture2DArray(texture_array1, vec3(texcoord_real, 0));
 	color2 = texture2DArray(texture_array1, vec3(texcoord_real, 1));
 	vec4 normal_map = mix(color1, color2, color_mix);
@@ -69,6 +81,8 @@ void main() {
 				shininess, vec4(.03f),
 				true, true);
 	}
+
+	accumLighting += originalColor * extra_light;
 
 	ocolor.rgb = mix(clamp(accumLighting,0.0, 1.0).rgb, fog_color, fogFactor);
 	ocolor.a= 1.f;

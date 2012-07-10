@@ -56,13 +56,7 @@ class Game {
 
 		//Shader * dof_shader;
 	
-		Shader * line;
-
 		glm::vec4 mouse_position; //mouse position mapped down on world
-		GLuint buff;
-
-		Quad mouse_marker;
-		bool show_mouse_marker;
 		Texture2D * mouse_marker_texture;
 
 		enum {

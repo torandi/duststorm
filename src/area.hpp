@@ -27,7 +27,7 @@ class Area {
 		bool mouse_at(const glm::vec2 &pos); //return true if this marks something in the area
 
 		void update(float dt);
-		void render();
+		void render(const glm::vec2 &marker_position);
 
 		void upload_lights();
 
@@ -43,7 +43,7 @@ class Area {
 
 		Color skycolor;
 
-		GLint u_fog_density;
+		GLint u_fog_density, u_marker;
 		float fog_density;
 
 		GLint u_highlight;

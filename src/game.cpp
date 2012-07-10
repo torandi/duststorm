@@ -16,17 +16,12 @@
 
 #include <dirent.h>
 
-static RenderObject * cube;
-
-Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f), mouse_marker(glm::vec2(1.0f, -1.f), false), show_mouse_marker(true) {
+Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
 	camera.set_position(glm::vec3(41.851830, 14.846499, 15.102712));
 	camera.look_at(glm::vec3(43.761303, 5.710563, 28.003969));
 
 	mouse_position = glm::vec4(43.761303, 5.7, 28.003969, 1.f);
-
-	cube = new RenderObject("cube.obj");
-	cube->set_position(glm::vec3(43.761303, 6.510563, 28.003969));
 
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	composition = new RenderTarget(resolution, GL_RGB8, false);
@@ -47,13 +42,9 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f), mous
 
 	//dof_shader = Shader::create_shader("dof");
 
-	line = Shader::create_shader("color");
-
 	for(bool &a : sustained_action) {
 		a = false;
 	}
-
-	glGenBuffers(1, &buff);
 }
 
 Game::~Game() {
@@ -68,7 +59,6 @@ Game::~Game() {
 	}
 
 	delete dof_shader;*/
-	glDeleteBuffers(1, &buff);
 }
 
 void Game::update(float dt) {
@@ -136,6 +126,7 @@ void Game::render_content() {
 
 	render_statics();
 
+
 	Shader::unbind();
 	composition->unbind();
 }
@@ -160,33 +151,9 @@ void Game::render() {
 }
 
 void Game::render_statics() {
-	current_area->render();
+	mouse_marker_texture->texture_bind(Shader::TEXTURE_2D_1);
+	current_area->render(glm::vec2(mouse_position.x, mouse_position.z));
 	shaders[SHADER_NORMAL]->bind();
-	cube->render();
-	line->bind();
-
-	const float data[] = {
-		mouse_position.x, mouse_position.y, mouse_position.z, 1.f,
-		//cube->position().x, cube->position().y, cube->position().z, 1.f,
-		//camera.position().x+camera.local_z().x, camera.position().y+camera.local_z().y, camera.position().z+camera.local_z().z, 1.f,
-		//mp_far.x, mp_far.y, mp_far.z, 1.f, 
-	};
-
-	glBindBuffer(GL_ARRAY_BUFFER, buff);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STREAM_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	Shader::upload_model_matrix(glm::mat4(1.f));
-
-	glPointSize(10.f);
-	glDrawArrays(GL_POINTS, 0, 1);
-
-	/*glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
-
 }
 
 void Game::render_display() {

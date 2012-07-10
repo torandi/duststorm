@@ -3,6 +3,8 @@
 
 #include "game.hpp"
 
+static const float marker_size = 0.5f;
+
 Area::Area(const std::string &name, Game &game_) : game(game_) {
 	char * str;
 	if(asprintf(&str, PATH_BASE "/game/areas/%s.yaml", name.c_str()) == -1) abort();
@@ -14,6 +16,8 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 
 	terrain_shader = Shader::create_shader(config["shader"].as<std::string>("terrain"));
 	u_fog_density = terrain_shader->uniform_location("fog_density");
+	u_marker = terrain_shader->uniform_location("marker_position");
+
 
 	//Create terrain
 	terrain_textures[0] = TextureArray::from_filename(config["textures"][0].as<std::string>().c_str(),config["textures"][1].as<std::string>().c_str(), nullptr);
@@ -28,6 +32,10 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	terrain = new Terrain(name, config["scale"].as<float>(1.f), config["height"].as<float>(), terrain_textures[0], terrain_textures[1]);
+
+	terrain_shader->bind();
+	printf("%f\n", marker_size/terrain->size().x);
+	glUniform1f(terrain_shader->uniform_location("marker_size"), marker_size/terrain->size().x);
 
 	fog_density = config["fog"].as<float>(0.02f);
 
@@ -71,10 +79,11 @@ bool Area::click_at(const glm::vec2 &pos) {
 }
 
 
-void Area::render() {
+void Area::render(const glm::vec2 &marker_position) {
 	RenderTarget::clear(skycolor);
 	terrain_shader->bind();
 	glUniform1f(u_fog_density, fog_density);
+	glUniform2f(u_marker, 1.f - (marker_position.x/terrain->size().x), 1.f - (marker_position.y/terrain->size().y));
 	terrain->render();
 }
 
