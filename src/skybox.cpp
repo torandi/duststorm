@@ -1,14 +1,17 @@
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <string>
-#include <GL/glew.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "skybox.hpp"
 #include "camera.hpp"
 #include "texture.hpp"
 #include "utils.hpp"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <string>
+#include <GL/glew.h>
 
 Skybox::Skybox(std::string skybox_path) {
 

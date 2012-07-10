@@ -5,7 +5,6 @@
 #include <GL/glew.h>
 
 #include "camera.hpp"
-#include "texture.hpp"
 
 class Skybox {
 	public:
