@@ -129,36 +129,4 @@ private:
 	GLuint _texture;
 };
 
-// 		/*
-// 		 * Requires the texture to be bound!
-// 		 *
-// 		 * Sets parameters to CLAMP_EDGE and GL_NEAREST (skybox etc)
-// 		 */
-// 		void set_clamp_params();
-
-// 		unsigned int mipmap_count()  const;
-
-// 		unsigned int num_textures() const;
-
-// 		GLuint texture_type() const;
-
-// 	private:
-// 		// Copy not allowed (no body implemented, intentional!)
-// 		// Not allowed since deallocating a texture object frees the texture
-// 		Image(const Image &other);
-
-// 		void load_texture();
-// 		void free_texture();
-
-// 		std::string * _filenames;
-// 		GLuint _texture;
-// 		int _width;
-// 		int _height;
-// 		unsigned int _num_textures;
-// 		unsigned int _mipmap_count;
-// 		GLuint _texture_type;
-
-// 		static GLuint cube_map_index_[6];
-// };
-
 #endif /* TEXTURE_H */
