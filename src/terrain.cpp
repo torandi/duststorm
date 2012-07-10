@@ -59,6 +59,7 @@ void Terrain::generate_terrain() {
 	unsigned long numVertices = hm_size.x*hm_size.y;
 
 	map_ = new float[numVertices];
+	wall_ = new float[numVertices];
 
 	fprintf(verbose,"Generating terrain...\n");
 	fprintf(verbose,"World size: %dx%d, scale: %fx%f\n", hm_size.x, hm_size.y, horizontal_scale_, vertical_scale_);
@@ -74,6 +75,7 @@ void Terrain::generate_terrain() {
 			v.tex_coord = glm::vec2(1.f-v.position.x/(hm_size.x*horizontal_scale_), 1.f-v.position.z/(hm_size.y*horizontal_scale_));
 			vertices_[i] = v;
 			map_[i] =  h*vertical_scale_;
+			wall_[i] = color.g;
 		}
 	}
 	unsigned long indexCount = (hm_size.y - 1 ) * (hm_size.x -1) * 6;
@@ -124,6 +126,9 @@ bool Terrain::get_collision_at(float x, float y) const {
 	return get_collision_at(_x, _y);
 }
 
+float Terrain::get_wall_at(int x, int y) const {
+	return wall_[y*hm_size.x + x];
+}
 
 float Terrain::get_height_at(int x, int y) const {
 	return map_[y*hm_size.x + x];

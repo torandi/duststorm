@@ -17,6 +17,7 @@ class Terrain : public Mesh {
 	SDL_Surface *heightmap_, *data_map_;
 	glm::ivec2 hm_size, dm_size;
 	float * map_;
+	float * wall_;
 	enum {
 		DATA_FALSE = 0,
 		DATA_TRUE = 1,
@@ -47,6 +48,7 @@ class Terrain : public Mesh {
 	float get_height_at(float x, float y) const;
 	bool get_collision_at(float x, float y) const;
 	bool get_collision_at(int x, int y) const;
+	float get_wall_at(int x, int y) const;
 
 };
 

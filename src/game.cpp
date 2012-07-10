@@ -18,8 +18,8 @@
 
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
-	camera.set_position(glm::vec3(41.851830, 14.846499, 15.102712));
-	camera.look_at(glm::vec3(43.761303, 5.710563, 28.003969));
+	camera.set_position(glm::vec3(27.584806, 17.217037, 186.391449));
+	camera.look_at(glm::vec3(33.531612, 14.147154, 180.580292));
 
 	mouse_position = glm::vec4(43.761303, 5.7, 28.003969, 1.f);
 
@@ -32,7 +32,7 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);*/
 
 	
-	Input::movement_speed = 5.f;
+	Input::movement_speed = 15.f;
 
 	Data * src = Data::open(PATH_BASE "/game/game.yaml");
 	YAML::Node config = YAML::Load((char*)(src->data()));

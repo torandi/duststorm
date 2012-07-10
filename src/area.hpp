@@ -36,8 +36,10 @@ class Area {
 
 		Shader * terrain_shader;
 		Terrain * terrain;
-		Texture2D * terrain_datamap;
+		Texture2D * terrain_datamap, * wall_texture;
 		TextureArray * terrain_textures[2];
+
+		Mesh * wall;
 
 		LightsData lights;
 
