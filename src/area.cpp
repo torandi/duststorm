@@ -41,6 +41,10 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 
 	skycolor = config["skycolor"].as<Color>(Color::red);
 
+	u_highlight = shaders[SHADER_NORMAL]->uniform_location("highlight");
+	shaders[SHADER_NORMAL]->bind();
+	glUniform3f(u_highlight, 0.f, 0.f, 0.f);
+	Shader::unbind();
 }
 
 Area::~Area() {
@@ -58,6 +62,15 @@ void Area::update(float dt) {
 
 }
 
+bool Area::mouse_at(const glm::vec2 &pos) {
+	return false;
+}
+
+bool Area::click_at(const glm::vec2 &pos) {
+	return false;
+}
+
+
 void Area::render() {
 	RenderTarget::clear(skycolor);
 	terrain_shader->bind();
@@ -65,6 +78,10 @@ void Area::render() {
 	terrain->render();
 }
 
-float Area::height_at(const glm::ivec2 &pos) const {
+float Area::height_at(const glm::vec2 &pos) const {
 	return terrain->get_height_at(pos.x, pos.y);
+}
+
+bool Area::collision_at(const glm::vec2 &pos) const {
+	return terrain->get_collision_at(pos.x, pos.y);
 }

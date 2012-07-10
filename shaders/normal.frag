@@ -1,5 +1,7 @@
 #version 150
 
+uniform vec3 highlight;
+
 //NORMAL SHADER
 
 #include "uniforms.glsl"
@@ -30,14 +32,12 @@ void main() {
 	camera_dir.z = dot(camera_direction, norm_normal);
 
 	vec4 originalColor;
-   originalColor = texture(texture0, texcoord);
-   //originalColor*=Mtl.diffuse;
+	originalColor = texture(texture0, texcoord);
+	//originalColor*=Mtl.diffuse;
 
-	vec3 normal_map = vec3(0.0, 0.0, 1.0);
-
-	/* //Normal map
-		normal_map = normalize(texture(texture2, texcoord).xyz * 2.0 - 1.0);
-	*/
+	//Normal map
+	vec3 normal_map = normalize(texture(texture2, texcoord).xyz * 2.0 - 1.0);
+	
 
    vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity, 1.0);
 
@@ -58,6 +58,7 @@ void main() {
             true, true);
    }
 
+	 accumLighting += originalColor * vec4(highlight,1.0);
 
    ocolor= clamp(accumLighting,0.0, 1.0);
 }

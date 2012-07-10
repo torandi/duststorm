@@ -20,10 +20,11 @@ class Area {
 		Area(const std::string &name, Game &game_);
 		~Area();
 		
-		float height_at(const glm::ivec2 &pos) const;
-		bool collision_at(const glm::ivec2 &pos) const;
+		float height_at(const glm::vec2 &pos) const;
+		bool collision_at(const glm::vec2 &pos) const;
 
-		bool click_at(const glm::ivec2 &pos);
+		bool click_at(const glm::vec2 &pos);
+		bool mouse_at(const glm::vec2 &pos); //return true if this marks something in the area
 
 		void update(float dt);
 		void render();
@@ -44,6 +45,8 @@ class Area {
 
 		GLint u_fog_density;
 		float fog_density;
+
+		GLint u_highlight;
 
 		//TODO: More properties
 		// * links to other locations

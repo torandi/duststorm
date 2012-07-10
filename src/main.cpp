@@ -80,7 +80,7 @@ static void init(bool fullscreen, bool vsync){
 	SDL_WM_SetCaption(GAME_NAME, NULL);
 
 	//if ( fullscreen ){
-		SDL_ShowCursor(SDL_DISABLE);
+		//SDL_ShowCursor(SDL_DISABLE);
 	//}
 
 	int ret;

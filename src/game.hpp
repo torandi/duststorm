@@ -42,9 +42,11 @@ class Game {
 
 		void load_areas();
 
+		void do_action(int num);
+
 		static void dir_content(const char * dir, std::list<std::string> &files);
 
-
+		void update_mouse_position(int x, int y);
 
 		Camera camera;
 		RenderTarget *screen, *composition;//, *downsample[2];
@@ -53,6 +55,26 @@ class Game {
 		std::map<std::string, Area*> areas;
 
 		//Shader * dof_shader;
+	
+		Shader * line;
+
+		glm::vec4 mouse_position; //mouse position mapped down on world
+		GLuint buff;
+
+		Quad mouse_marker;
+		bool show_mouse_marker;
+		Texture2D * mouse_marker_texture;
+
+		enum {
+			MOVE_UP = 0,
+			MOVE_DOWN,
+			MOVE_RIGHT,
+			MOVE_LEFT,
+			MOUSE_1,
+			MOUSE_2,
+			NUM_ACTIVE_ACTIONS
+		};
+		bool sustained_action[NUM_ACTIVE_ACTIONS];
 };
 
 #endif
