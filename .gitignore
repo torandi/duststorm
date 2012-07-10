@@ -21,6 +21,10 @@ autoload.cpp
 autoload.lst
 stamp-autoload
 
+# binaries
+nox2
+demo
+
 # Compiled Object files
 *.slo
 *.lo
