@@ -38,9 +38,9 @@ public:
 
 	/**
 	 * Load texture by name (cached if possible)
-	 * Paths are relative to texture folder. Textures are cached unless mipmap levels are changed.
+	 * Paths are relative to texture folder.
 	 */
-	static Texture2D* from_filename(const std::string &path, const unsigned int num_mipmap_levels = default_mipmap_level);
+	static Texture2D* from_filename(const std::string &path, bool mipmap = true);
 
 	/**
 	 * Load a default texture.
@@ -57,10 +57,9 @@ public:
 	virtual void texture_unbind() const;
 
 private:
-	Texture2D(const std::string &path, unsigned int num_mipmap_levels);
+	Texture2D(const std::string &path, bool mipmap);
 
 	GLuint _texture;
-	size_t _mipmap_count;
 };
 
 class Texture3D: public TextureBase {
@@ -68,12 +67,8 @@ public:
 
 	virtual ~Texture3D();
 
-	static Texture3D * from_filename(const char* filename, ...) 
-#ifndef WIN32
-		__attribute__((sentinel))
-#endif
-;
-	static Texture3D * from_filename(const std::vector<std::string>& paths);
+	static Texture3D * from_filename(const char* filename, ...) __attribute__((sentinel));
+	static Texture3D * from_filename(const std::vector<std::string>& paths, bool mipmap = false);
 
 	const GLint gl_texture() const;
 
@@ -82,7 +77,7 @@ public:
 
 	const int depth() const;
 private:
-	Texture3D(std::vector<std::string> path);
+	Texture3D(std::vector<std::string> path, bool mipmap);
 
 	GLuint _texture;
 	int _depth;
@@ -120,19 +115,15 @@ class TextureArray: public TextureBase {
 public:
 	virtual ~TextureArray();
 
-	static TextureArray* from_filename(const char* filename, ...) 
-#ifndef WIN32
-		__attribute__((sentinel))
-#endif		
-;
-	static TextureArray* from_filename(const std::vector<std::string>& paths);
+	static TextureArray* from_filename(const char* filename, ...) __attribute__((sentinel));
+	static TextureArray* from_filename(const std::vector<std::string>& paths, bool mipmap = true);
 
 	size_t num_textures() const;
 	virtual void texture_bind(Shader::TextureUnit unit) const;
 	virtual void texture_unbind() const;
 
 private:
-	TextureArray(std::vector<std::string> path);
+	TextureArray(std::vector<std::string> path, bool mipmap);
 
 	size_t _num;
 	GLuint _texture;

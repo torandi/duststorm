@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <sstream>
 #include <cstdarg>
 #include <cassert>
 #include <SDL/SDL.h>
@@ -128,21 +129,20 @@ void Texture2D::preload(const std::string& path){
 	from_filename(path);
 };
 
-Texture2D* Texture2D::from_filename(const std::string &path, const unsigned int num_mipmap_levels) {
-	/* if custom mipmap levels has been set texture cannot be cached */
-	if ( num_mipmap_levels != default_mipmap_level ){
-		return new Texture2D(path, num_mipmap_levels);
-	}
+Texture2D* Texture2D::from_filename(const std::string &path, bool mipmap) {
+	/* puts settings in entry for caching*/
+	std::stringstream entry;
+	entry << path << ";mipmap=" << mipmap;
 
 	/* search cache */
-	auto it = texture_cache.find(path);
+	auto it = texture_cache.find(entry.str());
 	if ( it != texture_cache.end() ){
 		return it->second;
 	}
 
 	/* create new instance */
-	Texture2D* texture = new Texture2D(path, num_mipmap_levels);
-	texture_cache[path] = texture;
+	Texture2D* texture = new Texture2D(path, mipmap);
+	texture_cache[entry.str()] = texture;
 
 	return texture;
 }
@@ -163,10 +163,9 @@ Texture2D* Texture2D::default_alphamap(){
 	return from_filename("white.png");
 }
 
-Texture2D::Texture2D(const std::string& filename, unsigned int num_mipmap_levels)
+Texture2D::Texture2D(const std::string& filename, bool mipmap)
 	: TextureBase()
-	, _texture(0)
-	, _mipmap_count(num_mipmap_levels) {
+	, _texture(0) {
 
 	SDL_Surface* image = load_image(filename, &size);
 
@@ -174,9 +173,17 @@ Texture2D::Texture2D(const std::string& filename, unsigned int num_mipmap_levels
 	glBindTexture(GL_TEXTURE_2D, _texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+
+	if ( mipmap ){
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	} else {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
+	}
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -270,14 +277,14 @@ TextureArray* TextureArray::from_filename(const char* filename, ...){
 	}
 	va_end(ap);
 
-	return new TextureArray(paths);
+	return TextureArray::from_filename(paths);
 }
 
-TextureArray* TextureArray::from_filename(const std::vector<std::string>& paths) {
-	return new TextureArray(paths);
+TextureArray* TextureArray::from_filename(const std::vector<std::string>& paths, bool mipmap) {
+	return new TextureArray(paths, mipmap);
 }
 
-TextureArray::TextureArray(std::vector<std::string> path)
+TextureArray::TextureArray(std::vector<std::string> path, bool mipmap)
 	: TextureBase()
 	, _num(path.size())
 	, _texture(0) {
@@ -301,9 +308,17 @@ TextureArray::TextureArray(std::vector<std::string> path)
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_GENERATE_MIPMAP, GL_TRUE);
+
+	if ( mipmap ){
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_GENERATE_MIPMAP, GL_TRUE);
+	} else {
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_GENERATE_MIPMAP, GL_FALSE);
+	}
+
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, size.x, size.y, num_textures(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 	int n = 0;
@@ -348,14 +363,14 @@ Texture3D* Texture3D::from_filename(const char* filename, ...){
 	}
 	va_end(ap);
 
-	return new Texture3D(paths);
+	return Texture3D::from_filename(paths);
 }
 
-Texture3D* Texture3D::from_filename(const std::vector<std::string>& paths) {
-	return new Texture3D(paths);
+Texture3D* Texture3D::from_filename(const std::vector<std::string>& paths, bool mipmap) {
+	return new Texture3D(paths, mipmap);
 }
 
-Texture3D::Texture3D(std::vector<std::string> path)
+Texture3D::Texture3D(std::vector<std::string> path, bool mipmap)
 	: TextureBase()
 	, _texture(0)
 	, _depth(path.size()) {
@@ -379,8 +394,16 @@ Texture3D::Texture3D(std::vector<std::string> path)
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	if ( mipmap ){
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_GENERATE_MIPMAP, GL_TRUE);
+	} else {
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_GENERATE_MIPMAP, GL_FALSE);
+	}
 	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, size.x, size.y, depth(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 	int n = 0;
