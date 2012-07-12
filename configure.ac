@@ -37,7 +37,7 @@ AC_DEFINE_UNQUOTED([FULLSCREEN], [$FULLSCREEN], [Define to 1 if fullscreen is us
 
 dnl Use vendor libs
 platform=$(uname -s)
-arch=$(uname -p)
+arch=$(uname -m)
 AS_IF([test "x${platform}" == "xDarwin"], [arch="osx"])
 VENDOR_CFLAGS="-I \${top_srcdir}/vendor/include"
 VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/$arch -Wl,--rpath \${top_srcdir}/vendor/libs/$arch"
