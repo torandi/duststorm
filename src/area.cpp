@@ -278,7 +278,6 @@ void Area::upload_lights() {
 }
 
 void Area::update(float dt) {
-
 }
 
 bool Area::mouse_at(const glm::vec2 &pos) {

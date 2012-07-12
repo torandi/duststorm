@@ -35,6 +35,7 @@ class Game {
 		void change_area(const std::string &area, const std::string &entry_point);
 
 		Player * player;
+
 	private:
 
 		Input input;
@@ -65,6 +66,7 @@ class Game {
 	
 		glm::vec2 mouse_position;
 		Texture2D * mouse_marker_texture;
+		glm::vec3 camera_offset;
 
 		enum {
 			MOVE_UP = 0,

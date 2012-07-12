@@ -39,6 +39,7 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	YAML::Node config = YAML::Load((char*)(src->data()));
 
 	player = new Player(config["player"], *this);
+	camera_offset = config["camera_offset"].as<glm::vec3>(glm::vec3(3.f));
 
 	load_areas();
 	current_area = areas[config["start_area"].as<std::string>()];
@@ -85,14 +86,16 @@ void Game::update(float dt) {
 	if(sustained_action[MOUSE_1] && !current_area->click_at(mouse_position)) {
 		move_player();
 	}
+
+	//Move camera:
+	camera.look_at(player->position());
+	camera.set_position(player->position() + camera_offset);
 }
 
 //Move player towards mouse position
 void Game::move_player() {
 	player->target = mouse_position;
-	//glm::vec2 = player->target - player->current_position;
 
-	glm::vec3 lz = player->local_z();
 	//Rotate:
 	glm::vec2 dir = glm::normalize(player->current_position - player->target);
 	float rot = radians_to_degrees(atan2(dir.y, dir.x));
