@@ -30,7 +30,8 @@ VFX * VFX::get_vfx(const std::string &name) {
 
 ModelVFX::ModelVFX(const YAML::Node &node) {
 	render_object_ = new RenderObject(node["model"].as<std::string>());
-	render_object_->set_scale(node["scale"].as<glm::vec3>(glm::vec3()));
+	render_object_->set_scale(node["scale"].as<glm::vec3>(glm::vec3(1.f)));
+	render_object_->set_position(node["offset"].as<glm::vec3>(glm::vec3(0.f)));
 }
 
 ModelVFX::~ModelVFX() {

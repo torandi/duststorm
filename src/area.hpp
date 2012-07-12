@@ -23,7 +23,7 @@ class Area {
 		float height_at(const glm::vec2 &pos) const;
 		bool collision_at(const glm::vec2 &pos) const;
 
-		bool click_at(const glm::vec2 &pos);
+		bool click_at(const glm::vec2 &pos); //return true if this clicks something
 		bool mouse_at(const glm::vec2 &pos); //return true if this marks something in the area
 
 		void update(float dt);

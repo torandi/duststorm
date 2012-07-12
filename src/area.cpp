@@ -40,12 +40,15 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	fog_density = config["fog"].as<float>(0.02f);
 
 	//TODO: Read from config
-	lights.ambient_intensity() = glm::vec3(0.0f);
+	lights.ambient_intensity() = glm::vec3(0.01f);
 	lights.num_lights() = 1;
-	lights.lights[0].set_position(glm::vec3(10, 50.f, 10.f));
-	lights.lights[0].intensity = glm::vec3(0.8f);
+	lights.lights[0].set_position(game.player->position());
+	lights.lights[0].intensity = game.player->light_color;
 	lights.lights[0].type = Light::POINT_LIGHT;
-	lights.lights[0].quadratic_attenuation = 0.00002f;
+	lights.lights[1].constant_attenuation = 0.f;
+	lights.lights[0].linear_attenuation = 0.01f;
+	lights.lights[0].quadratic_attenuation = 0.09f;
+	game.player->add_position_callback(&(lights.lights[0]), game.player->light_offset);
 
 	skycolor = config["skycolor"].as<Color>(Color::red);
 

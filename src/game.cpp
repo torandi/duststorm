@@ -1,5 +1,6 @@
 #include "game.hpp"
 
+#include <glm/gtx/vector_angle.hpp>
 #include <SDL/SDL.h>
 #include "globals.hpp"
 #include "camera.hpp"
@@ -11,7 +12,7 @@
 #include "data.hpp"
 #include "yaml-helper.hpp"
 #include "render_object.hpp"
-
+#include "utils.hpp"
 #include "input.hpp"
 
 #include <dirent.h>
@@ -21,7 +22,7 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	camera.set_position(glm::vec3(27.584806, 17.217037, 186.391449));
 	camera.look_at(glm::vec3(33.531612, 14.147154, 180.580292));
 
-	mouse_position = glm::vec4(43.761303, 5.7, 28.003969, 1.f);
+	mouse_position = glm::vec2(43.761303, 28.003969);
 
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	composition = new RenderTarget(resolution, GL_RGB8, false);
@@ -37,14 +38,13 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	Data * src = Data::open(PATH_BASE "/game/game.yaml");
 	YAML::Node config = YAML::Load((char*)(src->data()));
 
-	player = new Player(config["player"]);
-	player->set_position(glm::vec3(33.531612, 14.147154, 180.580292));
+	player = new Player(config["player"], *this);
 
 	load_areas();
 	current_area = areas[config["start_area"].as<std::string>()];
-
-	player->set_position(glm::vec3(player->position().x, current_area->height_at(glm::vec2(player->position().x, player->position().z)), player->position().z));
-	//dof_shader = Shader::create_shader("dof");
+	
+	//Can't call this until current_area is set
+	player->move_to(glm::vec2(33.531612, 180.580292));
 
 	for(bool &a : sustained_action) {
 		a = false;
@@ -65,13 +65,39 @@ Game::~Game() {
 	delete dof_shader;*/
 }
 
+Area * Game::area() const { return current_area; }
+
 void Game::update(float dt) {
+	/**
+	 * Debug input
+	 */
 	input.update_object(camera, dt);
 	if(input.current_value(Input::ACTION_1) > 0.5f) {
 		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
 	}
+	/**
+	 * End debug
+	 */
 
+	player->update(dt);
 	current_area->update(dt);
+
+	if(sustained_action[MOUSE_1] && !current_area->click_at(mouse_position)) {
+		move_player();
+	}
+}
+
+//Move player towards mouse position
+void Game::move_player() {
+	player->target = mouse_position;
+	//glm::vec2 = player->target - player->current_position;
+
+	glm::vec3 lz = player->local_z();
+	//Rotate:
+	glm::vec2 dir = glm::normalize(player->current_position - player->target);
+	float rot = radians_to_degrees(atan2(dir.y, dir.x));
+	printf("ROTATE: %f\n", rot);
+	player->set_rotation(glm::vec3(0.f, 1.f, 0.f), -rot+90.f);
 }
 
 void Game::do_action(int num) {
@@ -90,7 +116,10 @@ void Game::update_mouse_position(int x, int y) {
 	glm::mat4 inv = glm::inverse( camera.projection_matrix() * camera.view_matrix()  );
 	glm::vec4 mouse_clip = glm::vec4(( (win.x * 2.f )/ resolution.x) - 1.f, ( (win.y * 2.f) / resolution.y) - 1.f , win.z*2.f -1.f, 1.f);
 	glm::vec4 mouse_worldspace =  inv * mouse_clip;
-	mouse_position = mouse_worldspace/mouse_worldspace.w;
+	glm::vec4 mp_v4 = mouse_worldspace/mouse_worldspace.w;
+	mouse_position.x = mp_v4.x;
+	mouse_position.y = mp_v4.z;
+	current_area->mouse_at(mouse_position);
 }
 
 void Game::handle_input(const SDL_Event &event) {
@@ -115,6 +144,20 @@ void Game::handle_input(const SDL_Event &event) {
 			break;
 		case SDL_MOUSEMOTION:
 			update_mouse_position(event.motion.x, event.motion.y);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			update_mouse_position(event.button.x, event.button.y);
+			if(event.button.button == SDL_BUTTON_LEFT)
+				sustained_action[MOUSE_1] = true;
+			else if(event.button.button == SDL_BUTTON_RIGHT)
+				sustained_action[MOUSE_2] = true;
+			break;
+		case SDL_MOUSEBUTTONUP:
+			update_mouse_position(event.button.x, event.button.y);
+			if(event.button.button == SDL_BUTTON_LEFT)
+				sustained_action[MOUSE_1] = false;
+			else if(event.button.button == SDL_BUTTON_RIGHT)
+				sustained_action[MOUSE_2] = false;
 			break;
 	}
 	input.parse_event(event);
@@ -157,7 +200,7 @@ void Game::render() {
 
 void Game::render_statics() {
 	mouse_marker_texture->texture_bind(Shader::TEXTURE_2D_1);
-	current_area->render(glm::vec2(mouse_position.x, mouse_position.z));
+	current_area->render(mouse_position);
 	shaders[SHADER_NORMAL]->bind();
 }
 

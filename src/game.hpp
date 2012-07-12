@@ -28,6 +28,8 @@ class Game {
 
 		void render();
 
+		Area * area() const;
+
 		Area * get_area(const std::string &str) const;
 
 		void change_area(const std::string &area, const std::string &entry_point);
@@ -49,6 +51,8 @@ class Game {
 
 		static void dir_content(const char * dir, std::list<std::string> &files);
 
+		void move_player();
+
 		void update_mouse_position(int x, int y);
 
 		Camera camera;
@@ -59,7 +63,7 @@ class Game {
 
 		//Shader * dof_shader;
 	
-		glm::vec4 mouse_position; //mouse position mapped down on world
+		glm::vec2 mouse_position;
 		Texture2D * mouse_marker_texture;
 
 		enum {
