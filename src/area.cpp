@@ -329,8 +329,12 @@ void Area::upload_lights() {
 }
 
 void Area::update(float dt) {
+	objects.remove_if([](const ObjectTemplate * o) {
+		return o->destroyed;
+	});
+
 	for(auto it : objects) {
-		it->update(dt);
+			it->update(dt);
 	}
 }
 

@@ -2,7 +2,7 @@
 #include "game.hpp"
 
 #define DOOR_RANGE 6.f
-#define PICKUP_RANGE 2.f
+#define PICKUP_RANGE 5.f
 
 void ObjectTemplate::update(float dt) {
 	obj->update(dt);
@@ -57,15 +57,19 @@ ObjectTemplate * Pickup::create(const YAML::Node &node, Game &game) {
 	return pickup;
 }
 
-ObjectTemplate * Pickup::create(const std::string &vfx, const std::string &attr, int effect, Game &game) {
+ObjectTemplate * Pickup::create(const std::string &vfx, const std::string &attr, int effect,float radius, float height, Game &game) {
 	Pickup * pickup = new Pickup();
 	pickup->obj = new Object2D(vfx, game);
+	pickup->obj->height = height;
+	pickup->obj->hit_detection = true;
+	pickup->obj->radius = radius;
 	pickup->attr = attr;
 	pickup->effect = effect;
 	return pickup;
 }
 
 bool Pickup::click() {
+	printf("Click\n");
 	if( glm::length(obj->current_position - obj->game.player->current_position) < PICKUP_RANGE) {
 		return collision();
 	} else {
@@ -74,8 +78,9 @@ bool Pickup::click() {
 }
 
 bool Pickup::collision() {
-	destroyed = true;
-	obj->game.player->attributes[attr] += effect;
+	printf("Add attribute %s +%d\n", attr.c_str(), effect);
+	obj->game.player->attr(attr) += effect;
 	//Play sound
+	destroyed = true;
 	return true;
 }

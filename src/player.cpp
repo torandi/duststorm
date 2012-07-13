@@ -17,3 +17,14 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_) {
 	click_radius = node["click_radius"].as<float>();
 	hit_detection = true;
 }
+
+int &Player::attr(const std::string attr) {
+	auto it = attributes.find(attr);
+	if(it == attributes.end()) {
+		printf("Unknown player attributes %s\n", attr.c_str());
+		abort();
+	} else {
+		return it->second;
+	}
+
+}

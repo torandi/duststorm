@@ -101,7 +101,7 @@ void Object2D::update(float dt) {
 	glm::vec2 prev = current_position;
 	if(target != current_position) {
 		glm::vec2 diff = target - current_position;
-		if(diff.length() < MIN_MOVE) {
+		if(glm::length(diff) < MIN_MOVE) {
 			target = current_position;
 		} else if(diff.length() < speed * dt) {
 			current_position = target;

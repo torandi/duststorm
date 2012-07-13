@@ -10,6 +10,8 @@ class Player : public Object2D {
 		glm::vec3 light_color;
 		glm::vec3 light_offset;
 
+		int &attr(const std::string attr);
+		
 		std::map<std::string, int> attributes;
 
 		float weapon_radius[4];
