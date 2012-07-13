@@ -8,6 +8,7 @@
 #include "color.hpp"
 #include "yaml-helper.hpp"
 #include "material.hpp"
+#include "object_template.hpp"
 
 #include <glm/glm.hpp>
 #include <string>
@@ -32,8 +33,6 @@ class Area {
 		void render(const glm::vec2 &marker_position);
 
 		void upload_lights();
-
-		//Object at
 
 		void move_light(int id, const glm::vec2 &new_pos);
 
@@ -62,6 +61,8 @@ class Area {
 		GLint u_highlight;
 
 		std::map<std::string, glm::vec2> entry_points;
+
+		std::list<ObjectTemplate*> objects;
 
 		//TODO: More properties
 		// * links to other locations

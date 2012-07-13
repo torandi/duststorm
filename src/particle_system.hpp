@@ -12,12 +12,12 @@ class ParticleSystem : public MovableObject {
 		~ParticleSystem();
 
 		void update(float dt);
-		void render();
+		void render(const glm::mat4 * m = nullptr);
 
 		void update_config();
 
 		//Change values in this struct and call update_config() to update
-		struct {
+		struct config_t {
 
 			glm::vec4 birth_color;
 

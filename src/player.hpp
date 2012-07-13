@@ -9,6 +9,8 @@ class Player : public Object2D {
 		Player(const YAML::Node &node, Game &game_);
 		glm::vec3 light_color;
 		glm::vec3 light_offset;
+
+		std::map<std::string, int> attributes;
 };
 
 #endif

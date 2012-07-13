@@ -10,12 +10,15 @@ class Game;
 class Object2D : public MovableObject {
 	public:
 		Object2D(const YAML::Node &node, Game &game_);
+		Object2D(const std::string &vfx_name, Game &game_);
 		glm::vec2 target;
 		glm::vec2 current_position;
 		float speed, radius;
 		bool hit_detection; //true to enable
+		float height;
 
 		virtual bool hit(const Object2D * other) const;
+		virtual bool hit(const glm::vec2 &pos, float radius) const;
 
 		virtual void move_to(const glm::vec2 &pos);
 
@@ -31,8 +34,8 @@ class Object2D : public MovableObject {
 		virtual void face(const Object2D * obj);
 
 		glm::vec2 center() const;
-	protected:
 		Game &game;
+	protected:
 
 		VFX * vfx;
 		void * vfx_state;

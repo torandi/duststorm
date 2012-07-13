@@ -17,6 +17,7 @@ static const char* shader_programs[NUM_SHADERS] = {
 	"debug",
 	"skybox",
 	"water",
+	"particles",
 	"passthru",
 	"blur",
 	"blend"
@@ -47,8 +48,9 @@ namespace Engine {
 	}
 
 	void init() {
-		game = new Game();
 		opencl = new CL();
+		Game::init();
+		game = new Game();
 	}
 
 	void cleanup() {

@@ -14,6 +14,8 @@
 #include "area.hpp"
 #include "input.hpp"
 
+#include "object_template.hpp"
+
 #include <map>
 #include <string>
 
@@ -36,6 +38,10 @@ class Game {
 
 		Player * player;
 
+		static std::map<std::string, object_template_create*> object_templates;
+		static void init();
+
+		ObjectTemplate * create_object(const std::string &name, const YAML::Node &node, Area * a = nullptr);
 	private:
 
 		Input input;

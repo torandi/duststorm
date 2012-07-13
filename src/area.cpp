@@ -81,6 +81,14 @@ Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 		entry_points[e_name] = pos;
 	}
 
+	//Add objects:
+	YAML::Node obj_node = config["objects"];
+	for(const YAML::Node &n : obj_node) {
+		ObjectTemplate * obj = game.create_object(n["type"].as<std::string>(), n, this);
+		objects.push_back(obj);
+	}
+	
+
 	u_highlight = shaders[SHADER_NORMAL]->uniform_location("highlight");
 	shaders[SHADER_NORMAL]->bind();
 	glUniform3f(u_highlight, 0.f, 0.f, 0.f);
@@ -321,6 +329,9 @@ void Area::upload_lights() {
 }
 
 void Area::update(float dt) {
+	for(auto it : objects) {
+		it->update(dt);
+	}
 }
 
 bool Area::mouse_at(const glm::vec2 &pos) {
@@ -343,6 +354,10 @@ void Area::render(const glm::vec2 &marker_position) {
 	wall_material.activate();
 	wall->render();
 	wall_material.deactivate();
+
+	for(auto it : objects) {
+		it->render();
+	}
 }
 
 float Area::height_at(const glm::vec2 &pos) const {

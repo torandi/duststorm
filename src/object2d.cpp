@@ -4,6 +4,21 @@
 
 #define MIN_MOVE 0.05f
 
+Object2D::Object2D(const std::string &vfx_name, Game &game_) : 
+		target(0.f)
+	, current_position(0.f)
+	, speed(1.f)
+	, radius(0.f)
+	, hit_detection(false)
+	,	game(game_) 
+	, base_rotation(0.f)
+	, center_offset(0.f)
+	{
+
+	vfx = VFX::get_vfx(vfx_name);
+	vfx_state = vfx->create_state();
+}
+
 Object2D::Object2D(const YAML::Node &node, Game &game_) : 
 		target(0.f)
 	, current_position(0.f)
@@ -19,6 +34,7 @@ Object2D::Object2D(const YAML::Node &node, Game &game_) :
 	base_rotation = node["rotation"].as<float>(0.f);
 
 	center_offset = node["center_offset"].as<glm::vec2>(glm::vec2(0.f));
+	height = node["height"].as<float>(0.f);
 
 	rotate(0.f);
 
@@ -50,7 +66,7 @@ void Object2D::face(const Object2D * obj) {
 }
 
 void Object2D::move_to(const glm::vec2 &pos) {
-	set_position(glm::vec3(pos.x, game.area()->height_at(pos), pos.y));
+	set_position(glm::vec3(pos.x, game.area()->height_at(pos)+height, pos.y));
 	target = pos;
 	current_position = pos;
 }
@@ -60,6 +76,10 @@ void Object2D::render() const {
 }
 
 bool Object2D::hit(const Object2D * other) const {
+	return false;
+}
+
+bool Object2D::hit(const glm::vec2 &pos, float radius) const {
 	return false;
 }
 
@@ -85,5 +105,5 @@ void Object2D::update(float dt) {
 }
 
 void Object2D::update_position() {
-	set_position(glm::vec3(current_position.x, game.area()->height_at(current_position), current_position.y));
+	set_position(glm::vec3(current_position.x, game.area()->height_at(current_position)+height, current_position.y));
 }

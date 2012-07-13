@@ -17,9 +17,37 @@
 
 #include <dirent.h>
 
+std::map<std::string, object_template_create*> Game::object_templates;
+
+static ParticleSystem * ptest;
+
 #define DEBUG_MOVE 1
 
-Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
+void Game::init() {
+	object_templates["door"] = &Door::create;
+	object_templates["decoration"] = &Decoration::create;
+	object_templates["pickup"] = &Pickup::create;
+}
+
+Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f), current_area(nullptr) {
+
+	ptest = new ParticleSystem(10000, TextureArray::from_filename("particle.png", nullptr));
+	ptest->config.spawn_position = glm::vec4(270, 11, 270, 0);
+	ptest->avg_spawn_rate = 1000000.f;
+	ptest->spawn_rate_var = 0.f;
+	ptest->config.spawn_position = glm::vec4(0.f, 0.f, 2.f, 1.f);
+	ptest->config.spawn_area = glm::vec4(0.0f, 0.f, 0.0f, 0.0f);
+	ptest->config.spawn_direction = glm::vec4(0.f, 1.f, 0.f, 0.f);
+	ptest->config.direction_var = glm::vec4(0.1f, 0.f, 0.0f, 0.f);
+	ptest->config.avg_spawn_speed= 0.01f;
+	ptest->config.spawn_speed_var = 0.005f;
+	ptest->config.avg_ttl = 5.f;
+	ptest->config.ttl_var = 2.5f;
+	ptest->config.avg_scale = 10.f;
+	ptest->config.scale_var = 0.005f;
+	ptest->config.birth_color = glm::vec4(1.0, 0.0, 0.0, 1.0);
+	ptest->config.death_color = glm::vec4(0.0 ,1.0, 0.0, 1.f);
+	ptest->update_config();
 
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	composition = new RenderTarget(resolution, GL_RGB8, false);
@@ -30,6 +58,8 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);*/
 
 	Input::movement_speed = 15.f;
+
+	//Prepare objects:
 
 	Data * src = Data::open(PATH_BASE "/game/game.yaml");
 	YAML::Node config = YAML::Load((char*)(src->data()));
@@ -81,7 +111,7 @@ void Game::change_area(const std::string &area, const std::string &entry_point) 
 }
 
 void Game::update(float dt) {
-
+	ptest->update(dt);
 	player->update(dt);
 	current_area->update(dt);
 
@@ -98,6 +128,22 @@ void Game::update(float dt) {
 	//Move camera:
 	look_at_player();
 #endif
+}
+
+ObjectTemplate * Game::create_object(const std::string &name, const YAML::Node &node, Area * a) { 
+	auto it = object_templates.find(name);
+	if(it == object_templates.end()) {
+		printf("Unknown object type %s\n", name.c_str());
+		abort();
+	}
+	ObjectTemplate * ot = (it->second) (node, *this);
+	Area * tmp = current_area;
+	if(a != nullptr)
+		current_area = a; //Oh the hack :)
+	ot->obj->move_to(node["position"].as<glm::vec2>());
+
+	current_area = tmp;
+	return ot;
 }
 
 void Game::look_at_player() {
@@ -187,12 +233,13 @@ void Game::render_content() {
 	render_statics();
 	render_dynamics();
 
-
-	Shader::unbind();
 	composition->unbind();
 }
 
 void Game::render() {
+	shaders[SHADER_PARTICLES]->bind();
+	ptest->render();
+
 	render_content();
 
 /*
@@ -218,7 +265,6 @@ void Game::render_statics() {
 }
 
 void Game::render_dynamics() {
-	shaders[SHADER_NORMAL]->bind();
 	player->render();
 }
 

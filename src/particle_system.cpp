@@ -24,6 +24,8 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	run_kernel_  = opencl->load_kernel(program_, "run_particles");
 	spawn_kernel_  = opencl->load_kernel(program_, "spawn_particles");
 
+	printf("Created particle system with %d particles\n", max_num_particles);
+
 	//Empty vec4s:
 	vertex_t * empty = new vertex_t[max_num_particles];
 
@@ -231,15 +233,17 @@ void ParticleSystem::update(float dt) {
 	//END DEBUG
 }
 
-void ParticleSystem::render() {
+void ParticleSystem::render(const glm::mat4 * m) {
 	glPushAttrib(GL_ENABLE_BIT|GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_CULL_FACE);
 	glDepthMask(GL_FALSE);
 
-	Shader::upload_model_matrix(matrix());
+	if(m == nullptr) 
+		Shader::upload_model_matrix(matrix());
+	else
+		Shader::upload_model_matrix(matrix() * (*m));
 
 	glBindBuffer(GL_ARRAY_BUFFER, gl_buffer_);
-
 /*
 	//DEBUG
 
