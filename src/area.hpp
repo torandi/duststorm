@@ -35,17 +35,17 @@ class Area {
 
 		//Object at
 
+		void move_light(int id, const glm::vec2 &new_pos);
+
 	private:
 		Game &game;
+
 
 		Shader * terrain_shader;
 		Terrain * terrain;
 		Texture2D * terrain_datamap;
 		Material wall_material;
 		TextureArray * terrain_textures[2];
-
-		void parse_colormap(); //Build color_positions
-		std::list<glm::vec3> &color_map(const YAML::Node &node);
 
 		Mesh * wall;
 
@@ -55,10 +55,9 @@ class Area {
 
 		GLint u_fog_density, u_marker;
 		float fog_density;
+		float light_height[MAX_NUM_LIGHTS-1];
 
 		GLint u_highlight;
-
-		std::map<std::string, std::list<glm::vec3>> color_positions; //map from color to positions
 
 		//TODO: More properties
 		// * links to other locations

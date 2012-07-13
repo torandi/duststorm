@@ -1,5 +1,6 @@
 #include "area.hpp"
 #include "data.hpp"
+#include "utils.hpp"
 
 #include "game.hpp"
 
@@ -39,14 +40,36 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 
 	fog_density = config["fog"].as<float>(0.02f);
 
-	lights.ambient_intensity() = glm::vec3(0.01f);
-	lights.num_lights() = 1;
+	int light_count = 1;
+
+	YAML::Node lights_node = config["lights"];
+	if(lights_node.IsSequence()) {
+		for(const YAML::Node &n : lights_node) {
+			if(light_count == MAX_NUM_LIGHTS) {
+				fprintf(stderr, "Warning! To many lights in area %s, only %d allowed\n", name.c_str(), MAX_NUM_LIGHTS);
+				break;
+			}
+			float h = light_height[light_count-1] = n["height"].as<float>(1.f);
+			lights.lights[light_count].type = (Light::light_type_t) n["type"].as<int>(Light::POINT_LIGHT);
+			glm::vec3 c = lights.lights[light_count].intensity = n["color"].as<glm::vec3>();
+			glm::vec2 pos = n["position"].as<glm::vec2>();
+			move_light(light_count-1, pos);
+			printf("LIGHT: %f, %f, %f, (%f, %f), ->%f\n", c.x, c.y, c.z, pos.x, pos.y, h);
+			++light_count;
+		}
+	}
+
+	fprintf(verbose, "Created %d lights in area %s\n", light_count, name.c_str());
+
+	lights.ambient_intensity() = config["ambient_intensity"].as<glm::vec3>(glm::vec3(0.f));
+	lights.num_lights() = light_count;
 	lights.lights[0].set_position(game.player->position());
 	lights.lights[0].intensity = game.player->light_color;
 	lights.lights[0].type = Light::POINT_LIGHT;
 	//lights.lights[1].constant_attenuation = 0.f;
 	//lights.lights[0].linear_attenuation = 0.01f;
 	lights.lights[0].quadratic_attenuation = 0.06f;
+
 	game.player->add_position_callback(&(lights.lights[0]), game.player->light_offset);
 
 	skycolor = config["skycolor"].as<Color>(Color::red);
@@ -55,8 +78,6 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	shaders[SHADER_NORMAL]->bind();
 	glUniform3f(u_highlight, 0.f, 0.f, 0.f);
 	Shader::unbind();
-
-	parse_colormap();
 
 	float wall_scale = config["walls"]["scale"].as<float>(1.f);
 	glm::vec2 texture_scale = config["walls"]["texture_scale"].as<glm::vec2>(glm::vec2(1.f));
@@ -275,19 +296,8 @@ Area::~Area() {
 	delete terrain_textures[1];
 }
 
-void Area::parse_colormap() {
-	
-}
-
-std::list<glm::vec3> &Area::color_map(const YAML::Node &node) {
-	std::string val = node.as<std::string>();
-	auto it = color_positions.find(val);
-	if(it != color_positions.end()) {
-		return it->second;
-	} else {
-		fprintf(verbose, "Unknown color %s\n", val.c_str());
-		abort();
-	}
+void Area::move_light(int id, const glm::vec2 &new_pos) {
+	lights.lights[id+1].set_position(glm::vec3(new_pos.x, height_at(new_pos) + light_height[id], new_pos.y));
 }
 
 void Area::upload_lights() {

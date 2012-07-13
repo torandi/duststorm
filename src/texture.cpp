@@ -410,7 +410,7 @@ const GLint Texture3D::gl_texture() const {
 glm::ivec4 TextureBase::get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size) {
 	Uint32 temp, pixel;
 	Uint8 red, green, blue, alpha;
-	pixel = ((Uint32*)surface->pixels)[(size.y-(y+1))*(size.x)+(size.x-(x+1))];
+	pixel = ((Uint32*)surface->pixels)[(size.y-(y+1))*(size.x)+x];
 
 	SDL_PixelFormat * fmt=surface->format;
 
@@ -437,6 +437,5 @@ glm::ivec4 TextureBase::get_pixel_color(int x, int y, SDL_Surface * surface, con
 	temp = temp >> fmt->Ashift; /* Shift it down to 8-bit */
 	temp = temp << fmt->Aloss;  /* Expand to a full 8-bit number */
 	alpha = (Uint8)temp;
-
 	return glm::ivec4(red, green, blue, alpha);
 }

@@ -17,6 +17,8 @@
 
 #include <dirent.h>
 
+#define DEBUG_MOVE 1
+
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
 	camera.set_position(glm::vec3(27.584806, 17.217037, 186.391449));
@@ -68,16 +70,6 @@ Game::~Game() {
 Area * Game::area() const { return current_area; }
 
 void Game::update(float dt) {
-	/**
-	 * Debug input
-	 */
-	/*input.update_object(camera, dt);
-	if(input.current_value(Input::ACTION_1) > 0.5f) {
-		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
-	}*/
-	/**
-	 * End debug
-	 */
 
 	player->update(dt);
 	current_area->update(dt);
@@ -86,9 +78,16 @@ void Game::update(float dt) {
 		move_player();
 	}
 
+#if DEBUG_MOVE
+	input.update_object(camera, dt);
+	if(input.current_value(Input::ACTION_1) > 0.5f) {
+		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
+	}
+#else
 	//Move camera:
 	camera.look_at(player->position());
 	camera.set_position(player->position() + camera_offset);
+#endif
 }
 
 //Move player towards mouse position
