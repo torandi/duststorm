@@ -7,6 +7,7 @@
 #include "lights_data.hpp"
 #include "color.hpp"
 #include "yaml-helper.hpp"
+#include "material.hpp"
 
 #include <glm/glm.hpp>
 #include <string>
@@ -36,7 +37,8 @@ class Area {
 
 		Shader * terrain_shader;
 		Terrain * terrain;
-		Texture2D * terrain_datamap, * wall_texture;
+		Texture2D * terrain_datamap;
+		Material wall_material;
 		TextureArray * terrain_textures[2];
 
 		Mesh * wall;

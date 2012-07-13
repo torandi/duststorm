@@ -17,6 +17,9 @@
 
 #include <dirent.h>
 
+static RenderObject * cube;
+static Texture2D * white;
+
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
 	camera.set_position(glm::vec3(27.584806, 17.217037, 186.391449));
@@ -29,9 +32,13 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
 	mouse_marker_texture = Texture2D::from_filename("mouse_marker.png");
 
+	cube = new RenderObject("cube.obj");
+	cube->set_scale(0.25f);
+
 	/*downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
 	downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);*/
 
+	white = Texture2D::from_filename("white.png");
 	
 	Input::movement_speed = 15.f;
 
@@ -43,7 +50,8 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
 	load_areas();
 	current_area = areas[config["start_area"].as<std::string>()];
-	
+
+	player->add_position_callback(cube, player->light_offset);
 	//Can't call this until current_area is set
 	player->move_to(glm::vec2(33.531612, 180.580292));
 
@@ -88,8 +96,8 @@ void Game::update(float dt) {
 	}
 
 	//Move camera:
-	camera.look_at(player->position());
-	camera.set_position(player->position() + camera_offset);
+/*	camera.look_at(player->position());
+	camera.set_position(player->position() + camera_offset);*/
 }
 
 //Move player towards mouse position
@@ -210,6 +218,9 @@ void Game::render_statics() {
 void Game::render_dynamics() {
 	shaders[SHADER_NORMAL]->bind();
 	player->render();
+	white->texture_bind(Shader::TEXTURE_2D_0);
+	shaders[SHADER_PASSTHRU]->bind();
+	cube->render();
 }
 
 void Game::render_display() {

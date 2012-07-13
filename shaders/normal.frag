@@ -36,7 +36,7 @@ void main() {
 	//originalColor*=Mtl.diffuse;
 
 	//Normal map
-	vec3 normal_map = normalize(texture(texture2, texcoord).xyz * 2.0 - 1.0);
+	vec3 normal_map = normalize(texture(texture1, texcoord).xyz * 2.0 - 1.0);
 	
 
    vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity, 1.0);

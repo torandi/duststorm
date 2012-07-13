@@ -28,9 +28,9 @@ vec4 computeLighting(
 	color.a = 1.0;
 
 	float attn = 1.0;
-	if ( light.type == 1 ){ /* point light */
+//	if ( light.type == 1 ){ /* point light */
 		attn = attenuation(light, distance);
-	}
+//	}
 
 	return color * attn;
 }

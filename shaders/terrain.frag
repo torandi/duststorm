@@ -58,9 +58,10 @@ void main() {
 
 	color1 = texture2DArray(texture_array1, vec3(texcoord_real, 0));
 	color2 = texture2DArray(texture_array1, vec3(texcoord_real, 1));
-	vec4 normal_map = mix(color1, color2, color_mix);
+	vec3 normal_map = mix(color1, color2, color_mix).xyz;
 
-	normal_map.xyz = normalize(normal_map.xyz * 2.0 - 1.0);
+	normal_map = normalize(normal_map * 2.0 - 1.0);
+
 	float shininess = 32.f;
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.f);
 
@@ -68,6 +69,7 @@ void main() {
 		vec3 light_distance = Lgt.lights[light].position.xyz - position;
 		vec3 dir = normalize(light_distance);
 		vec3 light_dir;
+		
 
 		//Convert to tangent space
 		light_dir.x = dot(dir, norm_tangent);
@@ -76,12 +78,11 @@ void main() {
 
 		accumLighting += computeLighting(
 				Lgt.lights[light], originalColor,
-				normal_map.xyz, light_dir,
+				normal_map, light_dir,
 				camera_dir, length(light_distance),
 				shininess, vec4(.03f),
 				true, true);
 	}
-
 	accumLighting += originalColor * extra_light;
 
 	ocolor.rgb = mix(clamp(accumLighting,0.0, 1.0).rgb, fog_color, fogFactor);

@@ -26,7 +26,7 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	//terrain_textures[1] = TextureArray::from_filename("dirt_normal.png","grass_normal.png", nullptr);
-	terrain_textures[1] = TextureArray::from_filename("default_normalmap.jpg","default_normalmap.jpg", nullptr); //TODO
+	terrain_textures[1] = TextureArray::from_filename("default_normalmap.png","default_normalmap.png", nullptr); //TODO
 	terrain_textures[1]->texture_bind(Shader::TEXTURE_ARRAY_0);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -45,9 +45,9 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	lights.lights[0].set_position(game.player->position());
 	lights.lights[0].intensity = game.player->light_color;
 	lights.lights[0].type = Light::POINT_LIGHT;
-	lights.lights[1].constant_attenuation = 0.f;
+	/*lights.lights[1].constant_attenuation = 0.f;
 	lights.lights[0].linear_attenuation = 0.01f;
-	lights.lights[0].quadratic_attenuation = 0.09f;
+	lights.lights[0].quadratic_attenuation = 0.09f;*/
 	game.player->add_position_callback(&(lights.lights[0]), game.player->light_offset);
 
 	skycolor = config["skycolor"].as<Color>(Color::red);
@@ -59,7 +59,8 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 
 	float wall_scale = config["walls"]["scale"].as<float>(1.f);
 	glm::vec2 texture_scale = config["walls"]["texture_scale"].as<glm::vec2>(glm::vec2(1.f));
-	wall_texture = Texture2D::from_filename(config["walls"]["texture"].as<std::string>());
+	wall_material.texture = Texture2D::from_filename(config["walls"]["texture"].as<std::string>());
+	wall_material.normal_map = Texture2D::from_filename(config["walls"]["normal_map"].as<std::string>("default_normalmap.png"));
 
 	//Create walls:
 	std::vector<Mesh::vertex_t> vertices;
@@ -296,9 +297,10 @@ void Area::render(const glm::vec2 &marker_position) {
 	glUniform2f(u_marker, 1.f - (marker_position.x/terrain->size().x), 1.f - (marker_position.y/terrain->size().y));
 	terrain->render();
 
-	wall_texture->texture_bind(Shader::TEXTURE_COLORMAP);
-	shaders[SHADER_PASSTHRU]->bind();
+	shaders[SHADER_NORMAL]->bind();
+	wall_material.activate();
 	wall->render();
+	wall_material.deactivate();
 }
 
 float Area::height_at(const glm::vec2 &pos) const {
