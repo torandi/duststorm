@@ -114,7 +114,7 @@ bool Terrain::get_collision_at(int x, int y) const {
 	int pos = y*dm_size.x + x;
 	if(data_[pos] == DATA_UNDEFINED) {
 		glm::vec4 c = get_pixel_color(x, y, data_map_, dm_size);
-		data_[pos] = c.g < 0.1f;
+		data_[pos] = c.g > 0.9f;
 	}
 	return data_[pos];
 }
