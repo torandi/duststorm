@@ -7,4 +7,13 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_) {
 	attributes["life"] = 100;
 	attributes["fuel"] = 100;
 	attributes["bombs"] = 2;
+
+	const YAML::Node &n = node["weapons"];
+	for(int i=0; i<4; ++i) {
+		weapon_radius[i] = n[i]["radius"].as<float>();
+		weapon_damage[i] = n[i]["damage"].as<float>();
+	}
+
+	click_radius = node["click_radius"].as<float>();
+	hit_detection = true;
 }

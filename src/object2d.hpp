@@ -18,7 +18,7 @@ class Object2D : public MovableObject {
 		float height;
 
 		virtual bool hit(const Object2D * other) const;
-		virtual bool hit(const glm::vec2 &pos, float radius) const;
+		virtual bool hit(const glm::vec2 &pos, float radius, bool ignore_flag = false) const;
 
 		virtual void move_to(const glm::vec2 &pos);
 

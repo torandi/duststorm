@@ -9,10 +9,11 @@ class Game;
 
 class ObjectTemplate {
 	public:
-		ObjectTemplate() : destroyed(false) {};
+		ObjectTemplate() : destroyed(false), highlighted(false) {};
 		virtual ~ObjectTemplate();
 		Object2D * obj;
 		bool destroyed;
+		bool highlighted;
 		virtual bool click() = 0;
 		virtual bool collision() = 0;
 		virtual bool hit() = 0;

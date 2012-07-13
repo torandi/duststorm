@@ -11,6 +11,10 @@ class Player : public Object2D {
 		glm::vec3 light_offset;
 
 		std::map<std::string, int> attributes;
+
+		float weapon_radius[4];
+		float weapon_damage[4];
+		float click_radius;
 };
 
 #endif

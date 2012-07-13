@@ -19,7 +19,7 @@
 
 std::map<std::string, object_template_create*> Game::object_templates;
 
-#define DEBUG_MOVE 1
+#define DEBUG_MOVE 0
 
 void Game::init() {
 	object_templates["door"] = &Door::create;
@@ -94,7 +94,7 @@ void Game::update(float dt) {
 	player->update(dt);
 	current_area->update(dt);
 
-	if(sustained_action[MOUSE_1] && !current_area->click_at(mouse_position)) {
+	if(sustained_action[MOUSE_1]) {
 		move_player();
 	}
 
@@ -185,10 +185,15 @@ void Game::handle_input(const SDL_Event &event) {
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			update_mouse_position(event.button.x, event.button.y);
-			if(event.button.button == SDL_BUTTON_LEFT)
-				sustained_action[MOUSE_1] = true;
-			else if(event.button.button == SDL_BUTTON_RIGHT)
-				sustained_action[MOUSE_2] = true;
+			if(event.button.button == SDL_BUTTON_LEFT) {
+				if(!current_area->click_at(mouse_position, 1)) {
+					sustained_action[MOUSE_1] = true;
+				}
+			} else if(event.button.button == SDL_BUTTON_RIGHT) {
+				if(!current_area->click_at(mouse_position, 2)) {
+						sustained_action[MOUSE_2] = true;
+				}
+			}
 			break;
 		case SDL_MOUSEBUTTONUP:
 			update_mouse_position(event.button.x, event.button.y);

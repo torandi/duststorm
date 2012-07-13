@@ -2,7 +2,7 @@
 #include "game.hpp"
 #include "utils.hpp"
 
-#define MIN_MOVE 0.05f
+#define MIN_MOVE 0.1f
 
 Object2D::Object2D(const std::string &vfx_name, Game &game_) : 
 		target(0.f)
@@ -76,11 +76,24 @@ void Object2D::render() const {
 }
 
 bool Object2D::hit(const Object2D * other) const {
-	return false;
+	if(!other->hit_detection)
+		return false;
+	else
+		return hit(other->current_position, other->radius, false);
 }
 
-bool Object2D::hit(const glm::vec2 &pos, float radius) const {
-	return false;
+bool Object2D::hit(const glm::vec2 &pos, float r, bool ignore_flag) const {
+	if(!ignore_flag && !hit_detection)
+		return false;
+	else {
+		glm::vec2 dv = (current_position - pos);
+		float dist = glm::length(dv);
+		if(dist <  (r + radius)) {
+			return true;
+		}	else {
+			return false;
+		}
+	}
 }
 
 void Object2D::update(float dt) {

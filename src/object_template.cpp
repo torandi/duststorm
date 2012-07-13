@@ -1,7 +1,7 @@
 #include "object_template.hpp"
 #include "game.hpp"
 
-#define DOOR_RANGE 1.f
+#define DOOR_RANGE 6.f
 #define PICKUP_RANGE 2.f
 
 void ObjectTemplate::update(float dt) {
@@ -26,15 +26,16 @@ ObjectTemplate * Door::create(const YAML::Node &node, Game &game) {
 }
 
 bool Door::click() {
-	if( (obj->current_position - obj->game.player->current_position).length() < DOOR_RANGE) {
+	//if( obj->game.player->hit(obj->current_position, DOOR_RANGE, true) ) {
 		return collision();
-	} else {
+	/*} else {
 		return false;
-	}
+	}*/
 }
 
 bool Door::collision() {
 	obj->game.change_area(area, entry_point);
+	printf("Change area to %s : %s\n", area.c_str(), entry_point.c_str());
 	return true;
 }
 
@@ -65,7 +66,7 @@ ObjectTemplate * Pickup::create(const std::string &vfx, const std::string &attr,
 }
 
 bool Pickup::click() {
-	if( (obj->current_position - obj->game.player->current_position).length() < PICKUP_RANGE) {
+	if( glm::length(obj->current_position - obj->game.player->current_position) < PICKUP_RANGE) {
 		return collision();
 	} else {
 		return false;

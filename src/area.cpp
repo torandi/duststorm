@@ -335,10 +335,30 @@ void Area::update(float dt) {
 }
 
 bool Area::mouse_at(const glm::vec2 &pos) {
-	return false;
+	bool on = false;
+	for(auto it : objects) {
+		if(it->obj->hit(pos, game.player->click_radius, true)) {
+			it->highlighted = true;
+			on = true;
+		} else {
+			it->highlighted = false;
+		}
+	}
+	return on;
 }
 
-bool Area::click_at(const glm::vec2 &pos) {
+bool Area::click_at(const glm::vec2 &pos, int btn) {
+	if(btn == 1) {
+		bool click = false;
+		for(auto it : objects) {
+			if(it->obj->hit(pos, game.player->click_radius, true)) {
+				printf("HIT\n");
+				it->click();
+				click = true;
+			}
+		}
+		return click;
+	}
 	return false;
 }
 
@@ -365,5 +385,15 @@ float Area::height_at(const glm::vec2 &pos) const {
 }
 
 bool Area::collision_at(const glm::vec2 &pos) const {
-	return terrain->get_collision_at(pos.x, pos.y);
+	if(!terrain->get_collision_at(pos.x, pos.y)) {
+		for(auto it : objects) {
+			if(it->obj->hit(pos, game.player->radius)) {
+				if(it->collision())
+					return true;
+			}
+		}
+		return false;
+	} else {
+		return true;
+	}
 }
