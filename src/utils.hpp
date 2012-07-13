@@ -21,6 +21,8 @@ inline float frand() {
 	return (float)rand()/RAND_MAX;
 }
 
+std::string color_to_string(const glm::ivec4 &color);
+
 /**
  * Reposition a position onto screen so [0,0] -> [0,0] and [1,1] -> [w-x, h-y].
  * E.g. [0.5, 0.5] will center box.

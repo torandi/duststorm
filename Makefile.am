@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
-engine_CXXFLAGS = ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} 
-engine_LIBS = ${VENDOR_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} -lSDL_image -lfmodex -lassimp -lyaml-cpp
+engine_CXXFLAGS = ${GL_CFLAGS} ${GLU_CFLAGS} ${GLEW_CFLAGS} ${GLM_CFLAGS} ${SDL_CFLAGS} ${CL_CFLAGS}
+engine_LIBS = ${VENDOR_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${CL_LIBS} -lSDL_image -lfmodex -lassimp -lyaml-cpp
 AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${engine_CXXFLAGS} ${VENDOR_CFLAGS}
 
 bin_PROGRAMS = fubar
@@ -11,6 +11,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/area.cpp area/area.hpp \
 								src/bindable.hpp \
 								src/camera.cpp src/camera.hpp \
+								src/cl.cpp src/cl.hpp \
 								src/color.cpp src/color.hpp \
 								src/config.cpp src/config.hpp \
 								src/data.cpp src/data.hpp \
@@ -25,6 +26,8 @@ fubar_SOURCES =	src/main.cpp \
 								src/movable_light.cpp src/movable_light.hpp \
 								src/movable_object.cpp src/movable_object.hpp \
 								src/music.cpp src/music.hpp \
+								src/object2d.cpp src/object2d.hpp \
+								src/particle_system.cpp src/particle_system.hpp \
 								src/player.cpp src/player.hpp \
 								src/rendertarget.cpp src/rendertarget.hpp \
 								src/render_object.cpp src/render_object.hpp \

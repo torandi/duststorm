@@ -13,6 +13,7 @@
 #include <string>
 
 #include <list>
+#include <map>
 
 class Game;
 
@@ -22,7 +23,7 @@ class Area {
 		~Area();
 		
 		float height_at(const glm::vec2 &pos) const;
-		bool collision_at(const glm::vec2 &pos) const;
+		bool collision_at(const glm::vec2 &pos) const; //This one may also trigger closness based stuff
 
 		bool click_at(const glm::vec2 &pos); //return true if this clicks something
 		bool mouse_at(const glm::vec2 &pos); //return true if this marks something in the area
@@ -32,6 +33,8 @@ class Area {
 
 		void upload_lights();
 
+		//Object at
+
 	private:
 		Game &game;
 
@@ -40,6 +43,9 @@ class Area {
 		Texture2D * terrain_datamap;
 		Material wall_material;
 		TextureArray * terrain_textures[2];
+
+		void parse_colormap(); //Build color_positions
+		std::list<glm::vec3> &color_map(const YAML::Node &node);
 
 		Mesh * wall;
 
@@ -51,6 +57,8 @@ class Area {
 		float fog_density;
 
 		GLint u_highlight;
+
+		std::map<std::string, std::list<glm::vec3>> color_positions; //map from color to positions
 
 		//TODO: More properties
 		// * links to other locations

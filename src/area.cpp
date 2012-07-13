@@ -56,6 +56,8 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	glUniform3f(u_highlight, 0.f, 0.f, 0.f);
 	Shader::unbind();
 
+	parse_colormap();
+
 	float wall_scale = config["walls"]["scale"].as<float>(1.f);
 	glm::vec2 texture_scale = config["walls"]["texture_scale"].as<glm::vec2>(glm::vec2(1.f));
 	wall_material.texture = Texture2D::from_filename(config["walls"]["texture"].as<std::string>());
@@ -271,6 +273,21 @@ Area::~Area() {
 
 	delete terrain_textures[0];
 	delete terrain_textures[1];
+}
+
+void Area::parse_colormap() {
+	
+}
+
+std::list<glm::vec3> &Area::color_map(const YAML::Node &node) {
+	std::string val = node.as<std::string>();
+	auto it = color_positions.find(val);
+	if(it != color_positions.end()) {
+		return it->second;
+	} else {
+		fprintf(verbose, "Unknown color %s\n", val.c_str());
+		abort();
+	}
 }
 
 void Area::upload_lights() {

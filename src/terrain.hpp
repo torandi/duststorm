@@ -27,7 +27,6 @@ class Terrain : public Mesh {
 
 	void generate_terrain();
 
-	glm::vec4 get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size) const;
 	float height_from_color(const glm::vec4 &color) const ;
 
 	Texture2D * terrain_data_, *height_texture_;
@@ -36,6 +35,7 @@ class Terrain : public Mesh {
 	std::string base_;
 	Shader * shader_;
 	public:
+		static glm::vec4 get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size);
 		float vertical_scale() { return vertical_scale_; };
 		Texture2D * heightmap() const;
 		Texture2D * datamap() const;

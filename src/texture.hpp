@@ -16,6 +16,7 @@ public:
 	virtual void texture_unbind() const = 0;
 
 	static SDL_Surface* load_image(const std::string &path, glm::ivec2* size);
+	static glm::ivec4 get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size);
 
 protected:
 	TextureBase();

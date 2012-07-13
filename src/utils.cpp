@@ -93,3 +93,9 @@ int timetable_parse(const std::string& filename, std::function<void(const std::s
 
 	return 0;
 }
+
+std::string color_to_string(const glm::ivec4 &color) {
+	char str[6];
+	sprintf(str, "%x%x%x", color.x, color.y, color.z);
+	return std::string(str);
+}

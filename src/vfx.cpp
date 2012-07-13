@@ -38,7 +38,7 @@ ModelVFX::~ModelVFX() {
 	delete render_object_;
 }
 
-void ModelVFX::render(const glm::mat4 &matrix) const {
+void ModelVFX::render(const glm::mat4 &matrix, const void * state) const {
 	render_object_->render(&matrix);
 }
 

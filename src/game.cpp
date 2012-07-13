@@ -96,9 +96,7 @@ void Game::move_player() {
 	player->target = mouse_position;
 
 	//Rotate:
-	glm::vec2 dir = glm::normalize(player->current_position - player->target);
-	float rot = radians_to_degrees(atan2(dir.y, dir.x));
-	player->set_rotation(glm::vec3(0.f, 1.f, 0.f), -rot+90.f);
+	player->face(mouse_position);
 }
 
 void Game::do_action(int num) {

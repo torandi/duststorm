@@ -9,6 +9,8 @@
 
 #include "game.hpp" 
 
+CL * opencl;
+
 static const char* shader_programs[NUM_SHADERS] = {
 	"simple",
 	"normal",
@@ -46,6 +48,7 @@ namespace Engine {
 
 	void init() {
 		game = new Game();
+		opencl = new CL();
 	}
 
 	void cleanup() {

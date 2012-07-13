@@ -10,6 +10,7 @@
 #include <cassert>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <glm/glm.hpp>
 
 static GLuint cube_map_index[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
@@ -404,4 +405,38 @@ void Texture3D::texture_unbind() const {
 
 const GLint Texture3D::gl_texture() const {
 	return _texture;
+}
+
+glm::ivec4 TextureBase::get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size) {
+	Uint32 temp, pixel;
+	Uint8 red, green, blue, alpha;
+	pixel = ((Uint32*)surface->pixels)[(size.y-(y+1))*(size.x)+(size.x-(x+1))];
+
+	SDL_PixelFormat * fmt=surface->format;
+
+	/* Get Red component */
+	temp = pixel & fmt->Rmask;  /* Isolate red component */
+	temp = temp >> fmt->Rshift; /* Shift it down to 8-bit */
+	temp = temp << fmt->Rloss;  /* Expand to a full 8-bit number */
+	red = (Uint8)temp;
+
+	/* Get Green component */
+	temp = pixel & fmt->Gmask;  /* Isolate green component */
+	temp = temp >> fmt->Gshift; /* Shift it down to 8-bit */
+	temp = temp << fmt->Gloss;  /* Expand to a full 8-bit number */
+	green = (Uint8)temp;
+
+	/* Get Blue component */
+	temp = pixel & fmt->Bmask;  /* Isolate blue component */
+	temp = temp >> fmt->Bshift; /* Shift it down to 8-bit */
+	temp = temp << fmt->Bloss;  /* Expand to a full 8-bit number */
+	blue = (Uint8)temp;
+
+	/* Get Alpha component */
+	temp = pixel & fmt->Amask;  /* Isolate alpha component */
+	temp = temp >> fmt->Ashift; /* Shift it down to 8-bit */
+	temp = temp << fmt->Aloss;  /* Expand to a full 8-bit number */
+	alpha = (Uint8)temp;
+
+	return glm::ivec4(red, green, blue, alpha);
 }

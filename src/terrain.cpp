@@ -147,43 +147,13 @@ float Terrain::get_height_at(float x_, float y_) const {
 	return height;
 }
 
-glm::vec4 Terrain::get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size) const {
+glm::vec4 Terrain::get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size) {
+	glm::ivec4 c = TextureBase::get_pixel_color(x, y, surface, size);
 	glm::vec4 color;
-
-	Uint32 temp, pixel;
-	Uint8 red, green, blue, alpha;
-	pixel = ((Uint32*)surface->pixels)[(size.y-(y+1))*(size.x)+(size.x-(x+1))];
-
-	SDL_PixelFormat * fmt=surface->format;
-
-	/* Get Red component */
-	temp = pixel & fmt->Rmask;  /* Isolate red component */
-	temp = temp >> fmt->Rshift; /* Shift it down to 8-bit */
-	temp = temp << fmt->Rloss;  /* Expand to a full 8-bit number */
-	red = (Uint8)temp;
-
-	/* Get Green component */
-	temp = pixel & fmt->Gmask;  /* Isolate green component */
-	temp = temp >> fmt->Gshift; /* Shift it down to 8-bit */
-	temp = temp << fmt->Gloss;  /* Expand to a full 8-bit number */
-	green = (Uint8)temp;
-
-	/* Get Blue component */
-	temp = pixel & fmt->Bmask;  /* Isolate blue component */
-	temp = temp >> fmt->Bshift; /* Shift it down to 8-bit */
-	temp = temp << fmt->Bloss;  /* Expand to a full 8-bit number */
-	blue = (Uint8)temp;
-
-	/* Get Alpha component */
-	temp = pixel & fmt->Amask;  /* Isolate alpha component */
-	temp = temp >> fmt->Ashift; /* Shift it down to 8-bit */
-	temp = temp << fmt->Aloss;  /* Expand to a full 8-bit number */
-	alpha = (Uint8)temp;
-
-	color.r = (float)red/0xFF;
-	color.g = (float)green/0xFF;
-	color.b = (float)blue/0xFF;
-	color.a = (float)alpha/0xFF;
+	color.r = (float)c.x/0xFF;
+	color.g = (float)c.y/0xFF;
+	color.b = (float)c.z/0xFF;
+	color.a = (float)c.w/0xFF;
 
 	return color;	
 }

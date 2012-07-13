@@ -17,7 +17,7 @@
 
 class VFX {
 	public:
-		virtual void render(const glm::mat4 &matrix) const = 0;
+		virtual void render(const glm::mat4 &matrix, const void * state) const = 0;
 		virtual void * update(float dt, void * state) = 0;
 
 		virtual void * create_state() = 0;
@@ -32,7 +32,7 @@ class ModelVFX : public VFX {
 	public:
 		ModelVFX(const YAML::Node &node);
 		~ModelVFX();
-		virtual void render(const glm::mat4 &matrix) const ;
+		virtual void render(const glm::mat4 &matrix, const void * state) const;
 		virtual void * update(float dt, void * state);
 		virtual void * create_state();
 

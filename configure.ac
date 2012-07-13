@@ -18,6 +18,7 @@ AX_CHECK_GL
 AX_CHECK_GLU
 AX_GLEW
 AX_GLM
+AX_CHECK_CL
 AM_PATH_SDL
 
 AS_IF([test "x$no_gl" == "xyes"], [AC_MSG_ERROR([OpenGL libraries required])])
