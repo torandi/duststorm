@@ -17,14 +17,9 @@
 
 #include <dirent.h>
 
-#define DEBUG_MOVE 1
+#define DEBUG_MOVE 0
 
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
-
-	camera.set_position(glm::vec3(27.584806, 17.217037, 186.391449));
-	camera.look_at(glm::vec3(33.531612, 14.147154, 180.580292));
-
-	mouse_position = glm::vec2(43.761303, 28.003969);
 
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	composition = new RenderTarget(resolution, GL_RGB8, false);
@@ -43,10 +38,9 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	camera_offset = config["camera_offset"].as<glm::vec3>(glm::vec3(3.f));
 
 	load_areas();
-	current_area = areas[config["start_area"].as<std::string>()];
+	YAML::Node start = config["start"];
 
-	//Can't call this until current_area is set
-	player->move_to(glm::vec2(33.531612, 180.580292));
+	change_area(start["area"].as<std::string>(), start["entry_point"].as<std::string>());
 
 	for(bool &a : sustained_action) {
 		a = false;
@@ -69,6 +63,23 @@ Game::~Game() {
 
 Area * Game::area() const { return current_area; }
 
+Area * Game::get_area(const std::string &str) const {
+	auto it = areas.find(str);
+	if(it == areas.end()) {
+		printf("Unknown area %s\n", str.c_str());
+		abort();
+	}
+	return it->second;
+}
+
+void Game::change_area(const std::string &area, const std::string &entry_point) {
+	current_area = get_area(area);
+	glm::vec2 pos = current_area->get_entry_point(entry_point);
+	printf("ENTRY POINT %f, %f\n", pos.x, pos.y);
+	player->move_to(pos);
+	look_at_player();
+}
+
 void Game::update(float dt) {
 
 	player->update(dt);
@@ -85,9 +96,13 @@ void Game::update(float dt) {
 	}
 #else
 	//Move camera:
+	look_at_player();
+#endif
+}
+
+void Game::look_at_player() {
 	camera.look_at(player->position());
 	camera.set_position(player->position() + camera_offset);
-#endif
 }
 
 //Move player towards mouse position

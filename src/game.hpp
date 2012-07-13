@@ -56,6 +56,8 @@ class Game {
 
 		void update_mouse_position(int x, int y);
 
+		void look_at_player();
+
 		Camera camera;
 		RenderTarget *screen, *composition;//, *downsample[2];
 

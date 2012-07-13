@@ -6,7 +6,7 @@
 
 static const float marker_size = 0.5f;
 
-Area::Area(const std::string &name, Game &game_) : game(game_) {
+Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 	char * str;
 	if(asprintf(&str, PATH_BASE "/game/areas/%s.yaml", name.c_str()) == -1) abort();
 
@@ -49,12 +49,11 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 				fprintf(stderr, "Warning! To many lights in area %s, only %d allowed\n", name.c_str(), MAX_NUM_LIGHTS);
 				break;
 			}
-			float h = light_height[light_count-1] = n["height"].as<float>(1.f);
+			light_height[light_count-1] = n["height"].as<float>(1.f);
 			lights.lights[light_count].type = (Light::light_type_t) n["type"].as<int>(Light::POINT_LIGHT);
-			glm::vec3 c = lights.lights[light_count].intensity = n["color"].as<glm::vec3>();
+			lights.lights[light_count].intensity = n["color"].as<glm::vec3>();
 			glm::vec2 pos = n["position"].as<glm::vec2>();
 			move_light(light_count-1, pos);
-			printf("LIGHT: %f, %f, %f, (%f, %f), ->%f\n", c.x, c.y, c.z, pos.x, pos.y, h);
 			++light_count;
 		}
 	}
@@ -73,6 +72,15 @@ Area::Area(const std::string &name, Game &game_) : game(game_) {
 	game.player->add_position_callback(&(lights.lights[0]), game.player->light_offset);
 
 	skycolor = config["skycolor"].as<Color>(Color::red);
+
+	//load entry points:
+	YAML::Node ep_node = config["entry_points"];
+	for(auto it = ep_node.begin(); it != ep_node.end(); ++it) {
+		std::string e_name = it->first.as<std::string>();
+		glm::vec2 pos = it->second.as<glm::vec2>();
+		entry_points[e_name] = pos;
+		printf("Added entry point '%s' (%f, %f)\n", e_name.c_str(), pos.x, pos.y);
+	}
 
 	u_highlight = shaders[SHADER_NORMAL]->uniform_location("highlight");
 	shaders[SHADER_NORMAL]->bind();
@@ -294,6 +302,15 @@ Area::~Area() {
 
 	delete terrain_textures[0];
 	delete terrain_textures[1];
+}
+
+const glm::vec2 &Area::get_entry_point(const std::string &name) {
+	auto it = entry_points.find(name);
+	if(it == entry_points.end()) {
+		printf("Unknown entry point '%s' in area %s\n", name.c_str(), name_.c_str());
+		abort();
+	}
+	return it->second;
 }
 
 void Area::move_light(int id, const glm::vec2 &new_pos) {

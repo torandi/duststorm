@@ -37,9 +37,11 @@ class Area {
 
 		void move_light(int id, const glm::vec2 &new_pos);
 
+		const glm::vec2 &get_entry_point(const std::string &name);
 	private:
 		Game &game;
-
+		std::string name_;	
+		//Entity * highlighted;
 
 		Shader * terrain_shader;
 		Terrain * terrain;
@@ -59,9 +61,10 @@ class Area {
 
 		GLint u_highlight;
 
+		std::map<std::string, glm::vec2> entry_points;
+
 		//TODO: More properties
 		// * links to other locations
-		// * entry points
 		// * objects [maybe global list of templates]
 		// * enemies [maybe global list of templates]
 };
