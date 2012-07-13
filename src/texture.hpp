@@ -48,6 +48,8 @@ public:
 	 */
 	static Texture2D* default_colormap();
 	static Texture2D* default_normalmap();
+	static Texture2D* default_specularmap();
+	static Texture2D* default_alphamap();
 
 	const GLint gl_texture() const;
 

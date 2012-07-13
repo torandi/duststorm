@@ -20,6 +20,8 @@ public:
 
 	TextureBase* texture;
 	TextureBase* normal_map;
+	TextureBase* specular_map;
+	TextureBase* alpha_map;
 	bool two_sided;
 };
 

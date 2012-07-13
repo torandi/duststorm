@@ -17,7 +17,7 @@
 
 #include <dirent.h>
 
-#define DEBUG_MOVE 0
+#define DEBUG_MOVE 1
 
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 

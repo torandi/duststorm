@@ -42,7 +42,7 @@ void Object2D::set_rotation(float angle) {
 void Object2D::face(const glm::vec2 &pos) {
 	glm::vec2 dir = glm::normalize(current_position - pos);
 	float rot = radians_to_degrees(atan2(dir.y, dir.x));
-	set_rotation(-rot + 90.f);
+	set_rotation(-rot);
 }
 
 void Object2D::face(const Object2D * obj) {

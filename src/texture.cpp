@@ -155,6 +155,14 @@ Texture2D* Texture2D::default_normalmap(){
 	return from_filename("default_normalmap.png");
 }
 
+Texture2D* Texture2D::default_specularmap(){
+	return from_filename("white.png");
+}
+
+Texture2D* Texture2D::default_alphamap(){
+	return from_filename("white.png");
+}
+
 Texture2D::Texture2D(const std::string& filename, unsigned int num_mipmap_levels)
 	: TextureBase()
 	, _texture(0)

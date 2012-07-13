@@ -79,7 +79,6 @@ Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 		std::string e_name = it->first.as<std::string>();
 		glm::vec2 pos = it->second.as<glm::vec2>();
 		entry_points[e_name] = pos;
-		printf("Added entry point '%s' (%f, %f)\n", e_name.c_str(), pos.x, pos.y);
 	}
 
 	u_highlight = shaders[SHADER_NORMAL]->uniform_location("highlight");

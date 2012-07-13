@@ -37,7 +37,8 @@ void main() {
 
 	//Normal map
 	vec3 normal_map = normalize(texture(texture1, texcoord).xyz * 2.0 - 1.0);
-	
+
+	float shininess = Mtl.shininess * normalize(texture(texture2, texcoord)).length();
 
    vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity, 1.0);
 
@@ -54,11 +55,13 @@ void main() {
       accumLighting += computeLighting(
             Lgt.lights[light], originalColor, normal_map,
             light_dir, camera_dir, length(light_distance),
-            Mtl.shininess, Mtl.specular,
+            shininess, Mtl.specular,
             true, true);
    }
 
 	 accumLighting += originalColor * vec4(highlight,1.0);
 
    ocolor= clamp(accumLighting,0.0, 1.0);
+
+	 ocolor.a *= texture(texture3, texcoord).r;
 }

@@ -53,7 +53,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 
 	if ( !scene ) {
 		printf("Failed to load model %s\n", real_path.c_str());
-		return;
+		abort();
 	}
 
 	fprintf(verbose, "Loaded model %s:\n"
@@ -111,10 +111,26 @@ void RenderObject::pre_render() {
 
 		//Check for normalmap:
 		if(mtl->GetTextureCount(aiTextureType_HEIGHT) > 0 &&
-			mtl->GetTexture(aiTextureType_HEIGHT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+				mtl->GetTexture(aiTextureType_HEIGHT, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
+			printf("Normal map %s\n", p.c_str());
 			mtl_data.normal_map = load_texture(p);
 		}
+
+		if(mtl->GetTextureCount(aiTextureType_SHININESS) > 0 &&
+				mtl->GetTexture(aiTextureType_SHININESS, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+			std::string p(path.data);
+			printf("Specular %s\n", p.c_str());
+			mtl_data.specular_map = load_texture(p);
+		}
+
+		if(mtl->GetTextureCount(aiTextureType_OPACITY) > 0 &&
+				mtl->GetTexture(aiTextureType_OPACITY, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+			std::string p(path.data);
+			printf("Opacity %s\n", p.c_str());
+			mtl_data.alpha_map = load_texture(p);
+		}
+
 
 		aiString name;
 		if(AI_SUCCESS == mtl->Get(AI_MATKEY_NAME, name))
