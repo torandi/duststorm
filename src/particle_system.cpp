@@ -61,7 +61,6 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	spawn_rate_  = opencl->create_buffer(CL_MEM_READ_WRITE, sizeof(cl_int));
 
 	random_ = opencl->create_buffer(CL_MEM_READ_ONLY, sizeof(float)*max_num_particles);
-	srand(time(0));
 
 	float * rnd = new float[max_num_particles];
 
@@ -234,8 +233,6 @@ void ParticleSystem::update(float dt) {
 }
 
 void ParticleSystem::render(const glm::mat4 * m) {
-	glPushAttrib(GL_ENABLE_BIT|GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_CULL_FACE);
 	glDepthMask(GL_FALSE);
 
 	if(m == nullptr) 
@@ -244,9 +241,9 @@ void ParticleSystem::render(const glm::mat4 * m) {
 		Shader::upload_model_matrix(matrix() * (*m));
 
 	glBindBuffer(GL_ARRAY_BUFFER, gl_buffer_);
-/*
-	//DEBUG
 
+	//DEBUG
+/*
 	vertex_t * vertices = (vertex_t* )glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
 	printf("---\n");
@@ -257,8 +254,9 @@ void ParticleSystem::render(const glm::mat4 * m) {
 	printf("Sizeof(vertex_t): %d\n", sizeof(vertex_t));
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-	//END DEBUG
 */
+	//END DEBUG
+
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) sizeof(glm::vec4));
@@ -269,5 +267,6 @@ void ParticleSystem::render(const glm::mat4 * m) {
 	glDrawArrays(GL_POINTS, 0, max_num_particles_);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glPopAttrib();
+	
+	glDepthMask(GL_TRUE);
 }

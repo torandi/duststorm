@@ -22,21 +22,23 @@ void main() {
 	color = particleData[0].color;
 	texture_index = particleData[0].texture_index;
 
-	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(a-b, a+b, 0, 1.0));
-	tex_coord = vec2(1,0);
-	EmitVertex();
 
-	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(a+b, -a+b, 0, 1.0));
+	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(a+b, -a+b, 0, 0.0));
 	tex_coord = vec2(1,1);
 	EmitVertex();
 
-	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(-a-b, a-b, 0, 1.0));
+	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(a-b, a+b, 0, 0.0));
+	tex_coord = vec2(1,0);
+	EmitVertex();
+
+	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(-a+b, -a-b, 0, 0.0));
+	tex_coord = vec2(0,1);
+	EmitVertex();
+
+	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(-a-b, a-b, 0, 0.0));
 	tex_coord = vec2(0,0);
 	EmitVertex();
 
-	gl_Position = projectionMatrix * (gl_in[0].gl_Position + vec4(-a+b, -a-b, 0, 1.0));
-	tex_coord = vec2(0,1);
-	EmitVertex();
 
 
 	EndPrimitive();

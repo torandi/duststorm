@@ -19,8 +19,6 @@
 
 std::map<std::string, object_template_create*> Game::object_templates;
 
-static ParticleSystem * ptest;
-
 #define DEBUG_MOVE 1
 
 void Game::init() {
@@ -29,28 +27,10 @@ void Game::init() {
 	object_templates["pickup"] = &Pickup::create;
 }
 
-Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f), current_area(nullptr) {
-
-	ptest = new ParticleSystem(10000, TextureArray::from_filename("particle.png", nullptr));
-	ptest->config.spawn_position = glm::vec4(270, 11, 270, 0);
-	ptest->avg_spawn_rate = 1000000.f;
-	ptest->spawn_rate_var = 0.f;
-	ptest->config.spawn_position = glm::vec4(0.f, 0.f, 2.f, 1.f);
-	ptest->config.spawn_area = glm::vec4(0.0f, 0.f, 0.0f, 0.0f);
-	ptest->config.spawn_direction = glm::vec4(0.f, 1.f, 0.f, 0.f);
-	ptest->config.direction_var = glm::vec4(0.1f, 0.f, 0.0f, 0.f);
-	ptest->config.avg_spawn_speed= 0.01f;
-	ptest->config.spawn_speed_var = 0.005f;
-	ptest->config.avg_ttl = 5.f;
-	ptest->config.ttl_var = 2.5f;
-	ptest->config.avg_scale = 10.f;
-	ptest->config.scale_var = 0.005f;
-	ptest->config.birth_color = glm::vec4(1.0, 0.0, 0.0, 1.0);
-	ptest->config.death_color = glm::vec4(0.0 ,1.0, 0.0, 1.f);
-	ptest->update_config();
+Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), current_area(nullptr) {
 
 	screen = new RenderTarget(resolution, GL_RGB8, false);
-	composition = new RenderTarget(resolution, GL_RGB8, false);
+	composition = new RenderTarget(resolution, GL_RGB8, true);
 
 	mouse_marker_texture = Texture2D::from_filename("mouse_marker.png");
 
@@ -111,7 +91,6 @@ void Game::change_area(const std::string &area, const std::string &entry_point) 
 }
 
 void Game::update(float dt) {
-	ptest->update(dt);
 	player->update(dt);
 	current_area->update(dt);
 
@@ -237,9 +216,6 @@ void Game::render_content() {
 }
 
 void Game::render() {
-	shaders[SHADER_PARTICLES]->bind();
-	ptest->render();
-
 	render_content();
 
 /*

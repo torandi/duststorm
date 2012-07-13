@@ -34,6 +34,7 @@ namespace Engine {
 		glEnable(GL_BLEND);
 		glCullFace(GL_BACK);
 		glDepthFunc(GL_LEQUAL);
+		glDepthMask(GL_TRUE);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	}
 
@@ -51,6 +52,7 @@ namespace Engine {
 		opencl = new CL();
 		Game::init();
 		game = new Game();
+		srand(124832486);
 	}
 
 	void cleanup() {

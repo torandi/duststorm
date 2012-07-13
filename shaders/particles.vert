@@ -20,8 +20,8 @@ void main() {
 	particleData.texture_index = texture_index;
 
 	particleData.rotation = position.w;
-
 	particleData.scale = scale;
+
 	gl_Position = viewMatrix * pos;
 
 	particleData.color = color;
