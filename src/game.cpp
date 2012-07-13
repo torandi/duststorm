@@ -17,9 +17,6 @@
 
 #include <dirent.h>
 
-static RenderObject * cube;
-static Texture2D * white;
-
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
 	camera.set_position(glm::vec3(27.584806, 17.217037, 186.391449));
@@ -32,14 +29,9 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 
 	mouse_marker_texture = Texture2D::from_filename("mouse_marker.png");
 
-	cube = new RenderObject("cube.obj");
-	cube->set_scale(0.25f);
-
 	/*downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
 	downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);*/
 
-	white = Texture2D::from_filename("white.png");
-	
 	Input::movement_speed = 15.f;
 
 	Data * src = Data::open(PATH_BASE "/game/game.yaml");
@@ -51,7 +43,6 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 150.f) {
 	load_areas();
 	current_area = areas[config["start_area"].as<std::string>()];
 
-	player->add_position_callback(cube, player->light_offset);
 	//Can't call this until current_area is set
 	player->move_to(glm::vec2(33.531612, 180.580292));
 
@@ -80,10 +71,10 @@ void Game::update(float dt) {
 	/**
 	 * Debug input
 	 */
-	input.update_object(camera, dt);
+	/*input.update_object(camera, dt);
 	if(input.current_value(Input::ACTION_1) > 0.5f) {
 		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
-	}
+	}*/
 	/**
 	 * End debug
 	 */
@@ -96,8 +87,8 @@ void Game::update(float dt) {
 	}
 
 	//Move camera:
-/*	camera.look_at(player->position());
-	camera.set_position(player->position() + camera_offset);*/
+	camera.look_at(player->position());
+	camera.set_position(player->position() + camera_offset);
 }
 
 //Move player towards mouse position
@@ -107,7 +98,6 @@ void Game::move_player() {
 	//Rotate:
 	glm::vec2 dir = glm::normalize(player->current_position - player->target);
 	float rot = radians_to_degrees(atan2(dir.y, dir.x));
-	printf("ROTATE: %f\n", rot);
 	player->set_rotation(glm::vec3(0.f, 1.f, 0.f), -rot+90.f);
 }
 
@@ -218,9 +208,6 @@ void Game::render_statics() {
 void Game::render_dynamics() {
 	shaders[SHADER_NORMAL]->bind();
 	player->render();
-	white->texture_bind(Shader::TEXTURE_2D_0);
-	shaders[SHADER_PASSTHRU]->bind();
-	cube->render();
 }
 
 void Game::render_display() {

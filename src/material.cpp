@@ -13,9 +13,9 @@ Material::Material()
 	texture    = Texture2D::default_colormap();
 	normal_map = Texture2D::default_normalmap();
 
-	shininess = 32;
+	shininess = 1;
 	diffuse   = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	specular  = glm::vec4(0.03f);
+	specular  = glm::vec4(.3f);
 	ambient   = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 	emission  = glm::vec4(0.0f);
 };

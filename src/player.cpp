@@ -4,7 +4,7 @@
 
 Player::Player(const YAML::Node &node, Game &game_) : game(game_) {
 	light_color = node["light"].as<glm::vec3>(glm::vec3(0.8f));
-	light_offset = glm::vec3(0.f, node["light_height"].as<float>(1.f), 0.f);
+	light_offset = node["light_offset"].as<glm::vec3>(glm::vec3(1.0));
 	speed = node["speed"].as<float>(1.f);
 
 	vfx = VFX::get_vfx(node["vfx"].as<std::string>("player"));
