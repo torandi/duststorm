@@ -67,7 +67,6 @@ void Player::change_attr(const std::string &attr, int val) {
 		if(it->second > max)
 			it->second = max;
 	}
-	fprintf(verbose,"%s: %d\n", attr.c_str(), it->second);
 }
 
 void Player::swing() {

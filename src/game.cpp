@@ -21,7 +21,7 @@
 std::map<std::string, object_template_create*> Game::object_templates;
 std::map<std::string, enemy_create*> Game::enemy_creators;
 
-#define DEBUG_MOVE 1
+#define DEBUG_MOVE 0
 
 static Quad * bar; 
 static Texture2D * bar_texture;

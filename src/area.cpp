@@ -318,7 +318,7 @@ Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 
 	splattermap = new RenderTarget(glm::ivec2(1024, 1024), GL_RGB8, false);
 	splattermap->bind();
-	splattermap->clear(Color::black);
+	splattermap->clear(Color::white);
 	splattermap->unbind();
 
 	blood = Texture2D::from_filename("blood.png");
@@ -405,12 +405,11 @@ bool Area::click_at(const glm::vec2 &pos, int btn) {
 		bool click = false;
 		for(auto it : objects) {
 			if(it->obj->hit(pos, game.player->click_radius, true)) {
-				it->click();
-				click = true;
+				click = it->click();
 			}
 		}
 		for(auto it : enemies) {
-			if(it->hit(pos, game.player->click_radius, true)) {
+			if(it->hit(pos, game.player->click_radius, true) && game.player->hit(it->current_position,it->radius + game.player->weapon_radius[0])) {
 				game.player->swing();
 				return true;
 			}
@@ -467,11 +466,11 @@ void Area::spawn_splatter(const glm::vec2 &pos) {
 	pv->set_spawn_rate(ot->obj->vfx_state, 0.f, 0.f);
 	objects.push_back(ot);
 
-	splattermap->bind();
+	/*splattermap->bind();
 	blood->texture_bind(Shader::TEXTURE_2D_0);
-	blood_quad->set_position(glm::vec3(pos.x/terrain->size().x, pos.y/terrain->size().y, 0));
+	blood_quad->set_position(glm::vec3(pos.x/terrain->size().x, pos.y/terrain->size().y, 0)*1024.f);
 	blood_quad->render();
-	splattermap->unbind();
+	splattermap->unbind();*/
 }
 
 void Area::render(const glm::vec2 &marker_position) {
@@ -479,7 +478,7 @@ void Area::render(const glm::vec2 &marker_position) {
 	terrain_shader->bind();
 	glUniform1f(u_fog_density, fog_density);
 	glUniform2f(u_marker, (marker_position.x/terrain->size().x), 1.f - (marker_position.y/terrain->size().y));
-	splattermap->texture_bind(Shader::TEXTURE_2D_2);
+	//splattermap->texture_bind(Shader::TEXTURE_2D_2);
 	terrain->render();
 
 	if(wall != nullptr) {

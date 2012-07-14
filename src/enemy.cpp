@@ -57,7 +57,7 @@ void BasicAI::update(float dt) {
 }
 
 void BasicAI::attack() {
-	if(rand() % 10 == 0) game.play_sfx(attack_sfx);
+	game.play_sfx(attack_sfx);
 	game.player->damage(damage);
 	attack_cooldown = attack_repeat;
 }
