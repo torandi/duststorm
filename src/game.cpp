@@ -54,7 +54,7 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), curr
 	for(auto it = sfx_config.begin(); it != sfx_config.end(); ++it) {
 		std::string name = it->first.as<std::string>();
 		std::string file = it->second.as<std::string>();
-		sfx[name] = new Sound(file.c_str());
+		sfx[name] = file;
 		printf("Added sfx %s: %s\n", name.c_str(), file.c_str());
 	}
 
@@ -86,14 +86,17 @@ Game::~Game() {
 	delete dof_shader;*/
 }
 
-void Game::play_sfx(const std::string &str, int loops) {
+void Game::play_sfx(const std::string &str, float delay, int loops) {
 	auto it = sfx.find(str);
 	if(it == sfx.end()) {
 		printf("Missing sfx %s\n", str.c_str());
 		abort();
 	}
-	Sound * s = new Sound(*(it->second), loops);
-	s->play();
+	Sound * s = new Sound(it->second.c_str(), loops);
+	if(delay > 0.f)
+		s->set_delay(delay);
+	else
+		s->play();
 	active_sfx.push_back(s);
 }
 

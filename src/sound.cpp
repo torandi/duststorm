@@ -72,21 +72,27 @@ Sound::Sound(const Sound &sound, int loops) :
 
 		++(*sound_usage_count_);
 
-		channel_ = nullptr;
 		result_ = system_->playSound(FMOD_CHANNEL_FREE, sound_, true /* paused */, &channel_);
-		errcheck("start sound (paused)");
+		if(result_ != FMOD_OK) {
+			fprintf(verbose, "[FMOD] Failed to start playing sound\n");
+			channel_ = nullptr;
+			return;
+		}
 		result_ = channel_->setLoopCount(loops);
 		errcheck("set loop count");
 }
 
 Sound::~Sound() {
-	errcheck("sound::release()");
+
+	if(channel_ != nullptr) 
+		channel_->stop();
 
 	--(*sound_usage_count_);
 	if(*sound_usage_count_ <= 0) {
 		delete sound_usage_count_;
 		delete source;
 		result_ = sound_->release();
+		errcheck("sound::release()");
 	}
 
 	--system_usage_;
@@ -102,6 +108,7 @@ void Sound::update_system() {
 }
 
 void Sound::update(float dt) {
+	if(channel_ == nullptr) return;
 	if(delay > 0.f) {
 		delay -= dt;
 		if(delay <= 0.f)
@@ -110,12 +117,14 @@ void Sound::update(float dt) {
 }
 
 bool Sound::is_done() const {
+	if(channel_ == nullptr) return false;
 	if(delay > 0.f)
 		return false;
 	return !is_playing();
 }
 
 bool Sound::is_playing() const {
+	if(channel_ == nullptr) return false;
 	bool is_playing, is_paused = false;
 	result_ = channel_->isPlaying(&is_playing);
 	if(result_ != FMOD_OK) return false;
@@ -127,6 +136,7 @@ bool Sound::is_playing() const {
 }
 
 void Sound::play() {
+	if(channel_ == nullptr) return;
 	result_ = channel_->setPosition(0, FMOD_TIMEUNIT_MS);
 	errcheck("Sound::play() setPosition(0)");
 	result_ = channel_->setPaused(false);
@@ -134,10 +144,12 @@ void Sound::play() {
 }
 
 void Sound::stop() {
+	if(channel_ == nullptr) return;
 	channel_->setPaused(true);
 }
 
 double Sound::time() const {
+	if(channel_ == nullptr) return -1.0;
 	unsigned int pos;
 	result_ = channel_->getPosition(&pos, FMOD_TIMEUNIT_MS);
 	errcheck("Sound::time()");
@@ -145,6 +157,7 @@ double Sound::time() const {
 }
 
 void Sound::seek(double t) {
+	if(channel_ == nullptr) return;
 		result_ = channel_->setPosition(t*1000.0, FMOD_TIMEUNIT_MS);
 		errcheck("Sound::seek()");
 }

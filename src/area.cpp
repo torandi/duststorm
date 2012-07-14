@@ -427,10 +427,10 @@ void Area::attack(int id) {
 		}
 	}
 	if(count >= 3) {
-		game.play_sfx("multikill");
+		game.play_sfx("multikill", 0.5f);
 	} else if(count >= 2) {
 		//Double kill
-		game.play_sfx("double_kill");
+		game.play_sfx("double_kill", 0.5f);
 	}
 }
 
@@ -477,6 +477,8 @@ void Area::render(const glm::vec2 &marker_position) {
 			glUniform3f(u_highlight, 0.f, 0.f, 0.f);
 		it->render();
 	}
+	shaders[SHADER_NORMAL]->bind();
+	glUniform3f(u_highlight, 0.f, 0.f, 0.f);
 
 }
 
