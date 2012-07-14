@@ -62,6 +62,11 @@ void main() {
 
 	normal_map = normalize(normal_map * 2.0 - 1.0);
 
+	vec4 splatter = texture(texture2, vec2(texcoord.x, 1.f-texcoord.y));
+
+	originalColor = splatter;
+	//originalColor.rgb = mix(originalColor.rgb, splatter.rgb, splatter.r);
+
 	float shininess = 32.f;
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.f);
 

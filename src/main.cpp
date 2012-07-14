@@ -2,7 +2,7 @@
 	#include "config.h"
 #endif
 
-#define GAME_NAME "Teh Game"
+#define GAME_NAME "FUBAR ENGINE - The Big Ponny Slaughter"
 
 #include "engine.hpp"
 #include "globals.hpp"

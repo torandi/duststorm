@@ -1,6 +1,9 @@
 #ifndef AREA_HPP
 #define AREA_HPP
 
+#include "rendertarget.hpp"
+#include "quad.hpp"
+
 #include "shader.hpp"
 #include "terrain.hpp"
 #include "texture.hpp"
@@ -48,6 +51,10 @@ class Area {
 		void spawn_pickups(const std::string &name, const glm::vec2 &center, int count=1);
 
 		int required_blood;
+
+		RenderTarget * splattermap;
+		Texture2D * blood;
+		Quad * blood_quad;
 
 		Sound * bg;
 	private:

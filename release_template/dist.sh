@@ -86,7 +86,7 @@ function add(){
 
 		echo "Building code"
 		pushd $build
-		../$root/configure --disable-editor --disable-input FULLSCREEN=1 DATA_PATH=.
+		../$root/configure --disable-editor --disable-input --enable-loading FULLSCREEN=1 DATA_PATH=.
 		make
 		popd
 		

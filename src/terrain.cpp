@@ -72,7 +72,7 @@ void Terrain::generate_terrain() {
 			glm::vec4 color = get_pixel_color(x, y, heightmap_, hm_size);
 			float h = height_from_color(color);
 			v.position = glm::vec3(horizontal_scale_*x, h*vertical_scale_, horizontal_scale_*y); 
-			v.tex_coord = glm::vec2(1.f-v.position.x/(hm_size.x*horizontal_scale_), 1.f-v.position.z/(hm_size.y*horizontal_scale_));
+			v.tex_coord = glm::vec2(v.position.x/(hm_size.x*horizontal_scale_), 1.f-v.position.z/(hm_size.y*horizontal_scale_));
 			vertices_[i] = v;
 			map_[i] =  h*vertical_scale_;
 			wall_[i] = color.g;

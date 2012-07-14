@@ -21,7 +21,7 @@
 std::map<std::string, object_template_create*> Game::object_templates;
 std::map<std::string, enemy_create*> Game::enemy_creators;
 
-#define DEBUG_MOVE 0
+#define DEBUG_MOVE 1
 
 static Quad * bar; 
 static Texture2D * bar_texture;
@@ -148,10 +148,16 @@ Area * Game::get_area(const std::string &str) const {
 }
 
 void Game::change_area(const std::string &area, const std::string &entry_point) {
-	if(current_area != nullptr)
-		current_area->bg->stop();
+	if(area == "end") {
+		Sound * s = play_sfx("victory");
+		while(s->is_playing()) {
+			Sound::update_system();
+		}
+		printf("Your score: %f\n", player->score);
+		exit(0);
+
+	}
 	current_area = get_area(area);
-	current_area->bg->play();
 	glm::vec2 pos = current_area->get_entry_point(entry_point);
 	player->move_to(pos);
 	look_at_player();
