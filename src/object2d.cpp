@@ -44,6 +44,10 @@ Object2D::Object2D(const YAML::Node &node, Game &game_) :
 	vfx_state = vfx->create_state();
 }
 
+Object2D::~Object2D() {
+	vfx->free_state(vfx_state);
+}
+
 glm::vec2 Object2D::center() const {
 	return current_position + center_offset;
 }

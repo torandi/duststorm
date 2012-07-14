@@ -11,6 +11,7 @@ class Object2D : public MovableObject {
 	public:
 		Object2D(const YAML::Node &node, Game &game_);
 		Object2D(const std::string &vfx_name, Game &game_);
+		virtual ~Object2D();
 		glm::vec2 target;
 		glm::vec2 current_position;
 		float speed, radius;
@@ -36,10 +37,10 @@ class Object2D : public MovableObject {
 
 		glm::vec2 center() const;
 		Game &game;
-	protected:
-
 		VFX * vfx;
 		void * vfx_state;
+	protected:
+
 		float base_rotation;
 		glm::vec2 center_offset;
 

@@ -1,5 +1,6 @@
 #include "player.hpp"
 #include "globals.hpp"
+#include "game.hpp"
 
 Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
 	, swing_state(-1.f)
@@ -42,6 +43,8 @@ void Player::swing() {
 	if(swing_state < 0.f) {
 		//Play sound
 		swing_state = 1.f;
+		game.area()->attack(0);
+		game.play_sfx("wroom");
 	}
 }
 
@@ -58,13 +61,13 @@ void Player::update(float dt) {
 
 		chainsaw.set_rotation(glm::vec3(0, 1.f, 0), current_rotation-90.f);
 		chainsaw.absolute_rotate(chainsaw.local_z(), M_PI_2);
-		chainsaw.set_position(center3()+glm::vec3(0,1.0f, 0.0f) + local_z()*0.2f); 
+		chainsaw.set_position(center3()+glm::vec3(0,1.0f, 0.0f) + local_z()); 
 		chainsaw.absolute_rotate(glm::vec3(0.0, 1.f, 0.f), M_PI_2);
 		chainsaw.absolute_rotate(glm::vec3(0.0, 1.f, 0.f), -(swing_state-1.f)*M_PI);
 	} else {
 		chainsaw.set_rotation(glm::vec3(0, 1.f, 0), current_rotation-90.f);
 		chainsaw.relative_rotate(glm::vec3(1.0, 0.f, 0.f), M_PI_2);
-		chainsaw.set_position(position()+glm::vec3(0,1.f, 0) + local_x()*0.25f);
+		chainsaw.set_position(position()+glm::vec3(0,1.5f, 0) + local_x()*0.25f);
 	}
 	Object2D::update(dt);
 }

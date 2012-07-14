@@ -2,47 +2,47 @@
 	#include "config.h"
 #endif
 
-#include "music.hpp"
+#include "sound.hpp"
 #include "globals.hpp"
 
 #include <fmodex/fmod_errors.h>
 
 #define MAX_CHANNELS 10
 
-FMOD::System * Music::system_ = nullptr;
-unsigned int Music::system_usage_ = 0;
-FMOD_RESULT Music::result_;
+FMOD::System * Sound::system_ = nullptr;
+unsigned int Sound::system_usage_ = 0;
+FMOD_RESULT Sound::result_;
 
-void Music::initialize_fmod() {
+void Sound::initialize_fmod() {
 	result_ = FMOD::System_Create(&system_);
 	errcheck("create system");
 	result_ = system_->init(MAX_CHANNELS, FMOD_INIT_NORMAL, NULL);
 	errcheck("initialize system");
 }
 
-void Music::errcheck(const char * contex) {
+void Sound::errcheck(const char * contex) {
 	if(result_ != FMOD_OK) {
-		printf("[Music] FMOD error in %s %s(%d))\n", contex, FMOD_ErrorString(result_), result_);
+		printf("[Sound] FMOD error in %s %s(%d))\n", contex, FMOD_ErrorString(result_), result_);
 		abort();
 	}
 }
 
-void Music::terminate_fmod() {
+void Sound::terminate_fmod() {
 	result_ = system_->release();
 	errcheck("terminate fmod");
 }
 
-Music::Music(const char * file) {
+Sound::Sound(const char * file) {
 	if(system_usage_ == 0) initialize_fmod();
 	++system_usage_;
 
 	char* real_path;
-	if ( asprintf(&real_path, "%s%s", PATH_BASE "/music/", file) == -1 ){
+	if ( asprintf(&real_path, "%s%s", PATH_BASE "/game/data/sfx/", file) == -1 ){
 		abort();
 	}
 	source = Data::open(real_path);
 	if(source == NULL) {
-		printf("[Music] Couldn't open file %s\n", real_path);
+		printf("[Sound] Couldn't open file %s\n", real_path);
 		abort();
 	}
 	
@@ -59,7 +59,7 @@ Music::Music(const char * file) {
 	errcheck("start sound (paused)");
 }
 
-Music::~Music() {
+Sound::~Sound() {
 	result_ = sound_->release();
 	errcheck("sound::release()");
 
@@ -69,7 +69,7 @@ Music::~Music() {
 	if(system_usage_ == 0) terminate_fmod();
 }
 
-bool Music::is_playing() const {
+bool Sound::is_playing() const {
 	bool is_playing, is_paused = false;
 	result_ = channel_->isPlaying(&is_playing);
 	errcheck("Get channel::isPlaying()");
@@ -80,29 +80,25 @@ bool Music::is_playing() const {
 	return is_playing && !is_paused;
 }
 
-void Music::play() {
-	if(is_playing()) {
-		printf("[Music] Warning, called Music::play() on playing stream\n");
-		return;
-	}
+void Sound::play() {
 	result_ = channel_->setPosition(0, FMOD_TIMEUNIT_MS);
-	errcheck("Music::play() setPosition(0)");
+	errcheck("Sound::play() setPosition(0)");
 	result_ = channel_->setPaused(false);
-	errcheck("Music::play() setPaused(false)");
+	errcheck("Sound::play() setPaused(false)");
 }
 
-void Music::stop() {
+void Sound::stop() {
 	channel_->setPaused(true);
 }
 
-double Music::time() const {
+double Sound::time() const {
 	unsigned int pos;
 	result_ = channel_->getPosition(&pos, FMOD_TIMEUNIT_MS);
-	errcheck("Music::time()");
+	errcheck("Sound::time()");
 	return pos / 1000.0;
 }
 
-void Music::seek(double t) {
+void Sound::seek(double t) {
 		result_ = channel_->setPosition(t*1000.0, FMOD_TIMEUNIT_MS);
-		errcheck("Music::seek()");
+		errcheck("Sound::seek()");
 }

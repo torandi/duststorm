@@ -17,6 +17,8 @@
 #include "object_template.hpp"
 #include "enemy.hpp"
 
+#include "sound.hpp"
+
 #include <map>
 #include <string>
 
@@ -45,6 +47,8 @@ class Game {
 
 		ObjectTemplate * create_object(const std::string &name, const YAML::Node &node, Area * a = nullptr);
 		Enemy * create_enemy(const YAML::Node &node, const glm::vec2 &pos, Area * a = nullptr);
+
+		void play_sfx(const std::string &str) const;
 	private:
 
 		Input input;
@@ -72,6 +76,7 @@ class Game {
 
 		Area * current_area;
 		std::map<std::string, Area*> areas;
+		std::map<std::string, Sound*> sfx;
 
 		//Shader * dof_shader;
 	

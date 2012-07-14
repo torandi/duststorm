@@ -38,6 +38,10 @@ class Area {
 		void move_light(int id, const glm::vec2 &new_pos);
 
 		const glm::vec2 &get_entry_point(const std::string &name);
+
+		void attack(int id); //Player attacs
+
+		void spawn_splatter(const glm::vec2 &pos);
 	private:
 		Game &game;
 		std::string name_;	

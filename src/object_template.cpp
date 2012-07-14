@@ -5,6 +5,12 @@
 #define PICKUP_RANGE 5.f
 
 void ObjectTemplate::update(float dt) {
+	if(ttl > 0.f) {
+		ttl -= dt;
+		if(ttl < 0.f) {
+			destroyed = true;
+		}
+	}
 	obj->update(dt);
 }
 
@@ -46,6 +52,12 @@ bool Door::hit() {
 ObjectTemplate * Decoration::create(const YAML::Node &node, Game &game) {
 	Decoration * d = new Decoration();
 	d->obj = new Object2D(node, game);
+	return d;
+}
+
+ObjectTemplate * Decoration::create(const std::string &vfx, Game &game) {
+	Decoration * d = new Decoration();
+	d->obj = new Object2D(vfx, game);
 	return d;
 }
 

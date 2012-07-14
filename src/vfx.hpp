@@ -22,11 +22,10 @@ class VFX {
 		virtual void * update(float dt, void * state) = 0;
 
 		virtual void * create_state() = 0;
+		virtual void free_state(void * state) = 0;
 
 		static VFX * get_vfx(const std::string &name);
 		static std::map<std::string, VFX*> loaded_vfx;
-		//TODO: Animations etc
-		
 };
 
 class ModelVFX : public VFX {
@@ -36,6 +35,7 @@ class ModelVFX : public VFX {
 		virtual void render(const glm::mat4 &matrix, const void * state) const;
 		virtual void * update(float dt, void * state);
 		virtual void * create_state();
+		virtual void free_state(void * state);
 
 	private:
 		RenderObject *  render_object_;
@@ -48,6 +48,7 @@ class ParticlesVFX : public VFX {
 		virtual void render(const glm::mat4 &matrix, const void * state) const;
 		virtual void * update(float dt, void * state);
 		virtual void * create_state();
+		virtual void free_state(void * state);
 
 		void set_spawn_rate(void * state, float spawn_rate, float spawn_rate_var) const;
 	private:

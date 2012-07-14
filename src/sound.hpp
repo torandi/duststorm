@@ -1,5 +1,5 @@
-#ifndef MUSIC_HPP
-#define MUSIC_HPP
+#ifndef SOUND_HPP
+#define SOUND_HPP
 
 #include "data.hpp"
 
@@ -8,14 +8,14 @@
 /**
  * A music player
  */
-class Music {
+class Sound {
 	public:
 		/*
 		 * Create a music player for the selected file.
 		 * Optional: Specify buffer size in bytes
 		 */
-		Music(const char * file);
-		~Music();
+		Sound(const char * file);
+		~Sound();
 
 		bool is_playing() const;
 		/**

@@ -52,6 +52,10 @@ void ModelVFX::render(const glm::mat4 &matrix, const void * state) const {
 	Shader::unbind();
 }
 
+void ModelVFX::free_state(void * state) {
+	//nope
+}
+
 void * ModelVFX::update(float dt, void * state) { return state; }
 
 void * ModelVFX::create_state() {
@@ -94,6 +98,11 @@ ParticlesVFX::ParticlesVFX(const YAML::Node &node) {
 	textures = TextureArray::from_filename(texture_names);
 
 
+}
+
+void ParticlesVFX::free_state(void * state) {
+	ParticleSystem* system = (ParticleSystem*) state;
+	delete system;
 }
 
 void ParticlesVFX::render(const glm::mat4 &matrix, const void * state) const {

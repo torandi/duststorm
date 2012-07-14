@@ -14,6 +14,7 @@
 #include "render_object.hpp"
 #include "utils.hpp"
 #include "input.hpp"
+#include "sound.hpp"
 
 #include <dirent.h>
 
@@ -47,6 +48,17 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), curr
 	Data * src = Data::open(PATH_BASE "/game/game.yaml");
 	YAML::Node config = YAML::Load((char*)(src->data()));
 
+	Data * src_sfx = Data::open(PATH_BASE "/game/sfx.yaml");
+	YAML::Node sfx_config = YAML::Load((char*)(src_sfx->data()));
+
+	for(auto it = sfx_config.begin(); it != sfx_config.end(); ++it) {
+		std::string name = it->first.as<std::string>();
+		std::string file = it->second.as<std::string>();
+		sfx[name] = new Sound(file.c_str());
+		printf("Added sfx %s: %s\n", name.c_str(), file.c_str());
+	}
+
+	delete src_sfx;
 	player = new Player(config["player"], *this);
 	camera_offset = config["camera_offset"].as<glm::vec3>(glm::vec3(3.f));
 
@@ -72,6 +84,16 @@ Game::~Game() {
 	}
 
 	delete dof_shader;*/
+}
+
+void Game::play_sfx(const std::string &str) const {
+	auto it = sfx.find(str);
+	if(it == sfx.end()) {
+		printf("Missing sfx %s\n", str.c_str());
+		abort();
+	}
+	it->second->play();
+
 }
 
 Area * Game::area() const { return current_area; }
@@ -273,7 +295,6 @@ void Game::render_statics() {
 }
 
 void Game::render_dynamics() {
-	player->render();
 }
 
 void Game::render_display() {

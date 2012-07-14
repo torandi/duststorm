@@ -26,7 +26,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/mesh.cpp src/mesh.hpp \
 								src/movable_light.cpp src/movable_light.hpp \
 								src/movable_object.cpp src/movable_object.hpp \
-								src/music.cpp src/music.hpp \
+								src/sound.cpp src/sound.hpp \
 								src/object2d.cpp src/object2d.hpp \
 								src/object_template.cpp src/object_template.hpp \
 								src/particle_system.cpp src/particle_system.hpp \

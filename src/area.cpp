@@ -338,12 +338,22 @@ void Area::upload_lights() {
 }
 
 void Area::update(float dt) {
-	objects.remove_if([](const ObjectTemplate * o) {
-		return o->destroyed;
+	objects.remove_if([](ObjectTemplate * o) {
+		if(o->destroyed) {
+			delete o;
+			return true;
+		} else {
+			return false;
+		}
 	});
 
 	enemies.remove_if([](const Enemy * e) {
-		return e->dead;
+		if(e->dead) {
+			delete e;
+			return true;
+		} else {
+			return false;
+		}
 	});
 
 	for(auto it : objects) {
@@ -397,6 +407,44 @@ bool Area::click_at(const glm::vec2 &pos, int btn) {
 	return false;
 }
 
+void Area::attack(int id) {
+	for(auto it : objects) {
+		if(it->obj->hit(game.player->center(), game.player->weapon_radius[id])) {
+			it->hit();
+		}
+	}
+
+	int count = 0;
+	for(auto it : enemies) {
+		if(it->hit(game.player->center(), game.player->weapon_radius[id])) {
+			it->life -= game.player->weapon_damage[id];
+			if(it->life <= 0) {
+				it->dead = true;
+				spawn_splatter(it->center());
+				++count;
+				game.play_sfx("splatt");
+			}
+		}
+	}
+	if(count >= 3) {
+		game.play_sfx("multikill");
+	} else if(count >= 2) {
+		//Double kill
+		game.play_sfx("double_kill");
+	}
+}
+
+
+void Area::spawn_splatter(const glm::vec2 &pos) {
+	ObjectTemplate * ot = Decoration::create("splatt", game);
+	ot->obj->height = 1.f;
+	ot->obj->move_to(pos);
+	ot->ttl = 4.0;
+	ot->obj->update(0.1f);
+	ParticlesVFX * pv = (ParticlesVFX*) ot->obj;
+	pv->set_spawn_rate(ot->obj->vfx_state, 0.f, 0.f);
+	objects.push_back(ot);
+}
 
 void Area::render(const glm::vec2 &marker_position) {
 	RenderTarget::clear(skycolor);
@@ -410,14 +458,7 @@ void Area::render(const glm::vec2 &marker_position) {
 	wall->render();
 	wall_material.deactivate();
 
-	for(auto it : objects) {
-		shaders[SHADER_NORMAL]->bind();
-		if(it->highlighted) 
-			glUniform3f(u_highlight, 0.f, 0.f, 0.8f);
-		else
-			glUniform3f(u_highlight, 0.f, 0.f, 0.f);
-		it->render();
-	}
+	game.player->render();
 
 	for(auto it : enemies) {
 		shaders[SHADER_NORMAL]->bind();
@@ -427,6 +468,16 @@ void Area::render(const glm::vec2 &marker_position) {
 			glUniform3f(u_highlight, 0.f, 0.f, 0.f);
 		it->render();
 	}
+
+	for(auto it : objects) {
+		shaders[SHADER_NORMAL]->bind();
+		if(it->highlighted) 
+			glUniform3f(u_highlight, 0.f, 0.f, 0.8f);
+		else
+			glUniform3f(u_highlight, 0.f, 0.f, 0.f);
+		it->render();
+	}
+
 }
 
 float Area::height_at(const glm::vec2 &pos) const {

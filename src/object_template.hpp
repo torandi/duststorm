@@ -9,7 +9,7 @@ class Game;
 
 class ObjectTemplate {
 	public:
-		ObjectTemplate() : destroyed(false), highlighted(false) {};
+		ObjectTemplate() : destroyed(false), highlighted(false), ttl(-1.f) {};
 		virtual ~ObjectTemplate();
 		Object2D * obj;
 		bool destroyed;
@@ -20,12 +20,15 @@ class ObjectTemplate {
 
 		virtual void update(float dt);
 		virtual void render() const;
+
+		float ttl;
 };
 
 class Decoration : public ObjectTemplate {
 	public:
 		virtual ~Decoration() {};
 		static ObjectTemplate * create(const YAML::Node &node, Game &game);
+		static ObjectTemplate * create(const std::string &vfx, Game &game);
 
 		virtual bool click() { return false; }
 		virtual bool collision() { return false; }
