@@ -297,13 +297,15 @@ Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 		}
 	}
 
-
-	wall = new Mesh(vertices, indices);
-	wall->generate_normals();
-	wall->generate_tangents_and_bitangents();
-	wall->ortonormalize_tangent_space();
-	wall->generate_vbos();
-
+	if(indices.size() > 0) {
+		wall = new Mesh(vertices, indices);
+		wall->generate_normals();
+		wall->generate_tangents_and_bitangents();
+		wall->ortonormalize_tangent_space();
+		wall->generate_vbos();
+	} else {
+		wall = nullptr;
+	}
 	//Spawn enemies:
 	const YAML::Node &e_node = config["enemies"];
 	for(auto e : e_node) {
@@ -418,7 +420,7 @@ void Area::attack(int id) {
 
 	int count = 0;
 	for(auto it : enemies) {
-		if(it->hit(game.player->center(), game.player->weapon_radius[id])) {
+		if(it->hit(game.player->center(), game.player->radius + game.player->weapon_radius[id])) {
 			it->life -= game.player->weapon_damage[id];
 			if(it->life <= 0) {
 				it->dead = true;
@@ -461,10 +463,12 @@ void Area::render(const glm::vec2 &marker_position) {
 	glUniform2f(u_marker, 1.f - (marker_position.x/terrain->size().x), 1.f - (marker_position.y/terrain->size().y));
 	terrain->render();
 
-	shaders[SHADER_NORMAL]->bind();
-	wall_material.activate();
-	wall->render();
-	wall_material.deactivate();
+	if(wall != nullptr) {
+		shaders[SHADER_NORMAL]->bind();
+		wall_material.activate();
+		wall->render();
+		wall_material.deactivate();
+	}
 
 	game.player->render();
 
@@ -497,7 +501,6 @@ float Area::height_at(const glm::vec2 &pos) const {
 bool Area::collision_at(const glm::vec2 &pos, Object2D * o) const {
 	if(!terrain->get_collision_at(pos.x, pos.y)) {
 		if(o->global_id == game.player->global_id) {
-			printf("PX\n");
 			for(auto it : objects) {
 				if(it->obj->hit(pos, game.player->radius)) {
 					if(it->collision())

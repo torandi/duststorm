@@ -140,6 +140,7 @@ void Game::update(float dt) {
 			};
 			return false;
 	});
+
 	for(Sound *s : active_sfx) {
 		s->update(dt);
 	}
@@ -158,6 +159,7 @@ void Game::update(float dt) {
 	}
 #else
 	//Move camera:
+	
 	look_at_player();
 #endif
 }
@@ -211,6 +213,9 @@ ObjectTemplate * Game::spawn_pickup(const std::string &name, const glm::vec2 &po
 void Game::look_at_player() {
 	camera.look_at(player->position());
 	camera.set_position(player->position() + camera_offset);
+	float height = current_area->height_at(glm::vec2(camera.position().x, camera.position().z));
+	if(camera.position().y - height < 1.f)
+		camera.absolute_move(glm::vec3(0, (height + 1.f) - camera.position().y, 0.f));
 }
 
 //Move player towards mouse position

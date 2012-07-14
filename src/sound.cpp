@@ -55,8 +55,9 @@ Sound::Sound(const char * file, int loops) : delay(-0.1f) {
 	result_ = system_->createSound((const char*) source->data(), FMOD_OPENMEMORY, &info, &sound_);
 	errcheck("create sound");
 	result_ = system_->playSound(FMOD_CHANNEL_FREE, sound_, true /* paused */, &channel_);
-	channel_->setLoopCount(loops);
 	errcheck("start sound (paused)");
+	result_ = channel_->setLoopCount(loops);
+	errcheck("set loops");
 
 	sound_usage_count_ = new int;
 	++(*sound_usage_count_);
