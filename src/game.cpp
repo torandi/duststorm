@@ -86,14 +86,15 @@ Game::~Game() {
 	delete dof_shader;*/
 }
 
-void Game::play_sfx(const std::string &str) const {
+void Game::play_sfx(const std::string &str, int loops) {
 	auto it = sfx.find(str);
 	if(it == sfx.end()) {
 		printf("Missing sfx %s\n", str.c_str());
 		abort();
 	}
-	it->second->play();
-
+	Sound * s = new Sound(*(it->second), loops);
+	s->play();
+	active_sfx.push_back(s);
 }
 
 Area * Game::area() const { return current_area; }
@@ -110,12 +111,24 @@ Area * Game::get_area(const std::string &str) const {
 void Game::change_area(const std::string &area, const std::string &entry_point) {
 	current_area = get_area(area);
 	glm::vec2 pos = current_area->get_entry_point(entry_point);
-	printf("ENTRY POINT %f, %f\n", pos.x, pos.y);
 	player->move_to(pos);
 	look_at_player();
 }
 
 void Game::update(float dt) {
+	Sound::update_system();
+
+	active_sfx.remove_if([](const Sound * s) {
+			if(s->is_done()) {
+				delete s;
+				return true;
+			};
+			return false;
+	});
+	for(Sound *s : active_sfx) {
+		s->update(dt);
+	}
+
 	player->update(dt);
 	current_area->update(dt);
 

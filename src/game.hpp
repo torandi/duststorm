@@ -48,8 +48,9 @@ class Game {
 		ObjectTemplate * create_object(const std::string &name, const YAML::Node &node, Area * a = nullptr);
 		Enemy * create_enemy(const YAML::Node &node, const glm::vec2 &pos, Area * a = nullptr);
 
-		void play_sfx(const std::string &str) const;
+		void play_sfx(const std::string &str, int loops = 0);
 	private:
+
 
 		Input input;
 		void render_composition();
@@ -77,6 +78,7 @@ class Game {
 		Area * current_area;
 		std::map<std::string, Area*> areas;
 		std::map<std::string, Sound*> sfx;
+		std::list<Sound*> active_sfx;
 
 		//Shader * dof_shader;
 	

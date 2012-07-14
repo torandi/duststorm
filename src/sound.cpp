@@ -7,7 +7,7 @@
 
 #include <fmodex/fmod_errors.h>
 
-#define MAX_CHANNELS 10
+#define MAX_CHANNELS 100
 
 FMOD::System * Sound::system_ = nullptr;
 unsigned int Sound::system_usage_ = 0;
@@ -32,7 +32,7 @@ void Sound::terminate_fmod() {
 	errcheck("terminate fmod");
 }
 
-Sound::Sound(const char * file) {
+Sound::Sound(const char * file, int loops) : delay(-0.1f) {
 	if(system_usage_ == 0) initialize_fmod();
 	++system_usage_;
 
@@ -52,30 +52,76 @@ Sound::Sound(const char * file) {
 	info.cbsize = sizeof(info);
 	info.length = source->size();
 
-	//result_ = system_->createSound((const char*) source->data(), FMOD_DEFAULT | FMOD_OPENMEMORY | FMOD_2D, &info, &sound_);
 	result_ = system_->createSound((const char*) source->data(), FMOD_OPENMEMORY, &info, &sound_);
 	errcheck("create sound");
 	result_ = system_->playSound(FMOD_CHANNEL_FREE, sound_, true /* paused */, &channel_);
+	channel_->setLoopCount(loops);
 	errcheck("start sound (paused)");
+
+	sound_usage_count_ = new int;
+	++(*sound_usage_count_);
+}
+
+Sound::Sound(const Sound &sound, int loops) : 
+		delay(-0.1f)
+	,	source(sound.source)
+	, sound_(sound.sound_)
+	, sound_usage_count_(sound.sound_usage_count_)
+{
+		++system_usage_;
+
+		++(*sound_usage_count_);
+
+		channel_ = nullptr;
+		result_ = system_->playSound(FMOD_CHANNEL_FREE, sound_, true /* paused */, &channel_);
+		errcheck("start sound (paused)");
+		result_ = channel_->setLoopCount(loops);
+		errcheck("set loop count");
 }
 
 Sound::~Sound() {
-	result_ = sound_->release();
 	errcheck("sound::release()");
 
-	delete source;
+	--(*sound_usage_count_);
+	if(*sound_usage_count_ <= 0) {
+		delete sound_usage_count_;
+		delete source;
+		result_ = sound_->release();
+	}
 
 	--system_usage_;
 	if(system_usage_ == 0) terminate_fmod();
 }
 
+void Sound::set_delay(float t) {
+	delay = t;
+}
+
+void Sound::update_system() {
+	system_->update();
+}
+
+void Sound::update(float dt) {
+	if(delay > 0.f) {
+		delay -= dt;
+		if(delay <= 0.f)
+			play();
+	}
+}
+
+bool Sound::is_done() const {
+	if(delay > 0.f)
+		return false;
+	return !is_playing();
+}
+
 bool Sound::is_playing() const {
 	bool is_playing, is_paused = false;
 	result_ = channel_->isPlaying(&is_playing);
-	errcheck("Get channel::isPlaying()");
+	if(result_ != FMOD_OK) return false;
 	if(is_playing) {
 		result_ = channel_->getPaused(&is_paused);
-		errcheck("Get channel::getPaused()");
+		if(result_ != FMOD_OK) return false;
 	}
 	return is_playing && !is_paused;
 }
