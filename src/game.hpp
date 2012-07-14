@@ -15,6 +15,7 @@
 #include "input.hpp"
 
 #include "object_template.hpp"
+#include "enemy.hpp"
 
 #include <map>
 #include <string>
@@ -39,9 +40,11 @@ class Game {
 		Player * player;
 
 		static std::map<std::string, object_template_create*> object_templates;
+		static std::map<std::string, enemy_create*> enemy_creators;
 		static void init();
 
 		ObjectTemplate * create_object(const std::string &name, const YAML::Node &node, Area * a = nullptr);
+		Enemy * create_enemy(const YAML::Node &node, const glm::vec2 &pos, Area * a = nullptr);
 	private:
 
 		Input input;

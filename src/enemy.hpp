@@ -17,6 +17,7 @@ class Enemy : public Object2D {
 		float life_regen;
 		bool dead;
 		std::string name;
+		bool highlighted;
 };
 
 typedef Enemy* (enemy_create) (const YAML::Node &node, Game &game);

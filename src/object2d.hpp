@@ -15,6 +15,7 @@ class Object2D : public MovableObject {
 		glm::vec2 current_position;
 		float speed, radius;
 		bool hit_detection; //true to enable
+		float current_rotation;
 		float height;
 
 		virtual bool hit(const Object2D * other) const;

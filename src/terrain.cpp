@@ -76,6 +76,9 @@ void Terrain::generate_terrain() {
 			vertices_[i] = v;
 			map_[i] =  h*vertical_scale_;
 			wall_[i] = color.g;
+			if(color.b > 0.9f) {
+				spawnmap.push_back(glm::ivec2(x, y));
+			}
 		}
 	}
 	unsigned long indexCount = (hm_size.y - 1 ) * (hm_size.x -1) * 6;

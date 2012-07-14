@@ -14,9 +14,17 @@ class Player : public Object2D {
 		
 		std::map<std::string, int> attributes;
 
+		virtual void update(float dt);
+		virtual void render();
+		void swing();
+
+		glm::vec3 center3() const;
+
 		float weapon_radius[4];
 		float weapon_damage[4];
 		float click_radius;
+		float swing_state;
+		RenderObject chainsaw;
 };
 
 #endif

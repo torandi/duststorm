@@ -1,6 +1,10 @@
 #include "player.hpp"
+#include "globals.hpp"
 
-Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_) {
+Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
+	, swing_state(-1.f)
+	,	chainsaw("chainsaw.obj")
+	{
 	light_color = node["light"].as<glm::vec3>(glm::vec3(0.8f));
 	light_offset = node["light_offset"].as<glm::vec3>(glm::vec3(1.0)) + glm::vec3(center_offset.x, 0.f, center_offset.y);
 
@@ -16,6 +20,11 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_) {
 
 	click_radius = node["click_radius"].as<float>();
 	hit_detection = true;
+
+	//Lets do teh ugly hack:
+	for(auto &m : chainsaw.materials) {
+		m.two_sided = true;
+	}
 }
 
 int &Player::attr(const std::string attr) {
@@ -27,4 +36,41 @@ int &Player::attr(const std::string attr) {
 		return it->second;
 	}
 
+}
+
+void Player::swing() {
+	if(swing_state < 0.f) {
+		//Play sound
+		swing_state = 1.f;
+	}
+}
+
+glm::vec3 Player::center3() const {
+	return glm::vec3(center().x, position().y, center().y);
+}
+
+
+void Player::update(float dt) {
+	if(swing_state >= 0.f) {
+		swing_state += dt*2.f;
+		if(swing_state > 2.f)
+			swing_state = -1.f;
+
+		chainsaw.set_rotation(glm::vec3(0, 1.f, 0), current_rotation-90.f);
+		chainsaw.absolute_rotate(chainsaw.local_z(), M_PI_2);
+		chainsaw.set_position(center3()+glm::vec3(0,1.0f, 0.0f) + local_z()*0.2f); 
+		chainsaw.absolute_rotate(glm::vec3(0.0, 1.f, 0.f), M_PI_2);
+		chainsaw.absolute_rotate(glm::vec3(0.0, 1.f, 0.f), -(swing_state-1.f)*M_PI);
+	} else {
+		chainsaw.set_rotation(glm::vec3(0, 1.f, 0), current_rotation-90.f);
+		chainsaw.relative_rotate(glm::vec3(1.0, 0.f, 0.f), M_PI_2);
+		chainsaw.set_position(position()+glm::vec3(0,1.f, 0) + local_x()*0.25f);
+	}
+	Object2D::update(dt);
+}
+
+void Player::render() {
+	shaders[SHADER_NORMAL]->bind();
+	chainsaw.render();
+	Object2D::render();
 }

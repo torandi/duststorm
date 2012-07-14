@@ -33,7 +33,7 @@ void main() {
 
 	vec4 originalColor;
 	originalColor = texture(texture0, texcoord);
-	//originalColor*=Mtl.diffuse;
+	originalColor*=Mtl.diffuse;
 
 	//Normal map
 	vec3 normal_map = normalize(texture(texture1, texcoord).xyz * 2.0 - 1.0);
@@ -59,7 +59,7 @@ void main() {
             true, true);
    }
 
-	 accumLighting += originalColor * vec4(highlight,1.0);
+	 accumLighting += originalColor * vec4(highlight,0.0);
 
    ocolor= clamp(accumLighting,0.0, 1.0);
 

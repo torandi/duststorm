@@ -9,6 +9,7 @@
 #include "yaml-helper.hpp"
 #include "material.hpp"
 #include "object_template.hpp"
+#include "enemy.hpp"
 
 #include <glm/glm.hpp>
 #include <string>
@@ -62,6 +63,7 @@ class Area {
 		std::map<std::string, glm::vec2> entry_points;
 
 		std::list<ObjectTemplate*> objects;
+		std::list<Enemy*> enemies;
 
 		//TODO: More properties
 		// * links to other locations

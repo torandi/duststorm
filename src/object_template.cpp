@@ -71,7 +71,8 @@ ObjectTemplate * Pickup::create(const std::string &vfx, const std::string &attr,
 bool Pickup::click() {
 	printf("Click\n");
 	if( glm::length(obj->current_position - obj->game.player->current_position) < PICKUP_RANGE) {
-		return collision();
+		collision();
+		return true;
 	} else {
 		return false;
 	}
@@ -82,5 +83,5 @@ bool Pickup::collision() {
 	obj->game.player->attr(attr) += effect;
 	//Play sound
 	destroyed = true;
-	return true;
+	return false;
 }

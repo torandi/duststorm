@@ -1,10 +1,11 @@
 #include "enemy.hpp"
 #include "game.hpp"
 
-Enemy::Enemy(const YAML::Node &node, Game &game) : Object2D(node, game), dead(false) {
+Enemy::Enemy(const YAML::Node &node, Game &game) : Object2D(node, game), dead(false), highlighted(false) {
 	max_life = life = node["life"].as<float>();
 	life_regen = node["life_regen"].as<float>(0.f);
 	name = node["name"].as<std::string>();
+	hit_detection = true;
 }
 
 void Enemy::update(float dt) {

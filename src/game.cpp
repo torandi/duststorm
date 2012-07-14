@@ -18,6 +18,7 @@
 #include <dirent.h>
 
 std::map<std::string, object_template_create*> Game::object_templates;
+std::map<std::string, enemy_create*> Game::enemy_creators;
 
 #define DEBUG_MOVE 0
 
@@ -25,6 +26,8 @@ void Game::init() {
 	object_templates["door"] = &Door::create;
 	object_templates["decoration"] = &Decoration::create;
 	object_templates["pickup"] = &Pickup::create;
+
+	enemy_creators["basic"] = &BasicAI::create;
 }
 
 Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), current_area(nullptr) {
@@ -125,6 +128,23 @@ ObjectTemplate * Game::create_object(const std::string &name, const YAML::Node &
 	return ot;
 }
 
+Enemy * Game::create_enemy(const YAML::Node &node, const glm::vec2 &pos, Area * a) { 
+	std::string name = node["type"].as<std::string>();
+	auto it = enemy_creators.find(name);
+	if(it == enemy_creators.end()) {
+		printf("Unknown enemy type %s\n", name.c_str());
+		abort();
+	}
+	Enemy * e = (it->second) (node, *this);
+	Area * tmp = current_area;
+	if(a != nullptr)
+		current_area = a; //Oh the hack :)
+	e->move_to(pos);
+
+	current_area = tmp;
+	return e;
+}
+
 void Game::look_at_player() {
 	camera.look_at(player->position());
 	camera.set_position(player->position() + camera_offset);
@@ -186,8 +206,15 @@ void Game::handle_input(const SDL_Event &event) {
 		case SDL_MOUSEBUTTONDOWN:
 			update_mouse_position(event.button.x, event.button.y);
 			if(event.button.button == SDL_BUTTON_LEFT) {
-				if(!current_area->click_at(mouse_position, 1)) {
-					sustained_action[MOUSE_1] = true;
+				if(SDL_GetModState() & KMOD_SHIFT) {
+					player->face(mouse_position);
+					player->swing();
+					player->target = player->center();
+					player->move_to(player->center());
+				} else {
+					if(!current_area->click_at(mouse_position, 1)) {
+						sustained_action[MOUSE_1] = true;
+					}
 				}
 			} else if(event.button.button == SDL_BUTTON_RIGHT) {
 				if(!current_area->click_at(mouse_position, 2)) {

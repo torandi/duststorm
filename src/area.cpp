@@ -301,7 +301,16 @@ Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 	wall->generate_tangents_and_bitangents();
 	wall->ortonormalize_tangent_space();
 	wall->generate_vbos();
-	
+
+	//Spawn enemies:
+	const YAML::Node &e_node = config["enemies"];
+	for(auto e : e_node) {
+		for(int i=0;i<e["count"].as<int>(1); ++i) {
+			glm::ivec2 pos = terrain->spawnmap[rand()%terrain->spawnmap.size()];
+			enemies.push_back(game.create_enemy(e, glm::vec2(pos.x*hscale, pos.y*hscale), this));
+			printf("Spawn %s at %d %d\n", e["name"].as<std::string>().c_str(), pos.x, pos.y);
+		}
+	}
 }
 
 Area::~Area() {
@@ -333,8 +342,16 @@ void Area::update(float dt) {
 		return o->destroyed;
 	});
 
+	enemies.remove_if([](const Enemy * e) {
+		return e->dead;
+	});
+
 	for(auto it : objects) {
-			it->update(dt);
+		it->update(dt);
+	}
+
+	for(auto it : enemies) {
+		it->update(dt);
 	}
 }
 
@@ -342,6 +359,15 @@ bool Area::mouse_at(const glm::vec2 &pos) {
 	bool on = false;
 	for(auto it : objects) {
 		if(it->obj->hit(pos, game.player->click_radius, true)) {
+			it->highlighted = true;
+			on = true;
+		} else {
+			it->highlighted = false;
+		}
+	}
+
+	for(auto it : enemies) {
+		if(it->hit(pos, game.player->click_radius, true)) {
 			it->highlighted = true;
 			on = true;
 		} else {
@@ -356,9 +382,14 @@ bool Area::click_at(const glm::vec2 &pos, int btn) {
 		bool click = false;
 		for(auto it : objects) {
 			if(it->obj->hit(pos, game.player->click_radius, true)) {
-				printf("HIT\n");
 				it->click();
 				click = true;
+			}
+		}
+		for(auto it : enemies) {
+			if(it->hit(pos, game.player->click_radius, true)) {
+				game.player->swing();
+				return true;
 			}
 		}
 		return click;
@@ -380,6 +411,20 @@ void Area::render(const glm::vec2 &marker_position) {
 	wall_material.deactivate();
 
 	for(auto it : objects) {
+		shaders[SHADER_NORMAL]->bind();
+		if(it->highlighted) 
+			glUniform3f(u_highlight, 0.f, 0.f, 0.8f);
+		else
+			glUniform3f(u_highlight, 0.f, 0.f, 0.f);
+		it->render();
+	}
+
+	for(auto it : enemies) {
+		shaders[SHADER_NORMAL]->bind();
+		if(it->highlighted) {
+			glUniform3f(u_highlight, 0.f, 0.f, 0.8f);
+		} else
+			glUniform3f(u_highlight, 0.f, 0.f, 0.f);
 		it->render();
 	}
 }
