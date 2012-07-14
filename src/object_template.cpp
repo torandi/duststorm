@@ -2,7 +2,7 @@
 #include "game.hpp"
 
 #define DOOR_RANGE 6.f
-#define PICKUP_RANGE 5.f
+#define PICKUP_RANGE 2.f
 
 void ObjectTemplate::update(float dt) {
 	if(ttl > 0.f) {
@@ -49,6 +49,10 @@ bool Door::hit() {
 	return false;
 }
 
+void Pickup::update(float dt) {
+	obj->absolute_rotate(glm::vec3(0, 1.f, 0), dt);
+}
+
 ObjectTemplate * Decoration::create(const YAML::Node &node, Game &game) {
 	Decoration * d = new Decoration();
 	d->obj = new Object2D(node, game);
@@ -69,10 +73,9 @@ ObjectTemplate * Pickup::create(const YAML::Node &node, Game &game) {
 	return pickup;
 }
 
-ObjectTemplate * Pickup::create(const std::string &vfx, const std::string &attr, int effect,float radius, float height, Game &game) {
+ObjectTemplate * Pickup::create(const std::string &vfx, const std::string &attr, int effect,float radius, Game &game) {
 	Pickup * pickup = new Pickup();
 	pickup->obj = new Object2D(vfx, game);
-	pickup->obj->height = height;
 	pickup->obj->hit_detection = true;
 	pickup->obj->radius = radius;
 	pickup->attr = attr;
@@ -92,7 +95,7 @@ bool Pickup::click() {
 
 bool Pickup::collision() {
 	printf("Add attribute %s +%d\n", attr.c_str(), effect);
-	obj->game.player->attr(attr) += effect;
+	obj->game.player->change_attr(attr,effect);
 	//Play sound
 	destroyed = true;
 	return false;

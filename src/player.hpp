@@ -10,9 +10,11 @@ class Player : public Object2D {
 		glm::vec3 light_color;
 		glm::vec3 light_offset;
 
-		int &attr(const std::string attr);
-		
-		std::map<std::string, int> attributes;
+		int attr(const std::string &attr);
+		void change_attr(const std::string &attr, int val);
+	
+		void damage(float dmg);
+
 
 		virtual void update(float dt);
 		virtual void render();
@@ -25,6 +27,12 @@ class Player : public Object2D {
 		float click_radius;
 		float swing_state;
 		RenderObject chainsaw;
+
+		float score;
+		bool dead;
+	private:
+		std::map<std::string, int> attributes;
+		std::map<std::string, int> attributes_max;
 };
 
 #endif

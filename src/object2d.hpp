@@ -35,6 +35,9 @@ class Object2D : public MovableObject {
 		virtual void face(const glm::vec2 &pos);
 		virtual void face(const Object2D * obj);
 
+		virtual float distance(const glm::vec2 &pos) const;
+		virtual float distance(const Object2D * obj) const;
+
 		glm::vec2 center() const;
 		Game &game;
 		VFX * vfx;

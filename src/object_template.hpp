@@ -39,7 +39,7 @@ class Pickup : public ObjectTemplate {
 	public:
 		virtual ~Pickup() {};
 		static ObjectTemplate * create(const YAML::Node &node, Game &game);
-		static ObjectTemplate * create(const std::string &vfx, const std::string &attr, int effect, float radius, float height, Game &game);
+		static ObjectTemplate * create(const std::string &vfx, const std::string &attr, int effect, float radius, Game &game);
 
 		std::string attr;
 		int effect;
@@ -47,6 +47,7 @@ class Pickup : public ObjectTemplate {
 		virtual bool click();
 		virtual bool collision();
 		virtual bool hit() { return false; }
+		virtual void update(float dt);
 };
 
 class Door : public ObjectTemplate {

@@ -49,8 +49,17 @@ class Game {
 		Enemy * create_enemy(const YAML::Node &node, const glm::vec2 &pos, Area * a = nullptr);
 
 		void play_sfx(const std::string &str, float delay= -1.f, int loops = 0);
+
+		ObjectTemplate * spawn_pickup(const std::string &name, const glm::vec2 &pos);
+
 	private:
 
+		struct pickup_t {
+			std::string vfx;
+			float radius;
+			int effect;
+			std::string attribute;
+		};
 
 		Input input;
 		void render_composition();
@@ -78,6 +87,7 @@ class Game {
 		Area * current_area;
 		std::map<std::string, Area*> areas;
 		std::map<std::string, std::string> sfx;
+		std::map<std::string, pickup_t> pickups;
 		std::list<Sound*> active_sfx;
 
 		//Shader * dof_shader;

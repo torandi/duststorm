@@ -90,13 +90,19 @@ bool Object2D::hit(const Object2D * other) const {
 		return hit(other->center(), other->radius, false);
 }
 
+float Object2D::distance(const glm::vec2 &pos) const {
+	return glm::length(center() - pos);
+}
+
+float Object2D::distance(const Object2D * obj) const {
+	return distance(obj->center());
+}
+
 bool Object2D::hit(const glm::vec2 &pos, float r, bool ignore_flag) const {
 	if(!ignore_flag && !hit_detection)
 		return false;
 	else {
-		glm::vec2 dv = (center() - pos);
-		float dist = glm::length(dv);
-		if(dist <  (r + radius)) {
+		if(distance(pos) <  (r + radius)) {
 			return true;
 		}	else {
 			return false;

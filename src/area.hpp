@@ -42,6 +42,8 @@ class Area {
 		void attack(int id); //Player attacs
 
 		void spawn_splatter(const glm::vec2 &pos);
+
+		void spawn_pickups(const std::string &name, const glm::vec2 &center, int count=1);
 	private:
 		Game &game;
 		std::string name_;	

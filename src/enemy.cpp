@@ -5,6 +5,18 @@ Enemy::Enemy(const YAML::Node &node, Game &game) : Object2D(node, game), dead(fa
 	max_life = life = node["life"].as<float>();
 	life_regen = node["life_regen"].as<float>(0.f);
 	name = node["name"].as<std::string>();
+	attack_sfx = node["attack_sfx"].as<std::string>();
+	attack_radius = node["attack_radius"].as<float>();
+	trigger_radius = node["trigger_radius"].as<float>();
+	damage = node["damage"].as<float>();
+
+	for(auto it = node["drops"].begin(); it != node["drops"].end(); ++it) {
+		drop_t d;
+		d.name = it->first.as<std::string>();
+		d.rate = it->second.as<glm::ivec2>();
+		drops.push_back(d);
+	}
+
 	hit_detection = true;
 }
 

@@ -4,6 +4,8 @@
 
 #include "game.hpp"
 
+#define ITEM_SPAWN_AREA 2.f
+
 static const float marker_size = 0.5f;
 
 Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
@@ -422,10 +424,16 @@ void Area::attack(int id) {
 				it->dead = true;
 				spawn_splatter(it->center());
 				++count;
-				game.play_sfx("splatt");
+				for(Enemy::drop_t &d : it->drops) {
+					 spawn_pickups( d.name, it->center(), d.rate.x + (rand() % (d.rate.y+1)));
+				}
 			}
 		}
 	}
+	if(count > 0) {
+		game.play_sfx("splatt");
+	}
+
 	if(count >= 3) {
 		game.play_sfx("multikill", 0.5f);
 	} else if(count >= 2) {
@@ -497,5 +505,12 @@ bool Area::collision_at(const glm::vec2 &pos) const {
 		return false;
 	} else {
 		return true;
+	}
+}
+
+void Area::spawn_pickups(const std::string &name, const glm::vec2 &center, int count) {
+	for(int c = 0; c < count; ++c) {
+		glm::vec2 pos = center + glm::vec2( ((2.f*frand())-1.f)*ITEM_SPAWN_AREA,  ((2.f*frand())-1.f)*ITEM_SPAWN_AREA );
+		objects.push_back(game.spawn_pickup(name, pos));
 	}
 }

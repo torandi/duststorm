@@ -58,6 +58,17 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), curr
 		printf("Added sfx %s: %s\n", name.c_str(), file.c_str());
 	}
 
+	for(auto it = config["pickups"].begin(); it != config["pickups"].end(); ++it) {
+		std::string name = it->first.as<std::string>();
+		pickup_t p;
+		p.vfx = it->second["vfx"].as<std::string>();
+		p.radius = it->second["radius"].as<float>();
+		p.attribute = it->second["attribute"].as<std::string>();
+		p.effect = it->second["effect"].as<int>();
+
+		pickups[name] = p;
+	}
+
 	delete src_sfx;
 	player = new Player(config["player"], *this);
 	camera_offset = config["camera_offset"].as<glm::vec3>(glm::vec3(3.f));
@@ -181,6 +192,19 @@ Enemy * Game::create_enemy(const YAML::Node &node, const glm::vec2 &pos, Area * 
 
 	current_area = tmp;
 	return e;
+}
+
+ObjectTemplate * Game::spawn_pickup(const std::string &name, const glm::vec2 &pos) {
+	auto it = pickups.find(name);
+	if(it == pickups.end()) {
+		printf("Unknown pickup %s\n", name.c_str());
+		abort();
+	}
+	ObjectTemplate * ot = Pickup::create(it->second.vfx, it->second.attribute, it->second.effect, it->second.radius, *this);
+
+	ot->obj->move_to(pos);
+
+	return ot;
 }
 
 void Game::look_at_player() {

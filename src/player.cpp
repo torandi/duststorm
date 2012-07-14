@@ -9,9 +9,10 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
 	light_color = node["light"].as<glm::vec3>(glm::vec3(0.8f));
 	light_offset = node["light_offset"].as<glm::vec3>(glm::vec3(1.0)) + glm::vec3(center_offset.x, 0.f, center_offset.y);
 
-	attributes["life"] = 100;
-	attributes["fuel"] = 100;
-	attributes["bombs"] = 2;
+	attributes["life"] = node["life"].as<float>();
+	attributes_max["life"] = attributes_max["life"];
+
+	score = 0;
 
 	const YAML::Node &n = node["weapons"];
 	for(int i=0; i<4; ++i) {
@@ -21,6 +22,7 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
 
 	click_radius = node["click_radius"].as<float>();
 	hit_detection = true;
+	dead = false;
 
 	//Lets do teh ugly hack:
 	for(auto &m : chainsaw.materials) {
@@ -28,7 +30,15 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
 	}
 }
 
-int &Player::attr(const std::string attr) {
+void Player::damage(float dmg) {
+	int &life = attributes["life"];
+	life -= dmg;
+	if(life <= 0) {
+		dead = true;
+	}
+}
+
+int Player::attr(const std::string &attr) {
 	auto it = attributes.find(attr);
 	if(it == attributes.end()) {
 		printf("Unknown player attributes %s\n", attr.c_str());
@@ -36,7 +46,19 @@ int &Player::attr(const std::string attr) {
 	} else {
 		return it->second;
 	}
+}
 
+void Player::change_attr(const std::string &attr, int val) {
+	auto it = attributes.find(attr);
+	if(it == attributes.end()) {
+		printf("Unknown player attributes %s\n", attr.c_str());
+		abort();
+	} else {
+		it->second += val;
+		int max = attributes_max[attr];
+		if(it->second > max)
+			it->second = max;
+	}
 }
 
 void Player::swing() {
