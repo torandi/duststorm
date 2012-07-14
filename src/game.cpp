@@ -23,6 +23,9 @@ std::map<std::string, enemy_create*> Game::enemy_creators;
 
 #define DEBUG_MOVE 0
 
+static Quad * bar; 
+static Texture2D * bar_texture;
+
 void Game::init() {
 	object_templates["door"] = &Door::create;
 	object_templates["decoration"] = &Decoration::create;
@@ -45,14 +48,11 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), curr
 
 	//Prepare objects:
 
-	Data * src = Data::open(PATH_BASE "/game/game.yaml");
-	YAML::Node config = YAML::Load((char*)(src->data()));
+	YAML::Node config = YAML::LoadFile(PATH_BASE "/game/game.yaml");
 
-	Data * src_sfx = Data::open(PATH_BASE "/game/sfx.yaml");
-	YAML::Node sfx_config = YAML::Load((char*)(src_sfx->data()));
+	YAML::Node sfx_config = YAML::LoadFile(PATH_BASE "/game/sfx.yaml");
 
 	for(auto it = sfx_config.begin(); it != sfx_config.end(); ++it) {
-		printf("%s\n", YAML::Dump(it->second).c_str());
 		std::string name = it->first.as<std::string>();
 		std::string file = it->second.as<std::string>();
 		sfx[name] = file;
@@ -63,16 +63,19 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), curr
 		std::string name = it->first.as<std::string>();
 		pickup_t p;
 		p.vfx = it->second["vfx"].as<std::string>();
+		VFX::get_vfx(p.vfx); //preload
 		p.radius = it->second["radius"].as<float>();
 		p.attribute = it->second["attribute"].as<std::string>();
+		p.sfx = it->second["sfx"].as<std::string>();
 		p.effect = it->second["effect"].as<int>();
 
 		pickups[name] = p;
 	}
 
-	delete src_sfx;
 	player = new Player(config["player"], *this);
 	camera_offset = config["camera_offset"].as<glm::vec3>(glm::vec3(3.f));
+
+	player->last_sfx_score = 0;
 
 	load_areas();
 	YAML::Node start = config["start"];
@@ -82,6 +85,9 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), curr
 	for(bool &a : sustained_action) {
 		a = false;
 	}
+
+	bar = new Quad();
+	bar_texture = Texture2D::from_filename("bar.png");
 }
 
 Game::~Game() {
@@ -203,7 +209,7 @@ ObjectTemplate * Game::spawn_pickup(const std::string &name, const glm::vec2 &po
 		printf("Unknown pickup %s\n", name.c_str());
 		abort();
 	}
-	ObjectTemplate * ot = Pickup::create(it->second.vfx, it->second.attribute, it->second.effect, it->second.radius, *this);
+	ObjectTemplate * ot = Pickup::create(it->second.vfx, it->second.attribute, it->second.effect, it->second.radius, it->second.sfx, *this);
 
 	ot->obj->move_to(pos);
 
@@ -359,6 +365,15 @@ void Game::render_composition(){
 	/*downsample[1]->texture_bind(Shader::TEXTURE_2D_2);
 	composition->draw(dof_shader);*/
 	composition->draw(shaders[SHADER_PASSTHRU]);
+	shaders[SHADER_PASSTHRU]->bind();
+	bar_texture->texture_bind(Shader::TEXTURE_COLORMAP);
+	bar->set_scale(glm::vec3(100.f*((float)player->attr("life")/player->attributes_max["life"]), 30.f, 0.f));
+	bar->set_position(glm::vec3(10.f, resolution.y - 30.f, 0.f));
+	bar->render();
+
+	bar->set_scale(glm::vec3(100.f*((float)player->attr("blood")/current_area->required_blood), 30.f, 0.f));
+	bar->set_position(glm::vec3(resolution.x - 110.f, resolution.y - 30.f, 0.f));
+	bar->render();
 }
 
 void Game::load_areas() {

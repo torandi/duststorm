@@ -5,7 +5,7 @@ uniform float fog_density;
 uniform vec2 marker_position;
 uniform float marker_size;
 
-#define TEXTURE_REPEAT 16.0
+#define TEXTURE_REPEAT 32.0
 
 
 in vec3 position;

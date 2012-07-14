@@ -39,10 +39,11 @@ class Pickup : public ObjectTemplate {
 	public:
 		virtual ~Pickup() {};
 		static ObjectTemplate * create(const YAML::Node &node, Game &game);
-		static ObjectTemplate * create(const std::string &vfx, const std::string &attr, int effect, float radius, Game &game);
+		static ObjectTemplate * create(const std::string &vfx, const std::string &attr, int effect, float radius, const std::string &sfx, Game &game);
 
 		std::string attr;
 		int effect;
+		std::string sfx;
 
 		virtual bool click();
 		virtual bool collision();

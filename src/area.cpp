@@ -21,6 +21,8 @@ Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 	u_fog_density = terrain_shader->uniform_location("fog_density");
 	u_marker = terrain_shader->uniform_location("marker_position");
 
+	required_blood = config["required_blood"].as<int>();
+
 
 	//Create terrain
 	terrain_textures[0] = TextureArray::from_filename(config["textures"][0].as<std::string>().c_str(),config["textures"][1].as<std::string>().c_str(), nullptr);
@@ -434,11 +436,14 @@ void Area::attack(int id) {
 	}
 	if(count > 0) {
 		game.play_sfx("splatt");
+		game.player->score += 100*count;
 	}
 
 	if(count >= 3) {
+		game.player->score += 100*count*2;
 		game.play_sfx("multikill", 0.5f);
-	} else if(count >= 2) {
+	} else if(count == 2) {
+		game.player->score += 100*count;
 		//Double kill
 		game.play_sfx("double_kill", 0.5f);
 	}

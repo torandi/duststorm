@@ -40,8 +40,12 @@ bool Door::click() {
 }
 
 bool Door::collision() {
-	obj->game.change_area(area, entry_point);
-	printf("Change area to %s : %s\n", area.c_str(), entry_point.c_str());
+	if(obj->game.player->attr("blood") >= obj->game.area()->required_blood) {
+		obj->game.change_area(area, entry_point);
+		printf("Change area to %s : %s\n", area.c_str(), entry_point.c_str());
+	} else {
+		obj->game.play_sfx("moreblood");
+	}
 	return true;
 }
 
@@ -70,21 +74,22 @@ ObjectTemplate * Pickup::create(const YAML::Node &node, Game &game) {
 	pickup->obj = new Object2D(node, game);
 	pickup->attr = node["attribute"].as<std::string>();
 	pickup->effect = node["effect"].as<int>();
+	pickup->sfx = node["sfx"].as<std::string>();
 	return pickup;
 }
 
-ObjectTemplate * Pickup::create(const std::string &vfx, const std::string &attr, int effect,float radius, Game &game) {
+ObjectTemplate * Pickup::create(const std::string &vfx, const std::string &attr, int effect,float radius, const std::string & sfx, Game &game) {
 	Pickup * pickup = new Pickup();
 	pickup->obj = new Object2D(vfx, game);
 	pickup->obj->hit_detection = true;
 	pickup->obj->radius = radius;
 	pickup->attr = attr;
 	pickup->effect = effect;
+	pickup->sfx = sfx;
 	return pickup;
 }
 
 bool Pickup::click() {
-	printf("Click\n");
 	if( glm::length(obj->current_position - obj->game.player->current_position) < PICKUP_RANGE) {
 		collision();
 		return true;
@@ -94,9 +99,8 @@ bool Pickup::click() {
 }
 
 bool Pickup::collision() {
-	printf("Add attribute %s +%d\n", attr.c_str(), effect);
 	obj->game.player->change_attr(attr,effect);
-	//Play sound
+	obj->game.play_sfx(sfx);
 	destroyed = true;
 	return false;
 }

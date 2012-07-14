@@ -24,6 +24,7 @@ Enemy::Enemy(const YAML::Node &node, Game &game) : Object2D(node, game), dead(fa
 }
 
 void Enemy::update(float dt) {
+	if(dead) return;
 	if(life < max_life) {
 		life += life_regen*dt;
 		if(life > max_life)
@@ -41,7 +42,8 @@ BasicAI::BasicAI(const YAML::Node &node, Game &game) : Enemy(node, game) {
 }
 
 void BasicAI::update(float dt) {
-	Object2D::update(dt);
+	if(dead) return;
+	Enemy::update(dt);
 	if(distance(game.player) < trigger_radius) {
 		glm::vec3 lz = game.player->local_z();
 		target = game.player->center() -  glm::vec2(lz.x, lz.z) * game.player->radius + glm::vec2(frand()*2.f, frand()*2.f);

@@ -59,6 +59,7 @@ class Game {
 			float radius;
 			int effect;
 			std::string attribute;
+			std::string sfx;
 		};
 
 		Input input;

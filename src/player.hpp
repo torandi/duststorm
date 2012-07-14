@@ -29,8 +29,8 @@ class Player : public Object2D {
 		RenderObject chainsaw;
 
 		float score;
+		float last_sfx_score;
 		bool dead;
-	private:
 		std::map<std::string, int> attributes;
 		std::map<std::string, int> attributes_max;
 };

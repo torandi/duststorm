@@ -11,6 +11,9 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
 
 	attributes["life"] = node["life"].as<float>();
 	attributes_max["life"] = attributes["life"];
+	attributes["blood"] = 0;
+	attributes_max["blood"] = 100000;
+
 
 	score = 0;
 
