@@ -123,6 +123,8 @@ bool Terrain::get_collision_at(int x, int y) const {
 }
 
 bool Terrain::get_collision_at(float x, float y) const {
+	if(x > hm_size.x * horizontal_scale_|| x < 0 || y > hm_size.y*horizontal_scale_ || y < 0)
+		return true;
 	//Calculate target pixel:
 	int _x = (int)round(x*(dm_size.x/(float)hm_size.x));
 	int _y = (int)round(y*(dm_size.y/(float)hm_size.y));
@@ -138,6 +140,8 @@ float Terrain::get_height_at(int x, int y) const {
 }
 
 float Terrain::get_height_at(float x_, float y_) const {
+	if(x_ > hm_size.x * horizontal_scale_|| x_ < 0 || y_ > hm_size.y*horizontal_scale_ || y_ < 0)
+		return 0;
 	int x = (int) (x_/horizontal_scale_);
 	int y = (int) (y_/horizontal_scale_);
 	float dx = (x_/horizontal_scale_) - x;

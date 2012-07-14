@@ -48,11 +48,14 @@ class Game {
 		ObjectTemplate * create_object(const std::string &name, const YAML::Node &node, Area * a = nullptr);
 		Enemy * create_enemy(const YAML::Node &node, const glm::vec2 &pos, Area * a = nullptr);
 
-		void play_sfx(const std::string &str, float delay= -1.f, int loops = 0);
+		Sound * play_sfx(const std::string &str, float delay= -1.f, int loops = 0);
+		Sound * play_sfx_nolist(const std::string &str, float delay= -1.f, int loops = 0);
 
 		ObjectTemplate * spawn_pickup(const std::string &name, const glm::vec2 &pos);
 
 	private:
+		GLint u_texture_mix;
+		Shader * mix_shader;
 
 		struct pickup_t {
 			std::string vfx;

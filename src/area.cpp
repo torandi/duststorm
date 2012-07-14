@@ -12,10 +12,8 @@ Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 	char * str;
 	if(asprintf(&str, PATH_BASE "/game/areas/%s.yaml", name.c_str()) == -1) abort();
 
-	Data * src = Data::open(str);
+	YAML::Node config = YAML::LoadFile(str);
 	free(str);
-
-	YAML::Node config = YAML::Load((char*)(src->data()));
 
 	terrain_shader = Shader::create_shader(config["shader"].as<std::string>("terrain"));
 	u_fog_density = terrain_shader->uniform_location("fog_density");
@@ -43,6 +41,8 @@ Area::Area(const std::string &name, Game &game_) : game(game_), name_(name) {
 	glUniform1f(terrain_shader->uniform_location("marker_size"), marker_size/terrain->size().x);
 
 	fog_density = config["fog"].as<float>(0.02f);
+
+	bg = game.play_sfx_nolist(config["music"].as<std::string>());
 
 	int light_count = 1;
 

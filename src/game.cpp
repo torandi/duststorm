@@ -88,6 +88,9 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), curr
 
 	bar = new Quad();
 	bar_texture = Texture2D::from_filename("bar.png");
+
+	mix_shader = Shader::create_shader("mix");
+	u_texture_mix = mix_shader->uniform_location("texture_mix");
 }
 
 Game::~Game() {
@@ -104,7 +107,7 @@ Game::~Game() {
 	delete dof_shader;*/
 }
 
-void Game::play_sfx(const std::string &str, float delay, int loops) {
+Sound * Game::play_sfx(const std::string &str, float delay, int loops) {
 	auto it = sfx.find(str);
 	if(it == sfx.end()) {
 		printf("Missing sfx %s\n", str.c_str());
@@ -116,6 +119,21 @@ void Game::play_sfx(const std::string &str, float delay, int loops) {
 	else
 		s->play();
 	active_sfx.push_back(s);
+	return s;
+}
+
+Sound * Game::play_sfx_nolist(const std::string &str, float delay, int loops) {
+	auto it = sfx.find(str);
+	if(it == sfx.end()) {
+		printf("Missing sfx %s\n", str.c_str());
+		abort();
+	}
+	Sound * s = new Sound(it->second.c_str(), loops);
+	if(delay > 0.f)
+		s->set_delay(delay);
+	else
+		s->play();
+	return s;
 }
 
 Area * Game::area() const { return current_area; }
@@ -130,7 +148,10 @@ Area * Game::get_area(const std::string &str) const {
 }
 
 void Game::change_area(const std::string &area, const std::string &entry_point) {
+	if(current_area != nullptr)
+		current_area->bg->stop();
 	current_area = get_area(area);
+	current_area->bg->play();
 	glm::vec2 pos = current_area->get_entry_point(entry_point);
 	player->move_to(pos);
 	look_at_player();
@@ -138,6 +159,14 @@ void Game::change_area(const std::string &area, const std::string &entry_point) 
 
 void Game::update(float dt) {
 	Sound::update_system();
+
+	if(player->dead == true) {
+		Sound * s = play_sfx("gameover");
+		while(s->is_playing()) {
+			Sound::update_system();
+		}
+		exit(0);
+	}
 
 	active_sfx.remove_if([](const Sound * s) {
 			if(s->is_done()) {
@@ -352,7 +381,15 @@ void Game::render_dynamics() {
 void Game::render_display() {
 	RenderTarget::clear(Color::magenta);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
-	screen->draw(shaders[SHADER_PASSTHRU]);
+	mix_shader->bind();
+	int life = player->attr("life");
+	if(life < PLAYER_LOW_HP) {
+		float mix = (PLAYER_LOW_HP - (float)life)/PLAYER_LOW_HP;
+		glUniform1f(u_texture_mix, mix);
+	} else {
+		glUniform1f(u_texture_mix, 0.f);
+	}
+	screen->draw(mix_shader);
 }
 
 void Game::render_composition(){

@@ -34,10 +34,16 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
 }
 
 void Player::damage(float dmg) {
+	float life = attr("life");
 	change_attr("life", -dmg);
-	if(attr("life") <= 0) {
+	float l2 = attr("life");
+	if(l2 <= 0) {
 		dead = true;
 	}
+
+	if(life > PLAYER_LOW_HP && l2 < PLAYER_LOW_HP)
+		game.play_sfx("heal");
+		
 }
 
 int Player::attr(const std::string &attr) {

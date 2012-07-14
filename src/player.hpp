@@ -4,6 +4,8 @@
 #include "movable_light.hpp"
 #include "object2d.hpp"
 
+#define PLAYER_LOW_HP 200
+
 class Player : public Object2D {
 	public:
 		Player(const YAML::Node &node, Game &game_);

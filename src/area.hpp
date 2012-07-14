@@ -11,6 +11,8 @@
 #include "object_template.hpp"
 #include "enemy.hpp"
 
+#include "sound.hpp"
+
 #include <glm/glm.hpp>
 #include <string>
 
@@ -46,6 +48,8 @@ class Area {
 		void spawn_pickups(const std::string &name, const glm::vec2 &center, int count=1);
 
 		int required_blood;
+
+		Sound * bg;
 	private:
 		Game &game;
 		std::string name_;	
