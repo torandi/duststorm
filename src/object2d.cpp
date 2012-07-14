@@ -4,6 +4,8 @@
 
 #define MIN_MOVE 0.1f
 
+long Object2D::next_global_id = 0;
+
 Object2D::Object2D(const std::string &vfx_name, Game &game_) : 
 		target(0.f)
 	, current_position(0.f)
@@ -12,6 +14,7 @@ Object2D::Object2D(const std::string &vfx_name, Game &game_) :
 	, hit_detection(false)
 	, current_rotation(0.f)
 	,	game(game_) 
+	, global_id(++next_global_id)
 	, base_rotation(0.f)
 	, center_offset(0.f)
 	{
@@ -27,7 +30,9 @@ Object2D::Object2D(const YAML::Node &node, Game &game_) :
 	, radius(0.f)
 	, current_rotation(0.f)
 	, hit_detection(false)
-	,	game(game_) {
+	,	game(game_)
+	, global_id(++next_global_id)
+{
 	speed = node["speed"].as<float>(1.f);
 	radius = node["radius"].as<float>(0.f);
 	hit_detection = node["enable_collision"].as<bool>(false);
@@ -117,13 +122,12 @@ void Object2D::update(float dt) {
 		glm::vec2 diff = target - center();
 		if(glm::length(diff) < MIN_MOVE) {
 			target = center();
-		} else if(diff.length() < speed * dt) {
+		} else if(glm::length(diff) < speed * dt) {
 			current_position = target - center_offset;
 		} else {
 			current_position += glm::normalize(diff) * speed * dt;
 		}
-		if(game.area()->collision_at(center())) {
-			printf("Collision!\n");
+		if(game.area()->collision_at(center(), this)) {
 			current_position = prev;
 			target = prev;
 		}

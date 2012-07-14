@@ -10,7 +10,7 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
 	light_offset = node["light_offset"].as<glm::vec3>(glm::vec3(1.0)) + glm::vec3(center_offset.x, 0.f, center_offset.y);
 
 	attributes["life"] = node["life"].as<float>();
-	attributes_max["life"] = attributes_max["life"];
+	attributes_max["life"] = attributes["life"];
 
 	score = 0;
 
@@ -31,9 +31,8 @@ Player::Player(const YAML::Node &node, Game &game_) : Object2D(node, game_)
 }
 
 void Player::damage(float dmg) {
-	int &life = attributes["life"];
-	life -= dmg;
-	if(life <= 0) {
+	change_attr("life", -dmg);
+	if(attr("life") <= 0) {
 		dead = true;
 	}
 }
@@ -59,6 +58,7 @@ void Player::change_attr(const std::string &attr, int val) {
 		if(it->second > max)
 			it->second = max;
 	}
+	fprintf(verbose,"%s: %d\n", attr.c_str(), it->second);
 }
 
 void Player::swing() {

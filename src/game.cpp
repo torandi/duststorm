@@ -52,6 +52,7 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f), curr
 	YAML::Node sfx_config = YAML::Load((char*)(src_sfx->data()));
 
 	for(auto it = sfx_config.begin(); it != sfx_config.end(); ++it) {
+		printf("%s\n", YAML::Dump(it->second).c_str());
 		std::string name = it->first.as<std::string>();
 		std::string file = it->second.as<std::string>();
 		sfx[name] = file;

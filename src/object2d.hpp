@@ -42,8 +42,9 @@ class Object2D : public MovableObject {
 		Game &game;
 		VFX * vfx;
 		void * vfx_state;
+		const long global_id;
 	protected:
-
+		static long next_global_id;
 		float base_rotation;
 		glm::vec2 center_offset;
 

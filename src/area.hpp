@@ -25,7 +25,7 @@ class Area {
 		~Area();
 		
 		float height_at(const glm::vec2 &pos) const;
-		bool collision_at(const glm::vec2 &pos) const; //This one may also trigger closness based stuff
+		bool collision_at(const glm::vec2 &pos, Object2D * o) const; //This one may also trigger closness based stuff
 
 		bool click_at(const glm::vec2 &pos, int btn); //return true if this clicks something, btn = {1, 2}
 		bool mouse_at(const glm::vec2 &pos); //return true if this marks something in the area

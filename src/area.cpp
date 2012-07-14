@@ -494,11 +494,19 @@ float Area::height_at(const glm::vec2 &pos) const {
 	return terrain->get_height_at(pos.x, pos.y);
 }
 
-bool Area::collision_at(const glm::vec2 &pos) const {
+bool Area::collision_at(const glm::vec2 &pos, Object2D * o) const {
 	if(!terrain->get_collision_at(pos.x, pos.y)) {
-		for(auto it : objects) {
-			if(it->obj->hit(pos, game.player->radius)) {
-				if(it->collision())
+		if(o->global_id == game.player->global_id) {
+			printf("PX\n");
+			for(auto it : objects) {
+				if(it->obj->hit(pos, game.player->radius)) {
+					if(it->collision())
+						return true;
+				}
+			}
+		}
+		for(auto it : enemies) {
+			if(it->global_id != o->global_id && it->hit(pos, game.player->radius/4.f)) {
 					return true;
 			}
 		}

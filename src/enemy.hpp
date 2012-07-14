@@ -25,6 +25,9 @@ class Enemy : public Object2D {
 		std::string name;
 		bool highlighted;
 
+		float attack_cooldown;
+		float attack_repeat;
+
 		struct drop_t {
 			std::string name;
 			glm::ivec2 rate;
@@ -40,6 +43,7 @@ class BasicAI : public Enemy {
 		BasicAI(const YAML::Node &node, Game &game);
 
 		virtual void update(float dt);
+		virtual void attack();
 
 		static Enemy * create(const YAML::Node &node, Game &game);
 };
