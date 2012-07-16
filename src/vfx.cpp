@@ -65,8 +65,12 @@ void * ModelVFX::create_state() {
 
 ParticlesVFX::ParticlesVFX(const YAML::Node &node) {
 	count = node["count"].as<int>();
-	avg_spawn_rate = node["avg_spawn_rate"].as<float>();
-	spawn_rate_var = node["spawn_rate_var"].as<float>();
+	oneshot = node["oneshot"].as<bool>(false);
+
+	if(!oneshot) {
+		avg_spawn_rate = node["avg_spawn_rate"].as<float>();
+		spawn_rate_var = node["spawn_rate_var"].as<float>();
+	}
 
 	std::vector<std::string> texture_names;
 	for(const YAML::Node &t : node["textures"]) {
@@ -119,9 +123,11 @@ void * ParticlesVFX::update(float dt, void * state) {
 }
 
 void * ParticlesVFX::create_state() {
-	ParticleSystem * system = new ParticleSystem(count, textures);
-	system->avg_spawn_rate = avg_spawn_rate;
-	system->spawn_rate_var = spawn_rate_var;
+	ParticleSystem * system = new ParticleSystem(count, textures, oneshot);
+	if(!oneshot) {
+		system->avg_spawn_rate = avg_spawn_rate;
+		system->spawn_rate_var = spawn_rate_var;
+	}
 	system->config.birth_color = config.birth_color;
 	system->config.death_color = config.death_color;
 	system->config.motion_rand = config.motion_rand;

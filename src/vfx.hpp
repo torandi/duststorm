@@ -53,6 +53,7 @@ class ParticlesVFX : public VFX {
 		void set_spawn_rate(void * state, float spawn_rate, float spawn_rate_var) const;
 	private:
 		int count;
+		bool oneshot;
 		ParticleSystem::config_t config;
 		float avg_spawn_rate, spawn_rate_var;
 		TextureArray * textures;
