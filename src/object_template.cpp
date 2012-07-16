@@ -2,6 +2,7 @@
 #include "game.hpp"
 
 #define DOOR_RANGE 6.f
+#define DOOR_TRY_TIMEOUT 2.f
 #define PICKUP_RANGE 2.f
 
 void ObjectTemplate::update(float dt) {
@@ -40,6 +41,8 @@ bool Door::click() {
 }
 
 bool Door::collision() {
+	if(try_timeout > 0.f) return false;
+	try_timeout = DOOR_TRY_TIMEOUT;
 	if(obj->game.player->attr("blood") >= obj->game.area()->required_blood) {
 		obj->game.change_area(area, entry_point);
 		printf("Change area to %s : %s\n", area.c_str(), entry_point.c_str());
@@ -53,8 +56,14 @@ bool Door::hit() {
 	return false;
 }
 
+void Door::update(float dt) {
+	if(try_timeout > 0.f) try_timeout -= dt;
+	ObjectTemplate::update(dt);
+}
+
 void Pickup::update(float dt) {
 	obj->absolute_rotate(glm::vec3(0, 1.f, 0), dt);
+	ObjectTemplate::update(dt);
 }
 
 ObjectTemplate * Decoration::create(const YAML::Node &node, Game &game) {

@@ -53,13 +53,17 @@ class Pickup : public ObjectTemplate {
 
 class Door : public ObjectTemplate {
 	public:
+		Door() : try_timeout(-0.1f) {};
 		virtual ~Door() {};
 		static ObjectTemplate * create(const YAML::Node &node, Game &game);
 
+		virtual void update(float dt);
 		std::string area, entry_point;
 		virtual bool click();
 		virtual bool collision();
 		virtual bool hit();
+	private:
+		float try_timeout;
 };
 
 typedef ObjectTemplate* (object_template_create) (const YAML::Node &node, Game &game);
