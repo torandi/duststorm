@@ -8,7 +8,7 @@
 class ParticleSystem : public MovableObject {
 	public:
 
-		ParticleSystem(const int max_num_particles, TextureArray* texture);
+		ParticleSystem(const int max_num_particles, TextureArray* texture, bool oneshot=false);
 		~ParticleSystem();
 
 		void update(float dt);
@@ -76,6 +76,8 @@ class ParticleSystem : public MovableObject {
 	private:
 
 		const int max_num_particles_;
+
+		bool spawn_; //set to false to stop spawning, must not be changed to true from false (but other way is ok)
 
 		//Texture * texture_;
 
