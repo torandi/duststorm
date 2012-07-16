@@ -139,6 +139,8 @@ function finalize(){
 		tar vf $2 --delete .binary
 		tar vf $2 --delete .arch
 		gzip $2
+		rm -rf $build
+		rm -rf $release
 }
 
 function info(){
