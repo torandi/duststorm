@@ -7,7 +7,7 @@
 set +e
 
 # detect arch
-arch=$(uname -p)
+arch=$(uname -m)
 
 # setup directories
 root=$(dirname $0)
