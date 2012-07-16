@@ -152,6 +152,8 @@ void Game::change_area(const std::string &area, const std::string &entry_point) 
 		a = false; //Stop sustained actions;
 	}
 
+	player->change_attr("blood", -player->attr("blood"));
+
 	if(area == "end") {
 		Sound * s = play_sfx("victory");
 		while(s->is_playing()) {
