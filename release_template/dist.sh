@@ -13,7 +13,7 @@ mode=""
 # exit on failures
 set -e
 
-while getopts "hcafn:b:" opt; do
+while getopts "hcafin:b:" opt; do
 		case $opt in
 				n)
 						name="$OPTARG"
@@ -30,6 +30,9 @@ while getopts "hcafn:b:" opt; do
 				f)
 						mode="finalize"
 						;;
+				i)
+						mode="info"
+						;;
 				h)
 						echo "usage:"
 						echo "  -c            Create new release"
@@ -38,6 +41,7 @@ while getopts "hcafn:b:" opt; do
 						echo ""
 						echo "  -a            Add new build to release"
 						echo "  -f            Finalize release"
+						echo "  -i            Information about release"
 						exit
 						;;
 		esac
@@ -64,6 +68,7 @@ function create(){
 				--exclude dist.sh \
 				--exclude release \
 				--exclude build \
+				--exclude '*.tar' \
 				--exclude '*.tar.gz' \
 				--exclude '*~' \
 				$release
@@ -82,8 +87,29 @@ function create(){
 }
 
 function add(){
-		name=$(tar xf $2 .name -O)
-		binary=$(tar xf $2 .binary -O)
+		local name=$(tar xf $2 .name -O)
+		local binary=$(tar xf $2 .binary -O)
+		local have_arch="no"
+
+		# test if overwriting existing arch
+		if [[ ! -z $(tar -tf $2 | grep .arch) ]]; then
+				have_arch="yes"
+				local match="no"
+				while read -r line; do
+						if [[ "$arch" == $line ]]; then
+								match="yes"
+								break
+						fi
+				done < <(tar xf $2 .arch -O)
+
+				if [[ $match == "yes" ]]; then
+						read -n 1 -p "Archive already contains binaries for $arch, continue? [yN]"
+						echo # force newline
+						if [[ $REPLY != "y" && $REPLY != "Y" ]]; then
+								exit
+						fi
+				fi
+		fi
 
 		echo "Building code"
 		pushd $build
@@ -97,13 +123,34 @@ function add(){
 
 		echo "Installing libraries"
 		tar rvf $2 "${root}/vendor/libs/${arch}" --transform="s#vendor/libs/${arch}#${name}/${arch}/libs#" --show-transformed
+
+		# record arch
+		if [[ $have_arch == "yes" ]]; then
+				tar xf $2 .arch
+		fi
+		echo "$arch" >> .arch
+		tar rvf $2 ".arch"
+		rm .arch
 }
 
 function finalize(){
 		echo $2
 		tar vf $2 --delete .name
 		tar vf $2 --delete .binary
+		tar vf $2 --delete .arch
 		gzip $2
+}
+
+function info(){
+		local name=$(tar xf $2 .name -O)
+		local binary=$(tar xf $2 .binary -O)
+
+		echo "Release name: $name"
+		echo "Binary name: $binary"
+		echo "Installed architectures:"
+		while read -r line; do
+				echo " * $line"
+		done < <(tar xf $2 .arch -O)
 }
 
 if [[ -z "$mode" ]]; then
@@ -111,4 +158,4 @@ if [[ -z "$mode" ]]; then
 		exit 1
 fi
 
-$mode	$*
+$mode	"$@"
