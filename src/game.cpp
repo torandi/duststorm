@@ -148,6 +148,10 @@ Area * Game::get_area(const std::string &str) const {
 }
 
 void Game::change_area(const std::string &area, const std::string &entry_point) {
+	for(bool &a : sustained_action) {
+		a = false; //Stop sustained actions;
+	}
+
 	if(area == "end") {
 		Sound * s = play_sfx("victory");
 		while(s->is_playing()) {
@@ -200,7 +204,7 @@ void Game::update(float dt) {
 	}
 #else
 	//Move camera:
-	
+
 	look_at_player();
 #endif
 }
@@ -272,7 +276,6 @@ void Game::do_action(int num) {
 }
 
 void Game::update_mouse_position(int x, int y) {
-
 	glm::vec3 win;
 	win.x = (float)x;
 	win.y = (float)(resolution.y - y);
