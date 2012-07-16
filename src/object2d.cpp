@@ -69,8 +69,9 @@ void Object2D::set_rotation(float angle) {
 }
 
 void Object2D::face(const glm::vec2 &pos) {
-	glm::vec2 dir = glm::normalize(center() - pos);
-	if(glm::length(dir) < 0.01f) return;
+	glm::vec2 diff = center() - pos;
+	if(glm::length(diff) < 0.01f) return;
+	glm::vec2 dir = glm::normalize(diff);
 	float rrot = atan2(dir.y, dir.x);
 	float rot = radians_to_degrees(rrot);
 	set_rotation(-rot);
@@ -81,9 +82,10 @@ void Object2D::face(const Object2D * obj) {
 }
 
 void Object2D::move_to(const glm::vec2 &pos) {
+	printf("Move obj %ld to (%f, %f)\n", global_id, pos.x, pos.y);
 	set_position(glm::vec3(pos.x, game.area()->height_at(pos)+height, pos.y));
-	target = pos;
 	current_position = pos - center_offset;
+	target = current_position;
 }
 
 void Object2D::render() const {
@@ -122,13 +124,15 @@ void Object2D::update(float dt) {
 	glm::vec2 prev = current_position;
 	if(target != center()) {
 		glm::vec2 diff = target - center();
-		if(glm::length(diff) < MIN_MOVE) {
+		float len = glm::length(diff);
+		if(len < MIN_MOVE) {
 			target = center();
-		} else if(glm::length(diff) < speed * dt) {
+		} else if(len < speed * dt) {
 			current_position = target - center_offset;
 		} else {
 			current_position += glm::normalize(diff) * speed * dt;
 		}
+
 		if(game.area()->collision_at(center(), this)) {
 			current_position = prev;
 			target = prev;
