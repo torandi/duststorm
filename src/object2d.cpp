@@ -70,7 +70,9 @@ void Object2D::set_rotation(float angle) {
 
 void Object2D::face(const glm::vec2 &pos) {
 	glm::vec2 dir = glm::normalize(center() - pos);
-	float rot = radians_to_degrees(atan2(dir.y, dir.x));
+	if(glm::length(dir) < 0.01f) return;
+	float rrot = atan2(dir.y, dir.x);
+	float rot = radians_to_degrees(rrot);
 	set_rotation(-rot);
 }
 
