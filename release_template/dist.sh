@@ -4,8 +4,7 @@ root=$(dirname $0)/..
 template=$(dirname $0)
 release=$(dirname $0)/release
 build=$(dirname $0)/build
-build=$(dirname $0)/temp
-arch=$(uname -p)
+arch=$(uname -m)
 
 name=""
 binary=""
@@ -52,17 +51,16 @@ function create(){
 				exit 1
 		fi
 		
-		echo "Creating release/temp folder"
-		mkdir "$release"
+		echo "Creating release/build folder"
+		mkdir -p "$release"
 		mkdir -p "$build"
-		mkdir -p "$temp"
 		
 		echo "Copying template"
 		rsync -av $template \
+				--exclude .gitignore \
 				--exclude dist.sh \
 				--exclude release \
 				--exclude build \
-				--exclude temp \
 				--exclude '*.tar.gz' \
 				--exclude '*~' \
 				$release
@@ -92,7 +90,10 @@ function add(){
 		
 		echo "Installing binaries"
 		strip $build/$binary
-		tar rvf $2 "$build/$binary" --transform="s#./temp/#${name}/${arch}/bin/#" --show-transformed
+		tar rvf $2 "$build/$binary" --transform="s#./build/#${name}/${arch}/bin/#" --show-transformed
+
+		echo "Installing libraries"
+		tar rvf $2 "${root}/vendor/libs/${arch}" --transform="s#vendor/libs/${arch}#${name}/${arch}/libs#" --show-transformed
 }
 
 function finalize(){
