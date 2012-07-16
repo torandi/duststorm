@@ -4,7 +4,7 @@
 #
 
 # exit on failures
-set +e
+set -e
 
 # detect arch
 arch=$(uname -m)

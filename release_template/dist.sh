@@ -10,6 +10,9 @@ name=""
 binary=""
 mode=""
 
+# exit on failures
+set -e
+
 while getopts "hcafn:b:" opt; do
 		case $opt in
 				n)
