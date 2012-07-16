@@ -186,5 +186,15 @@ public:
 	 * Upload white material
 	 */
 	static void upload_blank_material();
+
+	/**
+	 * Push vertex attribs and disable all
+	 */
+	static void push_vertex_attribs();
+
+	/**
+	 * Restore all vertex attribs
+	 */
+	static void pop_vertex_attribs();
 };
 #endif
