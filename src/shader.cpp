@@ -63,12 +63,12 @@ const GLenum Shader::global_uniform_usage_[] = {
 };
 
 GLuint Shader::global_uniform_buffers_[Shader::NUM_GLOBAL_UNIFORMS];
-
 Shader* Shader::current = nullptr;
 
 typedef std::map<std::string, Shader*> ShaderMap;
 typedef std::pair<std::string, Shader*> ShaderPair;
 static ShaderMap shadercache;
+static bool initialized = false;
 
 void Shader::initialize() {
 	//Generate global uniforms:
@@ -90,6 +90,8 @@ void Shader::initialize() {
 	for ( int i = 0; i < NUM_ATTR; ++i ) {
 		glEnableVertexAttribArray(i);
 	}
+
+	initialized = true;
 }
 
 void Shader::cleanup(){
@@ -251,6 +253,12 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 }
 
 Shader* Shader::create_shader(const std::string& base_name) {
+	/* sanity check */
+	if ( !initialized ){
+		fprintf(stderr, "Shader::create_shader(..) called before Shader::initialize()\n");
+		abort();
+	}
+
 	auto it = shadercache.find(base_name);
 	if ( it != shadercache.end() ){
 		return it->second;
