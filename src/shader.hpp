@@ -18,7 +18,13 @@ class LightsData;
 class Shader {
 public:
 
-	static Shader * create_shader(std::string base_name);
+	/**
+	 * Create a new shader, or if the shader is already loaded the same instance
+	 * is retrieved.
+	 *
+	 * base_name is used to build the filename: PATH_BASE + "/shaders/" + base_name + EXTENSION
+	 */
+	static Shader* create_shader(std::string base_name);
 
 	//Must be called before first call to create_shader
 	static void initialize();
