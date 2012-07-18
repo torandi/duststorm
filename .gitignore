@@ -20,6 +20,7 @@ autoload.h
 autoload.cpp
 autoload.lst
 stamp-autoload
+frob.log
 
 # binaries
 nox2
