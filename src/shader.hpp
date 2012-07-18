@@ -22,12 +22,14 @@ public:
 	 * Create a new shader, or if the shader is already loaded the same instance
 	 * is retrieved.
 	 *
-	 * base_name is used to build the filename: PATH_BASE + "/shaders/" + base_name + EXTENSION.
-	 *
+	 * @param base_name is used to build the filename: PATH_BASE + "/shaders/" + base_name + EXTENSION.
+	 * @param cache If true it uses caching. Uncached shaders should be removed
+	 *              with Shader::release(). Normally you do _not_ want to use
+	 *              uncached shaders.
 	 * @return A borrowed pointer. Do not delete yourself, call Shader::cleanup()
 	 *         to remove all shaders.
 	 */
-	static Shader* create_shader(const std::string& base_name);
+	static Shader* create_shader(const std::string& base_name, bool cache = true);
 
 	/**
 	 * Preload shader into GPU memory.
@@ -136,6 +138,12 @@ public:
 		float padding_2;
 		Light lights[MAX_NUM_LIGHTS];
 	};
+
+	/**
+	 * Used *ONLY* for uncached shaders. Will delete the pointer. Shader is not
+	 * valid for any use after this call and user should pointer to nullptr.
+	 */
+	void release();
 
 private:
 

@@ -121,6 +121,10 @@ Shader::~Shader(){
 	glDeleteProgram(program_);
 }
 
+void Shader::release(){
+	delete this;
+}
+
 void Shader::load_file(const std::string &filename, std::stringstream &shaderData, std::string included_from) {
 	Data * file = Data::open(filename);
 	if(file == nullptr) {
@@ -255,15 +259,15 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 	return program;
 }
 
-Shader* Shader::create_shader(const std::string& base_name) {
+Shader* Shader::create_shader(const std::string& base_name, bool cache) {
 	/* sanity check */
 	if ( !initialized ){
 		fprintf(stderr, "Shader::create_shader(..) called before Shader::initialize()\n");
 		abort();
 	}
 
-	auto it = shadercache.find(base_name);
-	if ( it != shadercache.end() ){
+	const auto it = shadercache.find(base_name);
+	if ( cache && it != shadercache.end() ){
 		return it->second;
 	}
 
