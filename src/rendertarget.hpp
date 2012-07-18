@@ -13,7 +13,8 @@ public:
 	static RenderTarget* stack;
 
 	enum Flags: int {
-		DEPTH_BUFFER  = (1<<0),       /** If set it enables depth buffer/write for the framebuffer. */
+		DEPTH_BUFFER  = (1<<0),       /** Enable depth buffer/write. */
+		DOUBLE_BUFFER = (1<<1),       /** Use doublebuffering so you can render the previous frame in the current frame. */
 	};
 
 	/**
@@ -93,7 +94,9 @@ private:
 
 	glm::mat4 projection;
 	GLuint id;
-	GLuint current;
+	GLuint front;
+	GLuint back;
+	GLuint max;
 	GLuint color[2];
 	GLuint depth;
 };

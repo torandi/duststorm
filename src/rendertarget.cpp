@@ -15,7 +15,9 @@ GLuint RenderTarget::vbo[2] = {0,0};
 RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, int flags, GLenum filter) throw()
 	: TextureBase()
 	, id(0)
-	, current(0){
+	, front(0)
+	, back(0)
+	, max(1) {
 
 	checkForGLErrors("RenderTarget()");
 	this->size = size;
@@ -44,7 +46,7 @@ RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, int flags, GLe
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 	}
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color[current], 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color[front], 0);
 	checkForGLErrors("glFramebufferTexture2D::color");
 
 	/* bind depth buffer */
@@ -57,6 +59,11 @@ RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, int flags, GLe
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth, 0);
 		checkForGLErrors("glFramebufferTexture2D::depth");
+	}
+
+	/* enable doublebuffering */
+	if ( flags & DOUBLE_BUFFER ){
+		max = 2;
 	}
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -141,7 +148,7 @@ void RenderTarget::bind(){
 
 	glViewport(0, 0, size.x, size.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color[current], 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color[back], 0);
 
 	stack = this;
 }
@@ -152,7 +159,8 @@ void RenderTarget::unbind(){
 		abort();
 	}
 
-	current = 1 - current;
+	front = back;
+	back = (back + 1) % max;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	stack = nullptr;
 }
@@ -164,7 +172,7 @@ void RenderTarget::with(const std::function<void()>& func){
 }
 
 GLuint RenderTarget::texture() const {
-	return color[1-current];
+	return color[front];
 }
 
 GLuint RenderTarget::depthbuffer() const {
