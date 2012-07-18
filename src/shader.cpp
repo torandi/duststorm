@@ -68,7 +68,7 @@ Shader* Shader::current = nullptr;
 
 void Shader::initialize() {
 	//Generate global uniforms:
-	glGenBuffers(NUM_GLOBAL_UNIFORMS, (GLuint*)&global_uniform_buffers_);
+	glGenBuffers(NUM_GLOBAL_UNIFORMS, global_uniform_buffers_);
 
 	checkForGLErrors("Generate global uniform buffers");
 
