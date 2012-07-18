@@ -22,12 +22,23 @@ public:
 	 * Create a new shader, or if the shader is already loaded the same instance
 	 * is retrieved.
 	 *
-	 * base_name is used to build the filename: PATH_BASE + "/shaders/" + base_name + EXTENSION
+	 * base_name is used to build the filename: PATH_BASE + "/shaders/" + base_name + EXTENSION.
+	 *
+	 * @return A borrowed pointer. Do not delete yourself, call Shader::cleanup()
+	 *         to remove all shaders.
 	 */
-	static Shader* create_shader(std::string base_name);
+	static Shader* create_shader(const std::string& base_name);
 
-	//Must be called before first call to create_shader
+	/**
+	 * Initialize shader engine.
+	 * Must be called before first call to create_shader.
+	 */
 	static void initialize();
+
+	/**
+	 * Release all resources owned by shader engine. No shaders is valid after call to this function.
+	 */
+	static void cleanup();
 
 	enum global_uniforms_t {
 		UNIFORM_PROJECTION_VIEW_MATRICES=0,

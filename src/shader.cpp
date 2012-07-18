@@ -16,7 +16,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
-
+#include <map>
 #include <cassert>
 
 #include <GL/glew.h>
@@ -66,6 +66,10 @@ GLuint Shader::global_uniform_buffers_[Shader::NUM_GLOBAL_UNIFORMS];
 
 Shader* Shader::current = nullptr;
 
+typedef std::map<std::string, Shader*> ShaderMap;
+typedef std::pair<std::string, Shader*> ShaderPair;
+static ShaderMap shadercache;
+
 void Shader::initialize() {
 	//Generate global uniforms:
 	glGenBuffers(NUM_GLOBAL_UNIFORMS, global_uniform_buffers_);
@@ -85,6 +89,15 @@ void Shader::initialize() {
 	/* Enable all attribs for Shader::vertex_x */
 	for ( int i = 0; i < NUM_ATTR; ++i ) {
 		glEnableVertexAttribArray(i);
+	}
+}
+
+void Shader::cleanup(){
+	glDeleteBuffers(NUM_GLOBAL_UNIFORMS, global_uniform_buffers_);
+
+	/* remove all shaders */
+	for ( ShaderPair p: shadercache ){
+		delete p.second;
 	}
 }
 
@@ -237,7 +250,12 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 	return program;
 }
 
-Shader * Shader::create_shader(std::string base_name) {
+Shader* Shader::create_shader(const std::string& base_name) {
+	auto it = shadercache.find(base_name);
+	if ( it != shadercache.end() ){
+		return it->second;
+	}
+
 	fprintf(verbose, "Compiling shader %s\n", base_name.c_str());
 
 	const std::string vs = PATH_BASE"/shaders/"+base_name+VERT_SHADER_EXTENTION;
