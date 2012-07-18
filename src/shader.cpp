@@ -279,7 +279,9 @@ Shader* Shader::create_shader(const std::string& base_name) {
 		shader_list.push_back(load_shader(GL_GEOMETRY_SHADER, gs));
 	}
 
-	return new Shader(base_name, create_program(base_name, shader_list));
+	Shader* shader = new Shader(base_name, create_program(base_name, shader_list));
+	shadercache[base_name] = shader;
+	return shader;
 }
 
 void Shader::preload(const std::string& base_name){
