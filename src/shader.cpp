@@ -274,6 +274,10 @@ Shader* Shader::create_shader(const std::string& base_name) {
 	return new Shader(base_name, create_program(base_name, shader_list));
 }
 
+void Shader::preload(const std::string& base_name){
+	create_shader(base_name);
+}
+
 void Shader::init_uniforms() {
 	//Bind global uniforms to blocks:
 	for(int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {

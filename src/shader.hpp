@@ -30,6 +30,11 @@ public:
 	static Shader* create_shader(const std::string& base_name);
 
 	/**
+	 * Preload shader into GPU memory.
+	 */
+	static void preload(const std::string& base_name);
+
+	/**
 	 * Initialize shader engine.
 	 * Must be called before first call to create_shader.
 	 */
