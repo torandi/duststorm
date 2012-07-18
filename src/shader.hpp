@@ -15,6 +15,19 @@
 
 class LightsData;
 
+/**
+ * GLSL shader wrapper class.
+ * Actual GLSL code is located in `shaders` subdirectory.
+ *
+ * Typical usage:
+ *   Shader* shader = Shader::create_shader("foobar");
+ *   ...
+ *   Shader::upload_projection_view_matrices(..);
+ *   Shader::upload_model_matrix(..);
+ *   ...
+ *   shader->bind();
+ *   model->render();
+ */
 class Shader {
 public:
 
