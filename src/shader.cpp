@@ -117,6 +117,9 @@ Shader::Shader(const std::string &name_, GLuint program) :
 	glUseProgram(0);
 }
 
+Shader::~Shader(){
+	glDeleteProgram(program_);
+}
 
 void Shader::load_file(const std::string &filename, std::stringstream &shaderData, std::string included_from) {
 	Data * file = Data::open(filename);

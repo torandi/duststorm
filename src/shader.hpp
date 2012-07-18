@@ -140,6 +140,7 @@ public:
 private:
 
 	Shader(const std::string &name_, GLuint program);
+	~Shader();
 
 	static const char *global_uniform_names_[];
 	static const GLsizeiptr global_uniform_buffer_sizes_[];
