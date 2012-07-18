@@ -35,6 +35,12 @@ public:
 	static void preload(const std::string& base_name);
 
 	/**
+	 * Write a usage report to dst with details about which shaders has been
+	 * loaded and the files it depends.
+	 */
+	static void usage_report(FILE* dst = stderr);
+
+	/**
 	 * Initialize shader engine.
 	 * Must be called before first call to create_shader.
 	 */
