@@ -12,7 +12,7 @@
 RenderTarget* RenderTarget::stack = nullptr;
 GLuint RenderTarget::vbo[2] = {0,0};
 
-RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuffer, GLenum filter) throw()
+RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, int flags, GLenum filter) throw()
 	: TextureBase()
 	, id(0)
 	, current(0){
@@ -48,7 +48,7 @@ RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuff
 	checkForGLErrors("glFramebufferTexture2D::color");
 
 	/* bind depth buffer */
-	if ( depth ){
+	if ( flags & DEPTH_BUFFER ){
 		glBindTexture(GL_TEXTURE_2D, depth);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, size.x, size.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -96,7 +96,7 @@ RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, bool depthbuff
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	checkForGLErrors("RenderTarget() fin");
 
-	with([this](){ 
+	with([this](){
 		RenderTarget::clear(Color::black);
 	} );
 }

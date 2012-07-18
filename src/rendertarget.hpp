@@ -12,6 +12,10 @@ class RenderTarget: public TextureBase {
 public:
 	static RenderTarget* stack;
 
+	enum Flags: int {
+		DEPTH_BUFFER  = (1<<0),       /** If set it enables depth buffer/write for the framebuffer. */
+	};
+
 	/**
 	 * RenderTarget is a framebuffer object which you can render to.
 	 *
@@ -29,10 +33,11 @@ public:
 	 *
 	 * @param size Size of the final textures.
 	 * @param format Format of the color attachment.
-	 * @param depth If true, it enables depth buffer/write for the framebuffer.
+	 * @param flags A bitmask of parameters for the rendertarget.
 	 * @param filter Texture filtering of color attachment.
+	 * @see Flags
 	 */
-	explicit RenderTarget(const glm::ivec2& size, GLenum format, bool depth, GLenum filter = GL_NEAREST) throw();
+	explicit RenderTarget(const glm::ivec2& size, GLenum format, int flags = 0, GLenum filter = GL_NEAREST) throw();
 	~RenderTarget();
 
 	void bind();
