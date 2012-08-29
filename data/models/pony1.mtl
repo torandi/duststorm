@@ -1,0 +1,98 @@
+# Blender MTL File: ''
+# Material Count: 9
+newmtl eyelashes
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.069444 0.069444 0.069444
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl fluttershy_body_fluttershy_body_2048._fluttershy_body_2048.tif.001
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ponnies/fluttershy_body_2048.tif
+
+
+newmtl fluttershy_eyes_fluttershy_eyes.tif_fluttershy_eyes.tif.001
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ponnies/fluttershy_eyes.tif
+
+
+newmtl fluttershy_hair_back_fluttershy_hair_back._fluttershy_hair_back.tif.001
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ponnies/fluttershy_hair_back.tif
+
+
+newmtl fluttershy_hair_front_fluttershy_hair_front_fluttershy_hair_front.tif.001
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ponnies/fluttershy_hair_front.tif
+
+
+newmtl fluttershy_tail_fluttershy_tail.tif_fluttershy_tail.tif.001
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ponnies/fluttershy_tail.tif
+
+
+newmtl fluttershy_wings1_fluttershy_wings.tif_fluttershy_wings.tif.001
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ponnies/fluttershy_wings.tif
+
+
+newmtl pony_teeth
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl pony_tongue
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.157569 0.028919
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+
+

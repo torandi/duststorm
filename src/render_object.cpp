@@ -38,7 +38,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	, name(model)
 	, scale(1.0f) {
 
-	const std::string real_path = PATH_BASE"/game/data/" + model;
+	const std::string real_path = PATH_BASE "data/models/" + model;
 
 	//aiImportFileFromMemory
 	scene = aiImportFile(real_path.c_str(),
@@ -52,7 +52,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 		);
 
 	if ( !scene ) {
-		printf("Failed to load model %s\n", real_path.c_str());
+		printf("Failed to load model %s: %s\n", real_path.c_str(), aiGetErrorString());
 		abort();
 	}
 

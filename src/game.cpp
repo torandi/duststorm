@@ -25,20 +25,21 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	composition = new RenderTarget(resolution, GL_RGB8, true);
 
-	lights.ambient_intensity() = glm::vec3(.01f);
+	lights.ambient_intensity() = glm::vec3(.02f);
 	lights.num_lights() = 1;
 
-	lights.lights[0]->set_position(glm::vec3(1.0, 2.0, 0.0f));
-	lights.lights[0]->intensity = glm::vec3(0.6f, 0.6f, 0.6f);
+	lights.lights[0]->set_position(glm::vec3(1.0, 1.0, 0.0f));
+	lights.lights[0]->intensity = glm::vec3(0.8f);
 	lights.lights[0]->type = Light::POINT_LIGHT;
 	lights.lights[0]->constant_attenuation = 0.0f;
 	lights.lights[0]->linear_attenuation = 0.1f;
 	lights.lights[0]->quadratic_attenuation = 0.4f;
 
 	model = new RenderObject("pony1.obj");
-	model->set_position(glm::vec3(0, 0, 1));
+	model->set_position(glm::vec3(0, -1.0, 1));
+	model->yaw(90);
 
-	camera.set_position(glm::vec3(0, 0, 0));
+	camera.set_position(glm::vec3(0, 0.2, 0));
 	camera.look_at(model->position());
 }
 
@@ -97,7 +98,9 @@ void Game::update(float dt) {
 	};
 
 
-	input.update_object(camera, dt);
+	model->yaw(dt*1.0);
+
+	//input.update_object(camera, dt);
 
 }
 
