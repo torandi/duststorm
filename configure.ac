@@ -1,4 +1,4 @@
-AC_INIT([frobnicator-demo-engine],[1],[ext@sidvind.com])
+AC_INIT([frobnicator-demo-engine],[1],[torandi@gmail.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Werror])
