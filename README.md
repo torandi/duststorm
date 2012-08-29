@@ -1,4 +1,4 @@
-FROBNICATORS DEMO ENGINE
+Fubar 3d engine
 ==========
 
 Dependencies
@@ -9,21 +9,8 @@ opencl-headers
 portaudio19-dev
 libvorbis-dev
 
-Usage
-===========
-
- * [Creating a release](/ext/frobnicator_demo_maker/wiki/Release)
-
-Scenes
--------
-TODO
-
 Particles
 --------
-TODO
-
-Position tables and interpolation
-------
 TODO
 
 Lights
