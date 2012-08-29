@@ -185,7 +185,7 @@ const float Skybox::vertices[] = {
 
 };
 
-const char * Skybox::texture_names[] {
+const char * Skybox::texture_names[] = {
 	"left.png",
 	"right.png",
 	"top.png",

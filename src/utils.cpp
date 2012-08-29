@@ -9,7 +9,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <sys/time.h>
+#include <ctime>
+
+#ifdef WIN32
+	#include <windows.h>
+#endif
 
 int checkForGLErrors( const char *s ) {
 	int errors = 0 ;
@@ -45,57 +49,40 @@ void print_mat4(const glm::mat4 &m) {
 }
 
 bool file_exists(const std::string& filename){
+#ifndef WIN32
 	return access(filename.c_str(), R_OK) == 0;
-}
+#else
+	std::wstring stemp = std::wstring(filename.begin(), filename.end());
+	DWORD dwAttrib = GetFileAttributes(stemp.c_str());
 
-int timetable_parse(const std::string& filename, std::function<void(const std::string&, float, float)> func){
-	const char* tablename = filename.c_str();
-	Data * timetable = Data::open(tablename);
-	if ( timetable == NULL ){
-		return errno;
-	}
-
-	char* line = nullptr;
-	size_t size;
-	unsigned int linenum = 0;
-	while ( timetable->getline(&line, &size) != -1 ){
-		const size_t len = strlen(line);
-		linenum++;
-
-		/* remove leading and trailing whitespace */
-		char* tmp = strdup(line);
-		char* entry = tmp;
-		if ( entry[len-1] == '\n' ){
-			entry[len-1] = 0;
-		}
-		while ( *entry != 0 && isblank(*entry) ) entry++;
-
-		/* ignore comments and blank lines */
-		if ( *entry == '#' || strlen(entry) == 0 ){
-			free(tmp);
-			continue;
-		}
-
-		/* parse line */
-		char* name = strtok(entry, ":");
-		char* begin = strtok(NULL, ":");
-		char* end = strtok(NULL, ":");
-		if ( !(name && begin && end) ){
-			fprintf(stderr, "%s:%d: malformed entry: \"%.*s\"\n", tablename, linenum, (int)(len-1), line);
-			free(tmp);
-			continue;
-		}
-		func(std::string(name), atof(begin), atof(end));
-		free(tmp);
-	}
-	delete timetable;
-	free(line);
-
-	return 0;
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
+         !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+#endif
 }
 
 std::string color_to_string(const glm::ivec3 &color) {
 	char str[7];
 	sprintf(str, "%02x%02x%02x", color.x, color.y, color.z);
 	return std::string(str);
+}
+
+long get_millis() {
+	#ifndef WIN32
+		struct timeval cur;
+		gettimeofday(&cur, NULL);
+		return (long) (cur.tv_sec * 1000000 + cur.tv_usec;
+	#else
+		SYSTEMTIME time;
+		GetSystemTime(&time);
+		WORD millis = (time.wSecond * 1000) + time.wMilliseconds;
+		return (long) millis;
+	#endif
+}
+
+void sleep_millis(long wait) {
+#ifndef WIN32
+	usleep(wait);
+#else
+	Sleep(wait);
+#endif
 }

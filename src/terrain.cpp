@@ -2,6 +2,7 @@
 #include "texture.hpp"
 #include "mesh.hpp"
 #include "globals.hpp"
+#include "utils.hpp"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>

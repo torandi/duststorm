@@ -9,16 +9,12 @@
 #include "quad.hpp"
 #include "terrain.hpp"
 #include "lights_data.hpp"
-#include "player.hpp"
 
-#include "area.hpp"
 #include "input.hpp"
-
-#include "object_template.hpp"
-#include "enemy.hpp"
 
 #include "sound.hpp"
 
+#include <list>
 #include <map>
 #include <string>
 
@@ -33,25 +29,10 @@ class Game {
 
 		void render();
 
-		Area * area() const;
-
-		Area * get_area(const std::string &str) const;
-
-		void change_area(const std::string &area, const std::string &entry_point);
-
-		Player * player;
-
-		static std::map<std::string, object_template_create*> object_templates;
-		static std::map<std::string, enemy_create*> enemy_creators;
 		static void init();
-
-		ObjectTemplate * create_object(const std::string &name, const YAML::Node &node, Area * a = nullptr);
-		Enemy * create_enemy(const YAML::Node &node, const glm::vec2 &pos, Area * a = nullptr);
 
 		Sound * play_sfx(const std::string &str, float delay= -1.f, int loops = 0);
 		Sound * play_sfx_nolist(const std::string &str, float delay= -1.f, int loops = 0);
-
-		ObjectTemplate * spawn_pickup(const std::string &name, const glm::vec2 &pos);
 
 	private:
 		GLint u_texture_mix;
@@ -73,13 +54,7 @@ class Game {
 		void render_statics();
 		void render_dynamics();
 
-		void load_areas();
-
 		void do_action(int num);
-
-		static void dir_content(const char * dir, std::list<std::string> &files);
-
-		void move_player();
 
 		void update_mouse_position(int x, int y);
 
@@ -88,10 +63,7 @@ class Game {
 		Camera camera;
 		RenderTarget *screen, *composition;//, *downsample[2];
 
-		Area * current_area;
-		std::map<std::string, Area*> areas;
 		std::map<std::string, std::string> sfx;
-		std::map<std::string, pickup_t> pickups;
 		std::list<Sound*> active_sfx;
 
 		//Shader * dof_shader;
@@ -99,17 +71,6 @@ class Game {
 		glm::vec2 mouse_position;
 		Texture2D * mouse_marker_texture;
 		glm::vec3 camera_offset;
-
-		enum {
-			MOVE_UP = 0,
-			MOVE_DOWN,
-			MOVE_RIGHT,
-			MOVE_LEFT,
-			MOUSE_1,
-			MOUSE_2,
-			NUM_ACTIVE_ACTIONS
-		};
-		bool sustained_action[NUM_ACTIVE_ACTIONS];
 };
 
 #endif

@@ -95,8 +95,14 @@ CL::CL() {
 														void *param_value,
 														size_t *param_value_size_ret)=NULL;
 	clGetGLContextInfoKHR=(clGetGLContextInfoKHR_fn)clGetExtensionFunctionAddress("clGetGLContextInfoKHR");
-
-	context_ = cl::Context(devices_, properties, &CL::cl_error_callback, NULL, &err);
+	
+	context_ = cl::Context(devices_, properties, 
+#ifndef WIN32
+		&CL::cl_error_callback
+#else
+		nullptr
+#endif
+		, nullptr, &err);
 
 	if(err != CL_SUCCESS) {
 		fprintf(stderr, "[OpenCL] Failed to create context: %s\n", errorString(err));
@@ -173,7 +179,7 @@ std::string CL::parse_file(
 			//Include the file:
 			char loc[256];
 			sprintf(loc, "%s:%d", filename.c_str(), linenr);
-			parsed_content << parse_file(PATH_BASE"/cl_programs/" + line, included_files, std::string(loc));
+			parsed_content << parse_file(PATH_BASE "/cl_programs/" + line, included_files, std::string(loc));
 		} else {
 			parsed_content << line << std::endl;
 		}
@@ -252,6 +258,7 @@ cl::BufferGL CL::create_gl_buffer(cl_mem_flags flags, GLuint gl_buffer) const {
 	return buffer;
 }
 
+/*
 cl::Image2DGL CL::create_from_gl_2d_image(cl_mem_flags flags, Texture2D * texture, GLenum texture_target, GLint miplevel) {
 	cl_int err;
 	cl::Image2DGL image(context_, flags, texture_target, miplevel, texture->gl_texture(), &err);
@@ -271,6 +278,7 @@ cl::Image3DGL CL::create_from_gl_3d_image(cl_mem_flags flags, Texture3D * textur
 	}
 	return image;
 }
+*/
 
 cl::CommandQueue &CL::queue() { return queue_; }
 cl::Context &CL::context() { return context_; }

@@ -4,6 +4,10 @@
 #include "movable_object.hpp"
 #include <glm/glm.hpp>
 
+/* Fuck you windows, sincerly me */
+#undef near
+#undef far
+
 class Camera : public MovableObject {
 public:
 	Camera(float fov, float aspect, float near, float far);

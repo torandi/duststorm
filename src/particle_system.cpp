@@ -8,6 +8,7 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <ctime>
 
 #include "cl.hpp"
 #include "globals.hpp"

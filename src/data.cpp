@@ -20,7 +20,7 @@ Data * Data::open(const char * filename) {
 }
 
 void * Data::load_from_file(const char * filename, size_t &size) {
-	FILE * file = fopen(filename, "r");
+	FILE * file = fopen(filename, "rb");
 	void * data;
 	if(file == nullptr) {
 		fprintf(verbose, "[Data] Couldn't open file %s\n", filename);
@@ -33,9 +33,15 @@ void * Data::load_from_file(const char * filename, size_t &size) {
 	rewind (file);
 
 	data = malloc(size);
-	size_t res = fread(data, 1, size, file);
-	if(res != size) {
-		fprintf(stderr, "Error in file read: read size was not the expected size (read %lu bytes, expected %lu)\n", res, size);
+	size_t read_bytes = 0;
+	while(read_bytes < size) {
+		size_t res = fread(data, 1, size, file);
+		if(res == 0) break;
+		read_bytes += res;
+	}
+
+	if(read_bytes != size) {
+		fprintf(stderr, "Error in file read: read size was not the expected size (read %lu bytes, expected %lu)\n", read_bytes, size);
 		abort();
 	}
 	fclose(file);

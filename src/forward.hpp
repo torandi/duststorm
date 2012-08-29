@@ -1,7 +1,7 @@
 class Camera;
 class CL;
 class Color;
-class Light;
+struct Light;
 class Mesh;
 class MovableObject;
 class ParticleSystem;
@@ -9,7 +9,6 @@ class PointTable;
 class Quad;
 class RenderObject;
 class RenderTarget;
-class Scene;
 class Shader;
 class TextureBase;
 class Texture2D;

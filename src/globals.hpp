@@ -2,19 +2,17 @@
 #define GLOBALS_H
 
 #ifdef HAVE_CONFIG_H
-	#include "config.h"
+       #include "config.h"
 #endif
 
 #include "shader.hpp"
 #include <glm/glm.hpp>
-#include "config.hpp"
 #include "cl.hpp"
 
 extern FILE* verbose;                    /* stderr if verbose output is enabled or /dev/null if not */
 extern float global_time;                 /* current time */
 extern glm::ivec2 resolution;            /* current resolution */
 extern glm::mat4 screen_ortho;           /* orthographic projection for window */
-extern Config config;
 extern CL * opencl;
 
 enum shader_t {
@@ -35,6 +33,6 @@ enum shader_t {
 
 extern Shader* shaders[];                /* all shader programs */
 
-void terminate(); //Implemented in main.cpp
+void terminate_program(); //Implemented in main.cpp
 
 #endif /* GLOBALS_H */

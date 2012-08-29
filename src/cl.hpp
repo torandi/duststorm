@@ -22,8 +22,8 @@ class CL {
       cl::Buffer create_buffer(cl_mem_flags flags, size_t size) const;
       cl::BufferGL create_gl_buffer(cl_mem_flags flags, GLuint gl_buffer) const;
 
-			cl::Image2DGL create_from_gl_2d_image(cl_mem_flags flags, Texture2D * texture, GLenum texture_target=GL_TEXTURE_2D, GLint miplevel = 0);
-			cl::Image3DGL create_from_gl_3d_image(cl_mem_flags flags, Texture3D * texture, GLint miplevel = 0);
+	/*cl::Image2DGL create_from_gl_2d_image(cl_mem_flags flags, Texture2D * texture, GLenum texture_target=GL_TEXTURE_2D, GLint miplevel = 0);
+	cl::Image3DGL create_from_gl_3d_image(cl_mem_flags flags, Texture3D * texture, GLint miplevel = 0);*/
 
       static void cl_error_callback(const char * errorinfo, const void * private_info_size, size_t cb, void * user_data);
 

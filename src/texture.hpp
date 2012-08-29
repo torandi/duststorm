@@ -68,7 +68,11 @@ public:
 
 	virtual ~Texture3D();
 
-	static Texture3D * from_filename(const char* filename, ...) __attribute__((sentinel));
+	static Texture3D * from_filename(const char* filename, ...) 
+#ifndef WIN32
+		__attribute__((sentinel))
+#endif
+;
 	static Texture3D * from_filename(const std::vector<std::string>& paths);
 
 	const GLint gl_texture() const;
@@ -116,7 +120,11 @@ class TextureArray: public TextureBase {
 public:
 	virtual ~TextureArray();
 
-	static TextureArray* from_filename(const char* filename, ...) __attribute__((sentinel));
+	static TextureArray* from_filename(const char* filename, ...) 
+#ifndef WIN32
+		__attribute__((sentinel))
+#endif		
+;
 	static TextureArray* from_filename(const std::vector<std::string>& paths);
 
 	size_t num_textures() const;

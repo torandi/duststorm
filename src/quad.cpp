@@ -25,5 +25,4 @@ Quad::Quad(glm::vec2 texture_scale, bool normal, bool tangent_and_bitangent) : M
 	if(normal) generate_normals();
 	if(tangent_and_bitangent) generate_tangents_and_bitangents();
 	generate_vbos();
-
 }

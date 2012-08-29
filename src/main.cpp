@@ -2,7 +2,7 @@
 	#include "config.h"
 #endif
 
-#define GAME_NAME "FUBAR ENGINE - The Big Ponny Slaughter"
+#define GAME_NAME "FUBAR 3D ENGINE"
 
 #include "engine.hpp"
 #include "globals.hpp"
@@ -20,12 +20,12 @@
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <unistd.h>
-#include <getopt.h>
+#ifndef WIN32
+	#include <getopt.h>
+#endif
+
 #include <map>
-#include <pthread.h>
-#include <time.h>
-#include <sys/time.h>
+#include <ctime>
 
 #define LOGFILE PATH_BASE "frob.log"
 
@@ -41,7 +41,7 @@ static int frames = 0;
 
 static void poll();
 
-void terminate() {
+void terminate_program() {
 	running = false;
 }
 
@@ -145,20 +145,19 @@ static void update(float dt){
 
 static void main_loop(){
 	/* for calculating dt */
-	struct timeval t, last;
-	gettimeofday(&t, NULL);
+	long t, last;
+	t = get_millis();
 	last = t;
 
 	while ( running ){
 		poll();
 
 		/* calculate dt */
-		struct timeval cur;
-		gettimeofday(&cur, NULL);
-		const uint64_t delta = (cur.tv_sec - t.tv_sec) * 1000000 + (cur.tv_usec - t.tv_usec);
-		const  int64_t delay = per_frame - delta;
+		long cur = get_millis();
+		const long delta = cur - t;
+		const long delay = per_frame - delta;
 
-		float dt = (cur.tv_sec - last.tv_sec)+ (cur.tv_usec - last.tv_usec)/1000000.0 ;
+		float dt = (cur - last)/1000000.0 ;
 
 		update(dt);
 		render();
@@ -166,21 +165,19 @@ static void main_loop(){
 		/* move time forward */
 		frames++;
 		last = cur;
-		t.tv_usec += per_frame;
-		if ( t.tv_usec > 1000000 ){
-			t.tv_usec -= 1000000;
-			t.tv_sec++;
-		}
+		t += per_frame;
+		
 
 		/* fixed framerate */
 		if ( delay > 0 ){
-			usleep(delay);
+			sleep_millis(delay);
 		}
 
 	}
 }
 
 void show_usage(){
+#ifndef WIN32
 	printf(PACKAGE_NAME "-" VERSION "\n"
 	       "usage: %s [OPTIONS]\n"
 	       "\n"
@@ -188,31 +185,32 @@ void show_usage(){
 	       "                          current resolution in fullscreen.)\n"
 	       "  -f, --fullscreen        Enable fullscreen mode (default: false)\n"
 	       "  -w, --windowed          Inverse of --fullscreen.\n"
-				 "  -c, --configure					Configure\n"
-				 "  -n, --no-vsync					Disable vsync\n"
+		   "  -n, --no-vsync					Disable vsync\n"
 	       "  -v, --verbose           Enable verbose output\n"
 	       "  -q, --quiet             Inverse of --verbose.\n"
 				 "  -l, --no-loading        Don't show loading scene (faster load).\n"
 	       "  -h, --help              This text\n",
 	       program_name);
+#else
+	printf(PACKAGE_NAME "-" VERSION ": windows doesn't support getopt. Go play with a kitten.\n");
+#endif
 }
 
 static int fullscreen = FULLSCREEN;
 static int vsync = 1;
 static int verbose_flag = 0;
-static int configure = 0;
-
+#ifndef WIN32
 static struct option options[] = {
 	{"resolution",   required_argument, 0, 'r'},
 	{"fullscreen",   no_argument,       &fullscreen, 1},
 	{"windowed",     no_argument,       &fullscreen, 0},
-	{"configure",		 no_argument,				&configure, 1},
 	{"no-vsync",     no_argument,       &vsync, 0},
 	{"verbose",      no_argument,       &verbose_flag, 1},
 	{"quiet",        no_argument,       &verbose_flag, 0},
 	{"help",         no_argument,       0, 'h'},
 	{0,0,0,0} /* sentinel */
 };
+#endif
 
 int main(int argc, char* argv[]){
 	/* extract program name from path. e.g. /path/to/MArCd -> MArCd */
@@ -224,8 +222,9 @@ int main(int argc, char* argv[]){
 	}
 
 	/* parse arguments */
+#ifndef WIN32
 	int op, option_index;
-	while ( (op = getopt_long(argc, argv, "r:fwcnvqlh", options, &option_index)) != -1 ){
+	while ( (op = getopt_long(argc, argv, "r:fwnvqlh", options, &option_index)) != -1 ){
 		switch ( op ){
 		case 0:   /* long opt*/
 		case '?': /* invalid */
@@ -253,9 +252,6 @@ int main(int argc, char* argv[]){
 			fullscreen = 0;
 			break;
 
-		case 'c':
-			configure = 1;
-			break;
 		case 'n': /* --no-vsync */
 			vsync = 0;
 			break;
@@ -277,15 +273,16 @@ int main(int argc, char* argv[]){
 			abort();
 		}
 	};
-
+#endif
 	verbose = fopen(verbose_flag ? "/dev/stderr" : LOGFILE, "w");
 
 	/* proper termination */
 	signal(SIGINT, handle_sigint);
 
+#ifndef WIN32
 	if(verbose_flag) {
 		/* setup FPS alarm handler */
-		struct itimerval difftime;
+		itimerval difftime;
 		difftime.it_interval.tv_sec = 1;
 		difftime.it_interval.tv_usec = 0;
 		difftime.it_value.tv_sec = 1;
@@ -293,17 +290,11 @@ int main(int argc, char* argv[]){
 		signal(SIGALRM, show_fps);
 		setitimer(ITIMER_REAL, &difftime, NULL);
 	}
+#endif
 
-	if(configure) {
-		SDL_Init(SDL_INIT_VIDEO);
-		SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
-		config.interactive_configure();
-		config.save();
-	} else {
-		init(fullscreen, vsync);
-		main_loop();
-		cleanup();
-	}
+	init(fullscreen, vsync);
+	main_loop();
+	cleanup();
 	
 	fclose(verbose);
 

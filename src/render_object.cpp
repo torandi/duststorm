@@ -202,13 +202,14 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 				normal = &zero_3d;
 
 			/* still hate c++ for not using designated initializes */
-			vertexData.push_back((Shader::vertex_t){
+			Shader::vertex_t v = {
 				/* .pos       = */ glm::vec3(pos->x, pos->y, pos->z),
 				/* .uv        = */ glm::vec2(texCoord->x, texCoord->y),
 				/* .normal    = */ glm::vec3(normal->x, normal->y, normal->z),
 				/* .tangent   = */ glm::vec3(tangent->x, tangent->y, tangent->z),
 				/* .bitangent = */ glm::vec3(bitangent->x, bitangent->y, bitangent->z),
-				/* .color     = */ glm::vec4(0.0f)});
+				/* .color     = */ glm::vec4(0.0f)};
+			vertexData.push_back(v);
 		}
 
 		for(unsigned int n = 0 ; n<mesh->mNumFaces; ++n) {

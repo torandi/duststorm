@@ -36,8 +36,8 @@ Sound::Sound(const char * file, int loops) : delay(-0.1f) {
 	if(system_usage_ == 0) initialize_fmod();
 	++system_usage_;
 
-	char* real_path;
-	if ( asprintf(&real_path, "%s%s", PATH_BASE "/game/data/sfx/", file) == -1 ){
+	char* real_path = (char*) malloc(sizeof(PATH_BASE) + sizeof(file) + 32);
+	if ( sprintf(real_path, "%s%s", PATH_BASE "/game/data/sfx/", file) == -1 ){
 		abort();
 	}
 	source = Data::open(real_path);
