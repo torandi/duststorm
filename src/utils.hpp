@@ -38,6 +38,7 @@ glm::vec2 screen_pos(const glm::vec2& v, const glm::vec2& size);
  */
 bool file_exists(const std::string& filename);
 
+#ifdef WIN32
 /* Fuck you microsoft: */
 #define M_E 2.71828182845904523536
 #define M_LOG2E 1.44269504088896340736
@@ -54,7 +55,6 @@ bool file_exists(const std::string& filename);
 #define M_SQRT2 1.41421356237309504880
 #define M_SQRT_2 0.707106781186547524401
 
-#ifdef WIN32
 #define round(val) floor((val) + 0.5)
 #endif
 

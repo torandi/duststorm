@@ -13,6 +13,9 @@
 
 #ifdef WIN32
 	#include <windows.h>
+#else
+	#include <unistd.h>
+	#include <sys/time.h>
 #endif
 
 int checkForGLErrors( const char *s ) {
@@ -70,7 +73,7 @@ long get_millis() {
 	#ifndef WIN32
 		struct timeval cur;
 		gettimeofday(&cur, NULL);
-		return (long) (cur.tv_sec * 1000000 + cur.tv_usec;
+		return (long) (cur.tv_sec * 1000000 + cur.tv_usec);
 	#else
 		SYSTEMTIME time;
 		GetSystemTime(&time);
