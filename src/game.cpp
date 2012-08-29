@@ -25,17 +25,21 @@ Game::Game() : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	composition = new RenderTarget(resolution, GL_RGB8, true);
 
-	mouse_marker_texture = Texture2D::from_filename("mouse_marker.png");
+	lights.ambient_intensity() = glm::vec3(.01f);
+	lights.num_lights() = 1;
 
-	/*downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
-	downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);*/
+	lights.lights[0]->set_position(glm::vec3(1.0, 2.0, 0.0f));
+	lights.lights[0]->intensity = glm::vec3(0.6f, 0.6f, 0.6f);
+	lights.lights[0]->type = Light::POINT_LIGHT;
+	lights.lights[0]->constant_attenuation = 0.0f;
+	lights.lights[0]->linear_attenuation = 0.1f;
+	lights.lights[0]->quadratic_attenuation = 0.4f;
 
-	Input::movement_speed = 15.f;
+	model = new RenderObject("pony1.obj");
+	model->set_position(glm::vec3(0, 0, 1));
 
-	//Prepare objects:
-
-	mix_shader = Shader::create_shader("mix");
-	u_texture_mix = mix_shader->uniform_location("texture_mix");
+	camera.set_position(glm::vec3(0, 0, 0));
+	camera.look_at(model->position());
 }
 
 Game::~Game() {
@@ -92,27 +96,8 @@ void Game::update(float dt) {
 		s->update(dt);
 	};
 
-#if DEBUG_MOVE
+
 	input.update_object(camera, dt);
-	if(input.current_value(Input::ACTION_1) > 0.5f) {
-		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
-	}
-#else
-	//Move camera:
-
-	look_at_player();
-#endif
-}
-
-void Game::look_at_player() {
-	//camera.look_at(player->position());
-	/*camera.set_position(player->position() + camera_offset);
-	float height = current_area->height_at(glm::vec2(camera.position().x, camera.position().z));
-	if(camera.position().y - height < 1.f)
-		camera.absolute_move(glm::vec3(0, (height + 1.f) - camera.position().y, 0.f));*/
-}
-
-void Game::do_action(int num) {
 
 }
 
@@ -126,9 +111,13 @@ void Game::render_content() {
 
 	shaders[SHADER_PASSTHRU]->bind();
 	Shader::upload_camera(camera);
+	Shader::upload_lights(lights);
 
-	render_statics();
-	render_dynamics();
+	RenderTarget::clear(Color::black);
+
+	shaders[SHADER_NORMAL]->bind();
+
+	model->render();
 
 	composition->unbind();
 }
@@ -152,20 +141,13 @@ void Game::render() {
 	render_display();
 }
 
-void Game::render_statics() {
-	mouse_marker_texture->texture_bind(Shader::TEXTURE_2D_1);
-	shaders[SHADER_NORMAL]->bind();
-}
-
-void Game::render_dynamics() {
-}
-
 void Game::render_display() {
 	RenderTarget::clear(Color::magenta);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
-	mix_shader->bind();
+	screen->draw(shaders[SHADER_PASSTHRU]);
+	/*mix_shader->bind();
 	glUniform1f(u_texture_mix, 0.f);
-	screen->draw(mix_shader);
+	screen->draw(mix_shader);*/
 }
 
 void Game::render_composition(){

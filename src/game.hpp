@@ -5,6 +5,7 @@
 #include "globals.hpp"
 #include "camera.hpp"
 #include "rendertarget.hpp"
+#include "render_object.hpp"
 #include "shader.hpp"
 #include "quad.hpp"
 #include "terrain.hpp"
@@ -37,14 +38,9 @@ class Game {
 	private:
 		GLint u_texture_mix;
 		Shader * mix_shader;
+		RenderObject * model;
+		LightsData lights;
 
-		struct pickup_t {
-			std::string vfx;
-			float radius;
-			int effect;
-			std::string attribute;
-			std::string sfx;
-		};
 
 		Input input;
 		void render_composition();
@@ -56,10 +52,6 @@ class Game {
 
 		void do_action(int num);
 
-		void update_mouse_position(int x, int y);
-
-		void look_at_player();
-
 		Camera camera;
 		RenderTarget *screen, *composition;//, *downsample[2];
 
@@ -68,8 +60,6 @@ class Game {
 
 		//Shader * dof_shader;
 	
-		glm::vec2 mouse_position;
-		Texture2D * mouse_marker_texture;
 		glm::vec3 camera_offset;
 };
 

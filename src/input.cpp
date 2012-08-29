@@ -4,7 +4,7 @@
 #include <SDL/SDL.h>
 
 #define AXIS_MAX 32767.f
-#define DEAD_ZONE 0.3f
+#define DEAD_ZONE 0.2f
 
 float Input::movement_speed = 1.f;
 float Input::rotation_speed = 1.f;
@@ -17,12 +17,6 @@ Input::Input(){
 		moved_triggers = new bool[SDL_JoystickNumAxes(joy)];
 		for(int i=0; i < SDL_JoystickNumAxes(joy); ++i)
 			moved_triggers[i]=false;
-	}
-	for(float &f : sustained_values) {
-		f = 0.f;
-	}
-	for(float &f : temporary_values) {
-		f = 0.f;
 	}
 }
 
