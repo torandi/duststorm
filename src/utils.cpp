@@ -55,6 +55,16 @@ unsigned long util_utime(){
 #endif
 }
 
+void util_usleep(unsigned long wait){
+#ifdef HAVE_USLEEP
+	usleep(wait);
+#elif defined(WIN32)
+	Sleep(wait / 1000); /** @todo Sleep only has ms-precision (and bad such). */
+#else
+#error util_usleep() is not defined for this platform.
+#endif
+}
+
 int checkForGLErrors( const char *s ) {
 	int errors = 0 ;
 
