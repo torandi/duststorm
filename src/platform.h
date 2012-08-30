@@ -14,7 +14,7 @@
 #       define __UNUSED__(decl) decl 
 #       define __WARN_UNUSED__(decl) decl 
 #       define __ALIGNED__(decl, size) decl		 
-#elif __GNUC__
+#elif defined(__GNUC__)
 #       define __PURE__(decl) decl __attribute__((pure))
 #       define __CONST__(decl) decl __attribute__((const))
 #       define __DEPRECATED__(decl) decl __attribute__ ((deprecated))
@@ -27,7 +27,7 @@
 #       define __UNUSED__(decl) decl __attribute__ ((unused))
 #       define __WARN_UNUSED__(decl) decl __attribute__((warn_unused_result))
 #       define __ALIGNED__(decl, size) decl __attribute__((aligned(16)))
-#elif WIN32
+#elif defined(WIN32)
 #       define __PURE__(decl) decl
 #       define __CONST__(decl) decl
 #       define __DEPRECATED__(decl) __declspec(deprecated) decl
@@ -76,6 +76,8 @@
 #	define M_SQRT_2 0.707106781186547524401
 
 #	define round(val) floor((val) + 0.5)
+
+	typedef size_t ssize_t;
 
 #endif
 

@@ -1,12 +1,11 @@
 #ifndef DATA_HPP
 #define DATA_HPP
+
+#include "platform.h"
+
 #include <cstdio>
 #include <string>
 #include <ostream>
-
-#ifdef WIN32
-	typedef size_t ssize_t;
-#endif
 
 /*
  * This is intended as the single point of i/o, so as to make it easy to
