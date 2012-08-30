@@ -36,18 +36,24 @@ AC_ARG_VAR([FULLSCREEN], [If non-empty fullscreen is used by default])
 AS_IF([test "x${FULLSCREEN}" == "x" -o "x${FULLSCREEN}" == "x0"], [FULLSCREEN=0], [FULLSCREEN=1])
 AC_DEFINE_UNQUOTED([FULLSCREEN], [$FULLSCREEN], [Define to 1 if fullscreen is used by default])
 
-dnl Use vendor libs
 platform=$(uname -s)
 arch=$(uname -m)
 AS_IF([test "x${platform}" == "xDarwin"], [arch="osx"])
-VENDOR_CFLAGS="-I \${top_srcdir}/vendor/include"
-VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/$arch -Wl,--rpath \${top_srcdir}/vendor/libs/$arch"
+
+dnl Use vendor libs
+VENDOR_CFLAGS=""
+VENDOR_LIBS=""
+AC_ARG_ENABLE([vendor-libs], [AS_HELP_STRING([--enable-vendor-libs], [Use libraries from vendor folder instead of system. @<:@default=enabled@:>@])], [], [enable_vendor_libs="yes"])
+AS_IF([test "x$enable_vendor_libs" == "xyes"], [
+	VENDOR_CFLAGS="-I \${top_srcdir}/vendor/include"
+	VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/$arch -Wl,--rpath \${top_srcdir}/vendor/libs/$arch"
+])
 AC_SUBST(VENDOR_CFLAGS)
 AC_SUBST(VENDOR_LIBS)
 
 dnl Show config
 echo
-echo "     Platform/arch: $platform $arch"
+echo "     Platform/arch: $platform $arch (vendor libs: $enable_vendor_libs)"
 echo "         Data path: $DATA_PATH"
 echo "    Editor enabled: $enable_editor"
 echo "     Input enabled: $enable_input"
