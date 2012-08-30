@@ -9,6 +9,8 @@
 #include <map>
 #include <set>
 
+//#include "texture.hpp"
+
 class CL {
 	public:
 		CL();
@@ -23,7 +25,7 @@ class CL {
 		/*cl::Image2DGL create_from_gl_2d_image(cl_mem_flags flags, Texture2D * texture, GLenum texture_target=GL_TEXTURE_2D, GLint miplevel = 0);
 		  cl::Image3DGL create_from_gl_3d_image(cl_mem_flags flags, Texture3D * texture, GLint miplevel = 0);*/
 
-		static void cl_error_callback(const char * errorinfo, const void * private_info_size, size_t cb, void * user_data);
+		static void CL_CALLBACK cl_error_callback(const char * errorinfo, const void * private_info_size, size_t cb, void * user_data);
 
 		static void check_error(const cl_int &err, const char * context);
 

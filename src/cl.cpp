@@ -96,13 +96,7 @@ CL::CL() {
 														size_t *param_value_size_ret)=NULL;
 	clGetGLContextInfoKHR=(clGetGLContextInfoKHR_fn)clGetExtensionFunctionAddress("clGetGLContextInfoKHR");
 	
-	context_ = cl::Context(devices_, properties, 
-#ifndef WIN32
-		&CL::cl_error_callback
-#else
-		nullptr
-#endif
-		, nullptr, &err);
+	context_ = cl::Context(devices_, properties, &CL::cl_error_callback, nullptr, &err);
 
 	if(err != CL_SUCCESS) {
 		fprintf(stderr, "[OpenCL] Failed to create context: %s\n", errorString(err));
