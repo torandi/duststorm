@@ -33,6 +33,7 @@ Data * Data::open(const char * filename) {
 
 void * Data::load_from_file(const char * filename, size_t &size) {
 	FILE * file = fopen(filename, "rb");
+	void * data;
 	if(file == nullptr) {
 		fprintf(verbose, "[Data] Couldn't open file `%s'\n", filename);
 		return nullptr;
@@ -49,7 +50,11 @@ void * Data::load_from_file(const char * filename, size_t &size) {
 	}
 
 	if(read_bytes != size) {
-		fprintf(stderr, "Error in file read: read size was not the expected size (read %lu bytes, expected %lu)\n", read_bytes, size);
+		if ( ferror(file) ){
+			fprintf(stderr, "Error when reading file `%s': %s\n", filename, strerror(errno));
+		} else {
+			fprintf(stderr, "Error when reading file `%s': read size was not the expected size (read %lu bytes, expected %lu)\n", filename, res, size);
+		}
 		abort();
 	}
 	fclose(file);
