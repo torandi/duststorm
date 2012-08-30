@@ -1141,7 +1141,7 @@ vn -0.561693 -0.537736 -0.628742
 vn -0.871578 -0.305429 -0.383404
 vn -0.985229 -0.113437 -0.128239
 vn -0.987457 0.068300 0.142186
-usemtl fluttershy_hair_front_fluttershy_hair_front_fluttershy_hair_front.tif.001
+usemtl fluttershy_hair_front_fluttershy_hair_front_fluttershy_hair_front.png.001
 s 1
 f 1/1/1 2/2/2 3/3/3 4/4/4
 f 5/5/5 1/1/1 4/4/4 6/6/6
@@ -2908,7 +2908,7 @@ vn -0.869015 0.051363 -0.492080
 vn -0.718802 0.009949 -0.695120
 vn -0.874935 0.054628 -0.481094
 vn -0.735679 -0.070437 -0.673605
-usemtl fluttershy_eyes_fluttershy_eyes.tif_fluttershy_eyes.tif.001
+usemtl fluttershy_eyes_fluttershy_eyes.png_fluttershy_eyes.png.001
 s 1
 f 371/400/371 372/401/372 373/402/373 374/403/374
 f 371/400/371 375/404/375 376/405/376 377/406/377
@@ -6321,7 +6321,7 @@ vn 0.558916 -0.045137 0.827967
 vn 0.790796 -0.308664 0.528489
 vn 0.868831 -0.492019 0.055055
 vn 0.735893 -0.519456 -0.434278
-usemtl fluttershy_tail_fluttershy_tail.tif_fluttershy_tail.tif.001
+usemtl fluttershy_tail_fluttershy_tail.png_fluttershy_tail.png.001
 s 1
 f 1345/1156/1345 1346/1157/1346 1347/1158/1347 1348/1159/1348
 f 1349/1160/1349 1345/1156/1345 1348/1159/1348 1350/1161/1350
@@ -10809,7 +10809,7 @@ vn -0.653249 -0.151555 0.741783
 vn -0.479629 0.871120 -0.105319
 vn 0.804315 -0.258095 0.535173
 vn 0.588397 0.598865 0.543260
-usemtl fluttershy_body_fluttershy_body_2048._fluttershy_body_2048.tif.001
+usemtl fluttershy_body_fluttershy_body_2048._fluttershy_body_2048.png.001
 s 1
 f 1805/1659/1805 1806/1660/1806 1807/1661/1807 1808/1662/1808
 f 1808/1662/1808 1807/1661/1807 1809/1663/1809 1810/1664/1810
@@ -14930,7 +14930,7 @@ vn -0.157598 0.089755 0.983398
 vn -0.360149 0.057863 0.931089
 vn 0.047853 0.316996 0.947203
 vn -0.140141 0.273049 0.951720
-usemtl fluttershy_hair_back_fluttershy_hair_back._fluttershy_hair_back.tif.001
+usemtl fluttershy_hair_back_fluttershy_hair_back._fluttershy_hair_back.png.001
 s 1
 f 3469/3205/3469 3470/3206/3470 3471/3207/3471 3472/3208/3472
 f 3470/3206/3470 3473/3209/3473 3474/3210/3474 3471/3207/3471
@@ -16954,7 +16954,7 @@ vn -0.590533 0.806665 0.023133
 vn 0.763146 0.578936 -0.287057
 vn -0.126255 -0.970336 0.206091
 vn -0.266243 -0.929624 -0.254707
-usemtl fluttershy_wings1_fluttershy_wings.tif_fluttershy_wings.tif.001
+usemtl fluttershy_wings1_fluttershy_wings.png_fluttershy_wings.png.001
 s 1
 f 3903/3670/3903 3904/3671/3904 3905/3672/3905 3906/3673/3906
 f 3907/3674/3907 3903/3670/3903 3908/3675/3908 3909/3676/3909
