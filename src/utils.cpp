@@ -18,6 +18,10 @@
 	#include <sys/time.h>
 #endif
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 int checkForGLErrors( const char *s ) {
 	int errors = 0 ;
 
