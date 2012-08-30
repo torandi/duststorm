@@ -12,8 +12,11 @@
  */
 float get_time();
 
-long get_millis();
 void sleep_millis(long wait);
+/**
+ * Read a monotonic clock with µs-precision.
+ */
+unsigned long util_utime();
 
 int checkForGLErrors( const char *s );
 

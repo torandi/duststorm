@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 
 #ifdef HAVE_SYS_TIME_H
 #	include <sys/time.h>
@@ -17,6 +18,42 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
+unsigned long util_utime(){
+#ifdef HAVE_GETTIMEOFDAY
+	struct timeval cur;
+	gettimeofday(&cur, NULL);
+	return (unsigned long)(cur.tv_sec * 1000000 + cur.tv_usec);
+#elif defined(WIN32)
+	static int initialized = 0;
+	static int dst_warning = 0;
+	static long long int divider = 0;
+	static LARGE_INTEGER qpc_freq;
+
+	/* verify timer precision */
+	if ( !initialized ){
+		QueryPerformanceFrequency(&qpc_freq);
+		if ( qpc_freq.QuadPart < 1000000 ){
+			fprintf(stderr, "warning: gettimeofday() requires µs precision but is not available (have %lld ticks per second).\n", qpc_freq.QuadPart);
+		}
+
+		/* set divider to calculate µs */
+		divider = qpc_freq.QuadPart / 1000000;
+		initialized = 1;
+	}
+
+	/* time query */
+	LARGE_INTEGER tmp;
+	QueryPerformanceCounter(&tmp);
+	return (unsigned long)(tmp.QuadPart / divider);
+#else
+#error util_utime() is not defined for this platform.
+#endif
+}
 
 int checkForGLErrors( const char *s ) {
 	int errors = 0 ;

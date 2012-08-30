@@ -26,7 +26,7 @@ AS_IF([test "x$no_cl" == "xyes"], [AC_MSG_ERROR([OpenCL libraries required])])
 
 AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([GL/glx.h])
-AC_CHECK_FUNCS([access])
+AC_CHECK_FUNCS([access gettimeofday])
 
 dnl Setup paths
 AC_ARG_VAR([DATA_PATH], [Data path prefix. Default is relative path to top srcdir])
