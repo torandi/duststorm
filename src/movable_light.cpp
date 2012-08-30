@@ -1,11 +1,9 @@
-#define GLM_SWIZZLE
-
 #include <glm/glm.hpp>
 
 #include "movable_light.hpp"
 
 MovableLight::MovableLight(Light * light) : 
-		MovableObject(light->position.xyz)
+		MovableObject(light->position)
 	, data(light)
 	, constant_attenuation(data->constant_attenuation)
 	, linear_attenuation(data->linear_attenuation)

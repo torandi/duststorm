@@ -75,7 +75,11 @@
 #	define M_SQRT2 1.41421356237309504880
 #	define M_SQRT_2 0.707106781186547524401
 
-#	define round(val) floor((val) + 0.5)
+#	include <cmath>
+
+	inline double round(double val) { return floor((val) + 0.5); };
+	
+	inline bool isblank(char c) { return (c == ' ' || c == '\t'); };
 
 	typedef size_t ssize_t;
 
