@@ -17,7 +17,7 @@ const unsigned int Quad::indices[] = {0,1,2,3,0,2};
 
 Quad::Quad(glm::vec2 texture_scale, bool normal, bool tangent_and_bitangent) : Mesh() {
 	float v[NUM_VERTEX_DATA_POINTS][NUM_VERTEX_DATA_POINTS];
-	memcpy(v, vertices, 20*sizeof(float));
+	memcpy(v, vertices, NUM_VERTICES*NUM_VERTEX_DATA_POINTS*sizeof(float));
 	for(int i=0; i <NUM_VERTICES; ++i) {
 		v[i][3]*=texture_scale.x; //u
 		v[i][4]*=texture_scale.y; //v
