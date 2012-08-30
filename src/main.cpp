@@ -112,6 +112,7 @@ static void init(bool fullscreen, bool vsync){
 
 static void cleanup(){
 	Engine::cleanup();
+	Shader::cleanup();
 }
 
 static void poll(){
@@ -182,19 +183,19 @@ static void main_loop(){
 
 void show_usage(){
 #ifndef WIN32
-	printf(PACKAGE_NAME "-" VERSION "\n"
+	printf(GAME_NAME " (" PACKAGE_NAME "-" VERSION ")\n"
 	       "usage: %s [OPTIONS]\n"
 	       "\n"
 	       "  -r, --resolution=SIZE   Set window resultion (default: 800x600 in windowed and\n"
 	       "                          current resolution in fullscreen.)\n"
-	       "  -f, --fullscreen        Enable fullscreen mode (default: false)\n"
+	       "  -f, --fullscreen        Enable fullscreen mode (default: %s)\n"
 	       "  -w, --windowed          Inverse of --fullscreen.\n"
 		   "  -n, --no-vsync					Disable vsync\n"
 	       "  -v, --verbose           Enable verbose output\n"
 	       "  -q, --quiet             Inverse of --verbose.\n"
 				 "  -l, --no-loading        Don't show loading scene (faster load).\n"
 	       "  -h, --help              This text\n",
-	       program_name);
+			program_name, FULLSCREEN ? "true" : "false");
 #else
 	printf(PACKAGE_NAME "-" VERSION ": windows doesn't support getopt. Go play with a kitten.\n");
 #endif
