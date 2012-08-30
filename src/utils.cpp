@@ -9,13 +9,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
 
-#ifdef WIN32
-	#include <windows.h>
-#else
-	#include <unistd.h>
-	#include <sys/time.h>
+#ifdef HAVE_SYS_TIME_H
+#	include <sys/time.h>
 #endif
 
 #ifdef HAVE_UNISTD_H
