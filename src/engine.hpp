@@ -11,6 +11,8 @@ namespace Engine {
 	void update(float dt);
 	void render();
 
+	void terminate(); //Implemented in main.cpp
+
 	/**
 	 * Enable and disable settings.
 	 */

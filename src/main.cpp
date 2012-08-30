@@ -45,8 +45,10 @@ static int frames = 0;
 
 static void poll();
 
-void terminate_program() {
-	running = false;
+namespace Engine {
+	void terminate() {
+		::running = false;
+	}
 }
 
 static void handle_sigint(int signum){

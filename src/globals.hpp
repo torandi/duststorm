@@ -35,6 +35,4 @@ enum shader_t {
 
 extern Shader* shaders[];                /* all shader programs */
 
-void terminate_program(); //Implemented in main.cpp
-
 #endif /* GLOBALS_H */
