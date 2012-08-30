@@ -100,8 +100,6 @@ void Game::update(float dt) {
 
 	model->yaw(dt*1.0);
 
-	//input.update_object(camera, dt);
-
 }
 
 void Game::handle_input(const SDL_Event &event) {

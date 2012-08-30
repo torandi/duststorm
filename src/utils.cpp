@@ -70,22 +70,19 @@ std::string color_to_string(const glm::ivec3 &color) {
 }
 
 long get_millis() {
-	#ifndef WIN32
-		struct timeval cur;
-		gettimeofday(&cur, NULL);
-		return (long) (cur.tv_sec * 1000000 + cur.tv_usec);
-	#else
-		SYSTEMTIME time;
-		GetSystemTime(&time);
-		WORD millis = (time.wSecond * 1000) + time.wMilliseconds;
-		return (long) millis;
-	#endif
+#ifndef WIN32
+	struct timeval cur;
+	gettimeofday(&cur, NULL);
+	return (long) (cur.tv_sec * 1000000 + cur.tv_usec);
+#else
+	return (long) GetTickCount()*1000;
+#endif
 }
 
 void sleep_millis(long wait) {
 #ifndef WIN32
 	usleep(wait);
 #else
-	Sleep(wait);
+	Sleep(wait / 1000);
 #endif
 }

@@ -152,17 +152,17 @@ static void main_loop(){
 	long t, last;
 	t = get_millis();
 	last = t;
-
 	while ( running ){
+		
 		poll();
-
+		
 		/* calculate dt */
 		long cur = get_millis();
 		const long delta = cur - t;
 		const long delay = per_frame - delta;
 
 		float dt = (cur - last)/1000000.0 ;
-
+		
 		update(dt);
 		render();
 
