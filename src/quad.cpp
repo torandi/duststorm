@@ -5,6 +5,7 @@
 
 static const int NUM_VERTICES = 4;
 static const int NUM_VERTEX_DATA_POINTS = 5;
+static const int NUM_INDICES = 6;
 
 const float Quad::vertices[][NUM_VERTEX_DATA_POINTS] = { /* x,y,z,u,v */
 	{1.f, 1.f, 0.f, 1.f, 1.f},
@@ -13,7 +14,7 @@ const float Quad::vertices[][NUM_VERTEX_DATA_POINTS] = { /* x,y,z,u,v */
 	{0.f, 1.f, 0.f, 0.f, 1.f},
 };
 
-const unsigned int Quad::indices[] = {0,1,2,3,0,2};
+const unsigned int Quad::indices[NUM_INDICES] = {0,1,2,3,0,2};
 
 Quad::Quad(glm::vec2 texture_scale, bool normal, bool tangent_and_bitangent) : Mesh() {
 	float v[NUM_VERTEX_DATA_POINTS][NUM_VERTEX_DATA_POINTS];
@@ -23,7 +24,7 @@ Quad::Quad(glm::vec2 texture_scale, bool normal, bool tangent_and_bitangent) : M
 		v[i][4]*=texture_scale.y; //v
 	}
 	set_vertices(v, NUM_VERTICES);
-	set_indices(std::vector<unsigned int>(indices, indices+sizeof(indices)));
+	set_indices(std::vector<unsigned int>(indices, indices+NUM_INDICES));
 
 	if(normal) generate_normals();
 	if(tangent_and_bitangent) generate_tangents_and_bitangents();
