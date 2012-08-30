@@ -8,6 +8,14 @@
 #include <cstdlib>
 #include <cstring>
 
+static long file_size(FILE* fp){
+	const long cur = ftell(fp);
+	fseek (fp , 0 , SEEK_END);
+	const long bytes = ftell(fp);
+	fseek(fp, cur, SEEK_SET);
+	return bytes;
+}
+
 Data::file_load_func * Data::load_file = &Data::load_from_file;
 
 Data * Data::open(const std::string &filename) {
@@ -25,16 +33,12 @@ Data * Data::open(const char * filename) {
 
 void * Data::load_from_file(const char * filename, size_t &size) {
 	FILE * file = fopen(filename, "rb");
-	void * data;
 	if(file == nullptr) {
-		fprintf(verbose, "[Data] Couldn't open file %s\n", filename);
+		fprintf(verbose, "[Data] Couldn't open file `%s'\n", filename);
 		return nullptr;
 	}
 
-	// obtain file size:
-	fseek (file , 0 , SEEK_END);
-	size = ftell (file);
-	rewind (file);
+	size = file_size(file);
 
 	data = malloc(size);
 	size_t read_bytes = 0;
