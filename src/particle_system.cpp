@@ -243,9 +243,13 @@ void ParticleSystem::update(float dt) {
 }
 
 void ParticleSystem::render(const glm::mat4 * m) {
-	glDepthMask(GL_FALSE);
 
 	Shader::push_vertex_attribs();
+
+	glPushAttrib(GL_ENABLE_BIT|GL_DEPTH_BUFFER_BIT);
+
+	glDepthMask(GL_FALSE);
+	glDisable(GL_CULL_FACE);
 
 	if(m == nullptr) 
 		Shader::upload_model_matrix(matrix());
@@ -284,7 +288,8 @@ void ParticleSystem::render(const glm::mat4 * m) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	glPopAttrib();
+
 	Shader::pop_vertex_attribs();
 
-	glDepthMask(GL_TRUE);
 }

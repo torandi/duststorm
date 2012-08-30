@@ -60,6 +60,7 @@ class ParticleSystem : public MovableObject {
 			int num_textures;
 			int max_num_particles;
 		} config, 16);
+
 		float avg_spawn_rate; //Number of particles to spawn per second
 		float spawn_rate_var;
 
