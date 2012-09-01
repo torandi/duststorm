@@ -1,14 +1,15 @@
 #ifdef HAVE_CONFIG_H
-	#include "config.h"
+#include "config.h"
 #endif
 
 #include "sound.hpp"
 #include "globals.hpp"
-#include "data.hpp"
 
 #include <fmodex/fmod_errors.h>
 
 #define MAX_CHANNELS 100
+
+static const bool mute_sound = false;
 
 FMOD::System * Sound::system_ = nullptr;
 unsigned int Sound::system_usage_ = 0;
@@ -46,7 +47,7 @@ Sound::Sound(const char * file, int loops) : delay(-0.1f) {
 		printf("[Sound] Couldn't open file %s\n", real_path);
 		abort();
 	}
-	
+
 	free(real_path);
 
 	FMOD_CREATESOUNDEXINFO info = {0, };
@@ -59,29 +60,33 @@ Sound::Sound(const char * file, int loops) : delay(-0.1f) {
 	errcheck("start sound (paused)");
 	result_ = channel_->setLoopCount(loops);
 	errcheck("set loops");
+	if(mute_sound) {
+		channel_->setMute(true);
+		printf("WARNING! Sound is MUTED!\n");
+	}
 
 	sound_usage_count_ = new int;
 	++(*sound_usage_count_);
 }
 
 Sound::Sound(const Sound &sound, int loops) : 
-		delay(-0.1f)
+	delay(-0.1f)
 	,	source(sound.source)
 	, sound_(sound.sound_)
 	, sound_usage_count_(sound.sound_usage_count_)
 {
-		++system_usage_;
+	++system_usage_;
 
-		++(*sound_usage_count_);
+	++(*sound_usage_count_);
 
-		result_ = system_->playSound(FMOD_CHANNEL_FREE, sound_, true /* paused */, &channel_);
-		if(result_ != FMOD_OK) {
-			fprintf(verbose, "[FMOD] Failed to start playing sound\n");
-			channel_ = nullptr;
-			return;
-		}
-		result_ = channel_->setLoopCount(loops);
-		errcheck("set loop count");
+	result_ = system_->playSound(FMOD_CHANNEL_FREE, sound_, true /* paused */, &channel_);
+	if(result_ != FMOD_OK) {
+		fprintf(verbose, "[FMOD] Failed to start playing sound\n");
+		channel_ = nullptr;
+		return;
+	}
+	result_ = channel_->setLoopCount(loops);
+	errcheck("set loop count");
 }
 
 Sound::~Sound() {
@@ -160,6 +165,6 @@ double Sound::time() const {
 
 void Sound::seek(double t) {
 	if(channel_ == nullptr) return;
-		result_ = channel_->setPosition(t*1000.0, FMOD_TIMEUNIT_MS);
-		errcheck("Sound::seek()");
+	result_ = channel_->setPosition(t*1000.0, FMOD_TIMEUNIT_MS);
+	errcheck("Sound::seek()");
 }
