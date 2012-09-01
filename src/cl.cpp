@@ -96,8 +96,6 @@ CL::CL() {
 	if(deviceSize == 0) {
 		fprintf(stderr, "[OpenCL] Interop not possible\n");
 		abort();
-	} else {
-		printf("devices: %d\n", deviceSize / sizeof(cl_device_id));
 	}
 
 	
