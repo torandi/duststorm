@@ -47,13 +47,20 @@ CL::CL() {
 		0
 	};
 #elif defined WIN32
-	cl_context_properties properties[] =
-	{
-		CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
-		CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
-		CL_CONTEXT_PLATFORM, (cl_context_properties)(platform_)(),
+	HGLRC current_context = wglGetCurrentContext();
+	HDC current_dc = wglGetCurrentDC();
+	if(current_dc == NULL || current_context == NULL) {
+		fprintf(stderr,"[OpenCL] No OpenGL context active\n");
+		abort();
+	}
+
+	cl_context_properties properties[] = {
+		CL_CONTEXT_PLATFORM, (cl_context_properties)platform_(),
+		CL_WGL_HDC_KHR, (intptr_t) current_dc,
+		CL_GL_CONTEXT_KHR, (intptr_t) current_context,
 		0
 	};
+
 #else
 	if(glXGetCurrentContext() == NULL) {
 		fprintf(stderr, "[OpenCL] glXGetCurrentContex() return NULL. Make sure to create OpenGL context before create the CL-context\n");
@@ -68,11 +75,43 @@ CL::CL() {
 	};
 #endif
 
+	
+	static CL_API_ENTRY cl_int (CL_API_CALL
+	*clGetGLContextInfoKHR)(const cl_context_properties *properties,
+														cl_gl_context_info param_name,
+														size_t param_value_size,
+														void *param_value,
+														size_t *param_value_size_ret)=NULL;
 
-	platform_.getDevices(CL_DEVICE_TYPE_GPU, &devices_);
+	clGetGLContextInfoKHR = (clGetGLContextInfoKHR_fn) clGetExtensionFunctionAddress("clGetGLContextInfoKHR");
+
+	cl_device_id devices[32];
+	size_t deviceSize = 0;
+	err = clGetGLContextInfoKHR(properties, 
+									CL_DEVICES_FOR_GL_CONTEXT_KHR,
+									32 * sizeof(cl_device_id), 
+									devices, 
+									&deviceSize);
+
+	if(deviceSize == 0) {
+		fprintf(stderr, "[OpenCL] Interop not possible\n");
+		abort();
+	} else {
+		printf("devices: %d\n", deviceSize / sizeof(cl_device_id));
+	}
+
+	
+	
 	cl_bool image_support, available;
 	size_t max_width, max_height;
-	for(cl::Device device : devices_) {
+	cl_uint num_cores, frequency;
+	cl_device_type _type;
+	std::string type;
+
+	fprintf(verbose, "[OpenCL] Available devices: \n");
+
+	for(int i=0; i< (deviceSize / sizeof(cl_device_id)); ++i) {
+		cl::Device device(devices[i]);
 		device.getInfo(CL_DEVICE_VENDOR, &name);
 		device.getInfo(CL_DEVICE_VERSION, &version);
 		device.getInfo(CL_DEVICE_EXTENSIONS, &extensions);
@@ -80,37 +119,56 @@ CL::CL() {
 		device.getInfo(CL_DEVICE_IMAGE_SUPPORT, &image_support);
 		device.getInfo(CL_DEVICE_IMAGE2D_MAX_WIDTH, &max_width);
 		device.getInfo(CL_DEVICE_IMAGE2D_MAX_HEIGHT, &max_height);
-		fprintf(verbose, "[OpenCL] Device (%p): %s %s\n"
-				"		Available: %s, Image support: %s, max size: %lux%lu\n"
-				"		Extensions: %s\n", (device)(),  name.c_str(), version.c_str(),available?"YES":"NO",image_support?"YES":"NO", max_width, max_height, extensions.c_str());
+		device.getInfo( CL_DEVICE_MAX_COMPUTE_UNITS , &num_cores);
+		device.getInfo(CL_DEVICE_MAX_CLOCK_FREQUENCY, &frequency);
+		device.getInfo(CL_DEVICE_TYPE, &_type);
 
+		switch(_type) {
+			case CL_DEVICE_TYPE_GPU:
+				type = "GPU";
+				break;
+			case CL_DEVICE_TYPE_CPU:
+				type = "CPU";
+				break;
+			case CL_DEVICE_TYPE_ACCELERATOR:
+				type =  "Accelerator";
+				break;
+		}
+
+		fprintf(verbose, "[OpenCL] Device (%p): %s %s (%s)\n"
+				"		Cores: %u, Frequency: %u MHz, Available: %s,"
+				"		Image support: %s, max size: %lux%lu\n"
+				"		Extensions: %s\n --- \n", (device)(),  name.c_str(), version.c_str(), type.c_str(), num_cores, frequency,available?"YES":"NO",image_support?"YES":"NO", max_width, max_height, extensions.c_str());
+		devices_.push_back(device);
 	}
+	
+	fprintf(verbose, "\n-------------------\n");
 
 	cl_device_id device_id;
 
-	static CL_API_ENTRY cl_int (CL_API_CALL
-	*clGetGLContextInfoKHR)(const cl_context_properties *properties,
-														cl_gl_context_info param_name,
-														size_t param_value_size,
-														void *param_value,
-														size_t *param_value_size_ret)=NULL;
-	clGetGLContextInfoKHR=(clGetGLContextInfoKHR_fn)clGetExtensionFunctionAddress("clGetGLContextInfoKHR");
-	
+
 	context_ = cl::Context(devices_, properties, &CL::cl_error_callback, nullptr, &err);
+
 
 	if(err != CL_SUCCESS) {
 		fprintf(stderr, "[OpenCL] Failed to create context: %s\n", errorString(err));
 		abort();
 	}
 
+
+
 	err = clGetGLContextInfoKHR(properties, CL_CURRENT_DEVICE_FOR_GL_CONTEXT_KHR, sizeof(device_id), &device_id, NULL);
 	if(err != CL_SUCCESS) {
 		fprintf(stderr, "[OpenCL] Failed to get current device for context: %s\n", errorString(err));
 		abort();
 	}
-	fprintf(verbose,"[OpenCL] Context device id: %p\n", device_id);
 
 	context_device_ = cl::Device(device_id);
+
+	
+	context_device_.getInfo(CL_DEVICE_VENDOR, &name);
+	context_device_.getInfo(CL_DEVICE_VERSION, &version);
+		fprintf(verbose, "[OpenCL] Context Device (%p): %s %s\n",(context_device_)(),  name.c_str(), version.c_str());
 
 	queue_ = cl::CommandQueue(context_, context_device_, 0, &err);
 
@@ -204,7 +262,7 @@ cl::Program CL::create_program(const std::string &source_file) const{
 
 
 	std::string build_log;
-	program.getBuildInfo(devices_[0], CL_PROGRAM_BUILD_LOG, &build_log);
+	program.getBuildInfo(context_device_, CL_PROGRAM_BUILD_LOG, &build_log);
 
 	if(build_log.size() > 1) { /* 1+ because nvidia likes to put a single LF in the log */
 		fprintf(stderr, "[OpenCL] Build log: %s\n", build_log.c_str());
@@ -249,6 +307,19 @@ cl::BufferGL CL::create_gl_buffer(cl_mem_flags flags, GLuint gl_buffer) const {
 		fprintf(stderr,"[OpenCL] Failed to create gl buffer: %s\n", errorString(err));
 		abort();
 	}
+	/*
+	//GET gl info:
+	cl_gl_object_type type;
+	GLuint gl_object_name;
+	err = buffer.getObjectInfo(&type, &gl_object_name);
+	if(err != CL_SUCCESS) {
+		fprintf(stderr,"[OpenCL] Failed to read cl-gl buffer info: %s\n", errorString(err));
+		abort();
+	}
+	if(gl_object_name != gl_buffer) {
+		fprintf(stderr, "[OpenCL] Name of gl buffer in cl buffer not correct: (is %u, should be %u)\n", gl_object_name, gl_buffer);
+	}
+	*/
 	return buffer;
 }
 
