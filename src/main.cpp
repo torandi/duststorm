@@ -92,7 +92,10 @@ static void init(bool fullscreen, bool vsync){
 		exit(1);
 	}
 
+	fprintf(verbose,"OpenGL Device: %s - %s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
+
 	Engine::setup_opengl();
+
 	Shader::initialize();
 	Engine::load_shaders();
 
