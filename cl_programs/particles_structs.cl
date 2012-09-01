@@ -1,3 +1,7 @@
+#ifndef cl_khr_fp64
+	#define M_PI 3.14159
+#endif
+
 typedef struct particle_t {
 	float3 direction;
 	
