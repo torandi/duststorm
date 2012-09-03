@@ -76,6 +76,7 @@ public:
 
 		UNIFORM_LIGHTS,
 		UNIFORM_STATE,
+		UNIFORM_FOG,
 		NUM_GLOBAL_UNIFORMS
 	};
 
@@ -231,6 +232,8 @@ public:
 	 * Upload current state.
 	 */
 	static void upload_state(const glm::ivec2& size);
+
+	static void set_fog_density(float density);
 
 	/**
 	 * Upload white material

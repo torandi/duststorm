@@ -1,7 +1,5 @@
 #version 150
 
-uniform vec3 highlight;
-
 //NORMAL SHADER
 
 #include "uniforms.glsl"
@@ -13,6 +11,7 @@ in vec3 bitangent;
 in vec2 texcoord;
 
 #include "light_calculations.glsl"
+#include "fog.glsl"
 
 out vec4 ocolor;
 
@@ -40,28 +39,28 @@ void main() {
 
 	float shininess = Mtl.shininess * normalize(texture(texture2, texcoord)).length();
 
-   vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity, 1.0);
+	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity, 1.0);
 
-   for(int light = 0; int(light) < Lgt.num_lights; ++light) {
-      vec3 light_distance = Lgt.lights[light].position.xyz - position;
-      vec3 dir = normalize(light_distance);
-      vec3 light_dir;
+	for(int light = 0; int(light) < Lgt.num_lights; ++light) {
+		vec3 light_distance = Lgt.lights[light].position.xyz - position;
+		vec3 dir = normalize(light_distance);
+		vec3 light_dir;
 
-      //Convert to tangent space
-      light_dir.x = dot(dir, norm_tangent);
-      light_dir.y = dot(dir, norm_bitangent);
-      light_dir.z = dot(dir, norm_normal);
+		//Convert to tangent space
+		light_dir.x = dot(dir, norm_tangent);
+		light_dir.y = dot(dir, norm_bitangent);
+		light_dir.z = dot(dir, norm_normal);
 
-      accumLighting += computeLighting(
-            Lgt.lights[light], originalColor, normal_map,
-            light_dir, camera_dir, length(light_distance),
-            shininess, Mtl.specular,
-            true, true);
-   }
+		accumLighting += computeLighting(
+				Lgt.lights[light], originalColor, normal_map,
+				light_dir, camera_dir, length(light_distance),
+				shininess, Mtl.specular,
+				true, true);
+	}
 
-	 accumLighting += originalColor * vec4(highlight,0.0);
+	accumLighting += originalColor * vec4(highlight,0.0);
 
-   ocolor= clamp(accumLighting,0.0, 1.0);
+	ocolor = calculate_fog(clamp(accumLighting,0.0, 1.0));
 
-	 ocolor.a *= texture(texture3, texcoord).r;
+	ocolor.a *= texture(texture3, texcoord).r;
 }

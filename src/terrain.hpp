@@ -13,23 +13,21 @@
 class Terrain : public Mesh {
 	float horizontal_scale_;
 	float vertical_scale_;
-	SDL_Surface *heightmap_, *data_map_;
-	glm::ivec2 hm_size, dm_size;
+	SDL_Surface * data_map_;
+	Texture2D * data_texture_; 
+	glm::ivec2 size_;
 	float * map_;
 
 	void generate_terrain();
 
 	float height_from_color(const glm::vec4 &color) const ;
 
-	Texture2D * terrain_data_, *height_texture_;
 	TextureArray * textures_[2];
 
 	std::string base_;
 	Shader * shader_;
 	public:
 		float vertical_scale() { return vertical_scale_; };
-		Texture2D * heightmap() const;
-		Texture2D * datamap() const;
 		Terrain(const std::string &name, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_);
 		virtual ~Terrain();
 		virtual void render();
@@ -39,6 +37,10 @@ class Terrain : public Mesh {
 		float get_height_at(int x, int y) const;
 		float get_height_at(float x, float y) const;
 
+		/*
+		 * Once this has been called get_pixel_color can not be called
+		 */
+		void free_surface();
 };
 
 #endif
