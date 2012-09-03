@@ -41,7 +41,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	lights.ambient_intensity() = glm::vec3(0.1f);
 	lights.num_lights() = 1;
 
-	lights.lights[0]->set_position(glm::vec3(256.0, 40.0f, 256.0f));
+	lights.lights[0]->set_position(glm::vec3(0.0, 100.0f, 0.0f));
 	lights.lights[0]->intensity = glm::vec3(0.8f);
 	lights.lights[0]->type = Light::DIRECTIONAL_LIGHT;
 	/*lights.lights[0]->quadratic_attenuation = 0.00002f;
