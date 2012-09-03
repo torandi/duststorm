@@ -4,6 +4,7 @@
 
 #include "sound.hpp"
 #include "globals.hpp"
+#include "data.hpp"
 
 #include <fmodex/fmod_errors.h>
 

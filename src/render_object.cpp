@@ -117,13 +117,13 @@ void RenderObject::pre_render() {
 		}
 
 		if(mtl->GetTextureCount(aiTextureType_SHININESS) > 0 &&
-				mtl->GetTexture(aiTextureType_SHININESS, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+			mtl->GetTexture(aiTextureType_SHININESS, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.specular_map = load_texture(p);
 		}
 
 		if(mtl->GetTextureCount(aiTextureType_OPACITY) > 0 &&
-				mtl->GetTexture(aiTextureType_OPACITY, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+			mtl->GetTexture(aiTextureType_OPACITY, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
 			std::string p(path.data);
 			mtl_data.alpha_map = load_texture(p);
 		}

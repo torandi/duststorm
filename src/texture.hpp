@@ -1,6 +1,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include "platform.h"
 #include "shader.hpp"
 #include <string>
 #include <vector>
@@ -67,7 +68,7 @@ public:
 
 	virtual ~Texture3D();
 
-	static Texture3D * from_filename(const char* filename, ...) __attribute__((sentinel));
+	__SENTINEL__( static Texture3D * from_filename(const char* filename, ...));
 	static Texture3D * from_filename(const std::vector<std::string>& paths, bool mipmap = false);
 
 	const GLint gl_texture() const;
@@ -115,7 +116,7 @@ class TextureArray: public TextureBase {
 public:
 	virtual ~TextureArray();
 
-	static TextureArray* from_filename(const char* filename, ...) __attribute__((sentinel));
+	__SENTINEL__ (static TextureArray* from_filename(const char* filename, ...));
 	static TextureArray* from_filename(const std::vector<std::string>& paths, bool mipmap = true);
 
 	size_t num_textures() const;

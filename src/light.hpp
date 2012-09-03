@@ -1,6 +1,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include "platform.h"
 #include <glm/glm.hpp>
 
 struct Light {
@@ -16,11 +17,7 @@ struct Light {
 	float quadratic_attenuation;
 	light_type_t type;
 	glm::vec3 intensity;
-#ifndef WIN32
-	glm::vec3 position __attribute__ ((aligned (16)));
-#else
-	__declspec(align(16)) glm::vec3 position;
-#endif
+	__ALIGNED__(glm::vec3 position, 16);
 };
 
 #endif

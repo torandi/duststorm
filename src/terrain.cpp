@@ -2,6 +2,7 @@
 #include "config.h"
 #endif
 
+#include "utils.hpp"
 #include "terrain.hpp"
 #include "texture.hpp"
 #include "mesh.hpp"
@@ -22,7 +23,6 @@ Terrain::~Terrain() {
 	if(terrain_data_ != NULL)
 		delete terrain_data_;
 	SDL_FreeSurface(data_map_);
-	delete data_;
 }
 
 Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical_scale,TextureArray * color_, TextureArray * normal_) :
@@ -39,15 +39,8 @@ Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical
 	heightmap_ = TextureBase::load_image(base_ + "_map.png", &hm_size);
 	terrain_data_ = Texture2D::from_filename(base_ + "_data.png");
 	height_texture_ = Texture2D::from_filename(base_ + "_map.png");
-	generate_terrain();	
+	generate_terrain();
 	SDL_FreeSurface(heightmap_);
-
-	data_ = new unsigned char[dm_size.x*dm_size.y];
-	for(int i = 0; i < dm_size.x * dm_size.y; ++i) {
-		data_[i] = DATA_UNDEFINED;
-	}
-
-	//absolute_move(-glm::vec3(hm_size.x*horizontal_scale_, 0, height_*horizontal_scale_)/2.0f);
 }
 
 Texture2D * Terrain::heightmap() const {
@@ -64,7 +57,6 @@ void Terrain::generate_terrain() {
 	unsigned long numVertices = hm_size.x*hm_size.y;
 
 	map_ = new float[numVertices];
-	wall_ = new float[numVertices];
 
 	fprintf(verbose,"Generating terrain...\n");
 	fprintf(verbose,"World size: %dx%d, scale: %fx%f\n", hm_size.x, hm_size.y, horizontal_scale_, vertical_scale_);
@@ -80,10 +72,6 @@ void Terrain::generate_terrain() {
 			v.tex_coord = glm::vec2(v.position.x/(hm_size.x*horizontal_scale_), 1.f-v.position.z/(hm_size.y*horizontal_scale_));
 			vertices_[i] = v;
 			map_[i] =  h*vertical_scale_;
-			wall_[i] = color.g;
-			if(color.b > 0.9f) {
-				spawnmap.push_back(glm::ivec2(x, y));
-			}
 		}
 	}
 	unsigned long indexCount = (hm_size.y - 1 ) * (hm_size.x -1) * 6;
@@ -118,28 +106,6 @@ float Terrain::height_from_color(const glm::vec4 &color) const {
 	return color.r;
 }
 
-bool Terrain::get_collision_at(int x, int y) const {
-	int pos = y*dm_size.x + x;
-	if(data_[pos] == DATA_UNDEFINED) {
-		glm::vec4 c = get_pixel_color(x, y, data_map_, dm_size);
-		data_[pos] = c.g < 0.1f;
-	}
-	return data_[pos];
-}
-
-bool Terrain::get_collision_at(float x, float y) const {
-	if(x > hm_size.x * horizontal_scale_|| x < 0 || y > hm_size.y*horizontal_scale_ || y < 0)
-		return true;
-	//Calculate target pixel:
-	int _x = (int)round(x*(dm_size.x/(float)hm_size.x));
-	int _y = (int)round(y*(dm_size.y/(float)hm_size.y));
-	return get_collision_at(_x, _y);
-}
-
-float Terrain::get_wall_at(int x, int y) const {
-	return wall_[y*hm_size.x + x];
-}
-
 float Terrain::get_height_at(int x, int y) const {
 	return map_[y*hm_size.x + x];
 }
@@ -167,7 +133,7 @@ glm::vec4 Terrain::get_pixel_color(int x, int y, SDL_Surface * surface, const gl
 	color.b = (float)c.z/0xFF;
 	color.a = (float)c.w/0xFF;
 
-	return color;
+	return color;	
 }
 
 void Terrain::render() {

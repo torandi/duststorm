@@ -5,6 +5,8 @@
        #include "config.h"
 #endif
 
+#include "platform.h"
+
 #include <cstdio>
 
 #include "shader.hpp"

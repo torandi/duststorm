@@ -1,6 +1,8 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
+
+#include "platform.h"
 
 #include "utils.hpp"
 #include "globals.hpp"
@@ -16,11 +18,11 @@
 #endif
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 
 #ifdef WIN32
-#include <Windows.h>
+#	include <Windows.h>
 #endif
 
 unsigned long util_utime(){
@@ -51,7 +53,7 @@ unsigned long util_utime(){
 	QueryPerformanceCounter(&tmp);
 	return (unsigned long)(tmp.QuadPart / divider);
 #else
-#error util_utime() is not defined for this platform.
+#	error util_utime() is not defined for this platform.
 #endif
 }
 
@@ -61,7 +63,7 @@ void util_usleep(unsigned long wait){
 #elif defined(WIN32)
 	Sleep(wait / 1000); /** @todo Sleep only has ms-precision (and bad such). */
 #else
-#error util_usleep() is not defined for this platform.
+#	error util_usleep() is not defined for this platform.
 #endif
 }
 

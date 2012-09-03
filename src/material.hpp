@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include "shader.hpp"
+#include "texture.hpp"
 
 class Material: public Shader::material_t {
 public:

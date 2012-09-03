@@ -1,6 +1,7 @@
 #ifndef PARTICLE_SYSTEM_H
 #define PARTICLE_SYSTEM_H
 
+#include "platform.h"
 #include "movable_object.hpp"
 #include "cl.hpp"
 #include <glm/glm.hpp>
@@ -17,10 +18,7 @@ class ParticleSystem : public MovableObject {
 		void update_config();
 
 		//Change values in this struct and call update_config() to update
-#ifdef WIN32
-		__declspec(align(16))
-#endif
-		struct config_t {
+		__ALIGNED__(struct config_t {
 
 			glm::vec4 birth_color;
 
@@ -61,28 +59,17 @@ class ParticleSystem : public MovableObject {
 			//These two should not be manually changed!
 			int num_textures;
 			int max_num_particles;
-
-		} config
-#ifndef WIN32
-			__attribute__ ((aligned (16)))
-#endif
-		;
+		} config, 16);
 		float avg_spawn_rate; //Number of particles to spawn per second
 		float spawn_rate_var;
 
-#ifdef WIN32
-		__declspec(align(16))
-#endif
-		struct vertex_t {
+		__ALIGNED__(struct vertex_t {
 			glm::vec4 position;
 			glm::vec4 color;
 			float scale;
 			int texture_index;
-		} 
-#ifndef WIN32
-			__attribute__ ((aligned (16)))
-#endif
-		;
+		},16);
+		
 		virtual void callback_position(const glm::vec3 &position);
 
 	private:
@@ -102,9 +89,7 @@ class ParticleSystem : public MovableObject {
 		cl::Program program_;
 		cl::Kernel run_kernel_, spawn_kernel_;
 
-#ifdef WIN32
-		__declspec(align(16))
-#endif
+		__ALIGNED__(
 		struct particle_t {
 			glm::vec4 direction;
 
@@ -117,11 +102,7 @@ class ParticleSystem : public MovableObject {
 			float final_scale;
 			float org_ttl;
 			int dead;
-		} 
-#ifndef WIN32
-			__attribute__ ((aligned (16)))
-#endif
-		;
+		},16);
 
 		TextureArray* texture_;
 };

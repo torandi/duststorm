@@ -3,6 +3,7 @@
 
 #include "movable_object.hpp"
 #include "material.hpp"
+#include "shader.hpp"
 
 #include <string>
 #include <assimp/assimp.h>

@@ -4,9 +4,7 @@
 #include "movable_object.hpp"
 #include <glm/glm.hpp>
 
-/* Fuck you windows, sincerly me */
-#undef near
-#undef far
+#include "platform.h"
 
 class Camera : public MovableObject {
 public:

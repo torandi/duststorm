@@ -53,12 +53,12 @@ void * Data::load_from_file(const char * filename, size_t &size) {
 		if ( ferror(file) ){
 			fprintf(stderr, "Error when reading file `%s': %s\n", filename, strerror(errno));
 		} else {
-			fprintf(stderr, "Error when reading file `%s': read size was not the expected size (read %lu bytes, expected %lu)\n", filename, res, size);
+			fprintf(stderr, "Error when reading file `%s': read size was not the expected size (read %lu bytes, expected %lu)\n", filename, read_bytes, size);
 		}
 		abort();
 	}
 	fclose(file);
-
+	
 	return data;
 }
 

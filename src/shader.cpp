@@ -457,7 +457,6 @@ GLint Shader::uniform_location(const char * uniform_name) const{
 	return loc;
 }
 
-
 void Shader::push_vertex_attribs() {
 	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 	for ( int i = 0; i < NUM_ATTR; ++i ) {

@@ -21,10 +21,9 @@
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #ifndef WIN32
-	#include <getopt.h>
 	#include <unistd.h>
+	#include <getopt.h>
 	#include <sys/time.h>
 #endif
 
@@ -94,8 +93,8 @@ static void init(bool fullscreen, bool vsync){
 	}
 
 	Engine::setup_opengl();
-	Engine::load_shaders();
 	Shader::initialize();
+	Engine::load_shaders();
 
 	screen_ortho = glm::ortho(0.0f, (float)resolution.x, 0.0f, (float)resolution.y, -1.0f, 1.0f);
 	screen_ortho = glm::scale(screen_ortho, glm::vec3(1.0f, -1.0f, 1.0f));
@@ -153,14 +152,14 @@ static void update(float dt){
 static void main_loop(){
 	/* for calculating dt */
 	long t, last;
-	t = get_millis();
+	t = util_utime();
 	last = t;
 	while ( running ){
 		
 		poll();
 		
-		/* calculate dt */
-		long cur = get_millis();
+
+		long cur = util_utime();
 		const long delta = cur - t;
 		const long delay = per_frame - delta;
 
@@ -173,11 +172,10 @@ static void main_loop(){
 		frames++;
 		last = cur;
 		t += per_frame;
-		
 
 		/* fixed framerate */
 		if ( delay > 0 ){
-			sleep_millis(delay);
+			util_usleep(delay);
 		}
 
 	}
@@ -199,13 +197,14 @@ void show_usage(){
 	       "  -h, --help              This text\n",
 			program_name, FULLSCREEN ? "true" : "false");
 #else
-	printf(PACKAGE_NAME "-" VERSION ": windows doesn't support getopt. Go play with a kitten.\n");
+	printf(PACKAGE_NAME "-" VERSION ": windows doesn't support getopt. Go play with a kitten (or install a better os, your choice).\n");
 #endif
 }
 
 static int fullscreen = FULLSCREEN;
 static int vsync = 1;
 static int verbose_flag = 0;
+
 #ifndef WIN32
 static struct option options[] = {
 	{"resolution",   required_argument, 0, 'r'},
