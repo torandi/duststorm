@@ -111,27 +111,3 @@ bool file_exists(const std::string& filename){
 #	error file_exists is not defined for this platform.
 #endif
 }
-
-std::string color_to_string(const glm::ivec3 &color) {
-	char str[7];
-	sprintf(str, "%02x%02x%02x", color.x, color.y, color.z);
-	return std::string(str);
-}
-
-long get_millis() {
-#ifndef WIN32
-	struct timeval cur;
-	gettimeofday(&cur, NULL);
-	return (long) (cur.tv_sec * 1000000 + cur.tv_usec);
-#else
-	return (long) GetTickCount()*1000;
-#endif
-}
-
-void sleep_millis(long wait) {
-#ifndef WIN32
-	usleep(wait);
-#else
-	Sleep(wait / 1000);
-#endif
-}

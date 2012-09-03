@@ -305,7 +305,7 @@ void Shader::usage_report(FILE* dst){
 		GLint num_attached;
 		glGetProgramiv(id, GL_ATTACHED_SHADERS, &num_attached);
 
-		GLuint shader[num_attached];
+		GLuint * shader = new GLuint[num_attached];
 		glGetAttachedShaders(id, num_attached, nullptr, shader);
 
 		for ( int i = 0; i < num_attached; i++ ){
@@ -326,6 +326,7 @@ void Shader::usage_report(FILE* dst){
 
 			fprintf(dst, "%s:%s\n", p.first.c_str(), filename.c_str());
 		}
+		delete[] shader;
 	}
 }
 
@@ -452,9 +453,9 @@ void Shader::upload_state(const glm::ivec2& size){
 const GLint Shader::num_attributes() const { return num_attributes_; }
 
 GLint Shader::uniform_location(const char * uniform_name) const{
-	GLint loc = glGetUniformLocation(program_, uniform_name);
-	checkForGLErrors((std::string("uniform_location(")+std::string(uniform_name)+") from shader "+name).c_str());
-	return loc;
+	GLint l = glGetUniformLocation(program_, uniform_name);
+	checkForGLErrors((std::string("uniform_location")+std::string(uniform_name)+" from shader "+name).c_str());
+	return l;
 }
 
 void Shader::push_vertex_attribs() {
