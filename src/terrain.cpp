@@ -25,18 +25,16 @@ Terrain::~Terrain() {
 	free_surface();
 }
 
-Terrain::Terrain(const std::string &name, float horizontal_scale, float vertical_scale,TextureArray * color_, TextureArray * normal_) :
+Terrain::Terrain(const std::string &file, float horizontal_scale, float vertical_scale,TextureArray * color_, TextureArray * normal_) :
 		horizontal_scale_(horizontal_scale),
 		vertical_scale_(vertical_scale),
-		map_(nullptr),
-		base_(name)
-		{
+		map_(nullptr) {
 	textures_[0] = color_;
 	textures_[1] = normal_;
 	shader_ = Shader::create_shader("terrain");
 
-	data_map_  = TextureBase::load_image(base_ + ".png", &size_);
-	data_texture_ = Texture2D::from_filename(base_ + ".png");
+	data_map_  = TextureBase::load_image(file , &size_);
+	data_texture_ = Texture2D::from_filename(file);
 	generate_terrain();
 }
 

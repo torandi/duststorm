@@ -63,8 +63,6 @@ void main() {
 				shininess, vec4(.03f),
 				true, true);
 	}
-	accumLighting += originalColor * extra_light;
-
 
 	ocolor.rgb = calculate_fog(clamp(accumLighting,0.0, 1.0).rgb);
 	ocolor.a= 1.f;

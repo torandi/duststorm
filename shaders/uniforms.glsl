@@ -67,5 +67,5 @@ layout(std140) uniform StateData {
 
 layout(std140) uniform Fog {
 	float fog_density;
-}
+};
 

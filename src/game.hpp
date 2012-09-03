@@ -33,9 +33,9 @@ class Game {
 		static void init();
 
 	private:
-		RenderObject * model;
 		LightsData lights;
 
+		Terrain * terrain;
 
 		Input input;
 		void render_composition();

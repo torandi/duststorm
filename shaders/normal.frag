@@ -58,9 +58,8 @@ void main() {
 				true, true);
 	}
 
-	accumLighting += originalColor * vec4(highlight,0.0);
+	accumLighting = clamp(accumLighting,0.0, 1.0);
+	ocolor.rgb = calculate_fog(accumLighting.rgb);
 
-	ocolor = calculate_fog(clamp(accumLighting,0.0, 1.0));
-
-	ocolor.a *= texture(texture3, texcoord).r;
+	ocolor.a = accumLighting.a * texture(texture3, texcoord).r;
 }

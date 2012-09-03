@@ -27,6 +27,15 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 	printf("Loading level %s\n", level.c_str());
 
+	std::string base_dir = PATH_BASE "/data/levels/" + level;
+
+	TextureArray * colors = TextureArray::from_filename( (base_dir +"/color0.png").c_str(),
+			(base_dir + "/color1.png").c_str(), nullptr);
+	TextureArray *  normals = TextureArray::from_filename( (base_dir +"/normal0.png").c_str(),
+			(base_dir + "/normal1.png").c_str(), nullptr);
+
+	terrain = new Terrain(base_dir + "/map.png", 0.5, 0.5, colors, normals);
+
 	lights.ambient_intensity() = glm::vec3(.02f);
 	lights.num_lights() = 1;
 
@@ -38,7 +47,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	lights.lights[0]->quadratic_attenuation = 0.4f;
 
 	camera.set_position(glm::vec3(0, 0.2, 0));
-	camera.look_at(model->position());
+	camera.look_at(glm::vec3(0, 0, 0));
 }
 
 Game::~Game() {
