@@ -2,6 +2,7 @@
 #include "config.h"
 #endif
 
+#include "data.hpp"
 #include "sound.hpp"
 #include "globals.hpp"
 
