@@ -17,6 +17,8 @@
 #include <SDL/SDL_image.h>
 #include <glm/glm.hpp>
 
+static const std::string default_texture = PATH_BASE "data/textures/default.jpg";
+
 static GLuint cube_map_index[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -27,16 +29,15 @@ static GLuint cube_map_index[6] = {
 };
 
 SDL_Surface* TextureBase::load_image(const std::string &path, glm::ivec2* size) {
-	const std::string real_path = std::string(PATH_BASE "/data/textures/") + path;
 
 	/* Load image using SDL Image */
-	fprintf(verbose, "Loading image `%s'\n", real_path.c_str());
-	Data * file = Data::open(real_path);
+	fprintf(verbose, "Loading image `%s'\n", path.c_str());
+	Data * file = Data::open(path);
 
 	if ( !file ){
-		fprintf(stderr, "Failed to load texture at %s\n", real_path.c_str());
-		if ( path != "default.jpg" ){
-			return load_image("default.jpg", size);
+		fprintf(stderr, "Failed to load texture at %s\n", path.c_str());
+		if ( path != default_texture ){
+			return load_image(default_texture, size);
 		}
 		abort();
 	}
@@ -46,7 +47,7 @@ SDL_Surface* TextureBase::load_image(const std::string &path, glm::ivec2* size) 
 	delete file;
 
 	if ( !surface ){
-		fprintf(stderr, "Failed to load surface from `%s'\n", real_path.c_str());
+		fprintf(stderr, "Failed to load surface from `%s'\n", path.c_str());
 		abort();
 	}
 
@@ -152,19 +153,19 @@ Texture2D* Texture2D::from_filename(const std::string &path, bool mipmap) {
 }
 
 Texture2D* Texture2D::default_colormap(){
-	return from_filename("default.jpg");
+	return from_filename(PATH_BASE "data/textures/default.jpg");
 }
 
 Texture2D* Texture2D::default_normalmap(){
-	return from_filename("default_normalmap.png");
+	return from_filename(PATH_BASE "data/textures/default_normalmap.png");
 }
 
 Texture2D* Texture2D::default_specularmap(){
-	return from_filename("white.png");
+	return from_filename(PATH_BASE "data/textures/white.png");
 }
 
 Texture2D* Texture2D::default_alphamap(){
-	return from_filename("white.png");
+	return from_filename(PATH_BASE "data/textures/white.png");
 }
 
 Texture2D::Texture2D(const std::string& filename, bool mipmap)

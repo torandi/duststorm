@@ -31,7 +31,13 @@ Terrain::Terrain(const std::string &file, float horizontal_scale, float vertical
 		map_(nullptr) {
 	textures_[0] = color_;
 	textures_[1] = normal_;
-	shader_ = Shader::create_shader("terrain");
+
+	for(TextureArray * ta : textures_) {
+		ta->texture_bind(Shader::TEXTURE_ARRAY_0);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		ta->texture_unbind();
+	}
 
 	data_map_  = TextureBase::load_image(file , &size_);
 	data_texture_ = Texture2D::from_filename(file);
@@ -65,7 +71,7 @@ void Terrain::generate_terrain() {
 			glm::vec4 color = get_pixel_color(x, y, data_map_, size_);
 			float h = height_from_color(color);
 			v.position = glm::vec3(horizontal_scale_*x, h*vertical_scale_, horizontal_scale_*y); 
-			v.tex_coord = glm::vec2(x/size_.x, 1.f-y/size_.y);
+			v.tex_coord = glm::vec2((float)x/size_.x, 1.f-(float)y/size_.y);
 			vertices_[i] = v;
 			map_[i] =  h*vertical_scale_;
 		}

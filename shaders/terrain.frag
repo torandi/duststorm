@@ -1,7 +1,7 @@
 #version 330
 #include "uniforms.glsl"
 
-#define TEXTURE_REPEAT 32.0
+#define TEXTURE_REPEAT 128.0
 
 in vec3 position;
 in vec3 normal;

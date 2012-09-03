@@ -24,7 +24,6 @@ class Terrain : public Mesh {
 
 	TextureArray * textures_[2];
 
-	Shader * shader_;
 	public:
 		float vertical_scale() { return vertical_scale_; };
 		Terrain(const std::string &file, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_);

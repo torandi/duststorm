@@ -233,9 +233,9 @@ int main(int argc, char* argv[]){
 	}
 
 	/* parse arguments */
-	int option_index = 1;;
+	int next_index = 1;
 #ifndef WIN32
-	int op;
+	int op, option_index;
 	while ( (op = getopt_long(argc, argv, "r:fwnvqlh", options, &option_index)) != -1 ){
 		switch ( op ){
 		case 0:   /* long opt*/
@@ -285,10 +285,11 @@ int main(int argc, char* argv[]){
 			abort();
 		}
 	};
+	next_index = optind;
 #endif
 
-	if(argc > option_index) {
-		level = std::string(argv[option_index]);
+	if(argc > next_index) {
+		level = std::string(argv[next_index]);
 	}
 
 	verbose = fopen(verbose_flag ? "/dev/stderr" : LOGFILE, "w");

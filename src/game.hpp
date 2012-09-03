@@ -48,6 +48,7 @@ class Game {
 		Camera camera;
 		RenderTarget *screen, *composition;//, *downsample[2];
 
+		Shader * terrain_shader;
 		//Shader * dof_shader;
 	
 		glm::vec3 camera_offset;

@@ -50,6 +50,7 @@ namespace Engine {
 	}
 
 	void init(const std::string &level) {
+		Shader::set_fog_density(0.01);
 		srand(util_utime());
 		opencl = new CL();
 		Game::init();
