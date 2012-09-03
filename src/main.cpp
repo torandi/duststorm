@@ -42,6 +42,8 @@ static const char* program_name;
 static bool resolution_given = false;
 static int frames = 0;
 
+static std::string level = "default";
+
 static void poll();
 
 namespace Engine {
@@ -107,7 +109,7 @@ static void init(bool fullscreen, bool vsync){
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_texture_units);
 	fprintf(verbose, "Supports %d texture units\n", max_texture_units);
 
-	Engine::init();
+	Engine::init(level);
 
 
 	checkForGLErrors("post init()");
@@ -231,8 +233,9 @@ int main(int argc, char* argv[]){
 	}
 
 	/* parse arguments */
+	int option_index = 1;;
 #ifndef WIN32
-	int op, option_index;
+	int op;
 	while ( (op = getopt_long(argc, argv, "r:fwnvqlh", options, &option_index)) != -1 ){
 		switch ( op ){
 		case 0:   /* long opt*/
@@ -283,6 +286,11 @@ int main(int argc, char* argv[]){
 		}
 	};
 #endif
+
+	if(argc > option_index) {
+		level = std::string(argv[option_index]);
+	}
+
 	verbose = fopen(verbose_flag ? "/dev/stderr" : LOGFILE, "w");
 
 	/* proper termination */

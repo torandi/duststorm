@@ -6,7 +6,7 @@
 
 namespace Engine {
 
-	void init();
+	void init(const std::string &level);
 	void cleanup();
 	void update(float dt);
 	void render();

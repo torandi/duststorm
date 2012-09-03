@@ -7,6 +7,7 @@
 #include "shader.hpp"
 #include "utils.hpp"
 
+#include "sound.hpp"
 #include "game.hpp" 
 
 CL * opencl;
@@ -48,11 +49,11 @@ namespace Engine {
 		game->handle_input(event);
 	}
 
-	void init() {
+	void init(const std::string &level) {
+		srand(util_utime());
 		opencl = new CL();
 		Game::init();
-		game = new Game();
-		srand(124832486);
+		game = new Game(level);
 	}
 
 	void cleanup() {
@@ -60,6 +61,7 @@ namespace Engine {
 	}
 
 	void update(float dt) {
+		Sound::update_system();
 		game->update(dt);	
 	}
 

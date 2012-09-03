@@ -21,7 +21,7 @@
 
 class Game {
 	public:
-		Game();
+		Game(const std::string &level);
 		~Game();
 
 		void update(float dt);
@@ -32,12 +32,7 @@ class Game {
 
 		static void init();
 
-		Sound * play_sfx(const std::string &str, float delay= -1.f, int loops = 0);
-		Sound * play_sfx_nolist(const std::string &str, float delay= -1.f, int loops = 0);
-
 	private:
-		GLint u_texture_mix;
-		Shader * mix_shader;
 		RenderObject * model;
 		LightsData lights;
 
@@ -46,17 +41,12 @@ class Game {
 		void render_composition();
 		void render_display();
 
-		void render_content();
-		void render_statics();
-		void render_dynamics();
+		void render_geometry(const Camera &cam);
 
 		void do_action(int num);
 
 		Camera camera;
 		RenderTarget *screen, *composition;//, *downsample[2];
-
-		std::map<std::string, std::string> sfx;
-		std::list<Sound*> active_sfx;
 
 		//Shader * dof_shader;
 	
