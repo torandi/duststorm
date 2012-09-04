@@ -11,7 +11,7 @@
 class ParticleSystem : public MovableObject {
 	public:
 
-		ParticleSystem(const int max_num_particles, TextureArray* texture, bool oneshot=false);
+		ParticleSystem(const int max_num_particles, TextureArray* texture, bool _auto_spawn = true);
 		~ParticleSystem();
 
 		void update(float dt);
@@ -64,10 +64,9 @@ class ParticleSystem : public MovableObject {
 
 		} config, 16);
 
-		typedef std::pair<config_t, int> spawn_data;
-
 		float avg_spawn_rate; //Number of particles to spawn per second
 		float spawn_rate_var;
+		bool auto_spawn;
 
 		__ALIGNED__(struct vertex_t {
 				glm::vec4 position;
@@ -84,12 +83,17 @@ class ParticleSystem : public MovableObject {
 		/*
 		 * Spawn count elements with current config
 		 */
-		void spawn_elements(int count);
+		void spawn(int count);
 	private:
+
+		/**
+		 * Internal function for spawning count particles now
+		 * event is set to the event for the execution
+		 */
+		void spawn_particles(cl_int count,cl::Event * event);
 
 		const int max_num_particles_;
 
-		bool spawn_; //set to false to stop spawning, must not be changed to true from false (but other way is ok)
 
 		//Texture * texture_;
 
@@ -123,8 +127,10 @@ class ParticleSystem : public MovableObject {
 		TextureArray* texture_;
 
 
-		std::list<spawn_data> spawn_list;
-		std::list<config_t> config_stack;
+		typedef std::pair<config_t, int> spawn_data;
+
+		std::list<spawn_data> spawn_list_;
+		std::list<config_t> config_stack_;
 };
 
 

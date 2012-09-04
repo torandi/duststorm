@@ -43,8 +43,22 @@ __kernel void run_particles (
 			vertices[id].color.w = 0.0;
 			particles[id].dead = 1;
 		}
-	} else if(particles[id].dead == 2) {
-		//Marked for respawn
+	}
+
+}
+
+__kernel void spawn_particles (
+														 __global vertex_t * vertices, 
+														 __global particle_t * particles, 
+														 __constant config_t * config, 
+														 __global const float * rnd,
+														 __global int * to_spawn, //Number of particles left to spawn, use atomic operations!
+														 uint time
+														 )
+{
+	uint id = get_global_id(0);
+
+	if (particles[id].dead == 1 && to_spawn[0] > 0 && atomic_dec(&to_spawn[0]) > 0 ) {
 		vertices[id].position.xyz = config->spawn_position + random3(config->spawn_area.xyz, false);
 
 		float a = random1(2*M_PI, false);
@@ -62,23 +76,6 @@ __kernel void run_particles (
 		particles[id].initial_scale = config->avg_scale + random1(config->scale_var, true);
 		particles[id].final_scale = particles[id].initial_scale + config->avg_scale_change + random1(config->scale_change_var, true);
 		particles[id].dead = 0;
-	}
-
-}
-
-__kernel void spawn_particles (
-														 __global vertex_t * vertices, 
-														 __global particle_t * particles, 
-														 __constant config_t * config, 
-														 __global const float * rnd,
-														 __global int * to_spawn, //Number of particles left to spawn, use atomic operations!
-														 uint time
-														 )
-{
-	uint id = get_global_id(0);
-
-	if (particles[id].dead == 1 && to_spawn[0] > 0 && atomic_dec(&to_spawn[0]) > 0 ) {
-		particles[id].dead = 2;	
 	}
 }
 
