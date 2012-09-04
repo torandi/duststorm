@@ -103,11 +103,11 @@ float Terrain::height_from_color(const glm::vec4 &color) const {
 	return color.r;
 }
 
-float Terrain::get_height_at(int x, int y) const {
+float Terrain::height_at(int x, int y) const {
 	return map_[y*size_.x + x];
 }
 
-float Terrain::get_height_at(float x_, float y_) const {
+float Terrain::height_at(float x_, float y_) const {
 	if(x_ > size_.x * horizontal_scale_|| x_ < 0 || y_ > size_.y*horizontal_scale_ || y_ < 0)
 		return 0;
 	int x = (int) (x_/horizontal_scale_);

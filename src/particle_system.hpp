@@ -53,13 +53,14 @@ class ParticleSystem : public MovableObject {
 
 				cl_float avg_scale_change;
 				cl_float scale_change_var;
-
 				//Rotation
 				cl_float avg_rotation_speed;
 				cl_float rotation_speed_var;
 
-				//These two should not be manually changed!
+				//Texture is choosen between start and start+num
+				cl_int start_texture;
 				cl_int num_textures;
+				//Should not be manually changed!
 				cl_int max_num_particles;
 
 		} config, 16);

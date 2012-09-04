@@ -54,10 +54,10 @@ typedef struct config_t {
 
 	float avg_scale_change;
 	float scale_change_var;
-
 	float avg_rotation_speed;
 	float rotation_speed_var;
 
+	int start_texture;
 	int num_textures;
 	int max_num_particles;
 

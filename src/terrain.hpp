@@ -32,8 +32,8 @@ class Terrain : public Mesh {
 		const glm::ivec2 &size() const;
 		static glm::vec4 get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size);
 
-		float get_height_at(int x, int y) const;
-		float get_height_at(float x, float y) const;
+		float height_at(int x, int y) const;
+		float height_at(float x, float y) const;
 
 		/*
 		 * Once this has been called get_pixel_color can not be called

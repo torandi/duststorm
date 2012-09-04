@@ -6,7 +6,7 @@
 #define AXIS_MAX 32767.f
 #define DEAD_ZONE 0.2f
 
-float Input::movement_speed = 1.f;
+float Input::movement_speed = 4.f;
 float Input::rotation_speed = 1.f;
 
 Input::Input(){

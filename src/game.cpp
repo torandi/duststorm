@@ -14,12 +14,33 @@
 #include "utils.hpp"
 #include "input.hpp"
 #include "sound.hpp"
+#include "particle_system.hpp"
 
 #define DEBUG_MOVE 0
 
-static RenderObject * test_object;
+/*
+ * Debug stuff
+ */
+static RenderObject * objects[10];
+static const int num_objects = 4;
+
+static ParticleSystem * test_system;
+static TextureArray * particle_textures;
+
+static const int num_controllable = 2;
+static MovableObject * controllable[num_controllable];
+static const char * controllable_names[] = { "Camera", "ParticleCenter" };
+static int cur_controll = 0;
 
 static Color sky;
+
+static int const num_particle_configs = 2;
+static ParticleSystem::config_t particle_configs[num_particle_configs];
+static int current_particle_config = 0;
+
+/*
+ * End debug stuff
+ */
 
 void Game::init() {
 }
@@ -55,14 +76,63 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	lights.lights[0]->linear_attenuation = 0.1f;
 	lights.lights[0]->quadratic_attenuation = 0.4f;*/
 
-	camera.set_position(glm::vec3(256.0, 35.0, 256));
-	camera.look_at(glm::vec3(0.0, 0.5, 0.0));
+	camera.set_position(glm::vec3(275.f, 28.f, 254.f));
 
-	test_object = new RenderObject("pony1.obj");
-	test_object->set_position(glm::vec3(1.0, 0, 1.0));
+	objects[0] = new RenderObject("pony1.obj");
+	objects[0]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f), 250.0));
 
-	//dof_shader = Shader::create_shader("dof");
+	objects[1] = new RenderObject("cube.obj");
+	objects[1]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f) + 1.f, 250.0));
+	objects[1]->set_scale(0.25f);
+
+	objects[2] = new RenderObject("bench.obj");
+	objects[2]->set_position(glm::vec3(300.0, terrain->height_at(300.f, 250.f), 250.0));
+
+	objects[3] = new RenderObject("tree1.obj");
+	objects[3]->set_position(glm::vec3(300.0, terrain->height_at(300.f, 252.f), 252.0));
+
+	camera.look_at(objects[0]->position());
+
 	terrain_shader = Shader::create_shader("terrain");
+
+	//Particles:
+	particle_textures = TextureArray::from_filename(PATH_BASE "data/textures/fire1.png", 
+																	PATH_BASE "data/textures/fire2.png", 
+																	PATH_BASE "data/textures/fire3.png", 
+																	PATH_BASE "data/textures/smoke.png", 
+																	PATH_BASE "data/textures/smoke2.png",
+																	nullptr);
+	
+	test_system = new ParticleSystem(10000, particle_textures, false);
+
+	controllable[0] = &camera;
+	controllable[1] = objects[1];
+
+	//Build particle configs:
+	test_system->config.spawn_position = glm::vec4(objects[1]->position(), 1.f);
+	test_system->config.spawn_area = glm::vec4(0.0f, 0.f, 0.0f, 1.f);
+	test_system->config.spawn_direction = glm::vec4(0, 1.f, 0.f, 0.f);
+	test_system->config.direction_var = glm::vec4(0.1f, 0.f, 0.1f, 0.f);
+	test_system->config.avg_spawn_speed= 0.003f;
+	test_system->config.spawn_speed_var = 0.0005f;
+	test_system->config.avg_ttl = 20.f;
+	test_system->config.ttl_var = 5.f;
+	test_system->config.avg_scale = 0.6f;
+	test_system->config.scale_var = 0.05f;
+	test_system->config.avg_scale_change = 2.f;
+	test_system->config.scale_change_var = 0.5f;
+	test_system->config.avg_rotation_speed = 0.02f;
+	test_system->config.rotation_speed_var = 0.005f;
+	test_system->config.birth_color = glm::vec4(0.2, 0.2, 0.2, 0.5);
+	test_system->config.death_color = glm::vec4(0.8 ,0.8, 0.8, 0.f);
+	test_system->config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
+	test_system->config.start_texture = 3;
+	test_system->config.num_textures = 1;
+	
+	test_system->update_config();
+
+	test_system->auto_spawn = true;
+	
 }
 
 Game::~Game() {
@@ -74,18 +144,28 @@ Game::~Game() {
 }
 
 void Game::update(float dt) {
-	input.update_object(camera, dt);
-	if(input.has_changed(Input::ACTION_0, 0.2f)) {
+	input.update_object(*(controllable[cur_controll]), dt);
+
+	if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
 		Input::movement_speed -= 1.f; 
 		printf("Decreased movement speed\n");
 	}
-	if(input.has_changed(Input::ACTION_1, 0.2f)) {
+	if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
 		Input::movement_speed += 1.f; 
 		printf("Increased movement speed\n");
 	}
-	if(input.has_changed(Input::ACTION_3, 0.2f)) {
-		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
+
+	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
+		cur_controll = (cur_controll + 1) % num_controllable;
+		printf("Switching controll to %s\n", controllable_names[cur_controll]);
 	}
+
+	if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
+
+	}
+
+	test_system->update(dt);
+	//printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
 }
 
 void Game::handle_input(const SDL_Event &event) {
@@ -99,7 +179,9 @@ void Game::render_geometry(const Camera &cam) {
 	Shader::upload_lights(lights);
 
 	shaders[SHADER_NORMAL]->bind();
-	test_object->render();
+	for(int i=0; i < num_objects; ++i) {
+		objects[i]->render();
+	}
 
 	terrain_shader->bind();
 	terrain->render();
@@ -113,6 +195,9 @@ void Game::render() {
 	RenderTarget::clear(sky);
 
 	render_geometry(camera);
+
+	shaders[SHADER_PARTICLES]->bind();
+	test_system->render();
 
 	composition->unbind();
 
