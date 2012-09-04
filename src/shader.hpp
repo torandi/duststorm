@@ -149,6 +149,11 @@ public:
 		Light lights[MAX_NUM_LIGHTS];
 	};
 
+	__ALIGNED__(struct fog_t {
+		glm::vec4 color;
+		float density;
+	}, 16);
+
 	/**
 	 * Used *ONLY* for uncached shaders. Will delete the pointer. Shader is not
 	 * valid for any use after this call and user should pointer to nullptr.
@@ -233,7 +238,7 @@ public:
 	 */
 	static void upload_state(const glm::ivec2& size);
 
-	static void set_fog_density(float density);
+	static void upload_fog(const fog_t &fog);
 
 	/**
 	 * Upload white material

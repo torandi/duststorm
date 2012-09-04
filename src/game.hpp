@@ -46,10 +46,10 @@ class Game {
 		void do_action(int num);
 
 		Camera camera;
-		RenderTarget *screen, *composition;//, *downsample[2];
+		RenderTarget *screen, *composition, *downsample[2];
 
 		Shader * terrain_shader;
-		//Shader * dof_shader;
+		Shader * dof_shader;
 	
 		glm::vec3 camera_offset;
 };

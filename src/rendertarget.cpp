@@ -19,7 +19,7 @@ RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, int flags, GLe
 	, back(0)
 	, max(1) {
 
-	checkForGLErrors("RenderTarget()");
+	checkForGLErrors("RenderTarget() pre");
 	this->size = size;
 
 	/* init_vbo is a no-op if it already is initialized */

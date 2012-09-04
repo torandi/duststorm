@@ -64,6 +64,5 @@ void main() {
 				true, true);
 	}
 
-	ocolor.rgb = calculate_fog(clamp(accumLighting,0.0, 1.0).rgb);
-	ocolor.a= 1.f;
+	ocolor = calculate_fog(clamp(accumLighting,0.0, 1.0));
 }

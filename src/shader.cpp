@@ -42,7 +42,7 @@ const char * Shader::global_uniform_names_[] = {
 	"Material",
 	"LightsData",
 	"StateData",
-	"Fog"
+	"Fog",
 };
 
 const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
@@ -52,6 +52,7 @@ const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
 	sizeof(Shader::material_t),
 	sizeof(Shader::lights_data_t),
 	sizeof(struct state_data),
+	sizeof(Shader::fog_t),
 };
 
 const GLenum Shader::global_uniform_usage_[] = {
@@ -60,7 +61,8 @@ const GLenum Shader::global_uniform_usage_[] = {
 	GL_DYNAMIC_DRAW,
 	GL_DYNAMIC_DRAW,
 	GL_DYNAMIC_DRAW,
-	GL_DYNAMIC_DRAW
+	GL_DYNAMIC_DRAW,
+	GL_DYNAMIC_DRAW,
 };
 
 GLuint Shader::global_uniform_buffers_[Shader::NUM_GLOBAL_UNIFORMS];
@@ -451,9 +453,9 @@ void Shader::upload_state(const glm::ivec2& size){
 	checkForGLErrors("Shader::upload_state");
 }
 
-void Shader::set_fog_density(float density) {
+void Shader::upload_fog(const fog_t &fog) {
 	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_FOG]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &density);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(fog_t), &fog);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 

@@ -19,13 +19,19 @@
 
 static RenderObject * test_object;
 
+static Color sky;
+
 void Game::init() {
 }
 
-Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 100.f) {
+Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f) {
+
+	sky = Color(0.584f, 0.698f, 0.698f, 1.f);
 
 	screen = new RenderTarget(resolution, GL_RGB8, false);
 	composition = new RenderTarget(resolution, GL_RGB8, true);
+	//downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
+	//downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);
 
 	printf("Loading level %s\n", level.c_str());
 
@@ -55,6 +61,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	test_object = new RenderObject("pony1.obj");
 	test_object->set_position(glm::vec3(1.0, 0, 1.0));
 
+	//dof_shader = Shader::create_shader("dof");
 	terrain_shader = Shader::create_shader("terrain");
 }
 
@@ -63,14 +70,20 @@ Game::~Game() {
 	delete screen;
 	/*for(RenderTarget * ds: downsample) {
 		delete ds;
-	}
-
-	delete dof_shader;*/
+	}*/
 }
 
 void Game::update(float dt) {
 	input.update_object(camera, dt);
-	if(input.current_value(Input::ACTION_0) > 0.5f) {
+	if(input.has_changed(Input::ACTION_0, 0.2f)) {
+		Input::movement_speed -= 1.f; 
+		printf("Decreased movement speed\n");
+	}
+	if(input.has_changed(Input::ACTION_1, 0.2f)) {
+		Input::movement_speed += 1.f; 
+		printf("Increased movement speed\n");
+	}
+	if(input.has_changed(Input::ACTION_3, 0.2f)) {
 		printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
 	}
 }
@@ -94,17 +107,17 @@ void Game::render_geometry(const Camera &cam) {
 }
 
 void Game::render() {
+	glClear(GL_DEPTH_BUFFER_BIT);
 	composition->bind();
 
-	RenderTarget::clear(Color::black);
+	RenderTarget::clear(sky);
 
 	render_geometry(camera);
 
 	composition->unbind();
 
-/*
 	//Blur
-	RenderTarget* prev = composition;
+	/*RenderTarget* prev = composition;
 	for ( int i = 0; i < 2; i++ ){
 		Shader::upload_state(downsample[i]->texture_size());
 		Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
@@ -112,8 +125,8 @@ void Game::render() {
 			prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->texture_size());
 		});
 		prev = downsample[i];
-	}
-*/	
+	}*/
+
 	screen->with(std::bind(&Game::render_composition, this));
 	render_display();
 }
@@ -134,5 +147,4 @@ void Game::render_composition(){
 	/*downsample[1]->texture_bind(Shader::TEXTURE_2D_2);
 	composition->draw(dof_shader);*/
 	composition->draw(shaders[SHADER_PASSTHRU]);
-	shaders[SHADER_PASSTHRU]->bind();
 }
