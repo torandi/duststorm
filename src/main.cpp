@@ -159,6 +159,7 @@ static void main_loop(){
 	long t, last;
 	t = util_utime();
 	last = t;
+	
 	while ( running ){
 		
 		poll();
@@ -168,8 +169,9 @@ static void main_loop(){
 		const long delta = cur - t;
 		const long delay = per_frame - delta;
 
+
 		float dt = (cur - last)/1000000.0 ;
-		
+
 		update(dt);
 		render();
 
@@ -177,6 +179,7 @@ static void main_loop(){
 		frames++;
 		last = cur;
 		t += per_frame;
+
 
 		/* fixed framerate */
 		if ( delay > 0 ){

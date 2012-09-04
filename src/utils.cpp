@@ -104,7 +104,7 @@ bool file_exists(const std::string& filename){
 #ifdef HAVE_ACCESS
 	return access(filename.c_str(), R_OK) == 0;
 #elif defined(WIN32)
-	const DWORD dwAttrib = GetFileAttributes(filename.c_str());
+	const DWORD dwAttrib = GetFileAttributes((LPCWSTR)filename.c_str());
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
 	        !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 #else

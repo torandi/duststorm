@@ -360,6 +360,8 @@ void ParticleSystem::pop_config() {
 }
 
 void ParticleSystem::spawn(int count) {
-	spawn_data sd = { config, count };
+	spawn_data sd;
+	sd.first = config;
+	sd.second = count;
 	spawn_list_.push_back(sd);
 }
