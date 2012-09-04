@@ -14,6 +14,9 @@ typedef struct particle_t {
 	float final_scale;
 	float org_ttl; //original time to live, stored to get a percentage
 	int dead;
+
+	float4 birth_color;
+	float4 death_color;
 } particle_t __attribute__ ((aligned (16))) ;
 
 typedef struct vertex_t {
