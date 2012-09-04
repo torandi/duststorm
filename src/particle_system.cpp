@@ -326,3 +326,15 @@ void ParticleSystem::render(const glm::mat4 * m) {
 	Shader::pop_vertex_attribs();
 
 }
+
+void ParticleSystem::push_config() {
+
+}
+
+void ParticleSystem::pop_config() {
+
+}
+
+void ParticleSystem::spawn_elements(int count) {
+
+}

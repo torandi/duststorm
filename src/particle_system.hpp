@@ -5,6 +5,8 @@
 #include "movable_object.hpp"
 #include "cl.hpp"
 #include <glm/glm.hpp>
+#include <list>
+#include <utility>
 
 class ParticleSystem : public MovableObject {
 	public:
@@ -62,6 +64,8 @@ class ParticleSystem : public MovableObject {
 
 		} config, 16);
 
+		typedef std::pair<config_t, int> spawn_data;
+
 		float avg_spawn_rate; //Number of particles to spawn per second
 		float spawn_rate_var;
 
@@ -74,6 +78,13 @@ class ParticleSystem : public MovableObject {
 
 		virtual void callback_position(const glm::vec3 &position);
 
+		void push_config();
+		void pop_config();
+
+		/*
+		 * Spawn count elements with current config
+		 */
+		void spawn_elements(int count);
 	private:
 
 		const int max_num_particles_;
@@ -104,9 +115,16 @@ class ParticleSystem : public MovableObject {
 				cl_float final_scale;
 				cl_float org_ttl;
 				cl_int dead;
+
+				glm::vec4 birth_color;
+				glm::vec4 death_color;
 				},16);
 
 		TextureArray* texture_;
+
+
+		std::list<spawn_data> spawn_list;
+		std::list<config_t> config_stack;
 };
 
 

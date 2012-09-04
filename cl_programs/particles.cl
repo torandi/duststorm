@@ -30,6 +30,9 @@ __kernel void run_particles (
 		if(particles[id].ttl > 0) {
 			float life_progression = 1.0 - (particles[id].ttl/particles[id].org_ttl);
 			particles[id].speed += particles[id].acc;
+			//Save colors to allow changing config during runtime
+			particles[id].birth_color = config.birth_color;
+			particles[id].death_color = config.death_color;
 			if(particles[id].speed < 0) particles[id].speed = 0.0;
 			vertices[id].position.xyz += particles[id].direction*particles[id].speed + random3(config->motion_rand, true) + config->directional_speed + random3(config->directional_speed_var, true);
 			vertices[id].position.w += particles[id].rotation_speed;
