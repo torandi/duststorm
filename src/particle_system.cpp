@@ -179,16 +179,16 @@ void ParticleSystem::update(float dt) {
 	//Make sure opengl is done with our vbos
 	glFinish();
 
-	cl::Event lock_e, e, e2, e3;
+	std::vector<cl::Event> lock(1,cl::Event());
 
-	err = opencl->queue().enqueueAcquireGLObjects((std::vector<cl::Memory>*) &cl_gl_buffers_, NULL, &lock_e);
+	err = opencl->queue().enqueueAcquireGLObjects((std::vector<cl::Memory>*) &cl_gl_buffers_, NULL, &lock[0]);
 	CL::check_error(err, "[ParticleSystem] acquire gl objects");
 
 	err = spawn_kernel_.setArg(5, (int)(time(0)%UINT_MAX));
 	CL::check_error(err, "[ParticleSystem] spawn: set time");
 
 	opencl->queue().flush();
-	lock_e.wait(); //Wait to aquire gl objects
+	lock[0].wait(); //Wait to aquire gl objects
 
 	bool restore_config = !spawn_list_.empty();
 	
@@ -196,19 +196,18 @@ void ParticleSystem::update(float dt) {
 	 * Handle spawning
 	 */
 	while(!spawn_list_.empty()) {
-		cl::Event lock;
 		spawn_data &sd = spawn_list_.front();
 
 		cl_int err = opencl->queue().enqueueWriteBuffer(config_, CL_TRUE, 0, sizeof(config_t), &sd.first, NULL, NULL);
 		CL::check_error(err, "[ParticleSystem] Write config");
 	
-		spawn_particles((cl_int) sd.second, &lock);
+		spawn_particles((cl_int) sd.second, &lock[0]);
 
 		spawn_list_.pop_front();
 
 		opencl->queue().flush();
 
-		lock.wait();
+		lock[0].wait();
 	}
 
 	if(restore_config) {
@@ -216,12 +215,11 @@ void ParticleSystem::update(float dt) {
 	}
 
 	if(auto_spawn) {
-		cl::Event lock;
 		//Write number of particles to spawn this round:
 		cl_int current_spawn_rate = (cl_int) round((avg_spawn_rate + 2.f*frand()*spawn_rate_var - spawn_rate_var)*dt);
-		spawn_particles(current_spawn_rate, &lock);
+		spawn_particles(current_spawn_rate, &lock[0]);
 		opencl->queue().flush();
-		lock.wait();
+		lock[0].wait();
 	}
 
 
@@ -230,10 +228,7 @@ void ParticleSystem::update(float dt) {
 	err = run_kernel_.setArg(5, (int)(time(0)%UINT_MAX));
 	CL::check_error(err, "[ParticleSystem] run: set time");
 
-	std::vector<cl::Event> queue;
-	queue.push_back(cl::Event());
-
-	err = opencl->queue().enqueueNDRangeKernel(run_kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, NULL, &queue[0]);
+	err = opencl->queue().enqueueNDRangeKernel(run_kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, NULL, &lock[0]);
 	CL::check_error(err, "[ParticleSystem] Execute run_kernel");
 	
 	//render_blocking_events_.push_back(e2);
@@ -257,7 +252,7 @@ void ParticleSystem::update(float dt) {
 	}
 	opencl->queue().enqueueUnmapMemObject(cl_gl_buffers_[0], vertices, NULL, NULL); */
 
-	err = opencl->queue().enqueueReleaseGLObjects((std::vector<cl::Memory>*)&cl_gl_buffers_, &queue, NULL);
+	err = opencl->queue().enqueueReleaseGLObjects((std::vector<cl::Memory>*)&cl_gl_buffers_, &lock, NULL);
 	CL::check_error(err, "[ParticleSystem] Release GL objects");
 
 	opencl->queue().flush();

@@ -119,6 +119,7 @@ static void init(bool fullscreen, bool vsync){
 static void cleanup(){
 	Engine::cleanup();
 	Shader::cleanup();
+	SDL_Quit();
 }
 
 static void poll(){

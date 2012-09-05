@@ -152,6 +152,12 @@ Texture2D* Texture2D::from_filename(const std::string &path, bool mipmap) {
 	return texture;
 }
 
+void Texture2D::cleanup() {
+	for(auto &entry : texture_cache) {
+		delete entry.second;
+	}
+}
+
 Texture2D* Texture2D::default_colormap(){
 	return from_filename(PATH_BASE "data/textures/default.jpg");
 }

@@ -57,6 +57,11 @@ public:
 	virtual void texture_bind(Shader::TextureUnit unit) const;
 	virtual void texture_unbind() const;
 
+	/**
+	 * Deletes all cached textures
+	 */
+	static void cleanup();
+
 private:
 	Texture2D(const std::string &path, bool mipmap);
 

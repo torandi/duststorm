@@ -138,6 +138,12 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 Game::~Game() {
 	delete composition;
 	delete screen;
+	for(int i=0; i < num_objects; ++i) {
+		delete objects[i];
+	}
+	delete test_system;
+	delete particle_textures;
+	delete terrain;
 	/*for(RenderTarget * ds: downsample) {
 		delete ds;
 	}*/

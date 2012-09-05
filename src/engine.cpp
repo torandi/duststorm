@@ -60,6 +60,7 @@ namespace Engine {
 
 	void cleanup() {
 		delete game;
+		Texture2D::cleanup();
 	}
 
 	void update(float dt) {
