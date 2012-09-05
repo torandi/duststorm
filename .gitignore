@@ -26,6 +26,10 @@ frob.log
 nox2
 demo
 
+# windows binary
+*.dll
+*.exe
+
 # Compiled Object files
 *.slo
 *.lo
