@@ -1,8 +1,0 @@
-newmtl Cliff_Planet_Low_defaultMat
-illum 4
-Kd 0.80 0.80 0.80
-Ka 0.40 0.40 0.40
-Tf 1.00 1.00 1.00
-Ni 1.00
-map_Kd sten_maya.jpg
-map_bump sten_normal.png
