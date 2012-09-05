@@ -154,8 +154,10 @@ Texture2D* Texture2D::from_filename(const std::string &path, bool mipmap) {
 }
 
 void Texture2D::cleanup() {
-	for(auto &entry : texture_cache) {
-		delete entry.second;
+	for(auto it = texture_cache.begin(); it != texture_cache.end(); ) {
+		Texture2D * t = it->second;
+		texture_cache.erase(it++);
+		delete t;
 	}
 }
 
