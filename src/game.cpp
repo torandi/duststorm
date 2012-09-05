@@ -111,21 +111,24 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	//Build particle configs:
 	test_system->config.spawn_position = glm::vec4(objects[1]->position(), 1.f);
 	test_system->config.spawn_area = glm::vec4(0.0f, 0.f, 0.0f, 1.f);
-	test_system->config.spawn_direction = glm::vec4(0, 1.f, 0.f, 0.f);
-	test_system->config.direction_var = glm::vec4(0.1f, 0.f, 0.1f, 0.f);
-	test_system->config.avg_spawn_speed= 0.003f;
-	test_system->config.spawn_speed_var = 0.0005f;
-	test_system->config.avg_ttl = 20.f;
-	test_system->config.ttl_var = 5.f;
-	test_system->config.avg_scale = 0.6f;
-	test_system->config.scale_var = 0.05f;
-	test_system->config.avg_scale_change = 2.f;
+	test_system->config.avg_spawn_velocity = glm::vec4(0, 0.2f, 0.f, 0.f);
+	test_system->config.spawn_velocity_var = glm::vec4(0.f, 0.f, 0.f, 0.f);
+	test_system->config.avg_ttl = 10.f;
+	test_system->config.ttl_var = 2.f;
+	test_system->config.avg_scale = 2.f;
+	test_system->config.scale_var = 0.5f;
+	test_system->config.avg_scale_change = 4.f;
 	test_system->config.scale_change_var = 0.5f;
 	test_system->config.avg_rotation_speed = 0.02f;
-	test_system->config.rotation_speed_var = 0.005f;
-	test_system->config.birth_color = glm::vec4(0.2, 0.2, 0.2, 0.5);
+	test_system->config.rotation_speed_var = 0.01f;
+	test_system->config.birth_color = glm::vec4(0.3, 0.3, 0.3, 0.1);
 	test_system->config.death_color = glm::vec4(0.8 ,0.8, 0.8, 0.f);
-	test_system->config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
+	test_system->config.motion_rand = glm::vec4(0.01f, 0.01f, 0.01f, 0);
+	test_system->config.avg_wind_influence = 0.06f;
+	test_system->config.wind_influence_var = 0.05f;
+	test_system->config.avg_gravity_influence = 0.005f;
+	test_system->config.gravity_influence_var = 0.f;
+	test_system->config.wind_velocity = glm::vec4(1.f, 0.f, 0.f, 0.f);
 	test_system->config.start_texture = 3;
 	test_system->config.num_textures = 1;
 	
