@@ -66,6 +66,7 @@ private:
 	Texture2D(const std::string &path, bool mipmap);
 
 	GLuint _texture;
+	std::string entry_name;
 };
 
 class Texture3D: public TextureBase {
