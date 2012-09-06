@@ -24,6 +24,9 @@ class Terrain : public Mesh {
 
 	TextureArray * textures_[2];
 
+	float height_at(int x, int y) const;
+	const glm::vec3 &normal_at(int x, int y) const;
+
 	public:
 		float vertical_scale() { return vertical_scale_; };
 		Terrain(const std::string &file, float horizontal_scale, float vertical_scale, TextureArray * color_, TextureArray * normal_);
@@ -32,8 +35,8 @@ class Terrain : public Mesh {
 		const glm::ivec2 &size() const;
 		static glm::vec4 get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size);
 
-		float height_at(int x, int y) const;
 		float height_at(float x, float y) const;
+		glm::vec3 normal_at(float x, float y) const;
 
 		/*
 		 * Once this has been called get_pixel_color can not be called
