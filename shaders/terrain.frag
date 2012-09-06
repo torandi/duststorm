@@ -33,7 +33,7 @@ void main() {
 	vec2 texcoord_real = texcoord * TEXTURE_REPEAT;
 	color1 = texture2DArray(texture_array0, vec3(texcoord_real, 0));
 	color2 = texture2DArray(texture_array0, vec3(texcoord_real, 1));
-	color_mix = texture(texture0, texcoord).r;
+	color_mix = texture(texture0, texcoord).g;
 	vec4 originalColor = mix(color1, color2, color_mix);
 
 	color1 = texture2DArray(texture_array1, vec3(texcoord_real, 0));
