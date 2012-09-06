@@ -1,2 +1,8 @@
 * text eol=lf
+*.jpg	-text
+*.png	-text
+*.xcf	-text
+*.svg	-text
+*.obj	-text
+*.mtl	-text
 
