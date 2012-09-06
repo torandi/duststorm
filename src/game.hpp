@@ -11,7 +11,7 @@
 #include "terrain.hpp"
 #include "lights_data.hpp"
 
-#include "nanosvg.h"
+#include "path.hpp"
 
 #include "input.hpp"
 
@@ -47,11 +47,12 @@ class Game {
 
 		void do_action(int num);
 
+		glm::vec3 correct_height(glm::vec3 v, float offset=0.f) const;
+
 		Camera camera;
 		RenderTarget *screen, *composition, *downsample[2];
 
-		glm::vec3 * path;
-		int path_size;
+		Path * path;
 
 		Shader * terrain_shader;
 		Shader * dof_shader;

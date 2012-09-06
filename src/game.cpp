@@ -1,5 +1,8 @@
 #include "game.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
+#include <vector>
 #include <glm/gtx/vector_angle.hpp>
 #include <SDL/SDL.h>
 #include "globals.hpp"
@@ -16,6 +19,7 @@
 #include "sound.hpp"
 #include "particle_system.hpp"
 
+#include "path.hpp"
 #include "nanosvg.h"
 
 #define DEBUG_MOVE 0
@@ -77,19 +81,20 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 	delete path_file;
 
-	path_size = svg_path->npts;
-	path = new glm::vec3[path_size];
+	std::vector<glm::vec3> path_nodes;
 
 	for(int i=0; i< svg_path->npts; ++i) {
-		path[i] = glm::vec3(
+		glm::vec3 v = glm::vec3(
 						svg_path->pts[i*2],
 						0,
 						svg_path->pts[i*2 + 1]
 					) * terrain_scale.x;
-		path[i].y = terrain->height_at(path[i].x, path[i].z) + 1.0;
+		path_nodes.push_back(correct_height(v));
 	}
 
 	svgDelete(svg_path);
+
+	path = new Path(path_nodes);
 
 	lights.ambient_intensity() = glm::vec3(0.1f);
 	lights.num_lights() = 1;
@@ -102,8 +107,10 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	lights.lights[0]->linear_attenuation = 0.1f;
 	lights.lights[0]->quadratic_attenuation = 0.4f;*/
 
-	camera.set_position(path[0]);
-	camera.look_at(path[1]);
+	Path::point_t p;
+	path->begin(&p);
+	camera.set_position(correct_height(p.position, 1.f));
+	camera.look_at(correct_height(p.position + p.direction, 1.f));
 
 	objects[0] = new RenderObject("pony1.obj");
 	objects[0]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f), 250.0));
@@ -176,11 +183,16 @@ Game::~Game() {
 	delete particle_textures;
 	delete terrain;
 
-	delete[] path;
+	delete path;
 
 	/*for(RenderTarget * ds: downsample) {
 		delete ds;
 	}*/
+}
+
+glm::vec3 Game::correct_height(glm::vec3 v, float offset) const {
+	//return glm::vec3(v.x, terrain->height_at(v.x, v.z) + offset, v.z);
+	return glm::vec3(v.x, 50.f + offset, v.z);
 }
 
 void Game::update(float dt) {
@@ -223,9 +235,14 @@ void Game::render_geometry(const Camera &cam) {
 		objects[i]->render();
 	}*/
 
-	for(int i = 0; i < path_size; ++i) {
-		path_marker->set_position(path[i]);
+	Path::point_t p;
+	path->begin(&p);
+
+	for(float i = 0.f; i<path->length(); i+=1.f) {
+		path_marker->set_position(correct_height(p.position, 1.f));
 		path_marker->render();
+		path->next(&p, 1.f);
+
 	}
 
 	terrain_shader->bind();

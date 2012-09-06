@@ -2,7 +2,6 @@
 #define PATH_HPP
 
 #include <glm/glm.hpp>
-#include <glm/gtx/spline.hpp>
 
 #include <vector>
 
@@ -11,10 +10,10 @@ class Path {
 		Path(const std::vector<glm::vec3> &path);
 
 		struct point_t {
-			glm::vec3 position;
-			glm::vec3 direction;
-			float path_position;	/* position in the path */
-			unsigned int keypoint;		/* keypoint before or on this position */
+			glm::vec3 position;		/* position in 3d space of the current point */
+			glm::vec3 direction;		/* Non-normalized direction (current point - previous point) */
+			float path_position;		/* position in the path */
+			unsigned int keypoint;	/* keypoint before or on this position */
 		};
 
 		/**
@@ -41,10 +40,14 @@ class Path {
 
 		const keypoint_t &keypoint(unsigned int index) const;
 
+		float normalize_position(float pos) const;
+
 		/**
 		 * Distance from one keypoint to the next
 		 */
 		float distance_to_next(unsigned int from) const;
+
+		const keypoint_t &find_keypoint(float position) const;
 };
 
 #endif
