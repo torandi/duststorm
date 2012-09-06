@@ -130,8 +130,10 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	objects[2] = new RenderObject("bench.obj");
 	objects[2]->set_position(glm::vec3(300.0, terrain->height_at(300.f, 250.f), 250.0));
 
-	objects[3] = new RenderObject("tree1.obj");
-	objects[3]->set_position(glm::vec3(300.0, terrain->height_at(300.f, 252.f), 252.0));
+	objects[3] = new RenderObject("kanon4.obj");
+	objects[3]->set_position(path->at(1.f));
+	objects[3]->absolute_move(glm::vec3(0, 1.f, 0.f));
+	objects[3]->yaw(90.f);
 
 	path_marker = new RenderObject("cube.obj");
 	path_marker->set_scale(0.25f);
@@ -245,9 +247,9 @@ void Game::render_geometry(const Camera &cam) {
 	Shader::upload_lights(lights);
 
 	shaders[SHADER_NORMAL]->bind();
-	/*for(int i=0; i < num_objects; ++i) {
+	for(int i=0; i < num_objects; ++i) {
 		objects[i]->render();
-	}*/
+	}
 
 	for(float i = 0.f; i<path->length(); i+=1.f) {
 		path_marker->set_position(path->at(i));
