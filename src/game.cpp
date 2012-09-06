@@ -87,17 +87,22 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	std::vector<glm::vec3> path_nodes;
 
 	for(int i=0; i< svg_path->npts; ++i) {
-		glm::vec3 v = glm::vec3(
+		path_nodes.push_back(glm::vec3(
 						svg_path->pts[i*2],
 						0,
 						svg_path->pts[i*2 + 1]
-					) * terrain_scale.x;
-		path_nodes.push_back(correct_height(v));
+					) * terrain_scale.x);
 	}
 
 	svgDelete(svg_path);
+	
+	Path::optimize_vector(path_nodes);
 
-	path = new Path(path_nodes);
+	for(glm::vec3 &v : path_nodes) {
+		v.y = terrain->height_at(v.x, v.z) + 1.f;
+	}
+
+	path = new Path(path_nodes, false);
 
 	prev = path->at(0.f);
 
@@ -194,8 +199,8 @@ Game::~Game() {
 }
 
 glm::vec3 Game::correct_height(glm::vec3 v, float offset) const {
-	//return glm::vec3(v.x, terrain->height_at(v.x, v.z) + offset, v.z);
-	return glm::vec3(v.x, 50.f + offset, v.z);
+	return glm::vec3(v.x, terrain->height_at(v.x, v.z) + offset, v.z);
+//	return glm::vec3(v.x, 50.f + offset, v.z);
 }
 
 void Game::update(float dt) {
@@ -209,17 +214,18 @@ void Game::update(float dt) {
 		Input::movement_speed += 1.f; 
 		printf("Increased movement speed\n");
 	}
-
+/*
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		cur_controll = (cur_controll + 1) % num_controllable;
 		printf("Switching controll to %s\n", controllable_names[cur_controll]);
-	}
+	}*/
 
 	if(input.current_value(Input::ACTION_3) > 0.9f) {
 		path_pos+=dt*Input::movement_speed;
 		glm::vec3 cur = path->at(path_pos);
-		camera.set_position(Game::correct_height(cur, 2.f));
-		camera.look_at(Game::correct_height(cur + (cur - prev), 2.f));
+		cur.y += 2.f;
+		camera.set_position(cur);
+		camera.look_at(cur + (cur - prev));
 
 		prev = cur;
 	}
@@ -243,17 +249,10 @@ void Game::render_geometry(const Camera &cam) {
 		objects[i]->render();
 	}*/
 
-	path_marker->set_scale(0.25f);
 	for(float i = 0.f; i<path->length(); i+=1.f) {
-		path_marker->set_position(correct_height(path->at(i), 1.f));
+		path_marker->set_position(path->at(i));
+		//path_marker->set_position(correct_height(path->at(i), 1.f));
 		path_marker->render();
-	}
-
-	path_marker->set_scale(1.f);
-	for(Path::keypoint_t &p : path->points) {
-		path_marker->set_position(correct_height(p.position, 1.f));
-		path_marker->render();
-
 	}
 
 	terrain_shader->bind();

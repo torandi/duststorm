@@ -11,7 +11,14 @@
  */
 class Path {
 	public:
-		Path(const std::vector<glm::vec3> &path);
+		/*
+		 * Adds and removes keyframes to optimize path, either 
+		 * call Path(vector,optimize) with second argument true (default) or
+		 * call this first
+		 */
+		static void optimize_vector(std::vector<glm::vec3> &path);
+
+		Path(const std::vector<glm::vec3> &path, bool optimize = true);
 
 		glm::vec3 at(float position) const;
 
@@ -27,7 +34,7 @@ class Path {
 	private:
 		float path_length;
 
-		const keypoint_t &keypoint(unsigned int index) const;
+		const keypoint_t &keypoint(int index) const;
 
 		float normalize_position(float pos) const;
 

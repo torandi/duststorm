@@ -1,62 +1,84 @@
 #include "path.hpp"
 
+#include <list>
 #include <glm/gtx/spline.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-Path::Path(const std::vector<glm::vec3> &path) {
-	if(path.size() < 4) {
+static const float min_keypoint_distance = 0.1f;
+static const float max_keypoint_distance = 10.f;
+
+void Path::optimize_vector(std::vector<glm::vec3> &path) {
+	for(auto it = path.begin(); it != path.end(); ++it) {
+		auto next = it + 1;
+		if(next == path.end()) next = path.begin();
+
+		if(glm::distance(*it, *next) < min_keypoint_distance) {
+			it = path.erase(it);
+			next = it + 1;
+			if(next >= path.end()) break;
+		}
+
+		while(glm::distance(*it, *next) > max_keypoint_distance) {
+			next = path.insert(next, *it + (*next - *it) / 2.f);
+			it = next - 1;
+		}
+	}
+}
+
+Path::Path(const std::vector<glm::vec3> &in_path, bool optimize) {
+	if(in_path.size() < 4) {
 		fprintf(stderr, "Path must contain at least four entries\n");
 		abort();
 	}
+	std::vector<glm::vec3> opt_path;
 
-	path_length = 0;
+	if(optimize) {
+		opt_path = in_path;
+		optimize_vector(opt_path);
+	}
+	const std::vector<glm::vec3> &path = optimize ? opt_path : in_path;
+
+
+	path_length = 0.f;
+
 	for(auto it = path.begin(); it != path.end(); ++it) {
 		keypoint_t kp;
+		kp.path_point = path_length;
 		kp.position = *it;
 		kp.index = points.size();
-		if(it == path.begin()) {
-			kp.path_point = 0.f;
-		} else {
-			/* We approximate the path_length of the subpath by
-			 * taking the middle point and taking the 
-			 * path_length from that to the two points
-			 */
-			const glm::vec3 * p[4];
-			if( it - 2 < path.begin() ) p[0] = & ( * (path.end() - 1) );
-			else p[0] = &(* (it - 2) );
 
-			p[1] = &(* (it - 1) );
-			p[2] = &(* (it) );
+		const glm::vec3 * p[4];
 
-			if(path.end() - it == 1) p[3] = &( *( path.begin() ) );
-			else p[3] = &(* (it + 1) );
+		/* We approximate the path_length of the subpath by
+		 * taking the middle point and taking the 
+		 * path_length from that to the two points
+		 */
+		if( it == path.begin() ) p[0] = & ( path.back() );
+		else p[0] = &(* (it - 1) );
 
-			glm::vec3 middle_point = glm::catmullRom(*p[0], *p[1], *p[2], *p[3], 0.5f);
-			path_length += glm::distance(*p[1], middle_point) + glm::distance(middle_point, *p[2]);
-			kp.path_point = path_length;
+		p[1] = &( *it );
 
-		}
-		printf("Added keypoint[%d]: {%f, %s}\n", kp.index, kp.path_point, glm::to_string(kp.position).c_str());
+		if(it + 1 == path.end()) p[2] = &path.front();
+		else p[2] = &( *(it + 1 ) );
+
+		if(it + 1 == path.end()) p[3] = &path.front();
+		else if(it + 2 == path.end() ) p[3] = &( *(path.begin() + 1) );
+		else p[3] = &( *(it + 2 ) );
+
+
+		glm::vec3 middle_point = glm::catmullRom(*p[0], *p[1], *p[2], *p[3], 0.5f);
+		path_length += glm::distance(*p[1], middle_point) + glm::distance(middle_point, *p[2]);
+
+	//	printf("Added keypoint[%d]: {%f, %s}\n", kp.index, kp.path_point, glm::to_string(kp.position).c_str());
 		points.push_back(kp);
 	}
-	//Calculate the length from last node to the first node 
-	const glm::vec3 *p[4] = {
-		&(*(path.end() - 2)), 
-		&(*(path.end() - 1)),
-		&(*path.begin()),
-		&(*(path.begin() + 1))
-	};
-
-
-	glm::vec3 middle_point = glm::catmullRom(*p[0], *p[1], *p[2], *p[3], 0.5f);
-	path_length += glm::distance(*p[1], middle_point) + glm::distance(middle_point, *p[2]);
 	
 }
 
 float Path::length() const { return path_length; }
 
-const Path::keypoint_t &Path::keypoint(unsigned int index) const {
-	if(index < 0) return keypoint(points.size() - index);
+const Path::keypoint_t &Path::keypoint(int index) const {
+	if(index < 0) return keypoint(points.size() + index);
 	return points[index % points.size()];
 }
 
@@ -64,7 +86,7 @@ float Path::distance_to_next(unsigned int from) const {
 	if(from+1 < points.size()) { 	
 		return points[from+1].path_point - points[from].path_point;
 	} else {
-		return path_length - from;
+		return path_length - points[from].path_point;
 	}
 }
 
@@ -98,7 +120,7 @@ glm::vec3 Path::at(float position) const {
 	const keypoint_t &p2 = keypoint(kp.index + 1);
 	const keypoint_t &p3 = keypoint(kp.index + 2);
 
-	float s = (position - p1.path_point) / (p2.path_point - p1.path_point);
+	float s = glm::clamp((position - p1.path_point) / distance_to_next(p1.index), 0.f, 1.f);;
 
 	return glm::catmullRom(p0.position, p1.position, p2.position, p3.position, s);
 }

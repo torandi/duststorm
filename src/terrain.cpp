@@ -115,10 +115,14 @@ float Terrain::height_at(float x_, float y_) const {
 	float dx = (x_/horizontal_scale_) - x;
 	float dy = (y_/horizontal_scale_) - y;
 	float height=0;
-	height += (1.0-dx) * (1.0-dy) * height_at(x,y);
+	/*height += (1.0-dx) * (1.0-dy) * height_at(x,y);
 	height += dx * (1.0-dy) * height_at(y,x+1);
 	height += (1.0-dx) * dy * height_at(y+1,x);
-	height += dx * dy * height_at(y+1, x+1);
+	height += dx * dy * height_at(y+1, x+1);*/
+	height += (1.0-dx) * (1.0-dy) * map_[y*size_.x + x];
+	height += dx * (1.0-dy) * map_[y*size_.x + x+1];
+	height += (1.0-dx) * dy * map_[(y+1)*size_.x + x];
+	height += dx * dy * map_[(y+1)*size_.x + x+1];
 	return height;
 }
 
