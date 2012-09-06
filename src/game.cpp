@@ -16,6 +16,8 @@
 #include "sound.hpp"
 #include "particle_system.hpp"
 
+#include "nanosvg.h"
+
 #define DEBUG_MOVE 0
 
 /*
@@ -23,6 +25,8 @@
  */
 static RenderObject * objects[10];
 static const int num_objects = 4;
+
+static RenderObject * path_marker;
 
 static ParticleSystem * test_system;
 static TextureArray * particle_textures;
@@ -49,8 +53,10 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 	sky = Color(0.584f, 0.698f, 0.698f, 1.f);
 
-	screen = new RenderTarget(resolution, GL_RGB8, false);
-	composition = new RenderTarget(resolution, GL_RGB8, true);
+	static glm::vec2 terrain_scale(0.5f, 50.f);
+
+	screen = new RenderTarget(resolution, GL_RGB8);
+	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER);
 	//downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
 	//downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);
 
@@ -63,7 +69,27 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	TextureArray *  normals = TextureArray::from_filename( (base_dir +"/normal0.png").c_str(),
 			(base_dir + "/normal1.png").c_str(), nullptr);
 
-	terrain = new Terrain(base_dir + "/map.png", 0.5, 50.0, colors, normals);
+	terrain = new Terrain(base_dir + "/map.png", terrain_scale.x, terrain_scale.y, colors, normals);
+
+	Data * path_file = Data::open(base_dir + "/path.svg");
+
+	SVGPath * svg_path = svgParse((char*) path_file->data());
+
+	delete path_file;
+
+	path_size = svg_path->npts;
+	path = new glm::vec3[path_size];
+
+	for(int i=0; i< svg_path->npts; ++i) {
+		path[i] = glm::vec3(
+						svg_path->pts[i*2],
+						0,
+						svg_path->pts[i*2 + 1]
+					) * terrain_scale.x;
+		path[i].y = terrain->height_at(path[i].x, path[i].z) + 1.0;
+	}
+
+	svgDelete(svg_path);
 
 	lights.ambient_intensity() = glm::vec3(0.1f);
 	lights.num_lights() = 1;
@@ -76,7 +102,8 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	lights.lights[0]->linear_attenuation = 0.1f;
 	lights.lights[0]->quadratic_attenuation = 0.4f;*/
 
-	camera.set_position(glm::vec3(275.f, 28.f, 254.f));
+	camera.set_position(path[0]);
+	camera.look_at(path[1]);
 
 	objects[0] = new RenderObject("pony1.obj");
 	objects[0]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f), 250.0));
@@ -91,7 +118,8 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	objects[3] = new RenderObject("tree1.obj");
 	objects[3]->set_position(glm::vec3(300.0, terrain->height_at(300.f, 252.f), 252.0));
 
-	camera.look_at(objects[0]->position());
+	path_marker = new RenderObject("cube.obj");
+	path_marker->set_scale(0.25f);
 
 	terrain_shader = Shader::create_shader("terrain");
 
@@ -147,6 +175,9 @@ Game::~Game() {
 	delete test_system;
 	delete particle_textures;
 	delete terrain;
+
+	delete[] path;
+
 	/*for(RenderTarget * ds: downsample) {
 		delete ds;
 	}*/
@@ -188,8 +219,13 @@ void Game::render_geometry(const Camera &cam) {
 	Shader::upload_lights(lights);
 
 	shaders[SHADER_NORMAL]->bind();
-	for(int i=0; i < num_objects; ++i) {
+	/*for(int i=0; i < num_objects; ++i) {
 		objects[i]->render();
+	}*/
+
+	for(int i = 0; i < path_size; ++i) {
+		path_marker->set_position(path[i]);
+		path_marker->render();
 	}
 
 	terrain_shader->bind();

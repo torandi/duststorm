@@ -11,6 +11,8 @@
 #include "terrain.hpp"
 #include "lights_data.hpp"
 
+#include "nanosvg.h"
+
 #include "input.hpp"
 
 #include "sound.hpp"
@@ -47,6 +49,9 @@ class Game {
 
 		Camera camera;
 		RenderTarget *screen, *composition, *downsample[2];
+
+		glm::vec3 * path;
+		int path_size;
 
 		Shader * terrain_shader;
 		Shader * dof_shader;

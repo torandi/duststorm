@@ -23,6 +23,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/mesh.cpp src/mesh.hpp \
 								src/movable_object.cpp src/movable_object.hpp \
 								src/movable_light.cpp src/movable_light.hpp \
+								src/nanosvg.cpp src/nanosvg.h \
 								src/sound.cpp src/sound.hpp \
 								src/particle_system.cpp src/particle_system.hpp \
 								src/rendertarget.cpp src/rendertarget.hpp \
