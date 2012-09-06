@@ -24,6 +24,7 @@ class Path {
 
 		float length() const;
 
+	private:
 		struct keypoint_t {
 			unsigned int index;
 			float path_point; /* A number indicating where on the path this keypoint exists */
@@ -31,7 +32,7 @@ class Path {
 		};
 
 		std::vector<keypoint_t> points;
-	private:
+
 		float path_length;
 
 		const keypoint_t &keypoint(int index) const;
