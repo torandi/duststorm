@@ -1,8 +1,8 @@
 #include "path.hpp"
 
-#include <list>
+#include <vector>
+#include <cstdio>
 #include <glm/gtx/spline.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 static const float min_keypoint_distance = 0.1f;
 static const float max_keypoint_distance = 10.f;
