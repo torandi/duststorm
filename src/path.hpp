@@ -5,30 +5,18 @@
 
 #include <vector>
 
+/*
+ * A path of positions in 3d space with the ability to specify any
+ * point on the path in a lineary progression
+ */
 class Path {
 	public:
 		Path(const std::vector<glm::vec3> &path);
 
-		struct point_t {
-			glm::vec3 position;		/* position in 3d space of the current point */
-			glm::vec3 direction;		/* Non-normalized direction (current point - previous point) */
-			float path_position;		/* position in the path */
-			unsigned int keypoint;	/* keypoint before or on this position */
-		};
-
-		/**
-		 * Use this to initialize a point_t. 
-		 */
-		void begin(point_t * point, float start_position=0.f) const;
-
-		/**
-		 * Use this to update the point to a relative position)
-		 */
-		void next(point_t * point, float incr) const;
+		glm::vec3 at(float position) const;
 
 		float length() const;
 
-	private:
 		struct keypoint_t {
 			unsigned int index;
 			float path_point; /* A number indicating where on the path this keypoint exists */
@@ -36,6 +24,7 @@ class Path {
 		};
 
 		std::vector<keypoint_t> points;
+	private:
 		float path_length;
 
 		const keypoint_t &keypoint(unsigned int index) const;

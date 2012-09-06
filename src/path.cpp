@@ -69,7 +69,7 @@ float Path::distance_to_next(unsigned int from) const {
 }
 
 /**
- * Finds the keypoint (before) for the give normalized position
+ * Finds the keypoint just before the give normalized position
  */
 const Path::keypoint_t &Path::find_keypoint(float position) const {
 	for(auto it = points.begin() + 1; it != points.end(); ++it) {
@@ -86,34 +86,19 @@ float Path::normalize_position(float pos) const {
 }
 
 /**
- * Use this to initialize a point_t. 
+ * Get the 3d coordinate for a given position in the path
  */
-void Path::begin(Path::point_t * point, float start_position) const {
-	point->position = glm::vec3(0.f);
-	point->path_position = start_position - 1.f;
-	point->keypoint = 0;
-	next(point, 0.5f); //Now point contains correct data for start - 0.5f, besides direction
-	next(point, 0.5f); //Now point contains correct data for start, including direction
-}
+glm::vec3 Path::at(float position) const {
+	position = normalize_position(position);
 
-/**
- * Use this to update the point to a relative position)
- */
-void Path::next(Path::point_t * point, float incr) const {
-	point->path_position = normalize_position(point->path_position + incr);
-
-	const keypoint_t &kp = find_keypoint(point->path_position);
+	const keypoint_t &kp = find_keypoint(position);
 
 	const keypoint_t &p0 = keypoint(kp.index - 1);
 	const keypoint_t &p1 = kp;
 	const keypoint_t &p2 = keypoint(kp.index + 1);
 	const keypoint_t &p3 = keypoint(kp.index + 2);
 
-	float s = (point->path_position - p1.path_point) / (p2.path_point - p1.path_point);
+	float s = (position - p1.path_point) / (p2.path_point - p1.path_point);
 
-	glm::vec3 new_position = glm::catmullRom(p0.position, p1.position, p2.position, p3.position, s);
-
-	point->direction = new_position - point->position;
-	point->position = new_position;
-	point->keypoint = kp.index;
+	return glm::catmullRom(p0.position, p1.position, p2.position, p3.position, s);
 }

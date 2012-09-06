@@ -46,6 +46,9 @@ static int const num_particle_configs = 2;
 static ParticleSystem::config_t particle_configs[num_particle_configs];
 static int current_particle_config = 0;
 
+static glm::vec3 prev;
+static float path_pos = 0.f;
+
 /*
  * End debug stuff
  */
@@ -96,6 +99,8 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 	path = new Path(path_nodes);
 
+	prev = path->at(0.f);
+
 	lights.ambient_intensity() = glm::vec3(0.1f);
 	lights.num_lights() = 1;
 
@@ -107,10 +112,8 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	lights.lights[0]->linear_attenuation = 0.1f;
 	lights.lights[0]->quadratic_attenuation = 0.4f;*/
 
-	Path::point_t p;
-	path->begin(&p);
-	camera.set_position(correct_height(p.position, 1.f));
-	camera.look_at(correct_height(p.position + p.direction, 1.f));
+	camera.set_position(correct_height(path->at(0.f), 1.f));
+	camera.look_at(correct_height(path->at(1.f)));
 
 	objects[0] = new RenderObject("pony1.obj");
 	objects[0]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f), 250.0));
@@ -212,8 +215,13 @@ void Game::update(float dt) {
 		printf("Switching controll to %s\n", controllable_names[cur_controll]);
 	}
 
-	if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
+	if(input.current_value(Input::ACTION_3) > 0.9f) {
+		path_pos+=dt*Input::movement_speed;
+		glm::vec3 cur = path->at(path_pos);
+		camera.set_position(Game::correct_height(cur, 2.f));
+		camera.look_at(Game::correct_height(cur + (cur - prev), 2.f));
 
+		prev = cur;
 	}
 
 	test_system->update(dt);
@@ -235,13 +243,16 @@ void Game::render_geometry(const Camera &cam) {
 		objects[i]->render();
 	}*/
 
-	Path::point_t p;
-	path->begin(&p);
-
+	path_marker->set_scale(0.25f);
 	for(float i = 0.f; i<path->length(); i+=1.f) {
+		path_marker->set_position(correct_height(path->at(i), 1.f));
+		path_marker->render();
+	}
+
+	path_marker->set_scale(1.f);
+	for(Path::keypoint_t &p : path->points) {
 		path_marker->set_position(correct_height(p.position, 1.f));
 		path_marker->render();
-		path->next(&p, 1.f);
 
 	}
 
