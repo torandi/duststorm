@@ -26,6 +26,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/nanosvg.cpp src/nanosvg.h \
 								src/sound.cpp src/sound.hpp \
 								src/particle_system.cpp src/particle_system.hpp \
+								src/path.cpp src/path.hpp \
 								src/rendertarget.cpp src/rendertarget.hpp \
 								src/render_object.cpp src/render_object.hpp \
 								src/shader.cpp src/shader.hpp \
