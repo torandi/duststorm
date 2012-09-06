@@ -1,8 +1,8 @@
 # Blender v2.58 (sub 0) OBJ File: 'cube.blend'
 # www.blender.org
-#mtllib cube.mtl
+mtllib cube.mtl
 o Cube
-#usemtl Material
+usemtl Material
 v 1.000000 -0.999028 -1.000000
 v 1.000000 -0.999028 1.000000
 v -1.000000 -0.999028 1.000000
