@@ -47,7 +47,7 @@ void main() {
 
 	normal_map = normalize(normal_map * 2.0 - 1.0);
 
-	float shininess = 32.f;
+	float shininess = 18.f;
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.f);
 
 	for(int light = 0; light < Lgt.num_lights; ++light) {
@@ -55,7 +55,7 @@ void main() {
 				Lgt.lights[light], originalColor, 
 				pos_tangent_space, normal_map, camera_dir, 
 				norm_normal, norm_tangent, norm_bitangent,
-				shininess, Mtl.specular);
+				Mtl.shininess, Mtl.specular);
 	}
 
 	ocolor = calculate_fog(clamp(accumLighting,0.0, 1.0));
