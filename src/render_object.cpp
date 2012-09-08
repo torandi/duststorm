@@ -164,9 +164,6 @@ void RenderObject::pre_render() {
 		}
 
 		max = 1;
-		int two_sided;
-		if((AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_TWOSIDED, &two_sided, &max)) && two_sided)
-			mtl_data.two_sided = true;
 
 		materials.push_back(mtl_data);
 	}
@@ -277,13 +274,11 @@ void RenderObject::recursive_render(const aiNode* node,
 
 			checkForGLErrors("set attrib pointers");
 
-			materials[md->mtl_index].activate();
+			materials[md->mtl_index].bind();
 			checkForGLErrors("Activte material");
 
 			glDrawElements(GL_TRIANGLES, md->num_indices, GL_UNSIGNED_INT,0 );
 			checkForGLErrors("Draw material");
-
-			materials[md->mtl_index].deactivate();
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

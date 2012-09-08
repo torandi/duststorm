@@ -8,8 +8,7 @@
 
 Material::Material()
 	: texture(nullptr)
-	, normal_map(nullptr)
-	, two_sided(false){
+	, normal_map(nullptr) {
 
 	texture    = Texture2D::default_colormap();
 	normal_map = Texture2D::default_normalmap();
@@ -27,19 +26,11 @@ Material::~Material(){
 
 }
 
-void Material::activate() {
-	glPushAttrib(GL_ENABLE_BIT);
-	if(two_sided)
-		glDisable(GL_CULL_FACE);
-
+void Material::bind() {
 	texture->texture_bind(Shader::TEXTURE_COLORMAP);
 	normal_map->texture_bind(Shader::TEXTURE_NORMALMAP);
 	specular_map->texture_bind(Shader::TEXTURE_SPECULARMAP);
 	alpha_map->texture_bind(Shader::TEXTURE_ALPHAMAP);
 
 	Shader::upload_material(*this);
-}
-
-void Material::deactivate() {
-	glPopAttrib();
 }
