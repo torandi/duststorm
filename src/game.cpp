@@ -147,8 +147,6 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	path_marker = new RenderObject("cube.obj");
 	path_marker->set_scale(0.25f);
 
-	terrain_shader = Shader::create_shader("terrain");
-
 	//Particles:
 	particle_textures = TextureArray::from_filename(PATH_BASE "data/textures/fire1.png", 
 																	PATH_BASE "data/textures/fire2.png", 
@@ -212,7 +210,6 @@ Game::~Game() {
 
 glm::vec3 Game::correct_height(glm::vec3 v, float offset) const {
 	return glm::vec3(v.x, terrain->height_at(v.x, v.z) + offset, v.z);
-//	return glm::vec3(v.x, 50.f + offset, v.z);
 }
 
 void Game::update(float dt) {
@@ -238,8 +235,6 @@ void Game::update(float dt) {
 		cur.y += 2.f;
 		camera.set_position(cur);
 		camera.look_at(path->at(path_pos + 10.f));
-		printf("%f\n", path_pos);
-
 	}
 
 	test_system->update(dt);
@@ -273,7 +268,6 @@ void Game::render_geometry(const Camera &cam) {
 	//shaders[SHADER_DEBUG]->bind();
 	//rails->render();
 
-	terrain_shader->bind();
 	terrain->render();
 
 }
