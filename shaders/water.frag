@@ -35,6 +35,10 @@ void main() {
 	camera_dir.z = dot(camera_direction, norm_normal);
 	camera_dir = normalize(camera_dir);
 
+	vec3 pos_tangent_space;
+	pos_tangent_space.x = dot(position, norm_tangent);
+	pos_tangent_space.y = dot(position, norm_bitangent);
+	pos_tangent_space.z = dot(position, norm_normal);
 
 	vec3 normal_map1 = texture(texture1, tex_coord1).xyz;
 	vec3 normal_map2 = texture(texture1, tex_coord2).xyz;
@@ -49,18 +53,11 @@ void main() {
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.0) *1.5;
 
 	for(int light = 0; int(light) < Lgt.num_lights; ++light) {
-		vec3 light_distance = Lgt.lights[light].position.xyz - position;
-		vec3 dir = normalize(light_distance);
-		vec3 light_dir;
-		//Convert to tangent space
-		light_dir.x = dot(dir, norm_tangent);
-		light_dir.y = dot(dir, norm_bitangent);
-		light_dir.z = dot(dir, norm_normal);
-		accumLighting += computeLighting(
-				Lgt.lights[light], originalColor, normal_map,
-				light_dir, camera_dir, length(light_distance),
-				shininess, specular,
-				true, true);
+		accumLighting += compute_lighting(
+			Lgt.lights[light], originalColor, 
+			pos_tangent_space, normal_map, camera_dir, 
+			norm_normal, norm_tangent, norm_bitangent,
+			shininess, Mtl.specular);
 	}
 	vec3 surface = clamp(accumLighting,0.0, 1.0).rgb;
 

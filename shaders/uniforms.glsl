@@ -48,7 +48,7 @@ struct light_data {
 	float constant_attenuation;
 	float linear_attenuation;
 	float quadratic_attenuation;
-	int type;
+	float is_directional;
 	vec3 intensity;
 	vec3 position;
 };

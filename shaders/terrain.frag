@@ -28,6 +28,11 @@ void main() {
 	camera_dir.y = dot(camera_direction, norm_bitangent);
 	camera_dir.z = dot(camera_direction, norm_normal);
 
+	vec3 pos_tangent_space;
+	pos_tangent_space.x = dot(position, norm_tangent);
+	pos_tangent_space.y = dot(position, norm_bitangent);
+	pos_tangent_space.z = dot(position, norm_normal);
+
 	vec4 color1, color2;
 	float color_mix;
 	vec2 texcoord_real = texcoord * TEXTURE_REPEAT;
@@ -46,22 +51,11 @@ void main() {
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.f);
 
 	for(int light = 0; light < Lgt.num_lights; ++light) {
-		vec3 light_distance = Lgt.lights[light].position.xyz - position;
-		vec3 dir = normalize(light_distance);
-		vec3 light_dir;
-		
-
-		//Convert to tangent space
-		light_dir.x = dot(dir, norm_tangent);
-		light_dir.y = dot(dir, norm_bitangent);
-		light_dir.z = dot(dir, norm_normal);
-
-		accumLighting += computeLighting(
-				Lgt.lights[light], originalColor,
-				normal_map, light_dir,
-				camera_dir, length(light_distance),
-				shininess, vec4(.03f),
-				true, true);
+		accumLighting += compute_lighting(
+				Lgt.lights[light], originalColor, 
+				pos_tangent_space, normal_map, camera_dir, 
+				norm_normal, norm_tangent, norm_bitangent,
+				shininess, Mtl.specular);
 	}
 
 	ocolor = calculate_fog(clamp(accumLighting,0.0, 1.0));
