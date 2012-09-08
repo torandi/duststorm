@@ -8,6 +8,7 @@
 
 #include "shader.hpp"
 #include "mesh.hpp"
+#include "material.hpp"
 #include "texture.hpp"
 
 class Terrain : public Mesh {
@@ -15,6 +16,7 @@ class Terrain : public Mesh {
 	float vertical_scale_;
 	SDL_Surface * data_map_;
 	Texture2D * data_texture_; 
+	Shader * shader_;
 	glm::ivec2 size_;
 	float * map_;
 
@@ -37,6 +39,8 @@ class Terrain : public Mesh {
 
 		float height_at(float x, float y) const;
 		glm::vec3 normal_at(float x, float y) const;
+
+		Material material;
 
 		/*
 		 * Once this has been called get_pixel_color can not be called

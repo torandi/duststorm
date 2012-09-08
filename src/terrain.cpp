@@ -41,6 +41,10 @@ Terrain::Terrain(const std::string &file, float horizontal_scale, float vertical
 
 	data_map_  = TextureBase::load_image(file , &size_);
 	data_texture_ = Texture2D::from_filename(file);
+
+	shader_ = Shader::create_shader("terrain");
+	material.specular = glm::vec4(0.f);
+
 	generate_terrain();
 }
 
@@ -157,7 +161,12 @@ glm::vec4 Terrain::get_pixel_color(int x, int y, SDL_Surface * surface, const gl
 }
 
 void Terrain::render() {
+
+	shader_->bind();
+
 	Shader::upload_model_matrix(matrix());
+
+	Shader::upload_material(material);
 
 	data_texture_->texture_bind(Shader::TEXTURE_2D_0);
 	textures_[0]->texture_bind(Shader::TEXTURE_ARRAY_0);
@@ -170,7 +179,8 @@ void Terrain::render() {
 	glLineWidth(2.0f);
 	shaders[SHADER_DEBUG]->bind();
 
-
 	Mesh::render();
 #endif
+
+
 }
