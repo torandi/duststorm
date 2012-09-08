@@ -36,6 +36,7 @@ class Game {
 
 	private:
 		LightsData lights;
+		Material rail_material;
 
 		Terrain * terrain;
 

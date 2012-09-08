@@ -20,6 +20,7 @@
 #include "particle_system.hpp"
 
 #include "path.hpp"
+#include "rails.hpp"
 #include "nanosvg.h"
 
 #define DEBUG_MOVE 0
@@ -48,6 +49,9 @@ static int current_particle_config = 0;
 
 static glm::vec3 prev;
 static float path_pos = 0.f;
+
+static Rails * rails;
+static Texture2D * rail_texture;
 
 /*
  * End debug stuff
@@ -103,6 +107,10 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	}
 
 	path = new Path(path_nodes, false);
+
+	rails = new Rails(path);
+	rail_texture = Texture2D::from_filename(PATH_BASE "data/textures/rails.png");
+	rail_material.texture = rail_texture;
 
 	prev = path->at(0.f);
 
@@ -194,6 +202,7 @@ Game::~Game() {
 	delete terrain;
 
 	delete path;
+	delete rails;
 
 	/*for(RenderTarget * ds: downsample) {
 		delete ds;
@@ -247,15 +256,22 @@ void Game::render_geometry(const Camera &cam) {
 	Shader::upload_lights(lights);
 
 	shaders[SHADER_NORMAL]->bind();
-	for(int i=0; i < num_objects; ++i) {
+/*	for(int i=0; i < num_objects; ++i) {
 		objects[i]->render();
-	}
+	}*/
 
-	for(float i = 0.f; i<path->length(); i+=1.f) {
+	/*for(float i = 0.f; i<path->length(); i+=1.f) {
 		path_marker->set_position(path->at(i));
-		//path_marker->set_position(correct_height(path->at(i), 1.f));
+		path_marker->set_position(correct_height(path->at(i), 1.f));
 		path_marker->render();
-	}
+	}*/
+
+	rail_material.activate();
+	rails->render();
+
+	shaders[SHADER_DEBUG]->bind();
+	rails->render();
+	rail_material.deactivate();
 
 	terrain_shader->bind();
 	terrain->render();
