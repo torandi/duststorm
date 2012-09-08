@@ -4,6 +4,7 @@
 LightsData::LightsData() {
 	int index=0;
 	for(Light &light : data_.lights) {
+		light.shadowmap_index = index;
 		lights[index++] = new MovableLight(&light);
 	}
 	data_.num_lights = 0;

@@ -43,6 +43,7 @@ const char * Shader::global_uniform_names_[] = {
 	"LightsData",
 	"StateData",
 	"Fog",
+	"Shadowmaps"
 };
 
 const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
@@ -53,6 +54,7 @@ const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
 	sizeof(Shader::lights_data_t),
 	sizeof(struct state_data),
 	sizeof(Shader::fog_t),
+	sizeof(GLint[MAX_NUM_LIGHTS])
 };
 
 const GLenum Shader::global_uniform_usage_[] = {
@@ -63,6 +65,7 @@ const GLenum Shader::global_uniform_usage_[] = {
 	GL_DYNAMIC_DRAW,
 	GL_DYNAMIC_DRAW,
 	GL_DYNAMIC_DRAW,
+	GL_STATIC_DRAW,
 };
 
 GLuint Shader::global_uniform_buffers_[Shader::NUM_GLOBAL_UNIFORMS];
@@ -80,7 +83,7 @@ void Shader::initialize() {
 	checkForGLErrors("Generate global uniform buffers");
 
 	for( int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
-		//Allocate memory in the buffer:A
+		//Allocate memory in the buffer:
 		glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[i]);
 		glBufferData(GL_UNIFORM_BUFFER, global_uniform_buffer_sizes_[i], NULL, global_uniform_usage_[i]);
 		//Bind buffers to range
@@ -88,6 +91,15 @@ void Shader::initialize() {
 	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	checkForGLErrors("Bind and allocate global uniforms");
+
+	//Set bindings for shadowmaps:
+	GLint shadowmap_units[MAX_NUM_LIGHTS];
+	for(int i=0; i < MAX_NUM_LIGHTS; ++i) {
+		shadowmap_units[i] = TEXTURE_SHADOWMAP_0 + i;
+	}
+	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_SHADOWMAPS]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(shadowmap_units), shadowmap_units);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	/* Enable all attribs for Shader::vertex_x */
 	for ( int i = 0; i < NUM_ATTR; ++i ) {

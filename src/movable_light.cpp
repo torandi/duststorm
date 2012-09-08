@@ -1,6 +1,7 @@
 #include <glm/glm.hpp>
 
 #include "movable_light.hpp"
+#include "globals.hpp"
 
 MovableLight::MovableLight(Light * light) : 
 		MovableObject(light->position)
@@ -11,6 +12,7 @@ MovableLight::MovableLight(Light * light) :
 	, intensity(data->intensity)
 	, type(MovableLight::DIRECTIONAL_LIGHT)
 	{ 
+		shadowmap = Texture2D::from_filename(PATH_BASE "/textures/white.png");
 		update();
 	}
 
