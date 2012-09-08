@@ -26,44 +26,10 @@ Rails::Rails(const Path * _path, float step) : Mesh(), path(_path){
 	glm::vec3 previous = path->at(-step);
 	emit_vertices(0.f, previous);
 	for(float p = step; p < path->length(); p += step) {
-		unsigned int index = emit_vertices(p, previous) - slice_indices; //Build faces between this and the previous slice
-
-		//Build two rails
-		for(int i=0; i<2; ++i) {
-
-			//Outer side
-
-			indices_.push_back(index + 8);
-			indices_.push_back(index + 0);
-			indices_.push_back(index + 1);
-
-			indices_.push_back(index + 8);
-			indices_.push_back(index + 1);
-			indices_.push_back(index + 9);
-
-			//Upper side
-
-			indices_.push_back(index + 9);
-			indices_.push_back(index + 1);
-			indices_.push_back(index + 2);
-
-			indices_.push_back(index + 9);
-			indices_.push_back(index + 2);
-			indices_.push_back(index + 10);
-
-			//Inner side
-
-			indices_.push_back(index + 10);
-			indices_.push_back(index + 2);
-			indices_.push_back(index + 3);
-
-			indices_.push_back(index + 10);
-			indices_.push_back(index + 3);
-			indices_.push_back(index + 11);
-
-			index += 4; //The indices in the next rail are offset by 4
-		}
+		generate_indices(p, previous);
 	}
+
+	generate_indices(path->length() + 0.01, previous);
 
 	generate_normals();
 	generate_tangents_and_bitangents();
@@ -157,4 +123,44 @@ unsigned int Rails::emit_vertices(float path_position, glm::vec3 &prev) {
 	prev = pos;
 
 	return start_index;
+}
+
+void Rails::generate_indices(float p, glm::vec3 &previous) {
+	unsigned int index = emit_vertices(p, previous) - slice_indices; //Build faces between this and the previous slice
+
+	//Build two rails
+	for(int i=0; i<2; ++i) {
+
+		//Outer side
+
+		indices_.push_back(index + 8);
+		indices_.push_back(index + 0);
+		indices_.push_back(index + 1);
+
+		indices_.push_back(index + 8);
+		indices_.push_back(index + 1);
+		indices_.push_back(index + 9);
+
+		//Upper side
+
+		indices_.push_back(index + 9);
+		indices_.push_back(index + 1);
+		indices_.push_back(index + 2);
+
+		indices_.push_back(index + 9);
+		indices_.push_back(index + 2);
+		indices_.push_back(index + 10);
+
+		//Inner side
+
+		indices_.push_back(index + 10);
+		indices_.push_back(index + 2);
+		indices_.push_back(index + 3);
+
+		indices_.push_back(index + 10);
+		indices_.push_back(index + 3);
+		indices_.push_back(index + 11);
+
+		index += 4; //The indices in the next rail are offset by 4
+	}
 }

@@ -24,6 +24,8 @@ class Rails : public Mesh {
 		 *	that was generated
 		 */
 		unsigned int emit_vertices(float position, glm::vec3 &v);
+
+		void generate_indices(float position, glm::vec3 &previous);
 };
 
 #endif

@@ -269,8 +269,6 @@ void Game::render_geometry(const Camera &cam) {
 	rail_material.activate();
 	rails->render();
 
-	shaders[SHADER_DEBUG]->bind();
-	rails->render();
 	rail_material.deactivate();
 
 	terrain_shader->bind();
