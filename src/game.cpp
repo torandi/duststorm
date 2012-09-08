@@ -29,7 +29,7 @@
  * Debug stuff
  */
 static RenderObject * objects[10];
-static const int num_objects = 4;
+static const int num_objects = 3;
 
 static RenderObject * path_marker;
 
@@ -38,7 +38,7 @@ static TextureArray * particle_textures;
 
 static const int num_controllable = 2;
 static MovableObject * controllable[num_controllable];
-static const char * controllable_names[] = { "Camera", "ParticleCenter" };
+static const char * controllable_names[] = { "Camera", "Light" };
 static int cur_controll = 0;
 
 static Color sky;
@@ -115,33 +115,34 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	prev = path->at(0.f);
 
 	lights.ambient_intensity() = glm::vec3(0.1f);
-	lights.num_lights() = 1;
+	lights.num_lights() = 2;
 
-	lights.lights[0]->set_position(glm::vec3(0.0, 100.0f, 0.0f));
+	lights.lights[0]->set_position(glm::normalize(glm::vec3(1.0, 0.f, 0.0f)));
 	lights.lights[0]->intensity = glm::vec3(0.8f);
-	lights.lights[0]->type = Light::DIRECTIONAL_LIGHT;
+	lights.lights[0]->type = MovableLight::DIRECTIONAL_LIGHT;
+
+	lights.lights[1]->set_position(glm::normalize(path->at(0.f)));
+	lights.lights[1]->intensity = glm::vec3(0.8f);
+	lights.lights[1]->type = MovableLight::POINT_LIGHT;
 	/*lights.lights[0]->quadratic_attenuation = 0.00002f;
 	lights.lights[0]->constant_attenuation = 0.0f;
 	lights.lights[0]->linear_attenuation = 0.1f;
 	lights.lights[0]->quadratic_attenuation = 0.4f;*/
 
 	camera.set_position(correct_height(path->at(0.f), 1.f));
-	camera.look_at(correct_height(path->at(1.f)));
+	camera.look_at(camera.position() + glm::vec3(1.f, 0.f, 0.f));
+	//camera.look_at(correct_height(path->at(1.f)));
 
 	objects[0] = new RenderObject("pony1.obj");
-	objects[0]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f), 250.0));
+	objects[0]->set_position(correct_height(path->at(5.f) + glm::vec3(-5.f, 0.f, 0.f)));
 
-	objects[1] = new RenderObject("cube.obj");
-	objects[1]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f) + 1.f, 250.0));
-	objects[1]->set_scale(0.25f);
+	objects[1] = new RenderObject("bench.obj");
+	objects[1]->set_position(correct_height(path->at(6.f) + glm::vec3(-5.f, 0.f, 0.f)));
 
-	objects[2] = new RenderObject("bench.obj");
-	objects[2]->set_position(glm::vec3(300.0, terrain->height_at(300.f, 250.f), 250.0));
-
-	objects[3] = new RenderObject("kanon4.obj");
-	objects[3]->set_position(path->at(1.f));
-	objects[3]->absolute_move(glm::vec3(0, 1.f, 0.f));
-	objects[3]->yaw(90.f);
+	objects[2] = new RenderObject("cube.obj");
+	objects[2]->set_scale(0.25);
+	objects[2]->add_position_callback(lights.lights[1]);
+	objects[2]->set_position(correct_height(path->at(6.f) + glm::vec3(-5.f, 0.f, 0.f)));
 
 	path_marker = new RenderObject("cube.obj");
 	path_marker->set_scale(0.25f);
@@ -159,7 +160,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	test_system = new ParticleSystem(10000, particle_textures, false);
 
 	controllable[0] = &camera;
-	controllable[1] = objects[1];
+	controllable[1] = objects[2];
 
 	//Build particle configs:
 	test_system->config.spawn_position = glm::vec4(objects[1]->position(), 1.f);
@@ -225,11 +226,11 @@ void Game::update(float dt) {
 		Input::movement_speed += 1.f; 
 		printf("Increased movement speed\n");
 	}
-/*
+
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		cur_controll = (cur_controll + 1) % num_controllable;
 		printf("Switching controll to %s\n", controllable_names[cur_controll]);
-	}*/
+	}
 
 	if(input.current_value(Input::ACTION_3) > 0.9f) {
 		path_pos+=dt*Input::movement_speed;
@@ -256,9 +257,9 @@ void Game::render_geometry(const Camera &cam) {
 	Shader::upload_lights(lights);
 
 	shaders[SHADER_NORMAL]->bind();
-/*	for(int i=0; i < num_objects; ++i) {
+	for(int i=0; i < num_objects; ++i) {
 		objects[i]->render();
-	}*/
+	}
 
 	/*for(float i = 0.f; i<path->length(); i+=1.f) {
 		path_marker->set_position(path->at(i));
@@ -268,6 +269,9 @@ void Game::render_geometry(const Camera &cam) {
 
 	rail_material.activate();
 	rails->render();
+
+	//shaders[SHADER_DEBUG]->bind();
+	//rails->render();
 
 	rail_material.deactivate();
 
@@ -284,8 +288,8 @@ void Game::render() {
 
 	render_geometry(camera);
 
-	shaders[SHADER_PARTICLES]->bind();
-	test_system->render();
+	/*shaders[SHADER_PARTICLES]->bind();
+	test_system->render();*/
 
 	composition->unbind();
 
