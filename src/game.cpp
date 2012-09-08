@@ -267,13 +267,11 @@ void Game::render_geometry(const Camera &cam) {
 		path_marker->render();
 	}*/
 
-	rail_material.activate();
+	rail_material.bind();
 	rails->render();
 
 	//shaders[SHADER_DEBUG]->bind();
 	//rails->render();
-
-	rail_material.deactivate();
 
 	terrain_shader->bind();
 	terrain->render();
