@@ -6,15 +6,15 @@
 
 class Rails : public Mesh {
 	public:
-		Rails(const Path * _path, float detail = 1.f);
+		Rails(const Path * _path, float step = 1.f);
 		virtual ~Rails();
 	private:
 		const Path * path;
 		/**
 		 * The vertex structure is for each slice as follows:
-		 * 1 - 2     5 - 6
+		 * 1 - 2     6 - 5
 		 * |   |     |   |
-		 *	0   3     4   7
+		 *	0   3     7   4
 		 *
 		 
 		 *	@param prev: should contain previous coordinate (for direction calculation)
