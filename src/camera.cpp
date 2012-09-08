@@ -85,6 +85,12 @@ void Camera::set_fov(float fov) {
 	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);
 }
 
+void Camera::set_near_far(float near, float far) {
+	near_ = near;
+	far_ = far;
+	projection_matrix_ = glm::perspective(fov_, aspect_, near_, far_);
+}
+
 void Camera::set_roll(const float r) {
 	MovableObject::roll(r-roll_);
 	roll_ = r;
