@@ -108,7 +108,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 	path = new Path(path_nodes, false);
 
-	rails = new Rails(path);
+	rails = new Rails(path, 1.f);
 	rail_texture = Texture2D::from_filename(PATH_BASE "data/textures/rails.png");
 	rail_material.texture = rail_texture;
 
@@ -236,9 +236,9 @@ void Game::update(float dt) {
 		glm::vec3 cur = path->at(path_pos);
 		cur.y += 2.f;
 		camera.set_position(cur);
-		camera.look_at(cur + (cur - prev));
+		camera.look_at(path->at(path_pos + 10.f));
+		printf("%f\n", path_pos);
 
-		prev = cur;
 	}
 
 	test_system->update(dt);

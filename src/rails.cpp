@@ -2,7 +2,11 @@
 
 #include "terrain.hpp"
 
+#include "globals.hpp"
+
 #include <cstdio>
+
+#include <glm/gtx/string_cast.hpp>
 
 /**
  * Configuration
@@ -83,22 +87,29 @@ Rails::~Rails() { }
  *	This method returns the index of the first vertex in the slice
  *	that was generated
  */
-unsigned int Rails::emit_vertices(float position, glm::vec3 &prev) {
+unsigned int Rails::emit_vertices(float path_position, glm::vec3 &prev) {
 	unsigned int start_index = vertices_.size();
 
-	glm::vec3 initial_normal = glm::vec3(0.f, 1.f, 0.f);
+	const glm::vec3 initial_normal = glm::vec3(0.f, 1.f, 0.f);
 
-	glm::vec3 pos = path->at(position);
-	glm::vec3 direction = glm::normalize(position - prev);
-	glm::vec3 side = glm::normalize(glm::cross(direction, initial_normal)); //points right
-	glm::vec3 normal = glm::normalize(glm::cross(side, direction));
+	const glm::vec3 pos = path->at(path_position);
+	const glm::vec3 direction = glm::normalize(pos - prev);
+	const glm::vec3 side = glm::normalize(glm::cross(direction, initial_normal)); //points right
+	const glm::vec3 normal = glm::normalize(glm::cross(side, direction));
 
-	glm::vec3 right = pos + (side * separation/2.f);
-	glm::vec3 left = pos - (side * separation/2.f);
+	fprintf(verbose, "%f (%s - %s): %s %s %s\n", path_position
+							, glm::to_string(prev).c_str()
+							, glm::to_string(pos).c_str()
+							, glm::to_string(direction).c_str()
+							, glm::to_string(side).c_str()
+							, glm::to_string(normal).c_str());
+
+	const glm::vec3 right = pos + (side * separation/2.f);
+	const glm::vec3 left = pos - (side * separation/2.f);
 
 	vertex_t v;
 
-	float uv_y = position / uv_offset;
+	float uv_y = path_position / uv_offset;
 
 
 	//0

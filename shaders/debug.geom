@@ -19,7 +19,7 @@ in VertexData {
 out vec4 color;
 
 void main() {
-	float extra_lines_length = 0.3;
+	float extra_lines_length = 0.05;
 
 	#if RENDER_TANGENT || RENDER_NORMAL || RENDER_BITANGENT
 	//Generate normals:
@@ -50,11 +50,11 @@ void main() {
 
 		#if RENDER_BITANGENT
 			//bitangent:
-			color = vec4(0.f, 1.0f, 0.0f, 1.f);
+			color = vec4(1.f, 0.0f, 1.0f, 1.f);
 			gl_Position = projectionViewMatrix * gl_in[i].gl_Position;
 			EmitVertex();
 
-			color = vec4(0.f, 1.0f, 0.0f, 1.f);
+			color = vec4(1.f, 0.0f, 1.0f, 1.f);
 			gl_Position = projectionViewMatrix * (gl_in[i].gl_Position+ vec4(normalize(vertexData[i].bitangent)*extra_lines_length, 0.f));
 			EmitVertex();
 			EndPrimitive();
