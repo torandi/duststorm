@@ -15,11 +15,12 @@
 class MovableLight : public MovableObject {
 	private:
 		Light * data;
-		glm::ivec2 shadowmap_resolution;
-		Camera light_camera;
-		RenderTarget * shadowmap_fbo;
 
-		void calculateFrustrumCorners(const Camera &cam, glm::vec3 * points) const;
+		/**
+		 * points shall be [8], filled with corners
+		 * @return frustrum center
+		 */
+		glm::vec3 calculateFrustrumData(const Camera &cam, glm::vec3 * points) const;
 	public:
 
 		enum light_type_t {
@@ -28,6 +29,18 @@ class MovableLight : public MovableObject {
 			SPOT_LIGHT 
 		};
 
+		struct shadow_map_t {
+			shadow_map_t(glm::ivec2 size);
+			~shadow_map_t();
+
+			void create_fbo();
+
+			glm::ivec2 resolution;
+			RenderTarget * fbo;
+			TextureBase * texture;
+			glm::mat4 inverse_matrix;
+		} shadow_map;
+
 		MovableLight(Light * light);
 		MovableLight();
 		MovableLight(const MovableLight &ml);
@@ -35,17 +48,13 @@ class MovableLight : public MovableObject {
 
 		void update(); //Must be called to update position and type in light
 
-		void activate_shadowmap_rendering();
-
 		float &constant_attenuation;
 		float &linear_attenuation;
 		float &quadratic_attenuation;
 		glm::vec3 &intensity;
 		light_type_t type;
 
-		Texture2D * shadowmap;
-
-		void render_shadow_map(const Camera &camera, std::function<void(const Camera &)> render_geometry);
+		void render_shadow_map(const Camera &camera, std::function<void()> render_geometry);
 };
 
 #endif
