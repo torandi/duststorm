@@ -137,7 +137,7 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 		case POINT_LIGHT:
 			{
 				view_matrix = glm::lookAt(position(), position() + local_z(), local_y());
-				projection_matrix = glm::perspective(90.f, 1.f, 0.1f, 100.f);
+				projection_matrix = glm::perspective(90.f, 800.f/600.f, 0.1f, 100.f);
 				break;
 			}
 		default:
@@ -145,16 +145,18 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 			abort();
 	}
 
-	shadow_map.matrix = glm::translate(glm::scale(projection_matrix * view_matrix, glm::vec3(0.5f)), glm::vec3(0.5f));
+	shadow_map.matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.5f)) * glm::scale(glm::mat4(1.f),glm::vec3(0.5f)) * projection_matrix * view_matrix;
 
 	Shader::upload_projection_view_matrices(projection_matrix, view_matrix);
 
 	shadow_map.fbo->bind();
 
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
 	shaders[SHADER_PASSTHRU]->bind();
 
-	glDrawBuffer(GL_NONE); // essential for depth-only FBOs!!!
-	glReadBuffer(GL_NONE); // essential for depth-only FBOs!!!
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
 
 	render_geometry();
 

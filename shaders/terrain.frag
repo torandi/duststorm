@@ -8,6 +8,7 @@ in vec3 normal;
 in vec3 tangent;
 in vec3 bitangent;
 in vec2 texcoord;
+in vec4 shadowmap_coord[maxNumberOfLights];
 
 #include "light_calculations.glsl"
 #include "fog.glsl"
@@ -50,12 +51,14 @@ void main() {
 	float shininess = 18.f;
 	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.f);
 
+
 	for(int light = 0; light < Lgt.num_lights; ++light) {
-		accumLighting += compute_lighting(
-				Lgt.lights[light], originalColor, 
-				pos_tangent_space, normal_map, camera_dir, 
-				norm_normal, norm_tangent, norm_bitangent,
-				Mtl.shininess, Mtl.specular);
+			float depth = shadow2DProj(shadowmap0, shadowmap_coord[light]);
+			accumLighting += depth *compute_lighting(
+						Lgt.lights[light], originalColor, 
+						pos_tangent_space, normal_map, camera_dir, 
+						norm_normal, norm_tangent, norm_bitangent,
+						Mtl.shininess, Mtl.specular);
 	}
 
 	ocolor = calculate_fog(clamp(accumLighting,0.0, 1.0));
