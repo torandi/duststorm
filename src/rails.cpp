@@ -62,14 +62,14 @@ unsigned int Rails::emit_vertices(float path_position, glm::vec3 &prev) {
 	const glm::vec3 direction = glm::normalize(pos - prev);
 	const glm::vec3 side = glm::normalize(glm::cross(direction, initial_normal)); //points right
 	const glm::vec3 normal = glm::normalize(glm::cross(side, direction));
-
+/*
 	fprintf(verbose, "%f (%s - %s): %s %s %s\n", path_position
 							, glm::to_string(prev).c_str()
 							, glm::to_string(pos).c_str()
 							, glm::to_string(direction).c_str()
 							, glm::to_string(side).c_str()
 							, glm::to_string(normal).c_str());
-
+*/
 	const glm::vec3 right = pos + (side * separation/2.f);
 	const glm::vec3 left = pos - (side * separation/2.f);
 
