@@ -245,13 +245,8 @@ void Game::handle_input(const SDL_Event &event) {
 	input.parse_event(event);
 }
 
-void Game::render_geometry(const Camera &cam) {
+void Game::render_geometry() {
 
-	shaders[SHADER_PASSTHRU]->bind();
-	Shader::upload_camera(cam);
-	Shader::upload_lights(lights);
-
-	shaders[SHADER_NORMAL]->bind();
 	for(int i=0; i < num_objects; ++i) {
 		objects[i]->render();
 	}
@@ -262,6 +257,35 @@ void Game::render_geometry(const Camera &cam) {
 		path_marker->render();
 	}*/
 
+	rails->render_geometry();
+
+	//shaders[SHADER_DEBUG]->bind();
+	//rails->render();
+
+	terrain->render_geometry();
+
+}
+
+void Game::render() {
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
+		render_geometry();
+	});
+
+	composition->bind();
+
+	RenderTarget::clear(sky);
+
+	shaders[SHADER_NORMAL]->bind();
+
+	Shader::upload_camera(camera);
+	Shader::upload_lights(lights);
+
+	for(int i=0; i < num_objects; ++i) {
+		objects[i]->render();
+	}
+
 	rail_material.bind();
 	rails->render();
 
@@ -269,16 +293,6 @@ void Game::render_geometry(const Camera &cam) {
 	//rails->render();
 
 	terrain->render();
-
-}
-
-void Game::render() {
-	glClear(GL_DEPTH_BUFFER_BIT);
-	composition->bind();
-
-	RenderTarget::clear(sky);
-
-	render_geometry(camera);
 
 	/*shaders[SHADER_PARTICLES]->bind();
 	test_system->render();*/

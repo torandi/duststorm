@@ -44,7 +44,7 @@ class Game {
 		void render_composition();
 		void render_display();
 
-		void render_geometry(const Camera &cam);
+		void render_geometry();
 
 		void do_action(int num);
 
