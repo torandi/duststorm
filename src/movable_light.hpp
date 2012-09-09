@@ -38,7 +38,7 @@ class MovableLight : public MovableObject {
 			glm::ivec2 resolution;
 			RenderTarget * fbo;
 			TextureBase * texture;
-			glm::mat4 inverse_matrix;
+			glm::mat4 matrix;
 		} shadow_map;
 
 		MovableLight(Light * light);
