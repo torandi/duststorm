@@ -40,6 +40,7 @@ class Mesh : public MovableObject {
 		//The mesh becommes immutable when vbos have been generated
 		void generate_vbos();
 		virtual void render();
+		virtual void render_geometry();
 		unsigned long num_faces() { return num_faces_; };
 
 	protected:

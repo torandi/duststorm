@@ -162,6 +162,10 @@ void Mesh::generate_vbos() {
 }
 
 void Mesh::render() {
+	render_geometry();
+}
+
+void Mesh::render_geometry() {
 	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 	Shader::upload_model_matrix(matrix());
 
