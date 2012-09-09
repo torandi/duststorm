@@ -68,3 +68,16 @@ vec4 compute_lighting(
 	return light.is_directional * compute_directional_light(light_pos, light, originalColor, position, normal, camera_dir, shininess, specular_color) 
 	+ (1 - light.is_directional) * compute_point_light(light_pos, light, originalColor, position, normal, camera_dir, shininess, specular_color);
 }
+
+bool in_light(in light_data light, in vec3 position, in vec4 shadowmap_coord) {
+	float bias = 0.0001f;
+	vec3 tex_coords = shadowmap_coord.xyz / shadowmap_coord.w;
+	if( tex_coords.x >= 0.f && tex_coords.x <= 1.f
+		&& tex_coords.y >= 0.f && tex_coords.y <= 1.f) {
+
+		float depth = texture(shadowmap0, tex_coords.xy).r;
+		return (depth + bias >= tex_coords.z);
+	} else {
+		return false;
+	}
+}
