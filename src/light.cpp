@@ -2,8 +2,9 @@
 
 Light::Light() :
 		constant_attenuation(1.0f),
-		linear_attenuation(0.01f),
-		quadratic_attenuation(0.002f),
-		is_directional(1) {
+		linear_attenuation(0.001f),
+		quadratic_attenuation(0.04f),
+		is_directional(1),
+		shadow_bias(0.0001f) {
 
 }

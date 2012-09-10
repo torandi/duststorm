@@ -16,12 +16,12 @@ class MovableLight : public MovableObject {
 	private:
 		Light * data;
 
+	public:
 		/**
 		 * points shall be [8], filled with corners
 		 * @return frustrum center
 		 */
-		glm::vec3 calculateFrustrumData(const Camera &cam, glm::vec3 * points) const;
-	public:
+		glm::vec3 calculateFrustrumData(const Camera &cam, float near, float far, glm::vec3 * points) const;
 
 		enum light_type_t {
 			DIRECTIONAL_LIGHT, //position is direction instead

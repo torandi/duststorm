@@ -21,6 +21,9 @@ layout(binding=13) uniform samplerCube texture_cube1;
 layout(binding=14) uniform samplerCube texture_cube2;
 layout(binding=15) uniform samplerCube texture_cube3;
 layout(binding=16) uniform sampler2D shadowmap0;
+layout(binding=17) uniform sampler2D shadowmap1;
+layout(binding=18) uniform sampler2D shadowmap2;
+layout(binding=19) uniform sampler2D shadowmap3;
 
 
 layout(std140) uniform projectionViewMatrices {
@@ -51,10 +54,13 @@ struct light_data {
 	float linear_attenuation;
 	float quadratic_attenuation;
 	float is_directional;
+
 	vec4 intensity;
 	vec4 position;
 	mat4 matrix;
+	vec2 shadowmap_scale;
 	int shadowmap_index;
+	float shadow_bias;
 };
 
 layout(std140) uniform LightsData {

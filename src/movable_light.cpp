@@ -9,7 +9,7 @@
 MovableLight::MovableLight(Light * light) : 
 		MovableObject(light->position)
 	, data(light)
-	, shadow_map(glm::ivec2(2048, 2048))
+	, shadow_map(glm::ivec2(2*2048, 2*2048))
 	, constant_attenuation(data->constant_attenuation)
 	, linear_attenuation(data->linear_attenuation)
 	, quadratic_attenuation(data->quadratic_attenuation)
@@ -21,7 +21,7 @@ MovableLight::MovableLight(Light * light) :
 
 MovableLight::MovableLight() :
 	  data(new Light())
-	, shadow_map(glm::ivec2(2048, 2048))
+	, shadow_map(glm::ivec2(2*2048, 2*2048))
 	, constant_attenuation(data->constant_attenuation)
 	, linear_attenuation(data->linear_attenuation)
 	, quadratic_attenuation(data->quadratic_attenuation)
@@ -29,7 +29,7 @@ MovableLight::MovableLight() :
 
 MovableLight::MovableLight(const MovableLight &ml) : MovableObject(ml.position())
 	, data(ml.data)
-	, shadow_map(glm::ivec2(2048, 2048))
+	, shadow_map(glm::ivec2(2*2048, 2*2048))
 	, constant_attenuation(data->constant_attenuation)
 	, linear_attenuation(data->linear_attenuation)
 	, quadratic_attenuation(data->quadratic_attenuation)
@@ -41,14 +41,15 @@ void MovableLight::update() {
 	data->position = position_;
 	data->is_directional = (type == DIRECTIONAL_LIGHT);
 	data->matrix = shadow_map.matrix;
+	data->shadowmap_scale = glm::vec2(1.f / shadow_map.resolution.x, 1.f / shadow_map.resolution.y);
 	if(shadow_map.fbo != NULL) {
 		shadow_map.fbo->depth_bind((Shader::TextureUnit) (Shader::TEXTURE_SHADOWMAP_0 + data->shadowmap_index));
 	}
 }
 
-glm::vec3 MovableLight::calculateFrustrumData(const Camera &cam, glm::vec3 * points) const {
+glm::vec3 MovableLight::calculateFrustrumData(const Camera &cam, float near, float far, glm::vec3 * points) const {
 	//Near plane:
-	float y = cam.near() * tan(cam.fov() / 2.f);
+	float y = near * tan(cam.fov() / 2.f);
 	float x = y * cam.aspect();
 
 	glm::vec3 lx, ly, lz;
@@ -56,15 +57,15 @@ glm::vec3 MovableLight::calculateFrustrumData(const Camera &cam, glm::vec3 * poi
 	ly = glm::normalize(cam.local_y());
 	lz = glm::normalize(cam.local_z());
 
-	glm::vec3 near_center = cam.position() + lz * cam.near();
-	glm::vec3 far_center = cam.position() + lz * cam.far();
+	glm::vec3 near_center = cam.position() + lz * near;
+	glm::vec3 far_center = cam.position() + lz * far;
 
 	points[0] = near_center + -x * lx + -y * ly;
 	points[1] = near_center + -x * lx +  y * ly;
 	points[2] = near_center +  x * lx +  y * ly;
 	points[3] = near_center +  x * lx + -y * ly;
 
-	y = cam.far() * tan(cam.fov() / 2.f);
+	y = far * tan(cam.fov() / 2.f);
 	x = y * cam.aspect();
 
 	points[4] = far_center + -x * lx + -y * ly;
@@ -72,12 +73,15 @@ glm::vec3 MovableLight::calculateFrustrumData(const Camera &cam, glm::vec3 * poi
 	points[6] = far_center +  x * lx +  y * ly;
 	points[7] = far_center +  x * lx + -y * ly;
 
-	return cam.position() + cam.far() * 0.5f  * lz;
+	return cam.position() + far * 0.5f  * lz;
 }
 
 void MovableLight::render_shadow_map(const Camera &camera, std::function<void()> render_geometry) {
 	if(shadow_map.fbo == nullptr) shadow_map.create_fbo();
 
+	float near, far;
+	near = camera.near();
+	far = 100.f;
 
 	glm::mat4 view_matrix, projection_matrix;
 
@@ -103,14 +107,13 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 				}
 
 				lightv[1] = glm::normalize(glm::cross(lightv[0], hint));
-				lightv[2] = glm::normalize(glm::cross(lightv[0], lightv[1]));
+				lightv[2] = glm::normalize(glm::cross(lightv[1], lightv[0]));
 
 				glm::vec3 frustrum_corners[8];
-				glm::vec3 frustrum_center = calculateFrustrumData(camera, frustrum_corners);
-
+				glm::vec3 frustrum_center = calculateFrustrumData(camera, near, far, frustrum_corners);
 
 				float min_v[3] = { FLT_MAX, FLT_MAX, FLT_MAX };
-				float max_v[3] = { FLT_MIN, FLT_MIN, FLT_MIN };
+				float max_v[3] = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
 				for(glm::vec3 &corner : frustrum_corners) {
 					for(int i=0; i < 3; ++i) {
 						float l = glm::dot(corner, lightv[i]);
@@ -121,11 +124,25 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 				float center[3];
 				for(int i=0; i < 3; ++i) {
 					center[i] = glm::dot(frustrum_center, lightv[i]);
+					min_v[i] -= 5.f;
+					max_v[i] += 5.f;
 				}
+
 				glm::vec3 eye = frustrum_center + lightv[0] * (min_v[0] - center[0]);
+				float left, right, bottom, top, far_dist;
+
+				left = min_v[1];
+				right = max_v[1];
+				bottom = min_v[2];
+				top = max_v[2];
+				far_dist = max_v[0] - min_v[0];
+
+				float halfw, halfh;
+				halfw = (right - left)/2.f;
+				halfh = (top - bottom)/2.f;
 
 				view_matrix = glm::lookAt(eye, frustrum_center, lightv[2]);
-				projection_matrix = glm::ortho(min_v[1], max_v[1], min_v[2], max_v[2], 0.f, max_v[0] - min_v[0]);
+				projection_matrix = glm::ortho(-halfw, halfw, halfh, -halfh, 0.f, far_dist);
 
 				/*glm::vec4 test4 = projection_matrix * view_matrix * glm::vec4(frustrum_center, 1.f);
 				glm::vec3 test = glm::vec3(test4.x, test4.y, test4.z) / test4.w;
@@ -137,7 +154,7 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 		case POINT_LIGHT:
 			{
 				view_matrix = glm::lookAt(position(), position() + local_z(), local_y());
-				projection_matrix = glm::perspective(90.f, 800.f/600.f, 0.1f, 100.f);
+				projection_matrix = glm::perspective(90.f, 1.f, 0.1f, 100.f);
 				break;
 			}
 		default:
@@ -145,7 +162,9 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 			abort();
 	}
 
-	shadow_map.matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.5f)) * glm::scale(glm::mat4(1.f),glm::vec3(0.5f)) * projection_matrix * view_matrix;
+	shadow_map.matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.5f))
+		* glm::scale(glm::mat4(1.f),glm::vec3(0.5f))
+		* projection_matrix * view_matrix;
 
 	Shader::upload_projection_view_matrices(projection_matrix, view_matrix);
 

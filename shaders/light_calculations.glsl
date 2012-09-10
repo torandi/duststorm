@@ -69,15 +69,46 @@ vec4 compute_lighting(
 	+ (1 - light.is_directional) * compute_point_light(light_pos, light, originalColor, position, normal, camera_dir, shininess, specular_color);
 }
 
-bool in_light(in light_data light, in vec3 position, in vec4 shadowmap_coord) {
-	float bias = 0.0001f;
-	vec3 tex_coords = shadowmap_coord.xyz / shadowmap_coord.w;
-	if( tex_coords.x >= 0.f && tex_coords.x <= 1.f
-		&& tex_coords.y >= 0.f && tex_coords.y <= 1.f) {
+float offset_lookup(in light_data light, in sampler2D map, in vec3 loc, in vec2 offset) {
+	return texture(map, loc.xy + offset * light.shadowmap_scale).r + light.shadow_bias >=  loc.z ? 1.f : 0.f;
+}
 
-		float depth = texture(shadowmap0, tex_coords.xy).r;
-		return (depth + bias >= tex_coords.z);
+float shadowmap_coef(in light_data light, in sampler2D shadowmap, in vec3 tex_coords) {
+	float bias = light.shadow_bias;
+	float sum = 0;
+	float x, y;
+
+	for (y = -1.5; y <= 1.5; y += 1.0) {
+	  for (x = -1.5; x <= 1.5; x += 1.0) {
+			sum += offset_lookup(light, shadowmap, tex_coords, vec2(x, y));
+		}
+	}
+	return sum/16.f;
+}
+
+float shadow_coefficient(in light_data light, in vec3 position, in vec4 shadowmap_coord) {
+	vec3 tex_coords = shadowmap_coord.xyz / shadowmap_coord.w;
+	if( tex_coords.x > 0.f && tex_coords.x < 1.f
+		&& tex_coords.y > 0.f && tex_coords.y < 1.f) {
+
+		float coef;
+		switch(light.shadowmap_index) {
+			case 0:
+				coef = shadowmap_coef(light, shadowmap0, tex_coords);
+				break;
+			case 1:
+				coef = shadowmap_coef(light, shadowmap1, tex_coords);
+				break;
+			case 2:
+				coef = shadowmap_coef(light, shadowmap2, tex_coords);
+				break;
+			case 3:
+				coef = shadowmap_coef(light, shadowmap3, tex_coords);
+				break;
+		}
+
+		return coef;
 	} else {
-		return false;
+		return light.is_directional; //Directional lights should display areas outside of the shadowmap as lit
 	}
 }

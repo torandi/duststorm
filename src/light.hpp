@@ -15,7 +15,9 @@ struct Light {
 	__ALIGNED__(glm::vec3 intensity, 16);
 	__ALIGNED__(glm::vec3 position, 16);
 	__ALIGNED__(glm::mat4 matrix, 16);
-	__ALIGNED__(GLint shadowmap_index,16);
+	__ALIGNED__(glm::vec2 shadowmap_scale, 16); // 1/width, 1/height of shadowmap resolution
+	GLint shadowmap_index;
+	float shadow_bias;
 };
 
 #endif
