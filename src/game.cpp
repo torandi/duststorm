@@ -115,15 +115,15 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	prev = path->at(0.f);
 
 	lights.ambient_intensity() = glm::vec3(0.1f);
-	lights.num_lights() = 2;
+	lights.num_lights() = 1;
 
-	lights.lights[0]->set_position(glm::normalize(glm::vec3(1.0, 0.f, 0.0f)));
+	lights.lights[0]->set_position(glm::normalize(glm::vec3(1.0, -1.f, 0.0f)));
 	lights.lights[0]->intensity = glm::vec3(0.8f);
 	lights.lights[0]->type = MovableLight::DIRECTIONAL_LIGHT;
 
-	lights.lights[1]->set_position(glm::normalize(path->at(0.f)));
+	/*(lights.lights[1]->set_position(glm::normalize(path->at(0.f)));
 	lights.lights[1]->intensity = glm::vec3(0.8f);
-	lights.lights[1]->type = MovableLight::POINT_LIGHT;
+	lights.lights[1]->type = MovableLight::POINT_LIGHT;*/
 	/*lights.lights[0]->quadratic_attenuation = 0.00002f;
 	lights.lights[0]->constant_attenuation = 0.0f;
 	lights.lights[0]->linear_attenuation = 0.1f;
@@ -131,7 +131,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 	camera.set_position(correct_height(path->at(0.f), 1.f));
 	camera.look_at(camera.position() + glm::vec3(1.f, 0.f, 0.f));
-	//camera.look_at(correct_height(path->at(1.f)));
+
 
 	objects[0] = new RenderObject("pony1.obj");
 	objects[0]->set_position(correct_height(path->at(5.f) + glm::vec3(-5.f, 0.f, 0.f)));
@@ -141,8 +141,9 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 	objects[2] = new RenderObject("cube.obj");
 	objects[2]->set_scale(0.25);
-	objects[2]->add_position_callback(lights.lights[1]);
-	objects[2]->set_position(correct_height(path->at(6.f) + glm::vec3(-5.f, 0.f, 0.f)));
+	//objects[2]->add_position_callback(lights.lights[0]);
+	//objects[2]->add_rotation_callback(lights.lights[0]);
+	objects[2]->set_position(correct_height(path->at(6.f) + glm::vec3(-5.f, 2.f, 0.f)));
 
 	path_marker = new RenderObject("cube.obj");
 	path_marker->set_scale(0.25f);
@@ -158,7 +159,8 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	test_system = new ParticleSystem(10000, particle_textures, false);
 
 	controllable[0] = &camera;
-	controllable[1] = objects[2];
+	//controllable[1] = objects[2];
+	controllable[1] = lights.lights[0];
 
 	//Build particle configs:
 	test_system->config.spawn_position = glm::vec4(objects[1]->position(), 1.f);
@@ -187,7 +189,6 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	test_system->update_config();
 
 	test_system->auto_spawn = true;
-	
 }
 
 Game::~Game() {
@@ -273,6 +274,7 @@ void Game::render() {
 		render_geometry();
 	});
 
+
 	composition->bind();
 
 	RenderTarget::clear(sky);
@@ -330,4 +332,5 @@ void Game::render_composition(){
 	/*downsample[1]->texture_bind(Shader::TEXTURE_2D_2);
 	composition->draw(dof_shader);*/
 	composition->draw(shaders[SHADER_PASSTHRU]);
+
 }
