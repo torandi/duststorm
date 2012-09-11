@@ -139,11 +139,10 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	objects[1] = new RenderObject("bench.obj");
 	objects[1]->set_position(correct_height(path->at(6.f) + glm::vec3(-5.f, 0.f, 0.f)));
 
-	objects[2] = new RenderObject("cube.obj");
-	objects[2]->set_scale(0.25);
+	objects[2] = new RenderObject("kanon5.obj");
 	//objects[2]->add_position_callback(lights.lights[0]);
 	//objects[2]->add_rotation_callback(lights.lights[0]);
-	objects[2]->set_position(correct_height(path->at(6.f) + glm::vec3(-5.f, 2.f, 0.f)));
+	objects[2]->set_position(path->at(6.f) + glm::vec3(-3.f, 2.f, 0.f));
 
 	path_marker = new RenderObject("cube.obj");
 	path_marker->set_scale(0.25f);

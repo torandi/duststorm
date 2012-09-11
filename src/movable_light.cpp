@@ -183,7 +183,7 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 }
 
 MovableLight::shadow_map_t::shadow_map_t(glm::ivec2 size) : resolution(size), fbo(nullptr), matrix(1.f){
-	texture = Texture2D::from_filename(PATH_BASE "/textures/white.png");
+	texture = Texture2D::from_filename(PATH_BASE "/data/textures/white.png");
 }
 
 MovableLight::shadow_map_t::~shadow_map_t() {
