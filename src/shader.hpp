@@ -252,7 +252,7 @@ public:
 	/**
 	 * Push vertex attribs and disable all
 	 */
-	static void push_vertex_attribs();
+	static void push_vertex_attribs(int offset = 0);
 
 	/**
 	 * Restore all vertex attribs

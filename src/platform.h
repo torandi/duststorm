@@ -15,6 +15,7 @@
 #       define __WARN_UNUSED__(decl) decl 
 #       define __ALIGNED__(decl, size) decl		 
 #       define __CONSTEXPR__ constexpr
+#       define __PATH_SEPARATOR_ '/'
 #elif defined(__GNUC__)
 #       define __PURE__(decl) decl __attribute__((pure))
 #       define __CONST__(decl) decl __attribute__((const))
@@ -29,6 +30,7 @@
 #       define __WARN_UNUSED__(decl) decl __attribute__((warn_unused_result))
 #       define __ALIGNED__(decl, size) decl __attribute__((aligned(16)))
 #       define __CONSTEXPR__ constexpr
+#       define __PATH_SEPARATOR_ '/'
 #elif defined(WIN32)
 #       define __PURE__(decl) decl
 #       define __CONST__(decl) decl
@@ -43,6 +45,7 @@
 #       define __WARN_UNUSED__(decl) decl
 #       define __ALIGNED__(decl, size) __declspec(align(16)) decl
 #       define __CONSTEXPR__ 
+#       define __PATH_SEPARATOR_ '\\'
 #else
 #       error Unknown compiler/platform
 #endif

@@ -2,12 +2,11 @@
 #define RENDER_OBJECT_H
 
 #include "movable_object.hpp"
-#include "material.hpp"
-#include "shader.hpp"
 
 #include <string>
-#include <assimp/assimp.h>
-#include <assimp/aiScene.h>
+#include <assimp/types.h>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
 #include <map>
 #include <vector>
 #include <glm/glm.hpp>
@@ -16,10 +15,11 @@
 class RenderObject : public MovableObject {
 
 	glm::mat4 normalization_matrix_;
+	Assimp::Importer importer;
 
-	void get_bounding_box_for_node (const struct aiNode* nd,	struct aiVector3D* min, struct aiVector3D* max, struct aiMatrix4x4* trafo);
-	void get_bounding_box (struct aiVector3D* min, struct aiVector3D* max);
-	void color4_to_vec4(const struct aiColor4D *c, glm::vec4 &target);
+	void get_bounding_box_for_node (const aiNode* nd,	aiVector3D* min, aiVector3D* max, aiMatrix4x4* trafo);
+	void get_bounding_box (aiVector3D* min, aiVector3D* max);
+	void color4_to_vec4(const aiColor4D *c, glm::vec4 &target);
 
 	//Trims path and loads texture
 	TextureBase* load_texture(const std::string& path);
@@ -52,7 +52,7 @@ public:
 	std::map<const aiMesh*, mesh_data_t > mesh_data;
 
 
-	void render(const glm::mat4 * model_matrix=nullptr);
+	void render(const glm::mat4& m = glm::mat4());
 
 	const glm::mat4 matrix() const;
 

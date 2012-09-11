@@ -1,4 +1,9 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "rails.hpp"
+#include "shader.hpp"
 
 #include "terrain.hpp"
 
@@ -23,6 +28,9 @@ static const float uv_offset = 1.f;
 static const unsigned int slice_indices = 8;
 
 Rails::Rails(const Path * _path, float step) : Mesh(), path(_path){
+
+	shader = Shader::create_shader("normal");
+
 	glm::vec3 previous = path->at(-step);
 	emit_vertices(0.f, previous);
 	for(float p = step; p < path->length(); p += step) {
@@ -163,4 +171,9 @@ void Rails::generate_indices(float p, glm::vec3 &previous) {
 
 		index += 4; //The indices in the next rail are offset by 4
 	}
+}
+
+void Rails::render(const glm::mat4 &m) {
+	shader->bind();
+	Mesh::render(m);
 }

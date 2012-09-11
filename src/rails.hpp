@@ -8,8 +8,11 @@ class Rails : public Mesh {
 	public:
 		Rails(const Path * _path, float step = 1.f);
 		virtual ~Rails();
+
+		void render(const glm::mat4 &m = glm::mat4());
 	private:
 		const Path * path;
+		Shader * shader;
 		/**
 		 * The vertex structure is for each slice as follows:
 		 * 1 - 2     6 - 5

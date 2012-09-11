@@ -16,6 +16,7 @@
 #include "input.hpp"
 
 #include "sound.hpp"
+#include "player.hpp"
 
 #include <list>
 #include <map>
@@ -35,30 +36,32 @@ class Game {
 		static void init();
 
 	private:
+		void render_display();
+		void render_geometry();
+		void update_camera();
+
 		LightsData lights;
 		Material rail_material;
+		Texture2D * rail_texture;
+		Path * path;
+		Rails * rails;
+		Player player;
 
 		Terrain * terrain;
 
 		Input input;
-		void render_composition();
-		void render_display();
-
-		void render_geometry();
-
-		void do_action(int num);
-
-		glm::vec3 correct_height(glm::vec3 v, float offset=0.f) const;
 
 		Camera camera;
-		RenderTarget *screen, *composition, *downsample[2];
-
-		Path * path;
+		RenderTarget *composition;
 
 		Shader * terrain_shader;
-		Shader * dof_shader;
 	
 		glm::vec3 camera_offset;
+		float look_at_offset;
+		float movement_speed;
+
+		Color sky_color;
+
 };
 
 #endif

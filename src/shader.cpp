@@ -468,9 +468,9 @@ GLint Shader::uniform_location(const char * uniform_name) const{
 	return l;
 }
 
-void Shader::push_vertex_attribs() {
+void Shader::push_vertex_attribs(int offset) {
 	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-	for ( int i = 0; i < NUM_ATTR; ++i ) {
+	for ( int i = offset; i < NUM_ATTR; ++i ) {
 		glDisableVertexAttribArray(i);
 	}
 }
