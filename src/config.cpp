@@ -60,7 +60,7 @@ ConfigEntry::~ConfigEntry() {
 		case ENTRY_MAP:
 			for(auto it: entry_map) {
 				delete it.second;
-			}
+		}
 			break;
 		case ENTRY_LIST:
 			for(auto it : entry_list) {
@@ -74,7 +74,7 @@ ConfigEntry::~ConfigEntry() {
 
 Config Config::parse(std::string file) {
 	Data * data = Data::open(file);
-	std::string str = std::string((const char*)data->data());
+	std::string str = std::string((const char*)data->data(), data->size());
 	std::vector<std::string> lines = split(str, ";[]{}", true);
 
 	std::list<ConfigEntry*> config_stack;
