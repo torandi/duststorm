@@ -25,24 +25,24 @@
 #include "config.hpp"
 
 static void read_particle_config(const ConfigEntry * config, ParticleSystem::config_t &particle_config) {
- particle_config.birth_color = config->find("birth_color", true)->as_vec4();
- particle_config.death_color = config->find("death_color", true)->as_vec4();
- particle_config.motion_rand = glm::vec4(config->find("motion_rand", true)->as_vec3(), 1.f);
- particle_config.spawn_velocity_var = glm::vec4(config->find("spawn_velocity_var", true)->as_vec3(), 1.f);
- particle_config.avg_ttl = config->find("avg_ttl", true)->as_float();
- particle_config.ttl_var = config->find("ttl_var", true)->as_float();
- particle_config.avg_scale = config->find("avg_scale", true)->as_float();
- particle_config.scale_var = config->find("scale_var", true)->as_float();
- particle_config.avg_scale_change = config->find("avg_scale_change", true)->as_float();
- particle_config.scale_change_var = config->find("scale_change_var", true)->as_float();
- particle_config.avg_rotation_speed = config->find("avg_rotation_speed", true)->as_float();
- particle_config.rotation_speed_var = config->find("rotation_speed_var", true)->as_float();
- particle_config.avg_wind_influence = config->find("avg_wind_influence", true)->as_float();
- particle_config.wind_influence_var = config->find("wind_influence_var", true)->as_float();
- particle_config.avg_gravity_influence = config->find("avg_gravity_influence", true)->as_float();
- particle_config.gravity_influence_var = config->find("gravity_influence_var", true)->as_float();
- particle_config.start_texture = config->find("start_texture", true)->as_int();
- particle_config.num_textures = config->find("num_textures", true)->as_int();
+	particle_config.birth_color = config->find("birth_color", true)->as_vec4();
+	particle_config.death_color = config->find("death_color", true)->as_vec4();
+	particle_config.motion_rand = glm::vec4(config->find("motion_rand", true)->as_vec3(), 1.f);
+	particle_config.spawn_velocity_var = glm::vec4(config->find("spawn_velocity_var", true)->as_vec3(), 1.f);
+	particle_config.avg_ttl = config->find("avg_ttl", true)->as_float();
+	particle_config.ttl_var = config->find("ttl_var", true)->as_float();
+	particle_config.avg_scale = config->find("avg_scale", true)->as_float();
+	particle_config.scale_var = config->find("scale_var", true)->as_float();
+	particle_config.avg_scale_change = config->find("avg_scale_change", true)->as_float();
+	particle_config.scale_change_var = config->find("scale_change_var", true)->as_float();
+	particle_config.avg_rotation_speed = config->find("avg_rotation_speed", true)->as_float();
+	particle_config.rotation_speed_var = config->find("rotation_speed_var", true)->as_float();
+	particle_config.avg_wind_influence = config->find("avg_wind_influence", true)->as_float();
+	particle_config.wind_influence_var = config->find("wind_influence_var", true)->as_float();
+	particle_config.avg_gravity_influence = config->find("avg_gravity_influence", true)->as_float();
+	particle_config.gravity_influence_var = config->find("gravity_influence_var", true)->as_float();
+	particle_config.start_texture = config->find("start_texture", true)->as_int();
+	particle_config.num_textures = config->find("num_textures", true)->as_int();
 }
 
 void Game::init() {
@@ -68,7 +68,6 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	movement_speed = config["/player/speed/normal"]->as_float();
 	brake_movement_speed = config["/player/speed/brake"]->as_float();
 
-	static const int max_attack_particles = config["/game/max_attack_particles"]->as_int();
 
 	TextureArray * colors = TextureArray::from_filename( (base_dir +"/color0.png").c_str(),
 			(base_dir + "/color1.png").c_str(), nullptr);
@@ -109,6 +108,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 //Setup player:
 	player.update_position(path, start_position);
+	player.canon_offset = config["/player/canon_offset"]->as_vec3();
 
 //Configure lights:
 
@@ -125,6 +125,10 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 //Create particle systems:
 
+	particle_shader = Shader::create_shader("particles");
+
+	static const float canon_inner_radius = config["/particles/spawn_radius"]->as_float();
+
 	wind_velocity = glm::vec4(config["/environment/wind_velocity"]->as_vec3(), 1.f);
 	gravity = glm::vec4(config["/environment/gravity"]->as_vec3(), 1.f);
 
@@ -135,17 +139,41 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 																	PATH_BASE "data/textures/smoke2.png",
 																	nullptr);
 
+	static const int max_attack_particles = config["/game/max_attack_particles"]->as_int();
+	static const int max_smoke_particles = config["/game/max_smoke_particles"]->as_int();
 	attack_particles = new ParticleSystem(max_attack_particles, particle_textures, false);
 	attack_particles->config.gravity = gravity;
 	attack_particles->config.wind_velocity = wind_velocity;
+	attack_particles->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius);
 
 	for(auto p : particle_types) {
-		p = attack_particles->config; //Get reasonable defaults
+		p.config = attack_particles->config; //Get reasonable defaults
 	}
-	read_particle_config(config["/particles/light"], particle_types[LIGHT_PARTICLES]);
-	read_particle_config(config["/particles/medium"], particle_types[MEDIUM_PARTICLES]);
-	read_particle_config(config["/particles/heavy"], particle_types[HEAVY_PARTICLES]);
+	read_particle_config(config["/particles/light"], particle_types[LIGHT_PARTICLES].config);
+	particle_types[LIGHT_PARTICLES].count = config["/particles/light/count"]->as_int();
+	particle_types[LIGHT_PARTICLES].spawn_speed = config["/particles/light/spawn_speed"]->as_float();
+
+	read_particle_config(config["/particles/medium"], particle_types[MEDIUM_PARTICLES].config);
+	particle_types[MEDIUM_PARTICLES].count = config["/particles/medium/count"]->as_int();
+	particle_types[MEDIUM_PARTICLES].spawn_speed = config["/particles/medium/spawn_speed"]->as_float();
+
+	read_particle_config(config["/particles/heavy"], particle_types[HEAVY_PARTICLES].config);
+	particle_types[HEAVY_PARTICLES].count = config["/particles/heavy/count"]->as_int();
+	particle_types[HEAVY_PARTICLES].spawn_speed = config["/particles/heavy/spawn_speed"]->as_float();
+
 	current_particle_type = MEDIUM_PARTICLES;
+	attack_particles->config = particle_types[current_particle_type].config;
+
+	//Smoke:
+	smoke = new ParticleSystem(max_smoke_particles, particle_textures, false);
+	smoke->config.gravity = gravity;
+	smoke->config.wind_velocity = wind_velocity;
+	smoke->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius * 2.0);
+
+	read_particle_config(config["/particles/smoke"], smoke->config);
+	smoke_count = config["/particles/smoke/count"]->as_int();
+	smoke_spawn_speed = config["/particles/smoke/spawn_speed"]->as_float();
+
 }
 
 Game::~Game() {
@@ -154,6 +182,10 @@ Game::~Game() {
 
 	delete path;
 	delete rails;
+
+	delete smoke;
+	delete attack_particles;
+	delete particle_textures;
 }
 
 void Game::update(float dt) {
@@ -164,13 +196,20 @@ void Game::update(float dt) {
 	input.update_object(*lights.lights[0], dt);
 
 	if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
+		shoot();
+		printf("FIRE!\n");
+	}
+	if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
 		movement_speed -= 1.f;
 		printf("Decreased movement speed\n");
 	}
-	if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
+	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		movement_speed += 1.f;
 		printf("Increased movement speed\n");
 	}
+
+	smoke->update(dt);
+	attack_particles->update(dt);
 /*
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		cur_controll = (cur_controll + 1) % num_controllable;
@@ -222,6 +261,10 @@ void Game::render() {
 
 	player.render();
 
+	particle_shader->bind();
+	attack_particles->render();
+	smoke->render();
+
 	composition->unbind();
 
 	render_display();
@@ -241,4 +284,16 @@ void Game::update_camera() {
 	glm::vec4 rotated_offset = player.rotation_matrix() * glm::vec4(camera_offset, 1.f);
 	camera.set_position(player.position() + glm::vec3(rotated_offset.x, rotated_offset.y, rotated_offset.z));
 	camera.look_at(path->at(player.path_position() + look_at_offset) + camera_offset);
+}
+
+void Game::shoot() {
+	glm::vec4 rotated_offset = player.rotation_matrix() * glm::vec4(player.canon_offset, 1.f);
+	glm::vec3 direction = player.direction();
+	attack_particles->config.avg_spawn_velocity = glm::vec4(direction * particle_types[current_particle_type].spawn_speed, 1.f);
+	attack_particles->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
+	attack_particles->spawn(particle_types[current_particle_type].count);
+
+	smoke->config.avg_spawn_velocity = glm::vec4(direction * smoke_spawn_speed, 1.f);
+	smoke->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
+	smoke->spawn(smoke_count);
 }

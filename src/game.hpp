@@ -43,9 +43,16 @@ class Game {
 			HEAVY_PARTICLES
 		};
 
+		struct particle_config_t {
+			ParticleSystem::config_t config;
+			int count;
+			float spawn_speed;
+		};
+
 		void render_display();
 		void render_geometry();
 		void update_camera();
+		void update_particles();
 
 		void shoot();
 
@@ -56,8 +63,10 @@ class Game {
 		Rails * rails;
 		Player player;
 		ParticleSystem * attack_particles, *dust, *smoke;
-		ParticleSystem::config_t particle_types[3];
+		particle_config_t particle_types[3];
 		particle_type_t current_particle_type;
+		int smoke_count;
+		float smoke_spawn_speed;
 
 		TextureArray * particle_textures;
 
@@ -68,7 +77,7 @@ class Game {
 		Camera camera;
 		RenderTarget *composition;
 
-		Shader * terrain_shader;
+		Shader *particle_shader;
 
 		glm::vec4 wind_velocity;
 		glm::vec4 gravity;

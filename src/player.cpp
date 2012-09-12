@@ -57,3 +57,7 @@ void Player::render(const glm::mat4 &m) {
 }
 
 const float Player::path_position() const { return path_position_; }
+
+glm::vec3 Player::direction() const {
+	return glm::normalize(local_z());
+}

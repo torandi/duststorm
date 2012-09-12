@@ -14,8 +14,13 @@
 static std::string trim(std::string s) {
 	size_t begin_str = s.find_first_not_of(" \t\n");
 	if(begin_str != std::string::npos) {
-		std::string trimmed = s.substr(begin_str, s.find_last_not_of(" \t\n") - begin_str + 1);
-		return trimmed;
+		size_t last = s.find_last_not_of(" \t\n");
+		if(last >= begin_str) {
+			std::string trimmed = s.substr(begin_str, last - begin_str + 1);
+			return trimmed;
+		} else {
+			return "";
+		}
 	} else {
 		return "";
 	}
@@ -36,7 +41,7 @@ static std::vector<std::string> split(std::string str, std::string search, bool 
 		}
 		pos = p + 1;
 	}
-	if(pos < str.size() - 1) {
+	if(pos < str.length() - 1) {
 		std::string s = trim(str.substr(pos));
 		if(!s.empty()) res.push_back(s);
 	}
