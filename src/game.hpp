@@ -10,6 +10,7 @@
 #include "quad.hpp"
 #include "terrain.hpp"
 #include "lights_data.hpp"
+#include "particle_system.hpp"
 
 #include "path.hpp"
 
@@ -36,9 +37,17 @@ class Game {
 		static void init();
 
 	private:
+		enum particle_type_t {
+			LIGHT_PARTICLES = 0,
+			MEDIUM_PARTICLES,
+			HEAVY_PARTICLES
+		};
+
 		void render_display();
 		void render_geometry();
 		void update_camera();
+
+		void shoot();
 
 		LightsData lights;
 		Material rail_material;
@@ -46,6 +55,11 @@ class Game {
 		Path * path;
 		Rails * rails;
 		Player player;
+		ParticleSystem * attack_particles, *dust, *smoke;
+		ParticleSystem::config_t particle_types[3];
+		particle_type_t current_particle_type;
+
+		TextureArray * particle_textures;
 
 		Terrain * terrain;
 
@@ -55,7 +69,10 @@ class Game {
 		RenderTarget *composition;
 
 		Shader * terrain_shader;
-	
+
+		glm::vec4 wind_velocity;
+		glm::vec4 gravity;
+
 		glm::vec3 camera_offset;
 		float look_at_offset;
 		float movement_speed;

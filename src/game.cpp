@@ -24,6 +24,27 @@
 #include "nanosvg.h"
 #include "config.hpp"
 
+static void read_particle_config(const ConfigEntry * config, ParticleSystem::config_t &particle_config) {
+ particle_config.birth_color = config->find("birth_color", true)->as_vec4();
+ particle_config.death_color = config->find("death_color", true)->as_vec4();
+ particle_config.motion_rand = glm::vec4(config->find("motion_rand", true)->as_vec3(), 1.f);
+ particle_config.spawn_velocity_var = glm::vec4(config->find("spawn_velocity_var", true)->as_vec3(), 1.f);
+ particle_config.avg_ttl = config->find("avg_ttl", true)->as_float();
+ particle_config.ttl_var = config->find("ttl_var", true)->as_float();
+ particle_config.avg_scale = config->find("avg_scale", true)->as_float();
+ particle_config.scale_var = config->find("scale_var", true)->as_float();
+ particle_config.avg_scale_change = config->find("avg_scale_change", true)->as_float();
+ particle_config.scale_change_var = config->find("scale_change_var", true)->as_float();
+ particle_config.avg_rotation_speed = config->find("avg_rotation_speed", true)->as_float();
+ particle_config.rotation_speed_var = config->find("rotation_speed_var", true)->as_float();
+ particle_config.avg_wind_influence = config->find("avg_wind_influence", true)->as_float();
+ particle_config.wind_influence_var = config->find("wind_influence_var", true)->as_float();
+ particle_config.avg_gravity_influence = config->find("avg_gravity_influence", true)->as_float();
+ particle_config.gravity_influence_var = config->find("gravity_influence_var", true)->as_float();
+ particle_config.start_texture = config->find("start_texture", true)->as_int();
+ particle_config.num_textures = config->find("num_textures", true)->as_int();
+}
+
 void Game::init() {
 }
 
@@ -45,9 +66,9 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	camera_offset = config["/player/camera/offset"]->as_vec3();
 	look_at_offset = config["/player/camera/look_at_offset"]->as_float();
 	movement_speed = config["/player/speed/normal"]->as_float();
-	brake_movement_speed = config["/player/speed/break"]->as_float();
+	brake_movement_speed = config["/player/speed/brake"]->as_float();
 
-
+	static const int max_attack_particles = config["/game/max_attack_particles"]->as_int();
 
 	TextureArray * colors = TextureArray::from_filename( (base_dir +"/color0.png").c_str(),
 			(base_dir + "/color1.png").c_str(), nullptr);
@@ -102,18 +123,29 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 
 	update_camera();
 
-
-
 //Create particle systems:
-/*
+
+	wind_velocity = glm::vec4(config["/environment/wind_velocity"]->as_vec3(), 1.f);
+	gravity = glm::vec4(config["/environment/gravity"]->as_vec3(), 1.f);
+
 	particle_textures = TextureArray::from_filename(PATH_BASE "data/textures/fire1.png", 
 																	PATH_BASE "data/textures/fire2.png", 
 																	PATH_BASE "data/textures/fire3.png", 
 																	PATH_BASE "data/textures/smoke.png", 
 																	PATH_BASE "data/textures/smoke2.png",
 																	nullptr);
-*/
-	//TODO!
+
+	attack_particles = new ParticleSystem(max_attack_particles, particle_textures, false);
+	attack_particles->config.gravity = gravity;
+	attack_particles->config.wind_velocity = wind_velocity;
+
+	for(auto p : particle_types) {
+		p = attack_particles->config; //Get reasonable defaults
+	}
+	read_particle_config(config["/particles/light"], particle_types[LIGHT_PARTICLES]);
+	read_particle_config(config["/particles/medium"], particle_types[MEDIUM_PARTICLES]);
+	read_particle_config(config["/particles/heavy"], particle_types[HEAVY_PARTICLES]);
+	current_particle_type = MEDIUM_PARTICLES;
 }
 
 Game::~Game() {
