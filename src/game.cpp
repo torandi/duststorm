@@ -290,7 +290,6 @@ void Game::shoot() {
 	glm::vec4 rotated_offset = player.rotation_matrix() * glm::vec4(player.canon_offset, 1.f);
 	glm::vec3 direction = player.direction();
 	attack_particles->config.avg_spawn_velocity = glm::vec4(direction * particle_types[current_particle_type].spawn_speed, 1.f);
-	printf("Spawn speed: %s\n", glm::to_string(attack_particles->config.avg_spawn_velocity).c_str());
 	attack_particles->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
 	attack_particles->spawn(particle_types[current_particle_type].count);
 

@@ -17,7 +17,8 @@ __kernel void run_particles (
 			float life_progression = 1.0 - (particles[id].ttl/particles[id].org_ttl);
 
 			particles[id].velocity += config->gravity * particles[id].gravity_influence * dt;
-			particles[id].velocity -= (particles[id].velocity - config->wind_velocity) * particles[id].wind_influence * dt;
+			//particles[id].velocity -= (particles[id].velocity - config->wind_velocity) * particles[id].wind_influence * dt;
+			particles[id].velocity += config->wind_velocity * particles[id].wind_influence * dt;
 
 			vertices[id].position.xyz += (particles[id].velocity + random3(config->motion_rand, true)) * dt;
 			vertices[id].position.w += particles[id].rotation_speed * dt;
@@ -66,7 +67,7 @@ __kernel void spawn_particles (
 		particles[id].wind_influence = config->avg_wind_influence + random1(config->wind_influence_var, true);
 		particles[id].gravity_influence = config->avg_gravity_influence + random1(config->gravity_influence_var, true);
 
-		particles[id].velocity = normalize(config->avg_spawn_velocity + random3(config->spawn_velocity_var, true));
+		particles[id].velocity = config->avg_spawn_velocity + random3(config->spawn_velocity_var, true);
 		particles[id].org_ttl = particles[id].ttl = config->avg_ttl + random1(config->ttl_var, true);
 		particles[id].rotation_speed = config->avg_rotation_speed + random1(config->rotation_speed_var, true);
 		particles[id].initial_scale = config->avg_scale + random1(config->scale_var, true);
