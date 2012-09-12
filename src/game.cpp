@@ -123,7 +123,7 @@ void Game::update(float dt) {
 	player.update_position(path, player.path_position() + movement_speed * dt);
 	update_camera();
 
-	input.update_object(camera, dt);
+	input.update_object(*lights.lights[0], dt);
 
 	if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
 		movement_speed -= 1.f;
