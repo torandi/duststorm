@@ -12,6 +12,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/bindable.hpp \
 								src/camera.cpp src/camera.hpp \
 								src/cl.cpp src/cl.hpp \
+								src/config.cpp src/config.hpp \
 								src/color.cpp src/color.hpp \
 								src/data.cpp src/data.hpp \
 								src/engine.cpp src/engine.hpp \
@@ -37,7 +38,6 @@ fubar_SOURCES =	src/main.cpp \
 								src/texture.cpp src/texture.hpp \
 								src/utils.cpp src/utils.hpp \
 								src/quad.hpp src/quad.cpp \
-								vendor/src/lcfg_static.c vendor/src/lcfg_static.h \
 								vendor/src/nanosvg.c
 release: all
 	@test "x${prefix}" = "x/" || (echo "Error: --prefix must be / when creating release (currently ${prefix})"; exit 1)

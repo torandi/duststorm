@@ -59,6 +59,7 @@ class Game {
 		glm::vec3 camera_offset;
 		float look_at_offset;
 		float movement_speed;
+		float brake_movement_speed;
 
 		Color sky_color;
 

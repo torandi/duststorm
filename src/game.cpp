@@ -22,26 +22,32 @@
 #include "path.hpp"
 #include "rails.hpp"
 #include "nanosvg.h"
+#include "config.hpp"
 
 void Game::init() {
 }
 
 Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f) {
 
-	//This is stuff that should be read from a config
-	static float start_position = 0.f;
-	sky_color = Color(0.584f, 0.698f, 0.698f, 1.f);
-	static glm::vec2 terrain_scale(0.5f, 50.f);
-	camera_offset = glm::vec3(0.f, 2.f, -2.5f);
-	look_at_offset = 10.f;
-	movement_speed = 5.f;
-
-
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 
 	printf("Loading level %s\n", level.c_str());
 
 	std::string base_dir = PATH_BASE "data/levels/" + level;
+
+	Config config = Config::parse(base_dir + "/level.cfg");
+	config.print();
+
+	//Read config:
+	static float start_position = config["/player/start_position"]->as_float();
+	sky_color = config["/environment/sky_color"]->as_color();
+	static glm::vec2 terrain_scale = config["/environment/terrain/scale"]->as_vec2();
+	camera_offset = config["/player/camera/offset"]->as_vec3();
+	look_at_offset = config["/player/camera/look_at_offset"]->as_float();
+	movement_speed = config["/player/speed/normal"]->as_float();
+	brake_movement_speed = config["/player/speed/break"]->as_float();
+
+
 
 	TextureArray * colors = TextureArray::from_filename( (base_dir +"/color0.png").c_str(),
 			(base_dir + "/color1.png").c_str(), nullptr);
