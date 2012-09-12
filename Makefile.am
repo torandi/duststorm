@@ -19,6 +19,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/input.cpp src/input.hpp \
 								src/light.cpp src/light.hpp \
 								src/lights_data.cpp src/lights_data.hpp \
+								vendor/src/lcfg_static.c vendor/src/lcfg_static.h \
 								src/material.cpp src/material.hpp \
 								src/mesh.cpp src/mesh.hpp \
 								src/movable_object.cpp src/movable_object.hpp \
