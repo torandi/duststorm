@@ -14,6 +14,7 @@ void Path::optimize_vector(std::vector<glm::vec3> &path) {
 
 		if(glm::distance(*it, *next) < min_keypoint_distance) {
 			it = path.erase(it);
+			if (it == path.end()) break;
 			next = it + 1;
 			if(next >= path.end()) break;
 		}
