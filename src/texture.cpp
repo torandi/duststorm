@@ -345,10 +345,12 @@ TextureArray::TextureArray(std::vector<std::string> path, bool mipmap)
 		glm::ivec2 cur_size;
 		SDL_Surface* surface = load_image(filename, &cur_size);
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, n++, cur_size.x, cur_size.y, 1, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+		checkForGLErrors(("Texture2DArray: glTexSubImage3D ( " + filename + ")").c_str());
 		SDL_FreeSurface(surface);
 	}
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	checkForGLErrors("Texture2DArray: Create");
 }
 
 TextureArray::~TextureArray(){
