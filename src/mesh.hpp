@@ -39,7 +39,8 @@ class Mesh : public MovableObject {
 		void ortonormalize_tangent_space();
 		//The mesh becommes immutable when vbos have been generated
 		void generate_vbos();
-		virtual void render();
+		virtual void render(const glm::mat4& m = glm::mat4());
+		virtual void render_geometry(const glm::mat4& m = glm::mat4());
 		unsigned long num_faces() { return num_faces_; };
 
 	protected:

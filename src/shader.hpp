@@ -97,6 +97,10 @@ public:
 		TEXTURE_CUBEMAP_1,
 		TEXTURE_CUBEMAP_2,
 		TEXTURE_CUBEMAP_3,
+		TEXTURE_SHADOWMAP_0,
+		TEXTURE_SHADOWMAP_1,
+		TEXTURE_SHADOWMAP_2,
+		TEXTURE_SHADOWMAP_3,
 
 		/* Aliases */
 		TEXTURE_COLORMAP = TEXTURE_2D_0,
@@ -248,7 +252,7 @@ public:
 	/**
 	 * Push vertex attribs and disable all
 	 */
-	static void push_vertex_attribs();
+	static void push_vertex_attribs(int offset = 0);
 
 	/**
 	 * Restore all vertex attribs

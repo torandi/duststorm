@@ -8,6 +8,7 @@ in vec3 normal;
 in vec3 tangent;
 in vec3 bitangent;
 in vec2 texcoord;
+in vec4 shadowmap_coord[maxNumberOfLights];
 
 #include "light_calculations.glsl"
 #include "fog.glsl"
@@ -28,12 +29,17 @@ void main() {
 	camera_dir.y = dot(camera_direction, norm_bitangent);
 	camera_dir.z = dot(camera_direction, norm_normal);
 
+	vec3 pos_tangent_space;
+	pos_tangent_space.x = dot(position, norm_tangent);
+	pos_tangent_space.y = dot(position, norm_bitangent);
+	pos_tangent_space.z = dot(position, norm_normal);
+
 	vec4 color1, color2;
 	float color_mix;
 	vec2 texcoord_real = texcoord * TEXTURE_REPEAT;
 	color1 = texture2DArray(texture_array0, vec3(texcoord_real, 0));
 	color2 = texture2DArray(texture_array0, vec3(texcoord_real, 1));
-	color_mix = texture(texture0, texcoord).r;
+	color_mix = texture(texture0, texcoord).g;
 	vec4 originalColor = mix(color1, color2, color_mix);
 
 	color1 = texture2DArray(texture_array1, vec3(texcoord_real, 0));
@@ -42,27 +48,18 @@ void main() {
 
 	normal_map = normalize(normal_map * 2.0 - 1.0);
 
-	float shininess = 32.f;
-	vec4 accumLighting = originalColor * vec4(Lgt.ambient_intensity,1.f);
-
+	float shininess = 18.f;
+	vec4 accumLighting = vec4(0.f); originalColor * vec4(Lgt.ambient_intensity,1.f);
+	
 	for(int light = 0; light < Lgt.num_lights; ++light) {
-		vec3 light_distance = Lgt.lights[light].position.xyz - position;
-		vec3 dir = normalize(light_distance);
-		vec3 light_dir;
-		
-
-		//Convert to tangent space
-		light_dir.x = dot(dir, norm_tangent);
-		light_dir.y = dot(dir, norm_bitangent);
-		light_dir.z = dot(dir, norm_normal);
-
-		accumLighting += computeLighting(
-				Lgt.lights[light], originalColor,
-				normal_map, light_dir,
-				camera_dir, length(light_distance),
-				shininess, vec4(.03f),
-				true, true);
+			accumLighting += compute_lighting(
+				Lgt.lights[light], originalColor, 
+				pos_tangent_space, normal_map, camera_dir, 
+				norm_normal, norm_tangent, norm_bitangent,
+					Mtl.shininess, Mtl.specular) *
+			shadow_coefficient(Lgt.lights[light], position, shadowmap_coord[light]);
 	}
 
 	ocolor = calculate_fog(clamp(accumLighting,0.0, 1.0));
+	ocolor.a = 1.f;
 }

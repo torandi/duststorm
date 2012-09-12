@@ -22,31 +22,25 @@ class ParticleSystem : public MovableObject {
 		//Change values in this struct and call update_config() to update
 		__ALIGNED__(struct config_t {
 
+				glm::vec4 spawn_position;
+				glm::vec4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
+
 				glm::vec4 birth_color;
 
 				glm::vec4 death_color;
 
 				glm::vec4 motion_rand;
 
-				glm::vec4 spawn_direction;
-				glm::vec4 direction_var;
+				glm::vec4 avg_spawn_velocity;
 
-				glm::vec4 spawn_position;
-				glm::vec4 spawn_area;
+				glm::vec4 spawn_velocity_var;
 
-				glm::vec4 directional_speed;
-				glm::vec4 directional_speed_var;
+				glm::vec4 wind_velocity;	//Speed
+				glm::vec4 gravity;			//Acceleration
 
 				//Time to live
 				cl_float avg_ttl;
 				cl_float ttl_var;
-				//Spawn speed
-				cl_float avg_spawn_speed;
-				cl_float spawn_speed_var;
-
-				//Acceleration
-				cl_float avg_acc;
-				cl_float acc_var;
 				//Scale
 				cl_float avg_scale;
 				cl_float scale_var;
@@ -56,6 +50,11 @@ class ParticleSystem : public MovableObject {
 				//Rotation
 				cl_float avg_rotation_speed;
 				cl_float rotation_speed_var;
+
+				cl_float avg_wind_influence;
+				cl_float wind_influence_var;
+				cl_float avg_gravity_influence;
+				cl_float gravity_influence_var;
 
 				//Texture is choosen between start and start+num
 				cl_int start_texture;
@@ -109,15 +108,15 @@ class ParticleSystem : public MovableObject {
 
 		__ALIGNED__(
 				struct particle_t {
-				glm::vec4 direction;
+				glm::vec4 velocity;
 
 				cl_float ttl;
-				cl_float speed;
-				cl_float acc;
 				cl_float rotation_speed;
-
 				cl_float initial_scale;
 				cl_float final_scale;
+
+				cl_float wind_influence;
+				cl_float gravity_influence;
 				cl_float org_ttl;
 				cl_int dead;
 

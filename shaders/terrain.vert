@@ -12,6 +12,7 @@ out vec3 normal;
 out vec3 tangent;
 out vec3 bitangent;
 out vec2 texcoord;
+out vec4 shadowmap_coord[maxNumberOfLights];
 
 void main() {
 	vec4 w_pos = modelMatrix * in_position;
@@ -21,5 +22,9 @@ void main() {
 	normal = (normalMatrix * in_normal).xyz;
 	tangent = (normalMatrix * in_tangent).xyz;
 	bitangent = (normalMatrix * in_bitangent).xyz;
+
+	for(int i=0; i < Lgt.num_lights; ++i) {
+		shadowmap_coord[i] = Lgt.lights[i].matrix * w_pos;
+	}
 }
 

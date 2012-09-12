@@ -41,6 +41,10 @@ Terrain::Terrain(const std::string &file, float horizontal_scale, float vertical
 
 	data_map_  = TextureBase::load_image(file , &size_);
 	data_texture_ = Texture2D::from_filename(file);
+
+	shader_ = Shader::create_shader("terrain");
+	material.specular = glm::vec4(0.f);
+
 	generate_terrain();
 }
 
@@ -115,11 +119,34 @@ float Terrain::height_at(float x_, float y_) const {
 	float dx = (x_/horizontal_scale_) - x;
 	float dy = (y_/horizontal_scale_) - y;
 	float height=0;
+	/*height += (1.0-dx) * (1.0-dy) * height_at(x,y);
+	height += dx * (1.0-dy) * height_at(y,x+1);
+	height += (1.0-dx) * dy * height_at(y+1,x);
+	height += dx * dy * height_at(y+1, x+1);*/
 	height += (1.0-dx) * (1.0-dy) * map_[y*size_.x + x];
 	height += dx * (1.0-dy) * map_[y*size_.x + x+1];
 	height += (1.0-dx) * dy * map_[(y+1)*size_.x + x];
 	height += dx * dy * map_[(y+1)*size_.x + x+1];
 	return height;
+}
+
+const glm::vec3 &Terrain::normal_at(int x, int y) const {
+	return vertices_[y*size_.x + x].normal;
+}
+
+glm::vec3 Terrain::normal_at(float x_, float y_) const {
+	if(x_ > size_.x * horizontal_scale_|| x_ < 0 || y_ > size_.y*horizontal_scale_ || y_ < 0)
+		return glm::vec3(0, 1, 0);
+	int x = (int) (x_/horizontal_scale_);
+	int y = (int) (y_/horizontal_scale_);
+	float dx = (x_/horizontal_scale_) - x;
+	float dy = (y_/horizontal_scale_) - y;
+	glm::vec3 normal(0.f);
+	normal += (1.f-dx) * (1.f-dy) * normal_at(x,y);
+	normal += dx * (1.f-dy) * normal_at(y,x+1);
+	normal += (1.f-dx) * dy * normal_at(y+1,x);
+	normal += dx * dy * normal_at(y+1, x+1);
+	return normal;
 }
 
 glm::vec4 Terrain::get_pixel_color(int x, int y, SDL_Surface * surface, const glm::ivec2 &size) {
@@ -134,7 +161,12 @@ glm::vec4 Terrain::get_pixel_color(int x, int y, SDL_Surface * surface, const gl
 }
 
 void Terrain::render() {
+
+	shader_->bind();
+
 	Shader::upload_model_matrix(matrix());
+
+	Shader::upload_material(material);
 
 	data_texture_->texture_bind(Shader::TEXTURE_2D_0);
 	textures_[0]->texture_bind(Shader::TEXTURE_ARRAY_0);
@@ -147,7 +179,8 @@ void Terrain::render() {
 	glLineWidth(2.0f);
 	shaders[SHADER_DEBUG]->bind();
 
-
 	Mesh::render();
 #endif
+
+
 }

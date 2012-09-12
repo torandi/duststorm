@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.1"
+   width="1024"
+   height="1024"
+   id="svg2">
+  <defs
+     id="defs4" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-28.362183)"
+     id="layer1">
+    <image
+       xlink:href="file:///home/torandi/dev/fubar_3d_engine/data/levels/default/map.png"
+       x="2.2857139"
+       y="26.076464"
+       width="1024"
+       height="1024"
+       id="image3063" />
+    <path
+       d="M 162.85714,835.42857 177.14286,206.85714 C 184.34816,113.98044 370.83394,105.72833 374.28571,204 l -22.85714,697.14286 c 1.63643,101.53304 181.11362,109.81264 180,-14.28572 l -2.85714,-745.71428 c 7.30722,-78.624029 133.96565,-87.472693 137.14286,-14.28572 l 14.28571,780 C 682.64067,1000.4499 862.11624,1013.2044 865.71429,904 L 873.4286,149.62704 C 876.3449,81.53778 827.51091,56.770542 828.57143,52.571428 800.07494,10.755727 337.19997,41.43026 200.00837,47.315802 96.458655,56.135275 75.476233,82.368939 65.714286,184 55.87687,229.29632 39.055176,710.4655 48.274209,840.53255 44.832752,955.89321 160.07884,995.22448 162.85714,835.42857 z"
+       transform="translate(0,28.362183)"
+       id="path3066"
+       style="fill:none;stroke:#0004ff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+  </g>
+</svg>

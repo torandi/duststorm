@@ -27,6 +27,7 @@ public:
 
 	void set_aspect(float aspect);
 	void set_fov(float fov);
+	void set_near_far(float near, float far);
 
 	virtual void roll(const float angle);
 	void set_roll(const float angle);

@@ -1,5 +1,8 @@
 #include "game.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
+#include <vector>
 #include <glm/gtx/vector_angle.hpp>
 #include <SDL/SDL.h>
 #include "globals.hpp"
@@ -16,43 +19,25 @@
 #include "sound.hpp"
 #include "particle_system.hpp"
 
-#define DEBUG_MOVE 0
-
-/*
- * Debug stuff
- */
-static RenderObject * objects[10];
-static const int num_objects = 4;
-
-static ParticleSystem * test_system;
-static TextureArray * particle_textures;
-
-static const int num_controllable = 2;
-static MovableObject * controllable[num_controllable];
-static const char * controllable_names[] = { "Camera", "ParticleCenter" };
-static int cur_controll = 0;
-
-static Color sky;
-
-static int const num_particle_configs = 2;
-static ParticleSystem::config_t particle_configs[num_particle_configs];
-static int current_particle_config = 0;
-
-/*
- * End debug stuff
- */
+#include "path.hpp"
+#include "rails.hpp"
+#include "nanosvg.h"
 
 void Game::init() {
 }
 
 Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f) {
 
-	sky = Color(0.584f, 0.698f, 0.698f, 1.f);
+	//This is stuff that should be read from a config
+	static float start_position = 0.f;
+	sky_color = Color(0.584f, 0.698f, 0.698f, 1.f);
+	static glm::vec2 terrain_scale(0.5f, 50.f);
+	camera_offset = glm::vec3(0.f, 2.f, -2.5f);
+	look_at_offset = 10.f;
+	movement_speed = 5.f;
 
-	screen = new RenderTarget(resolution, GL_RGB8, false);
-	composition = new RenderTarget(resolution, GL_RGB8, true);
-	//downsample[0] = new RenderTarget(resolution/2, GL_RGB8, false);
-	//downsample[1] = new RenderTarget(resolution/4, GL_RGB8, false);
+
+	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 
 	printf("Loading level %s\n", level.c_str());
 
@@ -63,179 +48,159 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	TextureArray *  normals = TextureArray::from_filename( (base_dir +"/normal0.png").c_str(),
 			(base_dir + "/normal1.png").c_str(), nullptr);
 
-	terrain = new Terrain(base_dir + "/map.png", 0.5, 50.0, colors, normals);
+	terrain = new Terrain(base_dir + "/map.png", terrain_scale.x, terrain_scale.y, colors, normals);
+
+	Data * path_file = Data::open(base_dir + "/path.svg");
+
+	SVGPath * svg_path = svgParse((char*) path_file->data());
+
+	delete path_file;
+
+	std::vector<glm::vec3> path_nodes;
+
+	for(int i=0; i< svg_path->npts; ++i) {
+		path_nodes.push_back(glm::vec3(
+						svg_path->pts[i*2],
+						0,
+						svg_path->pts[i*2 + 1]
+					) * terrain_scale.x);
+	}
+
+	svgDelete(svg_path);
+	
+	Path::optimize_vector(path_nodes);
+
+	for(glm::vec3 &v : path_nodes) {
+		v.y = terrain->height_at(v.x, v.z) + 1.f;
+	}
+
+	path = new Path(path_nodes, false);
+
+	rails = new Rails(path, 1.f);
+	rail_texture = Texture2D::from_filename(PATH_BASE "data/textures/rails.png");
+	rail_material.texture = rail_texture;
+
+//Setup player:
+	player.update_position(path, start_position);
+
+//Configure lights:
 
 	lights.ambient_intensity() = glm::vec3(0.1f);
 	lights.num_lights() = 1;
 
-	lights.lights[0]->set_position(glm::vec3(0.0, 100.0f, 0.0f));
+	lights.lights[0]->set_position(glm::normalize(glm::vec3(1.0, -1.f, 0.0f)));
 	lights.lights[0]->intensity = glm::vec3(0.8f);
-	lights.lights[0]->type = Light::DIRECTIONAL_LIGHT;
-	/*lights.lights[0]->quadratic_attenuation = 0.00002f;
-	lights.lights[0]->constant_attenuation = 0.0f;
-	lights.lights[0]->linear_attenuation = 0.1f;
-	lights.lights[0]->quadratic_attenuation = 0.4f;*/
+	lights.lights[0]->type = MovableLight::DIRECTIONAL_LIGHT;
 
-	camera.set_position(glm::vec3(275.f, 28.f, 254.f));
+//Set up camera:
 
-	objects[0] = new RenderObject("pony1.obj");
-	objects[0]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f), 250.0));
+	update_camera();
 
-	objects[1] = new RenderObject("cube.obj");
-	objects[1]->set_position(glm::vec3(280.0, terrain->height_at(280.f, 250.f) + 1.f, 250.0));
-	objects[1]->set_scale(0.25f);
 
-	objects[2] = new RenderObject("bench.obj");
-	objects[2]->set_position(glm::vec3(300.0, terrain->height_at(300.f, 250.f), 250.0));
 
-	objects[3] = new RenderObject("tree1.obj");
-	objects[3]->set_position(glm::vec3(300.0, terrain->height_at(300.f, 252.f), 252.0));
-
-	camera.look_at(objects[0]->position());
-
-	terrain_shader = Shader::create_shader("terrain");
-
-	//Particles:
+//Create particle systems:
+/*
 	particle_textures = TextureArray::from_filename(PATH_BASE "data/textures/fire1.png", 
 																	PATH_BASE "data/textures/fire2.png", 
 																	PATH_BASE "data/textures/fire3.png", 
 																	PATH_BASE "data/textures/smoke.png", 
 																	PATH_BASE "data/textures/smoke2.png",
 																	nullptr);
-	
-	test_system = new ParticleSystem(10000, particle_textures, false);
-
-	controllable[0] = &camera;
-	controllable[1] = objects[1];
-
-	//Build particle configs:
-	test_system->config.spawn_position = glm::vec4(objects[1]->position(), 1.f);
-	test_system->config.spawn_area = glm::vec4(0.0f, 0.f, 0.0f, 1.f);
-	test_system->config.spawn_direction = glm::vec4(0, 1.f, 0.f, 0.f);
-	test_system->config.direction_var = glm::vec4(0.1f, 0.f, 0.1f, 0.f);
-	test_system->config.avg_spawn_speed= 0.003f;
-	test_system->config.spawn_speed_var = 0.0005f;
-	test_system->config.avg_ttl = 20.f;
-	test_system->config.ttl_var = 5.f;
-	test_system->config.avg_scale = 0.6f;
-	test_system->config.scale_var = 0.05f;
-	test_system->config.avg_scale_change = 2.f;
-	test_system->config.scale_change_var = 0.5f;
-	test_system->config.avg_rotation_speed = 0.02f;
-	test_system->config.rotation_speed_var = 0.005f;
-	test_system->config.birth_color = glm::vec4(0.2, 0.2, 0.2, 0.5);
-	test_system->config.death_color = glm::vec4(0.8 ,0.8, 0.8, 0.f);
-	test_system->config.motion_rand = glm::vec4(0.001f, 0.f, 0.001f, 0);
-	test_system->config.start_texture = 3;
-	test_system->config.num_textures = 1;
-	
-	test_system->update_config();
-
-	test_system->auto_spawn = true;
-	
+*/
+	//TODO!
 }
 
 Game::~Game() {
 	delete composition;
-	delete screen;
-	for(int i=0; i < num_objects; ++i) {
-		delete objects[i];
-	}
-	delete test_system;
-	delete particle_textures;
 	delete terrain;
-	/*for(RenderTarget * ds: downsample) {
-		delete ds;
-	}*/
+
+	delete path;
+	delete rails;
 }
 
 void Game::update(float dt) {
-	input.update_object(*(controllable[cur_controll]), dt);
+
+	player.update_position(path, player.path_position() + movement_speed * dt);
+	update_camera();
+
+	input.update_object(camera, dt);
 
 	if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
-		Input::movement_speed -= 1.f; 
+		movement_speed -= 1.f;
 		printf("Decreased movement speed\n");
 	}
 	if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
-		Input::movement_speed += 1.f; 
+		movement_speed += 1.f;
 		printf("Increased movement speed\n");
 	}
-
+/*
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		cur_controll = (cur_controll + 1) % num_controllable;
 		printf("Switching controll to %s\n", controllable_names[cur_controll]);
 	}
 
-	if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
-
+	if(input.current_value(Input::ACTION_3) > 0.9f) {
+		path_pos+=dt*Input::movement_speed;
+		glm::vec3 cur = path->at(path_pos);
+		cur.y += 2.f;
+		camera.set_position(cur);
+		camera.look_at(path->at(path_pos + 10.f));
 	}
-
-	test_system->update(dt);
-	//printf("Current position: (%f, %f, %f)\n", camera.position().x, camera.position().y, camera.position().z);
+*/
 }
 
 void Game::handle_input(const SDL_Event &event) {
 	input.parse_event(event);
 }
 
-void Game::render_geometry(const Camera &cam) {
+void Game::render_geometry() {
 
-	shaders[SHADER_PASSTHRU]->bind();
-	Shader::upload_camera(cam);
-	Shader::upload_lights(lights);
+	terrain->render_geometry();
 
-	shaders[SHADER_NORMAL]->bind();
-	for(int i=0; i < num_objects; ++i) {
-		objects[i]->render();
-	}
+	rails->render_geometry();
 
-	terrain_shader->bind();
-	terrain->render();
-
+	player.render_geometry();
 }
 
 void Game::render() {
 	glClear(GL_DEPTH_BUFFER_BIT);
+
+	lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
+		render_geometry();
+	});
+
+
 	composition->bind();
 
-	RenderTarget::clear(sky);
+	RenderTarget::clear(sky_color);
 
-	render_geometry(camera);
+	Shader::upload_camera(camera);
+	Shader::upload_lights(lights);
 
-	shaders[SHADER_PARTICLES]->bind();
-	test_system->render();
+	terrain->render();
+
+	rail_material.bind();
+	rails->render();
+
+	player.render();
 
 	composition->unbind();
 
-	//Blur
-	/*RenderTarget* prev = composition;
-	for ( int i = 0; i < 2; i++ ){
-		Shader::upload_state(downsample[i]->texture_size());
-		Shader::upload_projection_view_matrices(downsample[i]->ortho(), glm::mat4());
-		downsample[i]->with([prev, i, downsample]() {
-			prev->draw(shaders[SHADER_BLUR], glm::ivec2(0,0), downsample[i]->texture_size());
-		});
-		prev = downsample[i];
-	}*/
-
-	screen->with(std::bind(&Game::render_composition, this));
 	render_display();
 }
 
 void Game::render_display() {
-	RenderTarget::clear(Color::magenta);
-	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
-	screen->draw(shaders[SHADER_PASSTHRU]);
-}
-
-void Game::render_composition(){
 	RenderTarget::clear(Color::black);
 
 	Shader::upload_state(resolution);
-	Shader::upload_projection_view_matrices(screen->ortho(), glm::mat4());
+	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
 
-	/*downsample[1]->texture_bind(Shader::TEXTURE_2D_2);
-	composition->draw(dof_shader);*/
 	composition->draw(shaders[SHADER_PASSTHRU]);
+}
+
+void Game::update_camera() {
+	glm::vec4 rotated_offset = player.rotation_matrix() * glm::vec4(camera_offset, 1.f);
+	camera.set_position(player.position() + glm::vec3(rotated_offset.x, rotated_offset.y, rotated_offset.z));
+	camera.look_at(path->at(player.path_position() + look_at_offset) + camera_offset);
 }

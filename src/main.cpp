@@ -298,6 +298,11 @@ int main(int argc, char* argv[]){
 
 	verbose = fopen(verbose_flag ? "/dev/stderr" : LOGFILE, "w");
 
+	if(!verbose) {
+		fprintf(stderr, "Failed to open logfile: %s\n", strerror(errno));
+		verbose = stderr;
+	}
+
 	/* proper termination */
 	signal(SIGINT, handle_sigint);
 

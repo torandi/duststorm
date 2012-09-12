@@ -11,18 +11,12 @@ public:
 
 	/**
 	 * Upload material attributes and bind texture units */
-	void activate();
-
-	/**
-	 * Restore state if needed.
-	 */
-	void deactivate();
+	void bind();
 
 	TextureBase* texture;
 	TextureBase* normal_map;
 	TextureBase* specular_map;
 	TextureBase* alpha_map;
-	bool two_sided;
 };
 
 #endif /* MATERIAL_H */

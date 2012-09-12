@@ -112,35 +112,35 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	config.birth_color = glm::vec4(0.f, 1.f, 1.f, 1.f);;
 	config.death_color = glm::vec4(1.f, 0.f, 0.f, 1.f);;
 
-	config.motion_rand = glm::vec4(0.001f, 0.001f, 0.001f, 0.f);
+	config.motion_rand = glm::vec4(0.f, 0.f, 0.f, 0.f);
 
-	config.spawn_direction = glm::vec4(1.f, 0.f, 0.f, 0.f);
-	config.direction_var = glm::vec4(0.f, 0.3f, 0.3f,0.f);
+	config.avg_spawn_velocity = glm::vec4(1.f, 0.f, 0.f, 0.f);
+	config.spawn_velocity_var = glm::vec4(0.f, 0.3f, 0.3f,0.f);
 
 	config.spawn_position = glm::vec4(0.f, 0.f, 0.f, 0.f);
 	config.spawn_area = glm::vec4(1.0f, 1.0f, 1.f, 0);
 
-	config.directional_speed = glm::vec4(0.f);
-	config.directional_speed_var = glm::vec4(0.f);
+	config.wind_velocity = glm::vec4(0.f);
+	config.gravity = glm::vec4(0, -1.f, 0, 0);
 
 	//Time to live
 	config.avg_ttl = 2.0;
 	config.ttl_var = 1.0;
-	//Spawn speed
-	config.avg_spawn_speed = 0.01f;
-	config.spawn_speed_var = 0.005f;
 
-	//Acceleration
-	config.avg_acc = 0.00f;
-	config.acc_var = 0.000f;
 	//Scale
 	config.avg_scale = 0.01f;
 	config.scale_var = 0.005f;
 	config.avg_scale_change = 0.f;
 	config.scale_change_var = 0.f;
+
 	//Rotation
 	config.avg_rotation_speed = 0.f;
 	config.rotation_speed_var = 0.f;
+
+	config.avg_wind_influence = 0.1f;
+	config.wind_influence_var = 0.f;
+	config.avg_gravity_influence = 0.5f;
+	config.gravity_influence_var = 0.f;
 
 	config.start_texture = 0;
 	config.num_textures = texture->num_textures();

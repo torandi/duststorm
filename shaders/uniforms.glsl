@@ -2,6 +2,8 @@
 #extension GL_ARB_explicit_attrib_location: enable
 #extension GL_EXT_texture_array : enable
 
+const int maxNumberOfLights = 4;
+
 layout(binding=0)  uniform sampler2D texture0;
 layout(binding=1)  uniform sampler2D texture1;
 layout(binding=2)  uniform sampler2D texture2;
@@ -18,8 +20,11 @@ layout(binding=12) uniform samplerCube texture_cube0;
 layout(binding=13) uniform samplerCube texture_cube1;
 layout(binding=14) uniform samplerCube texture_cube2;
 layout(binding=15) uniform samplerCube texture_cube3;
+layout(binding=16) uniform sampler2D shadowmap0;
+layout(binding=17) uniform sampler2D shadowmap1;
+layout(binding=18) uniform sampler2D shadowmap2;
+layout(binding=19) uniform sampler2D shadowmap3;
 
-const int maxNumberOfLights = 4;
 
 layout(std140) uniform projectionViewMatrices {
    mat4 projectionViewMatrix;
@@ -48,9 +53,14 @@ struct light_data {
 	float constant_attenuation;
 	float linear_attenuation;
 	float quadratic_attenuation;
-	int type;
-	vec3 intensity;
-	vec3 position;
+	float is_directional;
+
+	vec4 intensity;
+	vec4 position;
+	mat4 matrix;
+	vec2 shadowmap_scale;
+	int shadowmap_index;
+	float shadow_bias;
 };
 
 layout(std140) uniform LightsData {

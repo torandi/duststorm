@@ -42,7 +42,7 @@ const char * Shader::global_uniform_names_[] = {
 	"Material",
 	"LightsData",
 	"StateData",
-	"Fog",
+	"Fog"
 };
 
 const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
@@ -80,7 +80,7 @@ void Shader::initialize() {
 	checkForGLErrors("Generate global uniform buffers");
 
 	for( int i = 0; i < NUM_GLOBAL_UNIFORMS; ++i) {
-		//Allocate memory in the buffer:A
+		//Allocate memory in the buffer:
 		glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[i]);
 		glBufferData(GL_UNIFORM_BUFFER, global_uniform_buffer_sizes_[i], NULL, global_uniform_usage_[i]);
 		//Bind buffers to range
@@ -88,6 +88,7 @@ void Shader::initialize() {
 	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	checkForGLErrors("Bind and allocate global uniforms");
+
 
 	/* Enable all attribs for Shader::vertex_x */
 	for ( int i = 0; i < NUM_ATTR; ++i ) {
@@ -467,9 +468,9 @@ GLint Shader::uniform_location(const char * uniform_name) const{
 	return l;
 }
 
-void Shader::push_vertex_attribs() {
+void Shader::push_vertex_attribs(int offset) {
 	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-	for ( int i = 0; i < NUM_ATTR; ++i ) {
+	for ( int i = offset; i < NUM_ATTR; ++i ) {
 		glDisableVertexAttribArray(i);
 	}
 }

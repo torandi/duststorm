@@ -2,17 +2,15 @@
 
 #include "uniforms.glsl"
 
-in vec3 in_position;
-in vec2 in_texcoord;
-in vec4 in_normal;
-in vec4 in_tangent;
-in vec4 in_bitangent;
+layout(location=0) in vec3 in_position;
+layout(location=1) in vec4 in_color;
 
-out vec3 position;
+out vec4 color;
 
 void main() {
 	vec4 w_pos = modelMatrix * vec4(in_position, 1.0f);
 
-	position = w_pos.xyz;
+	color = in_color;
+
 	gl_Position = projectionViewMatrix * w_pos;
 }
