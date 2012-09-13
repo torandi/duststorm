@@ -292,6 +292,7 @@ void Game::shoot() {
 	glm::vec3 direction = player.direction();
 	attack_particles->config.avg_spawn_velocity = glm::vec4(direction * (current_movement_speed + particle_types[current_particle_type].spawn_speed), 1.f);
 	attack_particles->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
+	attack_particles->config.spawn_velocity_var = player.rotation_matrix() * particle_types[current_particle_type].config.spawn_velocity_var;
 	attack_particles->spawn(particle_types[current_particle_type].count);
 
 	smoke->config.avg_spawn_velocity = glm::vec4(direction * (current_movement_speed +smoke_spawn_speed), 1.f);
