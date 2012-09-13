@@ -47,6 +47,7 @@ class Game {
 			ParticleSystem::config_t config;
 			int count;
 			float spawn_speed;
+			float damage;
 		};
 
 		void render_display();

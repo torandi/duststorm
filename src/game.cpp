@@ -153,14 +153,17 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	read_particle_config(config["/particles/light"], particle_types[LIGHT_PARTICLES].config);
 	particle_types[LIGHT_PARTICLES].count = config["/particles/light/count"]->as_int();
 	particle_types[LIGHT_PARTICLES].spawn_speed = config["/particles/light/spawn_speed"]->as_float();
+	particle_types[LIGHT_PARTICLES].damage = config["/particles/light/damage"]->as_float();
 
 	read_particle_config(config["/particles/medium"], particle_types[MEDIUM_PARTICLES].config);
 	particle_types[MEDIUM_PARTICLES].count = config["/particles/medium/count"]->as_int();
 	particle_types[MEDIUM_PARTICLES].spawn_speed = config["/particles/medium/spawn_speed"]->as_float();
+	particle_types[MEDIUM_PARTICLES].damage = config["/particles/medium/damage"]->as_float();
 
 	read_particle_config(config["/particles/heavy"], particle_types[HEAVY_PARTICLES].config);
 	particle_types[HEAVY_PARTICLES].count = config["/particles/heavy/count"]->as_int();
 	particle_types[HEAVY_PARTICLES].spawn_speed = config["/particles/heavy/spawn_speed"]->as_float();
+	particle_types[HEAVY_PARTICLES].damage = config["/particles/heavy/damage"]->as_float();
 
 	current_particle_type = MEDIUM_PARTICLES;
 	attack_particles->config = particle_types[MEDIUM_PARTICLES].config;
