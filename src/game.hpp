@@ -87,6 +87,8 @@ class Game {
 		float movement_speed;
 		float brake_movement_speed;
 
+		float current_movement_speed;
+
 		Color sky_color;
 
 };

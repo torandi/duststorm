@@ -168,6 +168,8 @@ void ParticleSystem::spawn_particles(cl_int count, cl::Event * event) {
 	cl_int err = opencl->queue().enqueueWriteBuffer(spawn_rate_, CL_TRUE, 0, sizeof(cl_int), &count, NULL, NULL);
 	CL::check_error(err, "[ParticleSystem] spawn: Write spawn count");
 
+	err = spawn_kernel_.setArg(5, (int)(time(0)%UINT_MAX));
+	CL::check_error(err, "[ParticleSystem] spawn: set time");
 	//TODO: Optimize!
 	err = opencl->queue().enqueueNDRangeKernel(spawn_kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, NULL, event);
 	CL::check_error(err, "[ParticleSystem] Execute spawn_kernel");

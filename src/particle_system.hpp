@@ -21,7 +21,6 @@ class ParticleSystem : public MovableObject {
 
 		//Change values in this struct and call update_config() to update
 		__ALIGNED__(struct config_t {
-
 				glm::vec4 spawn_position;
 				glm::vec4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
 

@@ -68,6 +68,8 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	movement_speed = config["/player/speed/normal"]->as_float();
 	brake_movement_speed = config["/player/speed/brake"]->as_float();
 
+	current_movement_speed = movement_speed;
+
 
 	TextureArray * colors = TextureArray::from_filename( (base_dir +"/color0.png").c_str(),
 			(base_dir + "/color1.png").c_str(), nullptr);
@@ -135,8 +137,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	particle_textures = TextureArray::from_filename(PATH_BASE "data/textures/fire1.png", 
 																	PATH_BASE "data/textures/fire2.png", 
 																	PATH_BASE "data/textures/fire3.png", 
-																	PATH_BASE "data/textures/smoke.png", 
-																	PATH_BASE "data/textures/smoke2.png",
+																	PATH_BASE "data/textures/smoke.png",
 																	nullptr);
 
 	static const int max_attack_particles = config["/game/max_attack_particles"]->as_int();
@@ -146,7 +147,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	attack_particles->config.wind_velocity = wind_velocity;
 	attack_particles->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius);
 
-	for(auto p : particle_types) {
+	for(auto &p : particle_types) {
 		p.config = attack_particles->config; //Get reasonable defaults
 	}
 	read_particle_config(config["/particles/light"], particle_types[LIGHT_PARTICLES].config);
@@ -162,7 +163,7 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	particle_types[HEAVY_PARTICLES].spawn_speed = config["/particles/heavy/spawn_speed"]->as_float();
 
 	current_particle_type = MEDIUM_PARTICLES;
-	attack_particles->config = particle_types[current_particle_type].config;
+	attack_particles->config = particle_types[MEDIUM_PARTICLES].config;
 
 	//Smoke:
 	smoke = new ParticleSystem(max_smoke_particles, particle_textures, false);
@@ -190,7 +191,7 @@ Game::~Game() {
 
 void Game::update(float dt) {
 
-	player.update_position(path, player.path_position() + movement_speed * dt);
+	player.update_position(path, player.path_position() + current_movement_speed * dt);
 	update_camera();
 
 	input.update_object(*lights.lights[0], dt);
@@ -262,8 +263,8 @@ void Game::render() {
 	player.render();
 
 	particle_shader->bind();
-	attack_particles->render();
 	smoke->render();
+	attack_particles->render();
 
 	composition->unbind();
 
@@ -289,11 +290,11 @@ void Game::update_camera() {
 void Game::shoot() {
 	glm::vec4 rotated_offset = player.rotation_matrix() * glm::vec4(player.canon_offset, 1.f);
 	glm::vec3 direction = player.direction();
-	attack_particles->config.avg_spawn_velocity = glm::vec4(direction * particle_types[current_particle_type].spawn_speed, 1.f);
+	attack_particles->config.avg_spawn_velocity = glm::vec4(direction * (current_movement_speed + particle_types[current_particle_type].spawn_speed), 1.f);
 	attack_particles->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
 	attack_particles->spawn(particle_types[current_particle_type].count);
 
-	smoke->config.avg_spawn_velocity = glm::vec4(direction * smoke_spawn_speed, 1.f);
+	smoke->config.avg_spawn_velocity = glm::vec4(direction * (current_movement_speed +smoke_spawn_speed), 1.f);
 	smoke->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
 	smoke->spawn(smoke_count);
 }
