@@ -57,7 +57,6 @@ Game::Game(const std::string &level) : camera(75.f, resolution.x/(float)resoluti
 	std::string base_dir = PATH_BASE "data/levels/" + level;
 
 	Config config = Config::parse(base_dir + "/level.cfg");
-	config.print();
 
 	//Read config:
 	static float start_position = config["/player/start_position"]->as_float();
@@ -251,6 +250,7 @@ void Game::render() {
 	});
 
 
+	Shader::upload_state(composition->texture_size());
 	composition->bind();
 
 	RenderTarget::clear(sky_color);
@@ -266,6 +266,8 @@ void Game::render() {
 	player.render();
 
 	particle_shader->bind();
+	composition->depth_bind(Shader::TEXTURE_2D_0);
+
 	smoke->render();
 	attack_particles->render();
 

@@ -48,7 +48,7 @@ const char * Shader::global_uniform_names_[] = {
 const GLsizeiptr Shader::global_uniform_buffer_sizes_[] = {
 	sizeof(glm::mat4)*3,
 	sizeof(glm::mat4)*2,
-	sizeof(glm::vec3),
+	sizeof(camera_data_t),
 	sizeof(Shader::material_t),
 	sizeof(Shader::lights_data_t),
 	sizeof(struct state_data),
@@ -382,11 +382,15 @@ void Shader::upload_lights(LightsData &lights) {
 	upload_lights(lights.shader_data());
 }
 
-void Shader::upload_camera_position(const Camera &camera) {
+void Shader::upload_camera_data(const Camera &camera) {
+	camera_data_t cd;
+	cd.position = camera.position();
+	cd.near = camera.near();
+	cd.far = camera.far();
 	glBindBuffer(GL_UNIFORM_BUFFER, global_uniform_buffers_[UNIFORM_CAMERA]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(camera.position()));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(cd), &cd);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	checkForGLErrors("upload camera position");
+	checkForGLErrors("upload camera data");
 }
 
 void Shader::upload_projection_view_matrices(
@@ -437,7 +441,7 @@ void Shader::upload_blank_material() {
 }
 
 void Shader::upload_camera(const Camera &camera) {
-	upload_camera_position(camera);
+	upload_camera_data(camera);
 	upload_projection_view_matrices(camera.projection_matrix(), camera.view_matrix());
 }
 

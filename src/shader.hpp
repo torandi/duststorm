@@ -153,6 +153,12 @@ public:
 		Light lights[MAX_NUM_LIGHTS];
 	};
 
+	struct camera_data_t {
+		glm::vec3 position;
+		float near;
+		float far;
+	};
+
 	__ALIGNED__(struct fog_t {
 		glm::vec4 color;
 		float density;
@@ -210,9 +216,9 @@ public:
 	static void upload_lights(LightsData &lights);
 
 	/*
-	 * Uploads the camera position
+	 * Uploads the camera data (position, near, far)
 	 */
-	static void upload_camera_position(const Camera &camera);
+	static void upload_camera_data(const Camera &camera);
 
 	/**
 	 * Upload the material

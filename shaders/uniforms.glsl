@@ -39,6 +39,8 @@ layout(std140) uniform modelMatrices {
 
 layout(std140) uniform Camera {
 	vec3 camera_pos; //The cameras position in world space
+	float camera_near;
+	float camera_far;
 };
 
 layout(std140) uniform Material {
