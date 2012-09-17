@@ -5,7 +5,6 @@
 #include <GL/glew.h>
 
 #include "camera.hpp"
-#include "texture.hpp"
 
 class Skybox {
 	public:
@@ -17,6 +16,7 @@ class Skybox {
 		void render(const Camera &camera) const;
 
 	private:
+		static Shader* shader;
 		static GLuint vbo;
 		static const float vertices[2*3*36];
 		static const char * texture_names[];

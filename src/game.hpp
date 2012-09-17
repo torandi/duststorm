@@ -72,13 +72,17 @@ class Game {
 		TextureArray * particle_textures;
 
 		Terrain * terrain;
+		Skybox * skybox;
+		Quad * water_quad;
+		Texture2D *water_texture;
 
 		Input input;
 
 		Camera camera;
-		RenderTarget *composition;
+		RenderTarget *composition, *geometry;
 
 		Shader *particle_shader;
+		Shader *water_shader;
 
 		glm::vec4 wind_velocity;
 		glm::vec4 gravity;

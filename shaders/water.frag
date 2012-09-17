@@ -1,10 +1,12 @@
 #version 150
 #include "uniforms.glsl"
-#include "screenspace.glsl"
+#include "fog.glsl"
+
+uniform vec3 water_tint;
 
 //const float water_sight = 5.0;
 
-const vec3 water_tint = vec3(0.8, 1.0, 1.0);
+//const vec3 water_tint = vec3(0.8, 1.0, 1.0);
 const vec4 specular=vec4(1.0);
 const float shininess = 64.0;
 
@@ -62,15 +64,13 @@ void main() {
 	vec3 surface = clamp(accumLighting,0.0, 1.0).rgb;
 
 	//angle of vision
-	float aov = 1.0-abs(dot(camera_direction, norm_normal));
+	//float aov = 1.0-abs(dot(camera_direction, norm_normal));
 
-	/* Calculate bottom color (in screenspace) */
-	ivec2 size = textureSize(texture3, 0);
-	vec2 ss = vec2(gl_FragCoord.x / size.x, gl_FragCoord.y / size.y);
-	float depth = linear_depth(texture2, 1.0, 100.0f); /** @todo hardcoded near/far */
-	vec3 bottom = texture(texture3, ss).rgb;
+	/*float current_depth = (2.0 * camera_near) / (camera_far + camera_near - (gl_FragCoord.z/gl_FragCoord.w) * (camera_far - camera_near));
+	float screen_depth = linear_depth(texture2, camera_near, camera_far);*/
 
-	/* Mix colors together */
-	ocolor.rgb = mix(surface.rgb, bottom.rgb, min(1-depth, 0.8));
-	ocolor.a = 1.0f;
+	ocolor.rgb = surface.rgb;
+	ocolor.a = 1.f;
+
+	ocolor = calculate_fog(ocolor);
 }

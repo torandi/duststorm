@@ -21,11 +21,9 @@ out vec2 tex_coord2;
 
 void main() {
 	vec4 pos = in_position;
-	//pos.y = water_height;
 	vec4 w_pos = modelMatrix * pos;
 	position = w_pos.xyz;
 	gl_Position = projectionViewMatrix *  w_pos;
-//	depth = abs(water_height - in_position.y);
 
 	normal = (normalMatrix * in_normal).xyz;
 	tangent = (normalMatrix * in_tangent).xyz;

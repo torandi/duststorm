@@ -1,4 +1,4 @@
-#version 330
+#version 150
 #include "uniforms.glsl"
 
 #include "skybox_color.glsl"

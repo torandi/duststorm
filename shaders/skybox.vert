@@ -1,4 +1,4 @@
-#version 330
+#version 150
 #include "uniforms.glsl"
 
 layout (location = 0) in vec4 in_position;

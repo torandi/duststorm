@@ -28,6 +28,7 @@ Skybox::Skybox(std::string skybox_path) {
 	//Generate skybox buffers:
 	static bool initialized = false;
 	if ( !initialized ){
+		shader = Shader::create_shader("skybox");
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -41,7 +42,8 @@ Skybox::~Skybox() {
 }
 
 void Skybox::render(const Camera &camera) const{
-	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+	shader->bind();
+
 	glPushAttrib(GL_ENABLE_BIT|GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -52,9 +54,7 @@ void Skybox::render(const Camera &camera) const{
 	);
 
 	/* Disable most attribs from Shader::vertex_x */
-	for ( int i = 2; i < Shader::NUM_ATTR; ++i ) {
-		glDisableVertexAttribArray(i);
-	}
+	Shader::push_vertex_attribs(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -65,12 +65,13 @@ void Skybox::render(const Camera &camera) const{
 
 	checkForGLErrors("Skybox::render(): render");
 
+	Shader::pop_vertex_attribs();
 	glPopAttrib();
-	glPopClientAttrib();
 
 	checkForGLErrors("Skybox::render(): post");
 }
 
+Shader* Skybox::shader = nullptr;
 GLuint Skybox::vbo = 0;
 
 //Data:
@@ -196,4 +197,3 @@ const char * Skybox::texture_names[] = {
 	"front.png",
 	"back.png"
 };
-

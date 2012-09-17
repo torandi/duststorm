@@ -15,6 +15,7 @@ class Rails;
 class RenderObject;
 class RenderTarget;
 class Shader;
+class Skybox;
 class TextureBase;
 class Texture2D;
 class Texture3D;
