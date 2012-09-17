@@ -307,7 +307,6 @@ void Game::render() {
 	RenderTarget::clear(sky_color);
 
 	skybox->texture->texture_bind(Shader::TEXTURE_CUBEMAP_0);
-	skybox->render(camera);
 
 	Shader::upload_camera(camera);
 	Shader::upload_lights(lights);
