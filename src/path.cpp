@@ -20,7 +20,7 @@ void Path::optimize_vector(std::vector<glm::vec3> &path) {
 		}
 
 		while(glm::distance(*it, *next) > max_keypoint_distance) {
-			next = path.insert(next, *it + (*next - *it) / 2.f);
+			next = path.insert(it + 1, *it + (*next - *it) / 2.f);
 			it = next - 1;
 		}
 	}
