@@ -17,7 +17,6 @@
 #include "utils.hpp"
 #include "input.hpp"
 #include "sound.hpp"
-#include "skybox.hpp"
 #include "particle_system.hpp"
 
 #include "path.hpp"
@@ -50,8 +49,7 @@ void Game::init() {
 }
 
 Game::Game(const std::string &level) :
-		  water_texture(Texture2D::from_filename(PATH_BASE "/data/textures/water.png"))
-		, camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f)
+		 camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f)
 {
 
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
@@ -67,8 +65,6 @@ Game::Game(const std::string &level) :
 	static const float start_position = config["/player/start_position"]->as_float();
 	sky_color = config["/environment/sky_color"]->as_color();
 	static const glm::vec2 terrain_scale = config["/environment/terrain/scale"]->as_vec2();
-	static const float water_level = config["/environment/terrain/water_level"]->as_float();
-	static const glm::vec3 water_tint = config["/environment/water_tint"]->as_vec3();
 	static const float fog_intensity = config["/environment/fog_intensity"]->as_float();
 	camera_offset = config["/player/camera/offset"]->as_vec3();
 	look_at_offset = config["/player/camera/look_at_offset"]->as_float();
@@ -87,37 +83,6 @@ Game::Game(const std::string &level) :
 
 	terrain = new Terrain(base_dir + "/map.png", terrain_scale.x, terrain_scale.y, colors, normals);
 
-	skybox = new Skybox(base_dir + "/skybox");
-
-	//Configure water:
-	water_texture->texture_bind(Shader::TEXTURE_2D_0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 4.0f);
-	water_texture->texture_unbind();
-
-	glm::vec2 terrain_size = glm::vec2(terrain->size()) * terrain_scale.x;
-	water_quad = new Quad(terrain_size/10.f, true, true);
-
-	water_quad->set_rotation(glm::vec3(1.f, 0, 0), 90.f);
-	water_quad->set_scale(terrain_size.x);
-	water_quad->set_position(glm::vec3(0.f, water_level, 0.f));
-
-	water_shader = Shader::create_shader("water");
-
-	static const GLuint u_wave1 = water_shader->uniform_location("wave1");
-	static const GLuint u_wave2 = water_shader->uniform_location("wave2");
-	static const GLuint u_water_tint = water_shader->uniform_location("water_tint");
-
-	const glm::vec2 wave1 = glm::vec2(0.01, 0);
-	const glm::vec2 wave2 = glm::vec2(0.005, 0.03);
-
-	water_shader->bind();
-	glUniform2fv(u_wave1, 1, glm::value_ptr(wave1));
-	glUniform2fv(u_wave2, 1, glm::value_ptr(wave2));
-	glUniform3fv(u_water_tint, 1, glm::value_ptr(water_tint));
-
-	printf("Leading path\n");
 	Data * path_file = Data::open(base_dir + "/path.svg");
 
 	SVGPath * svg_path = svgParse((char*) path_file->data());
@@ -125,7 +90,6 @@ Game::Game(const std::string &level) :
 	delete path_file;
 
 	std::vector<glm::vec3> path_nodes;
-	printf("1\n");
 
 	for(int i=0; i< svg_path->npts; ++i) {
 		path_nodes.push_back(glm::vec3(
@@ -134,26 +98,20 @@ Game::Game(const std::string &level) :
 						svg_path->pts[i*2 + 1]
 					) * terrain_scale.x);
 	}
-	printf("2\n");
 
 	svgDelete(svg_path);
-	printf("2.5: %d\n", path_nodes.size());
 	
 	Path::optimize_vector(path_nodes);
-	printf("3\n");
 
 	for(glm::vec3 &v : path_nodes) {
 		v.y = terrain->height_at(v.x, v.z) + 0.2f;
 	}
-	printf("4\n");
 
 	path = new Path(path_nodes, false);
-	printf("path done\n");
 
 	rails = new Rails(path, 1.f);
 	rail_texture = Texture2D::from_filename(PATH_BASE "data/textures/rails.png");
 	rail_material.texture = rail_texture;
-	printf("Rails done\n");
 
 //Setup player:
 	player.update_position(path, start_position);
@@ -257,10 +215,6 @@ Game::~Game() {
 	delete smoke;
 	delete attack_particles;
 	delete particle_textures;
-
-	delete water_quad;
-	delete skybox;
-	delete water_texture;
 }
 
 void Game::update(float dt) {
@@ -315,8 +269,6 @@ void Game::render_geometry() {
 
 	terrain->render_geometry();
 
-	water_quad->render();
-
 	rails->render_geometry();
 
 	player.render_geometry();
@@ -342,29 +294,11 @@ void Game::render() {
 
 	RenderTarget::clear(sky_color);
 
-	skybox->texture->texture_bind(Shader::TEXTURE_CUBEMAP_0);
-
 	Shader::upload_camera(camera);
 	Shader::upload_lights(lights);
 
 
 	terrain->render();
-
-	water_texture->texture_bind(Shader::TEXTURE_NORMALMAP);
-	geometry->depth_bind(Shader::TEXTURE_2D_2);
-
-	water_shader->bind();
-	static const GLuint u_wave1 = water_shader->uniform_location("wave1");
-	static const GLuint u_wave2 = water_shader->uniform_location("wave2");
-	static const GLuint u_water_tint = water_shader->uniform_location("water_tint");
-
-	const glm::vec2 wave1 = glm::vec2(0.01, 0);
-	const glm::vec2 wave2 = glm::vec2(0.005, 0.03);
-
-	glUniform2fv(u_wave1, 1, glm::value_ptr(wave1));
-	glUniform2fv(u_wave2, 1, glm::value_ptr(wave2));
-	glUniform3fv(u_water_tint, 1, glm::value_ptr(glm::vec3(0.8, 0.5, 0.5)));
-	water_quad->render();
 
 	rail_material.bind();
 	rails->render();
