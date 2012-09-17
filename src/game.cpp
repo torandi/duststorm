@@ -69,6 +69,7 @@ Game::Game(const std::string &level) :
 	static const glm::vec2 terrain_scale = config["/environment/terrain/scale"]->as_vec2();
 	static const float water_level = config["/environment/terrain/water_level"]->as_float();
 	static const glm::vec3 water_tint = config["/environment/water_tint"]->as_vec3();
+	static const float fog_intensity = config["/environment/fog_intensity"]->as_float();
 	camera_offset = config["/player/camera/offset"]->as_vec3();
 	look_at_offset = config["/player/camera/look_at_offset"]->as_float();
 	movement_speed = config["/player/speed/normal"]->as_float();
@@ -76,6 +77,8 @@ Game::Game(const std::string &level) :
 
 	current_movement_speed = movement_speed;
 
+	static const Shader::fog_t fog = { glm::vec4(sky_color.to_vec3(), 1.f), fog_intensity };
+	Shader::upload_fog(fog);
 
 	TextureArray * colors = TextureArray::from_filename( (base_dir +"/color0.png").c_str(),
 			(base_dir + "/color1.png").c_str(), nullptr);
@@ -134,7 +137,7 @@ Game::Game(const std::string &level) :
 	Path::optimize_vector(path_nodes);
 
 	for(glm::vec3 &v : path_nodes) {
-		v.y = terrain->height_at(v.x, v.z) + 1.f;
+		v.y = terrain->height_at(v.x, v.z) + 0.2f;
 	}
 
 	path = new Path(path_nodes, false);

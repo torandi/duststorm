@@ -20,8 +20,8 @@
  * separation: width between the rails
  * uv_offset: how long a single texture stretches
  */
-static const float height = 0.25f;
-static const float width = 0.20f;
+static const float height = 0.15f;
+static const float width = 0.10f;
 static const float separation = 0.5f;
 static const float uv_offset = 1.f;
 

@@ -5,7 +5,7 @@
 #include <glm/gtx/spline.hpp>
 
 static const float min_keypoint_distance = 0.1f;
-static const float max_keypoint_distance = 10.f;
+static const float max_keypoint_distance = 5.f;
 
 void Path::optimize_vector(std::vector<glm::vec3> &path) {
 	for(auto it = path.begin(); it != path.end(); ++it) {
