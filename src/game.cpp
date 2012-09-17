@@ -117,6 +117,7 @@ Game::Game(const std::string &level) :
 	glUniform2fv(u_wave2, 1, glm::value_ptr(wave2));
 	glUniform3fv(u_water_tint, 1, glm::value_ptr(water_tint));
 
+	printf("Leading path\n");
 	Data * path_file = Data::open(base_dir + "/path.svg");
 
 	SVGPath * svg_path = svgParse((char*) path_file->data());
@@ -124,6 +125,7 @@ Game::Game(const std::string &level) :
 	delete path_file;
 
 	std::vector<glm::vec3> path_nodes;
+	printf("1\n");
 
 	for(int i=0; i< svg_path->npts; ++i) {
 		path_nodes.push_back(glm::vec3(
@@ -132,20 +134,26 @@ Game::Game(const std::string &level) :
 						svg_path->pts[i*2 + 1]
 					) * terrain_scale.x);
 	}
+	printf("2\n");
 
 	svgDelete(svg_path);
+	printf("2.5: %d\n", path_nodes.size());
 	
 	Path::optimize_vector(path_nodes);
+	printf("3\n");
 
 	for(glm::vec3 &v : path_nodes) {
 		v.y = terrain->height_at(v.x, v.z) + 0.2f;
 	}
+	printf("4\n");
 
 	path = new Path(path_nodes, false);
+	printf("path done\n");
 
 	rails = new Rails(path, 1.f);
 	rail_texture = Texture2D::from_filename(PATH_BASE "data/textures/rails.png");
 	rail_material.texture = rail_texture;
+	printf("Rails done\n");
 
 //Setup player:
 	player.update_position(path, start_position);
