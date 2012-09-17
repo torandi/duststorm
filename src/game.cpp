@@ -112,6 +112,7 @@ Game::Game(const std::string &level) :
 	const glm::vec2 wave1 = glm::vec2(0.01, 0);
 	const glm::vec2 wave2 = glm::vec2(0.005, 0.03);
 
+	water_shader->bind();
 	glUniform2fv(u_wave1, 1, glm::value_ptr(wave1));
 	glUniform2fv(u_wave2, 1, glm::value_ptr(wave2));
 	glUniform3fv(u_water_tint, 1, glm::value_ptr(water_tint));
@@ -176,7 +177,7 @@ Game::Game(const std::string &level) :
 																	PATH_BASE "data/textures/fire2.png", 
 																	PATH_BASE "data/textures/fire3.png", 
 																	PATH_BASE "data/textures/smoke.png",
-																	PATH_BASE "data/textures/particle.png",
+																	PATH_BASE "data/textures/fog.png",
 																	nullptr);
 
 	static const int max_attack_particles = config["/game/max_attack_particles"]->as_int();
@@ -226,9 +227,15 @@ Game::Game(const std::string &level) :
 	dust->config.gravity = gravity;
 	dust->config.wind_velocity = wind_velocity;
 	dust->config.spawn_area = config["/particles/dust/spawn_area"]->as_vec4();
-	dust->config.avg_spawn_rate = config["/particles/dust/avg_spawn_rate"]->as_float();
-	dust->config.spawn_rate_var = config["/particles/dust/spawn_rate_var"]->as_float();
+	dust->avg_spawn_rate = config["/particles/dust/avg_spawn_rate"]->as_float();
+	dust->spawn_rate_var = config["/particles/dust/spawn_rate_var"]->as_float();
+	dust_spawn_ahead = config["/particles/dust/spawn_ahead"]->as_float();
+	half_dust_spawn_area = glm::vec3(dust->config.spawn_area.x, dust->config.spawn_area.y, dust->config.spawn_area.z) / 2.f;
 
+	dust->config.spawn_position = glm::vec4(player.position() - half_dust_spawn_area, 1.f);
+	dust->spawn(dust->avg_spawn_rate * 5.0);
+	dust->config.spawn_position += glm::vec4(path->at(player.path_position() + dust_spawn_ahead / 2.f), 0.f);
+	dust->spawn(dust->avg_spawn_rate * 5.0);
 }
 
 Game::~Game() {
@@ -251,7 +258,7 @@ Game::~Game() {
 void Game::update(float dt) {
 
 	player.update_position(path, player.path_position() + current_movement_speed * dt);
-	//update_camera();
+	update_camera();
 
 	//input.update_object(*lights.lights[0], dt);
 	input.update_object(camera, dt);
@@ -271,6 +278,11 @@ void Game::update(float dt) {
 
 	smoke->update(dt);
 	attack_particles->update(dt);
+
+	dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
+	dust->update_config();
+	dust->update(dt);
+
 /*
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		cur_controll = (cur_controll + 1) % num_controllable;
@@ -356,6 +368,7 @@ void Game::render() {
 
 	smoke->render();
 	attack_particles->render();
+	dust->render();
 
 	composition->unbind();
 

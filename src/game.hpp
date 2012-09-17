@@ -68,7 +68,8 @@ class Game {
 		particle_type_t current_particle_type;
 		int smoke_count;
 		float smoke_spawn_speed;
-		int dust_count;
+		float dust_spawn_ahead;
+		glm::vec3 half_dust_spawn_area;
 
 		TextureArray * particle_textures;
 

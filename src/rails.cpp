@@ -11,7 +11,7 @@
 
 #include <cstdio>
 
-#include <glm/gtx/string_cast.hpp>
+#include "utils.hpp"
 
 /**
  * Configuration
