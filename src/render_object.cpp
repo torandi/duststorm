@@ -69,7 +69,7 @@ class AssimpDataImport : public Assimp::IOSystem {
 		}
 
 		virtual bool Exists (const char *pFile) const {
-			return file_exists(std::string(pFile));
+			return file_exists(PATH_BASE "/data/models/" + std::string(pFile));
 		}
 
 		virtual char getOsSeparator () const {
@@ -77,7 +77,7 @@ class AssimpDataImport : public Assimp::IOSystem {
 		}
 
 		virtual Assimp::IOStream * Open (const char *pFile, const char *pMode="rb") {
-			Data * data = Data::open(pFile);
+			Data * data = Data::open(PATH_BASE "/data/models/" + std::string(pFile));
 			if(data) {
 				return new AssimpDataStream(data);
 			} else {
@@ -105,7 +105,7 @@ RenderObject::RenderObject(std::string model, bool normalize_scale, unsigned int
 	, name(model)
 	, scale(1.0f) {
 
-	std::string real_path = PATH_BASE "/data/models/" + model;
+	std::string real_path = model;
 
 	importer.SetIOHandler(new AssimpDataImport());
 
