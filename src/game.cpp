@@ -176,10 +176,12 @@ Game::Game(const std::string &level) :
 																	PATH_BASE "data/textures/fire2.png", 
 																	PATH_BASE "data/textures/fire3.png", 
 																	PATH_BASE "data/textures/smoke.png",
+																	PATH_BASE "data/textures/particle.png",
 																	nullptr);
 
 	static const int max_attack_particles = config["/game/max_attack_particles"]->as_int();
 	static const int max_smoke_particles = config["/game/max_smoke_particles"]->as_int();
+	static const int max_dust_particles = config["/game/max_dust_particles"]->as_int();
 	attack_particles = new ParticleSystem(max_attack_particles, particle_textures, false);
 	attack_particles->config.gravity = gravity;
 	attack_particles->config.wind_velocity = wind_velocity;
@@ -215,6 +217,17 @@ Game::Game(const std::string &level) :
 	read_particle_config(config["/particles/smoke"], smoke->config);
 	smoke_count = config["/particles/smoke/count"]->as_int();
 	smoke_spawn_speed = config["/particles/smoke/spawn_speed"]->as_float();
+
+	//Dust:
+	dust = new ParticleSystem(max_dust_particles, particle_textures, true);
+
+	read_particle_config(config["/particles/dust"], dust->config);
+
+	dust->config.gravity = gravity;
+	dust->config.wind_velocity = wind_velocity;
+	dust->config.spawn_area = config["/particles/dust/spawn_area"]->as_vec4();
+	dust->config.avg_spawn_rate = config["/particles/dust/avg_spawn_rate"]->as_float();
+	dust->config.spawn_rate_var = config["/particles/dust/spawn_rate_var"]->as_float();
 
 }
 

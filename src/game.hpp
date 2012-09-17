@@ -68,6 +68,7 @@ class Game {
 		particle_type_t current_particle_type;
 		int smoke_count;
 		float smoke_spawn_speed;
+		int dust_count;
 
 		TextureArray * particle_textures;
 
