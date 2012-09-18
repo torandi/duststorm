@@ -93,7 +93,6 @@ class Game {
 		float current_movement_speed;
 
 		Color sky_color;
-
 };
 
 #endif

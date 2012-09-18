@@ -49,7 +49,7 @@ void Game::init() {
 }
 
 Game::Game(const std::string &level) :
-		 camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f)
+	camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f)
 {
 
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
@@ -93,14 +93,14 @@ Game::Game(const std::string &level) :
 
 	for(int i=0; i< svg_path->npts; ++i) {
 		path_nodes.push_back(glm::vec3(
-						svg_path->pts[i*2],
-						0,
-						svg_path->pts[i*2 + 1]
+					svg_path->pts[i*2],
+					0,
+					svg_path->pts[i*2 + 1]
 					) * terrain_scale.x);
 	}
 
 	svgDelete(svg_path);
-	
+
 	Path::optimize_vector(path_nodes);
 
 	for(glm::vec3 &v : path_nodes) {
@@ -113,17 +113,17 @@ Game::Game(const std::string &level) :
 	rail_texture = Texture2D::from_filename(PATH_BASE "data/textures/rails.png");
 	rail_material.texture = rail_texture;
 
-//Setup player:
+	//Setup player:
 	player.update_position(path, start_position);
 	player.canon_offset = config["/player/canon_offset"]->as_vec3();
 
-//Configure lights:
+	//Configure lights:
 
-	lights.ambient_intensity() = glm::vec3(0.1f);
+	lights.ambient_intensity() = config["/environment/light/ambient"]->as_vec3();
 	lights.num_lights() = 1;
 
 	lights.lights[0]->set_position(glm::normalize(glm::vec3(1.0, -1.f, 0.0f)));
-	lights.lights[0]->intensity = glm::vec3(0.8f);
+	lights.lights[0]->intensity = config["/environment/light/sunlight"]->as_vec3();
 	lights.lights[0]->type = MovableLight::DIRECTIONAL_LIGHT;
 
 //Set up camera:
@@ -132,12 +132,14 @@ Game::Game(const std::string &level) :
 
 //Create particle systems:
 
-	particle_shader = Shader::create_shader("particles");
-
-	static const float canon_inner_radius = config["/particles/spawn_radius"]->as_float();
-
 	wind_velocity = glm::vec4(config["/environment/wind_velocity"]->as_vec3(), 1.f);
 	gravity = glm::vec4(config["/environment/gravity"]->as_vec3(), 1.f);
+
+	particle_shader = Shader::create_shader("particles");
+
+	static const Config particle_config = Config::parse(base_dir + "/particles.cfg");
+
+	static const float canon_inner_radius = particle_config["/particles/spawn_radius"]->as_float();
 
 	particle_textures = TextureArray::from_filename(PATH_BASE "data/textures/fire1.png", 
 																	PATH_BASE "data/textures/fire2.png", 
@@ -146,9 +148,9 @@ Game::Game(const std::string &level) :
 																	PATH_BASE "data/textures/fog.png",
 																	nullptr);
 
-	static const int max_attack_particles = config["/game/max_attack_particles"]->as_int();
-	static const int max_smoke_particles = config["/game/max_smoke_particles"]->as_int();
-	static const int max_dust_particles = config["/game/max_dust_particles"]->as_int();
+	static const int max_attack_particles = particle_config["/particles/max_attack_particles"]->as_int();
+	static const int max_smoke_particles = particle_config["/particles/max_smoke_particles"]->as_int();
+	static const int max_dust_particles = particle_config["/particles/max_dust_particles"]->as_int();
 	attack_particles = new ParticleSystem(max_attack_particles, particle_textures, false);
 	attack_particles->config.gravity = gravity;
 	attack_particles->config.wind_velocity = wind_velocity;
@@ -157,20 +159,20 @@ Game::Game(const std::string &level) :
 	for(auto &p : particle_types) {
 		p.config = attack_particles->config; //Get reasonable defaults
 	}
-	read_particle_config(config["/particles/light"], particle_types[LIGHT_PARTICLES].config);
-	particle_types[LIGHT_PARTICLES].count = config["/particles/light/count"]->as_int();
-	particle_types[LIGHT_PARTICLES].spawn_speed = config["/particles/light/spawn_speed"]->as_float();
-	particle_types[LIGHT_PARTICLES].damage = config["/particles/light/damage"]->as_float();
+	read_particle_config(particle_config["/particles/light"], particle_types[LIGHT_PARTICLES].config);
+	particle_types[LIGHT_PARTICLES].count = particle_config["/particles/light/count"]->as_int();
+	particle_types[LIGHT_PARTICLES].spawn_speed = particle_config["/particles/light/spawn_speed"]->as_float();
+	particle_types[LIGHT_PARTICLES].damage = particle_config["/particles/light/damage"]->as_float();
 
-	read_particle_config(config["/particles/medium"], particle_types[MEDIUM_PARTICLES].config);
-	particle_types[MEDIUM_PARTICLES].count = config["/particles/medium/count"]->as_int();
-	particle_types[MEDIUM_PARTICLES].spawn_speed = config["/particles/medium/spawn_speed"]->as_float();
-	particle_types[MEDIUM_PARTICLES].damage = config["/particles/medium/damage"]->as_float();
+	read_particle_config(particle_config["/particles/medium"], particle_types[MEDIUM_PARTICLES].config);
+	particle_types[MEDIUM_PARTICLES].count = particle_config["/particles/medium/count"]->as_int();
+	particle_types[MEDIUM_PARTICLES].spawn_speed = particle_config["/particles/medium/spawn_speed"]->as_float();
+	particle_types[MEDIUM_PARTICLES].damage = particle_config["/particles/medium/damage"]->as_float();
 
-	read_particle_config(config["/particles/heavy"], particle_types[HEAVY_PARTICLES].config);
-	particle_types[HEAVY_PARTICLES].count = config["/particles/heavy/count"]->as_int();
-	particle_types[HEAVY_PARTICLES].spawn_speed = config["/particles/heavy/spawn_speed"]->as_float();
-	particle_types[HEAVY_PARTICLES].damage = config["/particles/heavy/damage"]->as_float();
+	read_particle_config(particle_config["/particles/heavy"], particle_types[HEAVY_PARTICLES].config);
+	particle_types[HEAVY_PARTICLES].count = particle_config["/particles/heavy/count"]->as_int();
+	particle_types[HEAVY_PARTICLES].spawn_speed = particle_config["/particles/heavy/spawn_speed"]->as_float();
+	particle_types[HEAVY_PARTICLES].damage = particle_config["/particles/heavy/damage"]->as_float();
 
 	current_particle_type = MEDIUM_PARTICLES;
 	attack_particles->config = particle_types[MEDIUM_PARTICLES].config;
@@ -181,27 +183,31 @@ Game::Game(const std::string &level) :
 	smoke->config.wind_velocity = wind_velocity;
 	smoke->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius * 2.0);
 
-	read_particle_config(config["/particles/smoke"], smoke->config);
-	smoke_count = config["/particles/smoke/count"]->as_int();
-	smoke_spawn_speed = config["/particles/smoke/spawn_speed"]->as_float();
+	read_particle_config(particle_config["/particles/smoke"], smoke->config);
+	smoke_count = particle_config["/particles/smoke/count"]->as_int();
+	smoke_spawn_speed = particle_config["/particles/smoke/spawn_speed"]->as_float();
 
 	//Dust:
 	dust = new ParticleSystem(max_dust_particles, particle_textures, true);
 
-	read_particle_config(config["/particles/dust"], dust->config);
+	read_particle_config(particle_config["/particles/dust"], dust->config);
 
 	dust->config.gravity = gravity;
 	dust->config.wind_velocity = wind_velocity;
-	dust->config.spawn_area = config["/particles/dust/spawn_area"]->as_vec4();
-	dust->avg_spawn_rate = config["/particles/dust/avg_spawn_rate"]->as_float();
-	dust->spawn_rate_var = config["/particles/dust/spawn_rate_var"]->as_float();
-	dust_spawn_ahead = config["/particles/dust/spawn_ahead"]->as_float();
+	dust->config.spawn_area = particle_config["/particles/dust/spawn_area"]->as_vec4();
+	dust->avg_spawn_rate = particle_config["/particles/dust/avg_spawn_rate"]->as_float();
+	dust->spawn_rate_var = particle_config["/particles/dust/spawn_rate_var"]->as_float();
+	dust_spawn_ahead = particle_config["/particles/dust/spawn_ahead"]->as_float();
 	half_dust_spawn_area = glm::vec3(dust->config.spawn_area.x, dust->config.spawn_area.y, dust->config.spawn_area.z) / 2.f;
 
 	dust->config.spawn_position = glm::vec4(player.position() - half_dust_spawn_area, 1.f);
 	dust->spawn(dust->avg_spawn_rate * 5.0);
 	dust->config.spawn_position += glm::vec4(path->at(player.path_position() + dust_spawn_ahead / 2.f), 0.f);
 	dust->spawn(dust->avg_spawn_rate * 5.0);
+
+	//Load enemies:
+
+	//static const Config enemies_config = Config::parse(base_dir + "/enemies.cfg");
 }
 
 Game::~Game() {
@@ -308,9 +314,9 @@ void Game::render() {
 	particle_shader->bind();
 	geometry->depth_bind(Shader::TEXTURE_2D_0);
 
+	dust->render();
 	smoke->render();
 	attack_particles->render();
-	dust->render();
 
 	composition->unbind();
 
