@@ -76,6 +76,10 @@ glm::vec3 Player::direction() const {
 	return glm::normalize(local_z());
 }
 
+glm::vec3 Player::aim_direction() const {
+	return glm::normalize(glm::vec3( aim_matrix() * glm::vec4(0.f, 0.f, 1.f, 1.f)));
+}
+
 glm::mat4 Player::aim_matrix() const {
 	return rotation_matrix() * canon_yaw.rotation_matrix() * canon_pitch.rotation_matrix();
 }
@@ -85,6 +89,6 @@ void Player::set_canon_yaw(float angle) {
 }
 
 void Player::set_canon_pitch(float angle) {
-	angle = glm::clamp(angle, 0.f, 90.f);
+	//angle = glm::clamp(angle, 0.f, 90.f);
 	canon_pitch.set_rotation(glm::vec3(0.f, 0.f, 1.f), angle);
 }

@@ -18,6 +18,7 @@ class Player : public MovableObject {
 		const float path_position() const;
 
 		glm::vec3 direction() const;
+		glm::vec3 aim_direction() const;
 
 		glm::vec3 canon_offset;
 

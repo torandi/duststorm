@@ -346,11 +346,11 @@ void Game::update_camera() {
 }
 
 void Game::shoot() {
-	glm::vec4 rotated_offset = player.rotation_matrix() * glm::vec4(player.canon_offset, 1.f);
-	glm::vec3 direction = player.direction();
+	glm::vec4 rotated_offset = player.aim_matrix()* glm::vec4(player.canon_offset, 1.f);
+	glm::vec3 direction = player.aim_direction();
 	attack_particles->config.avg_spawn_velocity = glm::vec4(direction * (current_movement_speed + particle_types[current_particle_type].spawn_speed), 1.f);
 	attack_particles->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
-	attack_particles->config.spawn_velocity_var = player.rotation_matrix() * particle_types[current_particle_type].config.spawn_velocity_var;
+	attack_particles->config.spawn_velocity_var = player.aim_matrix() * particle_types[current_particle_type].config.spawn_velocity_var;
 	attack_particles->spawn(particle_types[current_particle_type].count);
 
 	smoke->config.avg_spawn_velocity = glm::vec4(direction * (current_movement_speed +smoke_spawn_speed), 1.f);
