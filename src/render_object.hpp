@@ -44,7 +44,7 @@ public:
 	};
 
 	//Set normalize_scale to false to not scale down to 1.0
-	RenderObject(std::string model, bool normalize_scale=true, unsigned int aiOptions=0);
+	RenderObject(std::string model, bool normalize_scale=false, unsigned int aiOptions=0);
 	~RenderObject();
 
 	std::vector<Material> materials;

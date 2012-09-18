@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include "game.hpp"
 
 #include <glm/gtx/string_cast.hpp>
@@ -229,7 +233,7 @@ void Game::update(float dt) {
 	update_camera();
 
 	//input.update_object(*lights.lights[0], dt);
-	input.update_object(camera, dt);
+	//input.update_object(camera, dt);
 
 	if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
 		shoot();
@@ -243,6 +247,8 @@ void Game::update(float dt) {
 		Input::movement_speed += 1.f;
 		printf("Increased movement speed\n");
 	}
+	player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
+	player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
 
 	smoke->update(dt);
 	attack_particles->update(dt);

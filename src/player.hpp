@@ -15,16 +15,20 @@ class Player : public MovableObject {
 
 		void update_position(const Path * path, float pos);
 
-		MovableObject * canon_rotation;
-
 		const float path_position() const;
 
 		glm::vec3 direction() const;
 
 		glm::vec3 canon_offset;
 
+		glm::mat4 aim_matrix() const;
+
+		void set_canon_yaw(float angle);
+		void set_canon_pitch(float angle);
 	private:
-		RenderObject * model;
+		RenderObject * cart, *holder, *gun;
+		MovableObject canon_pitch, canon_yaw;
+
 
 		Shader * shader;
 

@@ -1,8 +1,9 @@
 class Camera;
 class CL;
 class Color;
-struct Light;
 class Data;
+class Enemy;
+class EnemyTemplate;
 struct Light;
 class Material;
 class Mesh;
