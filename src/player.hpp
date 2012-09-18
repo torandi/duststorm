@@ -21,6 +21,7 @@ class Player : public MovableObject {
 		glm::vec3 aim_direction() const;
 
 		glm::vec3 canon_offset;
+		float canon_length;
 
 		glm::mat4 aim_matrix() const;
 
@@ -29,6 +30,7 @@ class Player : public MovableObject {
 	private:
 		RenderObject * cart, *holder, *gun;
 		MovableObject canon_pitch, canon_yaw;
+		float f_canon_pitch, f_canon_yaw;
 
 
 		Shader * shader;

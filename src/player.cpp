@@ -21,6 +21,9 @@ Player::Player() {
 	shader = Shader::create_shader("normal");
 	canon_pitch.set_rotation(glm::vec3(1.0, 0.0, 0.0), 0.f);
 	canon_yaw.set_rotation(glm::vec3(1.0, 0.0, 0.0), 0.f);
+
+	f_canon_pitch = 0.f;
+	f_canon_yaw = 0.f;
 }
 
 Player::~Player() {
@@ -68,6 +71,21 @@ void Player::render_geometry(const glm::mat4 &m_) {
 void Player::render(const glm::mat4 &m) {
 	shader->bind();
 	render_geometry(m);
+	/*
+	shaders[SHADER_SIMPLE]->bind();
+	Shader::push_vertex_attribs(2);
+	Shader::upload_model_matrix(glm::mat4(1.f));
+	glm::vec4 points[] = { 
+		matrix() * glm::vec4(0.f, 0.7f, 0.f, 1.f),
+		translation_matrix() * (glm::vec4(0.f, 0.7f, 0.f, 0.f) + glm::vec4(10.f * aim_direction(), 1.f)) 
+	};
+	glLineWidth(2.f);
+	glm::vec4 colors[] = {glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec4(1.f, 0.f, 0.f, 1.f) };
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, points);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, colors);
+	glDrawArrays(GL_LINES, 0, 2);
+	Shader::pop_vertex_attribs();
+	*/
 }
 
 const float Player::path_position() const { return path_position_; }
@@ -77,18 +95,20 @@ glm::vec3 Player::direction() const {
 }
 
 glm::vec3 Player::aim_direction() const {
-	return glm::normalize(glm::vec3( aim_matrix() * glm::vec4(0.f, 0.f, 1.f, 1.f)));
+	return glm::normalize(glm::vec3( aim_matrix() * glm::vec4(1.f, 0.2f, 0.f, 1.f)));
 }
 
 glm::mat4 Player::aim_matrix() const {
-	return rotation_matrix() * canon_yaw.rotation_matrix() * canon_pitch.rotation_matrix();
+	return rotation_matrix() * cart->rotation_matrix() * canon_yaw.rotation_matrix() * canon_pitch.rotation_matrix();
 }
 
 void Player::set_canon_yaw(float angle) {
 	canon_yaw.set_rotation(glm::vec3(0.f, 1.0, 0.0), angle);
+	f_canon_yaw = angle;
 }
 
 void Player::set_canon_pitch(float angle) {
 	//angle = glm::clamp(angle, 0.f, 90.f);
 	canon_pitch.set_rotation(glm::vec3(0.f, 0.f, 1.f), angle);
+	f_canon_pitch = angle;
 }

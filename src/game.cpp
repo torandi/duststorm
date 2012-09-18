@@ -120,6 +120,7 @@ Game::Game(const std::string &level) :
 	//Setup player:
 	player.update_position(path, start_position);
 	player.canon_offset = config["/player/canon_offset"]->as_vec3();
+	player.canon_length = config["/player/canon_length"]->as_float();
 
 	//Configure lights:
 
@@ -178,8 +179,8 @@ Game::Game(const std::string &level) :
 	particle_types[HEAVY_PARTICLES].spawn_speed = particle_config["/particles/heavy/spawn_speed"]->as_float();
 	particle_types[HEAVY_PARTICLES].damage = particle_config["/particles/heavy/damage"]->as_float();
 
-	current_particle_type = MEDIUM_PARTICLES;
-	attack_particles->config = particle_types[MEDIUM_PARTICLES].config;
+	current_particle_type = HEAVY_PARTICLES;
+	attack_particles->config = particle_types[HEAVY_PARTICLES].config;
 
 	//Smoke:
 	smoke = new ParticleSystem(max_smoke_particles, particle_textures, false);
@@ -346,14 +347,14 @@ void Game::update_camera() {
 }
 
 void Game::shoot() {
-	glm::vec4 rotated_offset = player.aim_matrix()* glm::vec4(player.canon_offset, 1.f);
-	glm::vec3 direction = player.aim_direction();
-	attack_particles->config.avg_spawn_velocity = glm::vec4(direction * (current_movement_speed + particle_types[current_particle_type].spawn_speed), 1.f);
-	attack_particles->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
+	glm::vec3 base_speed = player.direction() * current_movement_speed;
+	attack_particles->config.avg_spawn_velocity = glm::vec4(player.aim_direction() * particle_types[current_particle_type].spawn_speed + base_speed, 1.f);
+	glm::vec4 spawn_position = glm::vec4(player.position() + player.canon_offset + player.aim_direction() * player.canon_length, 0.f);
+	attack_particles->config.spawn_position = spawn_position;
 	attack_particles->config.spawn_velocity_var = player.aim_matrix() * particle_types[current_particle_type].config.spawn_velocity_var;
 	attack_particles->spawn(particle_types[current_particle_type].count);
 
-	smoke->config.avg_spawn_velocity = glm::vec4(direction * (current_movement_speed +smoke_spawn_speed), 1.f);
-	smoke->config.spawn_position = glm::vec4(player.position(), 0.f) + rotated_offset;
+	smoke->config.avg_spawn_velocity = glm::vec4(base_speed + player.aim_direction() * smoke_spawn_speed + glm::vec3(0.f, 1.f, 0.f), 1.f);
+	smoke->config.spawn_position = spawn_position;
 	smoke->spawn(smoke_count);
 }

@@ -17,8 +17,8 @@ __kernel void run_particles (
 			float life_progression = 1.0 - (particles[id].ttl/particles[id].org_ttl);
 
 			particles[id].velocity += config->gravity * particles[id].gravity_influence * dt;
-			//particles[id].velocity -= (particles[id].velocity - config->wind_velocity) * particles[id].wind_influence * dt;
-			particles[id].velocity += config->wind_velocity * particles[id].wind_influence * dt;
+			particles[id].velocity -= (particles[id].velocity - config->wind_velocity) * particles[id].wind_influence * dt;
+			//particles[id].velocity += config->wind_velocity * particles[id].wind_influence * dt;
 
 			vertices[id].position.xyz += (particles[id].velocity + random3(config->motion_rand, true)) * dt;
 			vertices[id].position.w += particles[id].rotation_speed * dt;
