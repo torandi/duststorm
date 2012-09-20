@@ -27,7 +27,7 @@ class RenderObject : public MovableObject {
 	void pre_render();
 	void recursive_pre_render(const aiNode* node);
 
-	void recursive_render(const aiNode* node, const glm::mat4 &matrix);
+	void recursive_render(const aiNode* node, const glm::mat4 &matrix) const;
 
 public:
 	const aiScene* scene;
@@ -51,8 +51,7 @@ public:
 
 	std::map<const aiMesh*, mesh_data_t > mesh_data;
 
-
-	void render(const glm::mat4& m = glm::mat4());
+	void render(const glm::mat4& m = glm::mat4()) const;
 
 	const glm::mat4 matrix() const;
 

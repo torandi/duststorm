@@ -26,7 +26,7 @@ Material::~Material(){
 
 }
 
-void Material::bind() {
+void Material::bind() const {
 	texture->texture_bind(Shader::TEXTURE_COLORMAP);
 	normal_map->texture_bind(Shader::TEXTURE_NORMALMAP);
 	specular_map->texture_bind(Shader::TEXTURE_SPECULARMAP);

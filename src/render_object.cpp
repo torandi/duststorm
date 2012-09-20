@@ -316,7 +316,7 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 }
 
 void RenderObject::recursive_render(const aiNode* node,
-		const glm::mat4 &parent_matrix) {
+		const glm::mat4 &parent_matrix) const {
 
 
 	aiMatrix4x4 m = node->mTransformation;
@@ -332,7 +332,14 @@ void RenderObject::recursive_render(const aiNode* node,
 		const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
 		if(mesh->mNumFaces > 0) {
-			mesh_data_t *md = &mesh_data[mesh];
+			auto it = mesh_data.find(mesh);
+			const mesh_data_t *md;
+
+			if(it != mesh_data.end()) {
+				md = &(it->second);
+			} else {
+				continue;
+			}
 
 			if(md->num_indices > 0) {
 				glBindBuffer(GL_ARRAY_BUFFER, md->vb);
@@ -362,7 +369,7 @@ void RenderObject::recursive_render(const aiNode* node,
 
 }
 
-void RenderObject::render(const glm::mat4& m) {
+void RenderObject::render(const glm::mat4& m) const {
 	if ( !scene ) return;
 	recursive_render(scene->mRootNode, m * matrix());
 }
