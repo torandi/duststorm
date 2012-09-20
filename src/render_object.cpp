@@ -252,7 +252,9 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 		for(unsigned int n = 0; n<mesh->mNumVertices; ++n) {
 			const aiVector3D* pos = &(mesh->mVertices[n]);
 			const aiVector3D* texCoord = &zero_3d;
-			if(mesh->HasTextureCoords(0)) texCoord = &(mesh->mTextureCoords[0][n]);
+			if(mesh->HasTextureCoords(0) && mesh->mTextureCoords[0] != NULL) {
+				texCoord = &(mesh->mTextureCoords[0][n]);
+			}
 			const aiVector3D* normal = &(mesh->mNormals[n]);
 			const aiVector3D* tangent, *bitangent;
 			if(mesh->HasTangentsAndBitangents()) {
