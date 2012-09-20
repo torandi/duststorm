@@ -289,21 +289,24 @@ void RenderObject::recursive_pre_render(const aiNode* node) {
 					indexData.push_back(index);
 				}
 			} else {
-				fprintf(verbose, "Derp, ignoring mesh with %d indices\n", face->mNumIndices);
+				fprintf(verbose, "Derp, ignoring face with %d indices\n", face->mNumIndices);
 			}
 		}
 
-		glGenBuffers(1, &md.vb);
+		if(indexData.size() > 0) {
+			glGenBuffers(1, &md.vb);
 
-		glBindBuffer(GL_ARRAY_BUFFER, md.vb);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Shader::vertex_t)*vertexData.size(), &vertexData.front(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, md.vb);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(Shader::vertex_t)*vertexData.size(), &vertexData.front(), GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glGenBuffers(1, &md.ib);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md.ib);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indexData.size(), &indexData.front(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+			glGenBuffers(1, &md.ib);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md.ib);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indexData.size(), &indexData.front(), GL_STATIC_DRAW);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		} else {
+			md.num_indices = 0;
+		}
 		mesh_data[mesh] = md;
 	}
 
@@ -331,27 +334,25 @@ void RenderObject::recursive_render(const aiNode* node,
 		if(mesh->mNumFaces > 0) {
 			mesh_data_t *md = &mesh_data[mesh];
 
-			glBindBuffer(GL_ARRAY_BUFFER, md->vb);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md->ib);
+			if(md->num_indices > 0) {
+				glBindBuffer(GL_ARRAY_BUFFER, md->vb);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, md->ib);
 
-			glVertexAttribPointer(Shader::ATTR_POSITION,  3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, pos));
-			glVertexAttribPointer(Shader::ATTR_TEXCOORD,  2, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, uv));
-			glVertexAttribPointer(Shader::ATTR_NORMAL,    3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, normal));
-			glVertexAttribPointer(Shader::ATTR_TANGENT,   3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, tangent));
-			glVertexAttribPointer(Shader::ATTR_BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, bitangent));
-			glVertexAttribPointer(Shader::ATTR_COLOR,     4, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, color));
+				glVertexAttribPointer(Shader::ATTR_POSITION,  3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, pos));
+				glVertexAttribPointer(Shader::ATTR_TEXCOORD,  2, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, uv));
+				glVertexAttribPointer(Shader::ATTR_NORMAL,    3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, normal));
+				glVertexAttribPointer(Shader::ATTR_TANGENT,   3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, tangent));
+				glVertexAttribPointer(Shader::ATTR_BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, bitangent));
+				glVertexAttribPointer(Shader::ATTR_COLOR,     4, GL_FLOAT, GL_FALSE, sizeof(Shader::vertex_t), (const GLvoid*)offsetof(Shader::vertex_t, color));
 
-			checkForGLErrors("set attrib pointers");
+				checkForGLErrors("set attrib pointers");
 
-			materials[md->mtl_index].bind();
-			checkForGLErrors("Activte material");
+				materials[md->mtl_index].bind();
+				checkForGLErrors("Activte material");
 
-			glDrawElements(GL_TRIANGLES, md->num_indices, GL_UNSIGNED_INT,0 );
-			checkForGLErrors("Draw material");
-
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			checkForGLErrors("Model post");
+				glDrawElements(GL_TRIANGLES, md->num_indices, GL_UNSIGNED_INT,0 );
+				checkForGLErrors("Draw material");
+			}
 		}
 	}
 
