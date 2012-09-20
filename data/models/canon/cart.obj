@@ -1,6 +1,6 @@
 # Blender v2.62 (sub 0) OBJ File: 'kanon6.blend'
 # www.blender.org
-mtllib cart.mtl
+mtllib canon/cart.mtl
 o Wheels_Circle.005
 v 2.059848 -1.527019 1.577114
 v -1.847080 -1.527019 1.577114

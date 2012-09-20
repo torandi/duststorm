@@ -1,6 +1,6 @@
 # Blender v2.62 (sub 0) OBJ File: 'kanon6.blend'
 # www.blender.org
-mtllib holder.mtl
+mtllib canon/holder.mtl
 o Wheels.002_Circle.001
 v 0.001135 -1.376923 -1.405152
 v -0.272997 -1.376923 -1.378153

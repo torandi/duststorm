@@ -1,6 +1,6 @@
 # Blender v2.62 (sub 0) OBJ File: 'kanon6.blend'
 # www.blender.org
-mtllib gun.mtl
+mtllib canon/gun.mtl
 o Wheels.001_Circle.000
 v -0.247636 0.966574 -0.000000
 v -0.431106 0.897521 -0.000000
