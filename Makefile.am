@@ -16,6 +16,8 @@ fubar_SOURCES =	src/main.cpp \
 								src/color.cpp src/color.hpp \
 								src/data.cpp src/data.hpp \
 								src/engine.cpp src/engine.hpp \
+								src/enemy.cpp src/enemy.hpp \
+								src/enemy_template.cpp src/enemy_template.hpp \
 								src/game.cpp src/game.hpp \
 								src/globals.cpp src/globals.hpp \
 								src/input.cpp src/input.hpp \
