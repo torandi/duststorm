@@ -12,9 +12,9 @@
 #include "data.hpp"
 
 static std::string trim(std::string s) {
-	size_t begin_str = s.find_first_not_of(" \t\n");
+	size_t begin_str = s.find_first_not_of(" \t\n\r");
 	if(begin_str != std::string::npos) {
-		size_t last = s.find_last_not_of(" \t\n");
+		size_t last = s.find_last_not_of(" \t\n\r");
 		if(last >= begin_str) {
 			std::string trimmed = s.substr(begin_str, last - begin_str + 1);
 			return trimmed;
