@@ -64,6 +64,12 @@ Game::Game(const std::string &level) :
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 	geometry = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER);
 
+	// hud initialization
+	hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
+	hud_static_elements = new Quad();
+	hud_static_elements->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
+
+
 	printf("Loading level %s\n", level.c_str());
 
 	std::string base_dir = PATH_BASE "data/levels/" + level;
@@ -149,6 +155,10 @@ Game::Game(const std::string &level) :
 //Set up camera:
 
 	update_camera();
+
+
+	
+	
 
 //Create particle systems:
 
@@ -407,6 +417,11 @@ void Game::render_display() {
 	composition->draw(shaders[SHADER_PASSTHRU]);
 
 	// Here the hud will be! Fun fun fun fun!
+	
+	hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
+	shaders[SHADER_PASSTHRU]->bind();
+	
+	hud_static_elements->render();
 }
 
 void Game::update_camera() {

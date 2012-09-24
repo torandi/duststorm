@@ -86,6 +86,9 @@ class Game {
 		Camera camera;
 		RenderTarget *composition, *geometry;
 
+		Quad *hud_static_elements;
+		Texture2D *hud_static_elements_tex;
+
 		Shader *particle_shader;
 
 		glm::vec4 wind_velocity;
