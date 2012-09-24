@@ -9,13 +9,15 @@ HittingParticles::HittingParticles(const int max_num_particles, TextureArray* te
 	max_num_enemies_(max_num_enemies)
 {
 
-	enemy_data_t initial_enemies[max_num_enemies];
+	enemy_data_t * initial_enemies = new enemy_data_t[max_num_enemies];
 
 	enemies_ = opencl->create_buffer(CL_MEM_READ_ONLY, sizeof(enemy_data_t) * max_num_enemies);
 	cl_int err = opencl->queue().enqueueWriteBuffer(enemies_, CL_TRUE, 0, sizeof(enemy_data_t) * max_num_enemies, initial_enemies, NULL,NULL);
 
 	err = run_kernel_.setArg(6, enemies_);
 	CL::check_error(err, "[ParticleSystem] create hitting particles: Set arg 6");
+
+	delete[] initial_enemies;
 }
 
 HittingParticles::~HittingParticles() { }
