@@ -11,6 +11,7 @@
 #include "terrain.hpp"
 #include "lights_data.hpp"
 #include "particle_system.hpp"
+#include "hitting_particles.hpp"
 
 #include "path.hpp"
 
@@ -66,7 +67,8 @@ class Game {
 		Path * path;
 		Rails * rails;
 		Player player;
-		ParticleSystem * attack_particles, *dust, *smoke;
+		ParticleSystem *dust, *smoke;
+		HittingParticles * attack_particles;
 		particle_config_t particle_types[3];
 		particle_type_t current_particle_type;
 		int smoke_count;

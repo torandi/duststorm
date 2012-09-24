@@ -20,6 +20,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/enemy_template.cpp src/enemy_template.hpp \
 								src/game.cpp src/game.hpp \
 								src/globals.cpp src/globals.hpp \
+								src/hitting_particles.cpp src/hitting_particles.hpp \
 								src/input.cpp src/input.hpp \
 								src/light.cpp src/light.hpp \
 								src/lights_data.cpp src/lights_data.hpp \

@@ -17,6 +17,12 @@ typedef struct particle_t {
 
 	float4 birth_color;
 	float4 death_color;
+
+	//Oh, herro hack.
+	int extra1;
+	int extra2;
+	float extra3;
+	float extra4;
 } particle_t __attribute__ ((aligned (16))) ;
 
 typedef struct vertex_t {

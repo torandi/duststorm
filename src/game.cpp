@@ -22,6 +22,7 @@
 #include "input.hpp"
 #include "sound.hpp"
 #include "particle_system.hpp"
+#include "hitting_particles.hpp"
 #include "enemy_template.hpp"
 #include "enemy.hpp"
 
@@ -167,7 +168,7 @@ Game::Game(const std::string &level) :
 	static const int max_attack_particles = particle_config["/particles/max_attack_particles"]->as_int();
 	static const int max_smoke_particles = particle_config["/particles/max_smoke_particles"]->as_int();
 	static const int max_dust_particles = particle_config["/particles/max_dust_particles"]->as_int();
-	attack_particles = new ParticleSystem(max_attack_particles, particle_textures, false);
+	attack_particles = new HittingParticles(max_attack_particles, particle_textures, false, "particles.cl");
 	attack_particles->config.gravity = gravity;
 	attack_particles->config.wind_velocity = wind_velocity;
 	attack_particles->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius);
@@ -267,7 +268,7 @@ void Game::update(float dt) {
 	player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
 
 	smoke->update(dt);
-	attack_particles->update(dt);
+	attack_particles->update(dt, enemies);
 
 	dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
 	dust->update_config();

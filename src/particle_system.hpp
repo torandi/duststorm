@@ -12,10 +12,10 @@ class ParticleSystem : public MovableObject {
 	public:
 
 		ParticleSystem(const int max_num_particles, TextureArray* texture, bool _auto_spawn = true, const std::string &kernel = "particles.cl");
-		~ParticleSystem();
+		virtual ~ParticleSystem();
 
-		void update(float dt);
-		void render(const glm::mat4 * m = nullptr);
+		virtual void update(float dt);
+		virtual void render(const glm::mat4 * m = nullptr);
 
 		void update_config();
 
@@ -84,7 +84,7 @@ class ParticleSystem : public MovableObject {
 		 * Spawn count elements with current config
 		 */
 		void spawn(int count);
-	private:
+	protected:
 
 		/**
 		 * Internal function for spawning count particles now
@@ -122,6 +122,11 @@ class ParticleSystem : public MovableObject {
 
 				glm::vec4 birth_color;
 				glm::vec4 death_color;
+
+				cl_int extra1;
+				cl_int extra2;
+				cl_float extra3;
+				cl_float extra4;
 				},16);
 
 		TextureArray* texture_;
