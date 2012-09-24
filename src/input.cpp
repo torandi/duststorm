@@ -4,7 +4,7 @@
 #include <SDL/SDL.h>
 
 #define AXIS_MAX 32767.f
-#define DEAD_ZONE 0.2f
+#define DEAD_ZONE 0.05f
 
 float Input::movement_speed = 1.f;
 float Input::rotation_speed = 1.f;
