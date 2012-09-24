@@ -2,7 +2,7 @@
 #include "particles_random.cl"
 
 typedef struct {
-	float4 position;
+	float3 position;
 	float radius;
 } enemy_data_t __attribute__ ((aligned (16)));
 

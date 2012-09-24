@@ -22,8 +22,17 @@ HittingParticles::~HittingParticles() { }
 
 void HittingParticles::update(float dt, const std::list<Enemy*> &enemies) {
 	cl_int err;
-	//std::vector<Enemy*> v(enemies.begin(), enemies.end());
 
+	enemy_list_.clear();
+	for(const Enemy * e : enemies) {
+		enemy_data_t d = { e->position(), e->radius };
+		enemy_list_.push_back(d);
+	}
+
+	if(enemy_list_.size() > 0) {
+		err = opencl->queue().enqueueWriteBuffer(enemies_, CL_TRUE, 0, sizeof(enemy_data_t) * enemy_list_.size(), &(enemy_list_[0]), NULL,NULL);
+		CL::check_error(err, "[ParticleSystem] write enemies");
+	}
 	err = run_kernel_.setArg(7, (unsigned int) enemies.size());
 	CL::check_error(err, "[ParticleSystem] update hitting: set arg 7");
 

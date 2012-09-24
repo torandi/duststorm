@@ -15,9 +15,11 @@ class HittingParticles : public ParticleSystem {
 		int max_num_enemies_;
 
 		struct enemy_data_t {
-			glm::vec4 position;
-			float radius;
+			__ALIGNED__(glm::vec3 position, 16);
+			__ALIGNED__(float radius, 16);
 		};
+
+		std::vector<enemy_data_t> enemy_list_;
 };
 
 #endif
