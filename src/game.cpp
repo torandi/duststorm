@@ -190,8 +190,7 @@ Game::Game(const std::string &level) :
 	particle_types[HEAVY_PARTICLES].spawn_speed = particle_config["/particles/heavy/spawn_speed"]->as_float();
 	particle_types[HEAVY_PARTICLES].damage = particle_config["/particles/heavy/damage"]->as_float();
 
-	current_particle_type = HEAVY_PARTICLES;
-	attack_particles->config = particle_types[HEAVY_PARTICLES].config;
+	change_particles(HEAVY_PARTICLES);
 
 	//Smoke:
 	smoke = new ParticleSystem(max_smoke_particles, particle_textures, false);
@@ -251,7 +250,6 @@ void Game::update(float dt) {
 
 	if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
 		shoot();
-		printf("FIRE!\n");
 	}
 	if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
 		Input::movement_speed -= 1.f;
@@ -260,6 +258,10 @@ void Game::update(float dt) {
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		Input::movement_speed += 1.f;
 		printf("Increased movement speed\n");
+	}
+	if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
+		printf("Change partciles!\n");
+		change_particles((particle_type_t) ((current_particle_type + 1) % 3));
 	}
 	player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
 	player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
@@ -421,4 +423,9 @@ void Game::shoot() {
 
 const Player &Game::get_player() const {
 	return player;
+}
+
+void Game::change_particles(Game::particle_type_t new_type) {
+	current_particle_type = new_type;
+	attack_particles->config = particle_types[new_type].config;
 }

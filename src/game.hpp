@@ -57,6 +57,7 @@ class Game {
 		void update_camera();
 		void update_enemies( float dt);
 
+		void change_particles(particle_type_t new_type);
 		void shoot();
 
 		LightsData lights;

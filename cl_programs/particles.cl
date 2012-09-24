@@ -28,6 +28,7 @@ __kernel void run_particles (
 			vertices[id].scale = mix(particles[id].initial_scale, particles[id].final_scale, life_progression);
 
 			//TODO: Collision detection (ground and enemies)
+			//bool collision = false;
 		} else {
 			//Dead!
 			vertices[id].color.w = 0.0;
