@@ -269,7 +269,7 @@ void Game::update(float dt) {
 	player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
 
 	smoke->update(dt);
-	attack_particles->update(dt, enemies);
+	attack_particles->update(dt, enemies, this);
 
 	dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
 	dust->update_config();
@@ -294,7 +294,10 @@ void Game::update(float dt) {
 void Game::update_enemies(float dt) {
 	//Despawn old enemies:
 	for(auto it = enemies.begin(); it != enemies.end(); ++it) {
-		if(player.path_position() - (*it)->path_position > despawn_distance) {
+		if((*it)->hp <= 0 ) {
+			printf("KILL!\n");
+			it = enemies.erase(it);
+		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
 			it = enemies.erase(it);
 		}
 	}

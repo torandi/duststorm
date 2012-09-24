@@ -20,14 +20,14 @@ HittingParticles::HittingParticles(const int max_num_particles, TextureArray* te
 
 HittingParticles::~HittingParticles() { }
 
-void HittingParticles::update(float dt, const std::list<Enemy*> &enemies) {
+void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game) {
 	cl_int err;
 
 	enemy_list_.clear();
-	for(const Enemy * e : enemies) {
+	for(Enemy * e : enemies) {
 		enemy_data_t d = { e->position(), e->radius };
-		printf("%f\n", d.radius);
 		enemy_list_.push_back(d);
+		enemy_back_ref_.push_back(e);
 	}
 
 	if(enemy_list_.size() > 0) {
@@ -46,8 +46,11 @@ void HittingParticles::update(float dt, const std::list<Enemy*> &enemies) {
 	opencl->queue().finish();
 
 	for(int i=0; i < max_num_particles_; ++i ) {
-		if(particles[i].dead < 0) {
-			//Derp
+		if(particles[i].extra1 != 0) {
+			printf("HIT! %d\n", particles[i].extra1);
+			Enemy * e = enemy_back_ref_[particles[i].extra1];
+			//e->hp -= particles[i].extra3;
+			e->hp = -1.f;
 		}
 	}
 
