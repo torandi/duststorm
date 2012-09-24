@@ -107,8 +107,9 @@ Game::Game(const std::string &level) :
 
 	Path::optimize_vector(path_nodes);
 
+	// Gets max elevation for a radius around a point to avoid the rails cliping into the ground.
 	for(glm::vec3 &v : path_nodes) {
-		v.y = terrain->height_at(v.x, v.z) + 0.2f;
+		v.y = glm::max(glm::max(glm::max(terrain->height_at(v.x+1.5f, v.z),terrain->height_at(v.x-1.5f, v.z)),terrain->height_at(v.x, v.z+1.5f)),terrain->height_at(v.x, v.z-1.5f)) + 0.2f;
 	}
 
 	path = new Path(path_nodes, false);
