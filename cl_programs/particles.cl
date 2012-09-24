@@ -16,14 +16,15 @@ __kernel void run_particles (
 		if(particles[id].ttl > 0) {
 			float life_progression = 1.0 - (particles[id].ttl/particles[id].org_ttl);
 
-			particles[id].velocity += config->gravity * particles[id].gravity_influence * dt;
-			particles[id].velocity -= (particles[id].velocity - config->wind_velocity) * particles[id].wind_influence * dt;
+			particles[id].velocity += config->gravity.xyz * particles[id].gravity_influence * dt;
+			particles[id].velocity -= (particles[id].velocity - config->wind_velocity.xyz) * particles[id].wind_influence * dt;
 			//particles[id].velocity += config->wind_velocity * particles[id].wind_influence * dt;
 
-			vertices[id].position.xyz += (particles[id].velocity + random3(config->motion_rand, true)) * dt;
+			vertices[id].position.xyz += (particles[id].velocity + random3(config->motion_rand.xyz, true)) * dt;
 			vertices[id].position.w += particles[id].rotation_speed * dt;
 
 			vertices[id].color = mix(config->birth_color, config->death_color, life_progression);
+			//vertices[id].color = (float4)(particles[id].wind_influence);
 			vertices[id].scale = mix(particles[id].initial_scale, particles[id].final_scale, life_progression);
 
 			//TODO: Collision detection (ground and enemies)
@@ -49,7 +50,7 @@ __kernel void spawn_particles (
 	uint id = get_global_id(0);
 
 	if (particles[id].dead == 1 && to_spawn[0] > 0 && atomic_dec(&to_spawn[0]) > 0 ) {
-		vertices[id].position.xyz = config->spawn_position + random3(config->spawn_area.xyz, false);
+		vertices[id].position.xyz = config->spawn_position.xyz + random3(config->spawn_area.xyz, false);
 
 		//Save colors to allow changing config during runtime
 		particles[id].birth_color = config->birth_color;
@@ -68,7 +69,7 @@ __kernel void spawn_particles (
 		particles[id].wind_influence = config->avg_wind_influence + random1(config->wind_influence_var, true);
 		particles[id].gravity_influence = config->avg_gravity_influence + random1(config->gravity_influence_var, true);
 
-		particles[id].velocity = config->avg_spawn_velocity + random3(config->spawn_velocity_var, true);
+		particles[id].velocity = config->avg_spawn_velocity.xyz + random3(config->spawn_velocity_var.xyz, true);
 		particles[id].org_ttl = particles[id].ttl = config->avg_ttl + random1(config->ttl_var, true);
 		particles[id].rotation_speed = config->avg_rotation_speed + random1(config->rotation_speed_var, true);
 		particles[id].initial_scale = config->avg_scale + random1(config->scale_var, true);

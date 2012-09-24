@@ -217,6 +217,7 @@ Game::Game(const std::string &level) :
 	half_dust_spawn_area = glm::vec3(dust->config.spawn_area.x, dust->config.spawn_area.y, dust->config.spawn_area.z) / 2.f;
 
 	dust->config.spawn_position = glm::vec4(player.position() - half_dust_spawn_area, 1.f);
+	dust->update_config();
 	dust->spawn(dust->avg_spawn_rate * 5.0);
 	dust->config.spawn_position += glm::vec4(path->at(player.path_position() + dust_spawn_ahead / 2.f), 0.f);
 	dust->spawn(dust->avg_spawn_rate * 5.0);

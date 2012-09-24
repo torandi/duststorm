@@ -27,21 +27,6 @@ typedef struct vertex_t {
 } vertex_t __attribute__ ((aligned (16))) ;
 
 typedef struct config_t {
-
-	float3 spawn_position;
-	float4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
-
-	float4 birth_color; 
-	float4 death_color;
-
-	float3 motion_rand; 
-
-	float3 avg_spawn_velocity;
-	float3 spawn_velocity_var;
-
-	float3 wind_velocity;	//Speed
-	float3 gravity;			//Acceleration
-
 	float avg_ttl;
 	float ttl_var;
 	float avg_scale;
@@ -60,5 +45,19 @@ typedef struct config_t {
 	int start_texture;
 	int num_textures;
 	int max_num_particles;
+
+	float4 spawn_position __attribute__((aligned(16)));
+	float4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
+
+	float4 birth_color; 
+	float4 death_color;
+
+	float4 motion_rand; 
+
+	float4 avg_spawn_velocity;
+	float4 spawn_velocity_var;
+
+	float4 wind_velocity;	//Speed
+	float4 gravity;			//Acceleration
 
 } config_t __attribute__ ((aligned (16))) ;

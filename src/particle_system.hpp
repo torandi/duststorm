@@ -21,22 +21,6 @@ class ParticleSystem : public MovableObject {
 
 		//Change values in this struct and call update_config() to update
 		__ALIGNED__(struct config_t {
-				glm::vec4 spawn_position;
-				glm::vec4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
-
-				glm::vec4 birth_color;
-
-				glm::vec4 death_color;
-
-				glm::vec4 motion_rand;
-
-				glm::vec4 avg_spawn_velocity;
-
-				glm::vec4 spawn_velocity_var;
-
-				glm::vec4 wind_velocity;	//Speed
-				glm::vec4 gravity;			//Acceleration
-
 				//Time to live
 				cl_float avg_ttl;
 				cl_float ttl_var;
@@ -60,6 +44,23 @@ class ParticleSystem : public MovableObject {
 				cl_int num_textures;
 				//Should not be manually changed!
 				cl_int max_num_particles;
+
+				__ALIGNED__(glm::vec4 spawn_position, 16);
+				glm::vec4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
+
+				glm::vec4 birth_color;
+
+				glm::vec4 death_color;
+
+				glm::vec4 motion_rand;
+
+				glm::vec4 avg_spawn_velocity;
+
+				glm::vec4 spawn_velocity_var;
+
+				glm::vec4 wind_velocity;	//Speed
+				glm::vec4 gravity;			//Acceleration
+
 
 		} config, 16);
 
