@@ -22,6 +22,7 @@
 #include "input.hpp"
 #include "sound.hpp"
 #include "particle_system.hpp"
+#include "hitting_particles.hpp"
 #include "enemy_template.hpp"
 #include "enemy.hpp"
 
@@ -142,6 +143,9 @@ Game::Game(const std::string &level) :
 	lights.lights[0]->intensity = config["/environment/light/sunlight"]->as_vec3();
 	lights.lights[0]->type = MovableLight::DIRECTIONAL_LIGHT;
 
+	//Load enemies:
+	EnemyTemplate::init(Config::parse(base_dir + "/enemies.cfg"), this);
+
 //Set up camera:
 
 	update_camera();
@@ -167,7 +171,8 @@ Game::Game(const std::string &level) :
 	static const int max_attack_particles = particle_config["/particles/max_attack_particles"]->as_int();
 	static const int max_smoke_particles = particle_config["/particles/max_smoke_particles"]->as_int();
 	static const int max_dust_particles = particle_config["/particles/max_dust_particles"]->as_int();
-	attack_particles = new ParticleSystem(max_attack_particles, particle_textures, false);
+
+	attack_particles = new HittingParticles(max_attack_particles, particle_textures, EnemyTemplate::max_num_enemies, false);
 	attack_particles->config.gravity = gravity;
 	attack_particles->config.wind_velocity = wind_velocity;
 	attack_particles->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius);
@@ -220,9 +225,6 @@ Game::Game(const std::string &level) :
 	dust->spawn(dust->avg_spawn_rate * 5.0);
 	dust->config.spawn_position += glm::vec4(path->at(player.path_position() + dust_spawn_ahead / 2.f), 0.f);
 	dust->spawn(dust->avg_spawn_rate * 5.0);
-
-	//Load enemies:
-	EnemyTemplate::init(Config::parse(base_dir + "/enemies.cfg"), this);
 }
 
 Game::~Game() {
@@ -267,7 +269,7 @@ void Game::update(float dt) {
 	player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
 
 	smoke->update(dt);
-	attack_particles->update(dt);
+	attack_particles->update(dt, enemies);
 
 	dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
 	dust->update_config();
@@ -416,6 +418,7 @@ void Game::shoot() {
 	glm::vec4 spawn_position = glm::vec4(player.position() + player.canon_offset + player.aim_direction() * player.canon_length, 0.f);
 	attack_particles->config.spawn_position = spawn_position;
 	attack_particles->config.spawn_velocity_var = player.aim_matrix() * particle_types[current_particle_type].config.spawn_velocity_var;
+	attack_particles->config.extra = particle_types[current_particle_type].damage;
 	attack_particles->spawn(particle_types[current_particle_type].count);
 
 	smoke->config.avg_spawn_velocity = glm::vec4(base_speed + player.aim_direction() * smoke_spawn_speed + glm::vec3(0.f, 1.f, 0.f), 1.f);

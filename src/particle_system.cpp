@@ -14,7 +14,7 @@
 #include "globals.hpp"
 #include "utils.hpp"
 
-ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* texture, bool _auto_spawn)
+ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* texture, bool _auto_spawn, const std::string & kernel)
 	:
 		avg_spawn_rate(max_num_particles/10.f)
 	, spawn_rate_var(avg_spawn_rate/100.f)
@@ -22,7 +22,7 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	,	max_num_particles_(max_num_particles)
 	,	texture_(texture) {
 
-	program_ = opencl->create_program("particles.cl");
+	program_ = opencl->create_program(kernel);
 	run_kernel_  = opencl->load_kernel(program_, "run_particles");
 	spawn_kernel_  = opencl->load_kernel(program_, "spawn_particles");
 

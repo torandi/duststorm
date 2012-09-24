@@ -21,6 +21,7 @@ class EnemyTemplate : public MovableObject {
 		static std::vector<EnemyTemplate> templates;
 		static float spawn_rate;
 		static float min_spawn_cost;
+		static int max_num_enemies;
 
 		Enemy * spawn(const glm::vec3 &position, float path_position, float level_scaling);
 

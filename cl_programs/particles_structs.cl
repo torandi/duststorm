@@ -17,6 +17,12 @@ typedef struct particle_t {
 
 	float4 birth_color;
 	float4 death_color;
+
+	//Oh, herro hack.
+	int extra1;
+	int extra2;
+	float extra3;
+	float extra4;
 } particle_t __attribute__ ((aligned (16))) ;
 
 typedef struct vertex_t {
@@ -45,6 +51,7 @@ typedef struct config_t {
 	int start_texture;
 	int num_textures;
 	int max_num_particles;
+	float extra;
 
 	float4 spawn_position __attribute__((aligned(16)));
 	float4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
