@@ -11,7 +11,7 @@
 class ParticleSystem : public MovableObject {
 	public:
 
-		ParticleSystem(const int max_num_particles, TextureArray* texture, bool _auto_spawn = true);
+		ParticleSystem(const int max_num_particles, TextureArray* texture, bool _auto_spawn = true, const std::string &kernel = "particles.cl");
 		~ParticleSystem();
 
 		void update(float dt);
