@@ -26,6 +26,7 @@ void HittingParticles::update(float dt, const std::list<Enemy*> &enemies) {
 	enemy_list_.clear();
 	for(const Enemy * e : enemies) {
 		enemy_data_t d = { e->position(), e->radius };
+		printf("%f\n", d.radius);
 		enemy_list_.push_back(d);
 	}
 

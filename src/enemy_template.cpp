@@ -34,18 +34,19 @@ void EnemyTemplate::init(Config config, const Game * game) {
 }
 
 EnemyTemplate::EnemyTemplate(const ConfigEntry * config) {
-		model = new RenderObject(config->find("model")->as_string(), true);
+		model = new RenderObject(config->find("model", true)->as_string(), true);
 		model->set_position(glm::vec3(0.0, 0.0, 0.0));
 		model->set_rotation(glm::vec3(0.f, 1.f, 0.f), -90); //Hack because I'm lazy
-		min_scale = config->find("min_scale")->as_float();
-		max_scale  =config->find("max_scale")->as_float();
-		min_level = config->find("min_level")->as_float();
-		hp_base = config->find("hp_base")->as_float();
-		damage_base = config->find("damage_base")->as_float();
-		random_movement = config->find("random_movement")->as_float();
-		random_rotation = config->find("random_rotation")->as_float();
-		spawn_cost = config->find("spawn_cost")->as_float();
-		ai = available_ais[config->find("ai")->as_string()];
+		min_scale = config->find("min_scale", true)->as_float();
+		max_scale  =config->find("max_scale", true)->as_float();
+		min_level = config->find("min_level", true)->as_float();
+		hp_base = config->find("hp_base", true)->as_float();
+		radius = config->find("radius", true)->as_float();
+		damage_base = config->find("damage_base", true)->as_float();
+		random_movement = config->find("random_movement", true)->as_float();
+		random_rotation = config->find("random_rotation", true)->as_float();
+		spawn_cost = config->find("spawn_cost", true)->as_float();
+		ai = available_ais[config->find("ai", true)->as_string()];
 		if(spawn_cost < min_spawn_cost) min_spawn_cost = spawn_cost;
 }
 
