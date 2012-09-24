@@ -23,6 +23,10 @@ void Enemy::update(float dt) {
 		absolute_move(glm::vec3(0.f, dt * 1.f * cos((fly_in/0.25) * M_PI), 0.f));
 		fly_in -= dt;
 	}
+
+	//Basic woobling (Later, maybe)
+	
+
 	ai->run(this, dt);
 }
 

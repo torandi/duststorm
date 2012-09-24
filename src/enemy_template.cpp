@@ -19,8 +19,8 @@ std::map<std::string, EnemyAI*> EnemyTemplate::available_ais;
 float EnemyTemplate::spawn_rate;
 float EnemyTemplate::min_spawn_cost = FLT_MAX;
 
-void EnemyTemplate::init(Config config) {
-	available_ais["stare"] = new StaringAI();
+void EnemyTemplate::init(Config config, const Game * game) {
+	available_ais["stare"] = new StaringAI(game);
 
 	spawn_rate = config["spawn_rate"]->as_float();
 
@@ -34,6 +34,7 @@ void EnemyTemplate::init(Config config) {
 EnemyTemplate::EnemyTemplate(const ConfigEntry * config) {
 		model = new RenderObject(config->find("model")->as_string(), true);
 		model->set_position(glm::vec3(0.0, 0.0, 0.0));
+		model->set_rotation(glm::vec3(0.f, 1.f, 0.f), -90); //Hack because I'm lazy
 		min_scale = config->find("min_scale")->as_float();
 		max_scale  =config->find("max_scale")->as_float();
 		min_level = config->find("min_level")->as_float();
@@ -62,7 +63,15 @@ Enemy * EnemyTemplate::spawn(const glm::vec3 &position, float path_position, flo
 	return e;
 }
 
+EnemyAI::EnemyAI(const Game * g) : game(g) {};
+StaringAI::StaringAI(const Game * game) : EnemyAI(game) {};
+
 /* AIS */
 void StaringAI::run(Enemy * enemy, float dt) const {
-	//TODO!
+	const glm::vec3 direction = glm::normalize(game->get_player().position() - enemy->position());
+
+	glm::vec2 xz_projection = glm::vec2(direction.x,direction.z);
+
+	float rotation = acosf(glm::clamp(xz_projection.y / glm::length(xz_projection), -1.f, 1.f));
+	enemy->set_rotation(glm::vec3(0.f, 1.f, 0.f), glm::degrees(rotation*glm::sign(direction.x)));
 }

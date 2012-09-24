@@ -222,7 +222,7 @@ Game::Game(const std::string &level) :
 	dust->spawn(dust->avg_spawn_rate * 5.0);
 
 	//Load enemies:
-	EnemyTemplate::init(Config::parse(base_dir + "/enemies.cfg"));
+	EnemyTemplate::init(Config::parse(base_dir + "/enemies.cfg"), this);
 }
 
 Game::~Game() {
@@ -416,4 +416,8 @@ void Game::shoot() {
 	smoke->config.avg_spawn_velocity = glm::vec4(base_speed + player.aim_direction() * smoke_spawn_speed + glm::vec3(0.f, 1.f, 0.f), 1.f);
 	smoke->config.spawn_position = spawn_position;
 	smoke->spawn(smoke_count);
+}
+
+const Player &Game::get_player() const {
+	return player;
 }

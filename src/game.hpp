@@ -36,6 +36,8 @@ class Game {
 
 		static void init();
 
+		const Player &get_player() const;
+
 	private:
 		enum particle_type_t {
 			LIGHT_PARTICLES = 0,

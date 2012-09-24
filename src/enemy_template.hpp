@@ -3,6 +3,7 @@
 
 #include "movable_object.hpp"
 #include "config.hpp"
+#include "game.hpp"
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
@@ -15,7 +16,7 @@ class EnemyTemplate : public MovableObject {
 		EnemyTemplate(const ConfigEntry * config);
 		~EnemyTemplate();
 
-		static void init(Config config);
+		static void init(Config config, const Game * game);
 
 		static std::vector<EnemyTemplate> templates;
 		static float spawn_rate;
@@ -37,15 +38,20 @@ class EnemyTemplate : public MovableObject {
 		float radius;
 		RenderObject * model;
 		const EnemyAI * ai;
+		const Game * game;
 };
 
 class EnemyAI {
 	public:
+		EnemyAI(const Game * g);
 		virtual void run(Enemy * enemy, float dt) const = 0;
+	protected:
+		const Game * game;
 };
 
 class StaringAI : public EnemyAI {
 	public:
+		StaringAI(const Game * game);
 		virtual void run(Enemy * enemy, float dt) const;
 };
 
