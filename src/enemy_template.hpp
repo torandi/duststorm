@@ -19,8 +19,9 @@ class EnemyTemplate : public MovableObject {
 
 		static std::vector<EnemyTemplate> templates;
 		static float spawn_rate;
+		static float min_spawn_cost;
 
-		Enemy * spawn(const glm::vec3 &position, float level_scaling);
+		Enemy * spawn(const glm::vec3 &position, float path_position, float level_scaling);
 
 		float min_level; //Required level of player to spawn this
 		float spawn_cost; //The cost of spawning this enemy (drawn from spawn_rate)

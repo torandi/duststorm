@@ -53,7 +53,7 @@ class Game {
 		void render_display();
 		void render_geometry();
 		void update_camera();
-		void update_particles();
+		void update_enemies( float dt);
 
 		void shoot();
 
@@ -89,10 +89,19 @@ class Game {
 		float look_at_offset;
 		float movement_speed;
 		float brake_movement_speed;
+		float despawn_distance;
 
 		float current_movement_speed;
 
+		float spawn_area_start, spawn_area_end, spawn_area_size, spawn_distance;
+
+		float accum_unspawned;
+
+		float player_level;
+
 		Color sky_color;
+
+		std::list<Enemy*> enemies;
 };
 
 #endif
