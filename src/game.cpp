@@ -400,6 +400,8 @@ void Game::render_display() {
 	glViewport(0, 0, resolution.x, resolution.y);
 
 	composition->draw(shaders[SHADER_PASSTHRU]);
+
+	// Here the hud will be! Fun fun fun fun!
 }
 
 void Game::update_camera() {
