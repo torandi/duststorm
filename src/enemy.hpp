@@ -11,17 +11,20 @@ class Enemy : public MovableObject {
 		Enemy(const glm::vec3 &position, const RenderObject * model_, const EnemyAI * ai_);
 
 		void update(float dt);
-		void render();
+		void render() const;
 
 		float hp;
 		float damage;
 		float random_movement;
 		float random_rotation;
 		float radius;
+		float path_position;
 
 	private:
 		const RenderObject * model;
 		const EnemyAI * ai;
+
+		float fly_in;
 };
 
 #endif

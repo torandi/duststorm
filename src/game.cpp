@@ -22,6 +22,8 @@
 #include "input.hpp"
 #include "sound.hpp"
 #include "particle_system.hpp"
+#include "enemy_template.hpp"
+#include "enemy.hpp"
 
 #include "path.hpp"
 #include "rails.hpp"
@@ -53,7 +55,9 @@ void Game::init() {
 }
 
 Game::Game(const std::string &level) :
-	camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f)
+	camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f),
+	accum_unspawned(0),
+	player_level(1.f)
 {
 
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
@@ -74,6 +78,12 @@ Game::Game(const std::string &level) :
 	look_at_offset = config["/player/camera/look_at_offset"]->as_float();
 	movement_speed = config["/player/speed/normal"]->as_float();
 	brake_movement_speed = config["/player/speed/brake"]->as_float();
+
+	spawn_area_start = config["/environment/spawn_area/start"]->as_float();
+	spawn_area_end = config["/environment/spawn_area/end"]->as_float();
+	spawn_area_size = spawn_area_end - spawn_area_start;
+	spawn_distance = config["/environment/spawn_area/distance"]->as_float();
+	despawn_distance = config["/environment/spawn_area/despawn_distance"]->as_float();
 
 	current_movement_speed = movement_speed;
 
@@ -212,8 +222,7 @@ Game::Game(const std::string &level) :
 	dust->spawn(dust->avg_spawn_rate * 5.0);
 
 	//Load enemies:
-
-	//static const Config enemies_config = Config::parse(base_dir + "/enemies.cfg");
+	EnemyTemplate::init(Config::parse(base_dir + "/enemies.cfg"));
 }
 
 Game::~Game() {
@@ -233,6 +242,8 @@ void Game::update(float dt) {
 
 	player.update_position(path, player.path_position() + current_movement_speed * dt);
 	update_camera();
+
+	update_enemies(dt);
 
 	//input.update_object(*lights.lights[0], dt);
 	//input.update_object(camera, dt);
@@ -275,6 +286,44 @@ void Game::update(float dt) {
 */
 }
 
+void Game::update_enemies(float dt) {
+	//Despawn old enemies:
+	for(auto it = enemies.begin(); it != enemies.end(); ++it) {
+		if(player.path_position() - (*it)->path_position > despawn_distance) {
+			it = enemies.erase(it);
+		}
+	}
+
+	//Start by spawning:
+	accum_unspawned += EnemyTemplate::spawn_rate * player_level * dt * current_movement_speed;
+	int fail_count = 0;
+
+	float path_pos = player.path_position() + spawn_distance;
+
+	glm::vec3 spawn_base = path->at(path_pos);
+	glm::vec3 spawn_side = rails->perpendicular_vector_at(path_pos);
+	spawn_side.y = 0;
+	spawn_side = glm::normalize(spawn_side);
+
+	while(accum_unspawned > EnemyTemplate::min_spawn_cost && fail_count < 3) {
+		int index = floor(frand() * EnemyTemplate::templates.size());
+		auto it = EnemyTemplate::templates.begin() + index;
+		if(it->spawn_cost <= accum_unspawned && it->min_level <= player_level) {
+			float dir = frand() < 0.5 ? -1 : 1;
+			glm::vec3 pos = spawn_base + dir * (spawn_area_start + spawn_area_size * frand()) * spawn_side;
+			pos.y = terrain->height_at(pos.x, pos.z);
+			accum_unspawned -= it->spawn_cost;
+			enemies.push_back(it->spawn(pos, path_pos, player_level));
+		} else {
+			++fail_count;
+		}
+	}
+
+	for(Enemy * e : enemies) {
+		e->update(dt);
+	}
+}
+
 void Game::handle_input(const SDL_Event &event) {
 	input.parse_event(event);
 }
@@ -286,6 +335,10 @@ void Game::render_geometry() {
 	rails->render_geometry();
 
 	player.render_geometry();
+
+	for(const Enemy * e : enemies) {
+		e->render();
+	}
 }
 
 void Game::render() {
@@ -318,6 +371,11 @@ void Game::render() {
 	rails->render();
 
 	player.render();
+
+	shaders[SHADER_NORMAL]->bind();
+	for(Enemy * e : enemies) {
+		e->render();
+	}
 
 	particle_shader->bind();
 	geometry->depth_bind(Shader::TEXTURE_2D_0);

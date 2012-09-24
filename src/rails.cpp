@@ -27,7 +27,7 @@ static const float uv_offset = 1.f;
 
 static const unsigned int slice_indices = 8;
 
-Rails::Rails(const Path * _path, float step) : Mesh(), path(_path){
+Rails::Rails(const Path * _path, float _step) : Mesh(), path(_path), step(_step) {
 
 	shader = Shader::create_shader("normal");
 
@@ -70,6 +70,8 @@ unsigned int Rails::emit_vertices(float path_position, glm::vec3 &prev) {
 	const glm::vec3 direction = glm::normalize(pos - prev);
 	const glm::vec3 side = glm::normalize(glm::cross(direction, initial_normal)); //points right
 	const glm::vec3 normal = glm::normalize(glm::cross(side, direction));
+
+	perpendicular_vectors.push_back(side);
 /*
 	fprintf(verbose, "%f (%s - %s): %s %s %s\n", path_position
 							, glm::to_string(prev).c_str()
@@ -176,4 +178,14 @@ void Rails::generate_indices(float p, glm::vec3 &previous) {
 void Rails::render(const glm::mat4 &m) {
 	shader->bind();
 	Mesh::render(m);
+}
+
+glm::vec3 Rails::perpendicular_vector_at(float pos) const {
+	unsigned int index = (int)floor(pos / step);
+	const glm::vec3 &prev = perpendicular_vectors[index];
+	unsigned int next_index = index + 1;
+	if(next_index >= perpendicular_vectors.size()) next_index = 0;
+	const glm::vec3 &next = perpendicular_vectors[next_index];
+	float s = (pos - index * step) / step;
+	return glm::mix(prev, next, s);
 }

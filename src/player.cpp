@@ -69,23 +69,9 @@ void Player::render_geometry(const glm::mat4 &m_) {
 }
 
 void Player::render(const glm::mat4 &m) {
+
 	shader->bind();
 	render_geometry(m);
-	/*
-	shaders[SHADER_SIMPLE]->bind();
-	Shader::push_vertex_attribs(2);
-	Shader::upload_model_matrix(glm::mat4(1.f));
-	glm::vec4 points[] = { 
-		matrix() * glm::vec4(0.f, 0.7f, 0.f, 1.f),
-		translation_matrix() * (glm::vec4(0.f, 0.7f, 0.f, 0.f) + glm::vec4(10.f * aim_direction(), 1.f)) 
-	};
-	glLineWidth(2.f);
-	glm::vec4 colors[] = {glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec4(1.f, 0.f, 0.f, 1.f) };
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, points);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, colors);
-	glDrawArrays(GL_LINES, 0, 2);
-	Shader::pop_vertex_attribs();
-	*/
 }
 
 const float Player::path_position() const { return path_position_; }

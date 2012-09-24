@@ -30,6 +30,7 @@ __kernel void run_particles (
 		} else {
 			//Dead!
 			vertices[id].color.w = 0.0;
+			vertices[id].scale = 0.0;
 			particles[id].dead = 1;
 		}
 	}

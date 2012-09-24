@@ -13,7 +13,9 @@ MovableObject::MovableObject() : orientation_(1.f, 0.f, 0.f,0.f), scale_(1.f) {
 };
 
 MovableObject::MovableObject(glm::vec3 position) : position_(position), orientation_(1.f, 0.f, 0.f,0.f), scale_(1.f) { 
-	MovableObject();	
+	rotation_matrix_dirty_ = true;
+	translation_matrix_dirty_ = true;
+	scale_matrix_dirty_ = true;
 }
 
 MovableObject::~MovableObject() { }	
