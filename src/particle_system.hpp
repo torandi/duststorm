@@ -45,6 +45,8 @@ class ParticleSystem : public MovableObject {
 				//Should not be manually changed!
 				cl_int max_num_particles;
 
+				cl_float extra;
+
 				__ALIGNED__(glm::vec4 spawn_position, 16);
 				glm::vec4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)
 

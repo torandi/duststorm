@@ -416,6 +416,7 @@ void Game::shoot() {
 	glm::vec4 spawn_position = glm::vec4(player.position() + player.canon_offset + player.aim_direction() * player.canon_length, 0.f);
 	attack_particles->config.spawn_position = spawn_position;
 	attack_particles->config.spawn_velocity_var = player.aim_matrix() * particle_types[current_particle_type].config.spawn_velocity_var;
+	attack_particles->config.extra = particle_types[current_particle_type].damage;
 	attack_particles->spawn(particle_types[current_particle_type].count);
 
 	smoke->config.avg_spawn_velocity = glm::vec4(base_speed + player.aim_direction() * smoke_spawn_speed + glm::vec3(0.f, 1.f, 0.f), 1.f);

@@ -45,6 +45,9 @@ void HittingParticles::update(float dt, const std::list<Enemy*> &enemies) {
 	opencl->queue().finish();
 
 	for(int i=0; i < max_num_particles_; ++i ) {
+		if(particles[i].dead < 0) {
+			//Derp
+		}
 	}
 
 	

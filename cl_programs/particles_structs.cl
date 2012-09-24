@@ -51,6 +51,7 @@ typedef struct config_t {
 	int start_texture;
 	int num_textures;
 	int max_num_particles;
+	float extra;
 
 	float4 spawn_position __attribute__((aligned(16)));
 	float4 spawn_area; //The last component specifies radius (will be added to the position with a random angle)

@@ -20,7 +20,16 @@ __kernel void run_particles (
 	uint id = get_global_id(0);
 	if(particles[id].dead == 0) {
 		particles[id].ttl -= dt;
-		if(particles[id].ttl > 0) {
+		bool hit = false;
+		for(int e = 0; e < num_enemies; ++e) {
+			if( fast_distance(vertices[id].position.xyz, enemies[e].position) < enemies[e].radius) {
+				hit = true;
+				particles[id].extra1 = e;
+				break;
+			}
+		}
+
+		if(!hit && particles[id].ttl > 0) {
 			float life_progression = 1.0 - (particles[id].ttl/particles[id].org_ttl);
 
 			particles[id].velocity += config->gravity.xyz * particles[id].gravity_influence * dt;
@@ -34,14 +43,14 @@ __kernel void run_particles (
 			//vertices[id].color = (float4)(particles[id].wind_influence);
 			vertices[id].scale = mix(particles[id].initial_scale, particles[id].final_scale, life_progression);
 
-			//TODO: Collision detection (ground and enemies)
-			//bool collision = false;
 		} else {
 			//Dead!
 			vertices[id].color.w = 0.0;
 			vertices[id].scale = 0.0;
 			particles[id].dead = 1;
 		}
+	} else {
+		particles[id].extra1 = 0; //Hit enemy, unset
 	}
 
 }
@@ -83,6 +92,9 @@ __kernel void spawn_particles (
 		particles[id].initial_scale = config->avg_scale + random1(config->scale_var, true);
 		particles[id].final_scale = particles[id].initial_scale + config->avg_scale_change + random1(config->scale_change_var, true);
 		particles[id].dead = 0;
+		particles[id].extra1 = 0; //Hit enemy
+		particles[id].extra3 = config->extra; //Particle damage
+
 	}
 }
 
