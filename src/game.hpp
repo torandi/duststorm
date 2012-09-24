@@ -67,6 +67,7 @@ class Game {
 		Path * path;
 		Rails * rails;
 		Player player;
+
 		ParticleSystem *dust, *smoke;
 		HittingParticles * attack_particles;
 		particle_config_t particle_types[3];

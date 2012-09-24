@@ -143,6 +143,9 @@ Game::Game(const std::string &level) :
 	lights.lights[0]->intensity = config["/environment/light/sunlight"]->as_vec3();
 	lights.lights[0]->type = MovableLight::DIRECTIONAL_LIGHT;
 
+	//Load enemies:
+	EnemyTemplate::init(Config::parse(base_dir + "/enemies.cfg"), this);
+
 //Set up camera:
 
 	update_camera();
@@ -168,7 +171,8 @@ Game::Game(const std::string &level) :
 	static const int max_attack_particles = particle_config["/particles/max_attack_particles"]->as_int();
 	static const int max_smoke_particles = particle_config["/particles/max_smoke_particles"]->as_int();
 	static const int max_dust_particles = particle_config["/particles/max_dust_particles"]->as_int();
-	attack_particles = new HittingParticles(max_attack_particles, particle_textures, false, "particles.cl");
+
+	attack_particles = new HittingParticles(max_attack_particles, particle_textures, EnemyTemplate::max_num_enemies, false);
 	attack_particles->config.gravity = gravity;
 	attack_particles->config.wind_velocity = wind_velocity;
 	attack_particles->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius);
@@ -221,9 +225,6 @@ Game::Game(const std::string &level) :
 	dust->spawn(dust->avg_spawn_rate * 5.0);
 	dust->config.spawn_position += glm::vec4(path->at(player.path_position() + dust_spawn_ahead / 2.f), 0.f);
 	dust->spawn(dust->avg_spawn_rate * 5.0);
-
-	//Load enemies:
-	EnemyTemplate::init(Config::parse(base_dir + "/enemies.cfg"), this);
 }
 
 Game::~Game() {
