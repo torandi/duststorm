@@ -4,12 +4,17 @@
 #include "path.hpp"
 #include "mesh.hpp"
 
+#include <vector>
+#include <glm/glm.hpp>
+
 class Rails : public Mesh {
 	public:
 		Rails(const Path * _path, float step = 1.f);
 		virtual ~Rails();
 
 		void render(const glm::mat4 &m = glm::mat4());
+
+		glm::vec3 perpendicular_vector_at(float pos) const;
 	private:
 		const Path * path;
 		Shader * shader;
@@ -29,6 +34,12 @@ class Rails : public Mesh {
 		unsigned int emit_vertices(float position, glm::vec3 &v);
 
 		void generate_indices(float position, glm::vec3 &previous);
+
+		/**
+		 * Extra to keep track of perpendicular vector
+		 */
+		const float step;
+		std::vector<glm::vec3> perpendicular_vectors;
 };
 
 #endif
