@@ -174,6 +174,9 @@ Game::Game(const std::string &level) :
 	particle_textures = TextureArray::from_filename( PATH_BASE "data/textures/smoke.png",
 																	PATH_BASE "data/textures/fog.png",
 																	PATH_BASE "data/textures/particle.png",
+																	PATH_BASE "data/textures/fire1.png",
+																	PATH_BASE "data/textures/fire2.png",
+																	PATH_BASE "data/textures/fire3.png",
 																	nullptr);
 
 	static const int max_attack_particles = particle_config["/particles/max_attack_particles"]->as_int();
@@ -204,7 +207,7 @@ Game::Game(const std::string &level) :
 	particle_types[HEAVY_PARTICLES].spawn_speed = particle_config["/particles/heavy/spawn_speed"]->as_float();
 	particle_types[HEAVY_PARTICLES].damage = particle_config["/particles/heavy/damage"]->as_float();
 
-	change_particles(HEAVY_PARTICLES);
+	change_particles(LIGHT_PARTICLES);
 
 	//Smoke:
 	smoke = new ParticleSystem(max_smoke_particles, particle_textures, false);
