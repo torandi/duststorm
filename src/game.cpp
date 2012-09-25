@@ -318,12 +318,15 @@ void Game::update(float dt) {
 
 void Game::update_enemies(float dt) {
 	//Despawn old enemies:
-	for(auto it = enemies.begin(); it != enemies.end(); ++it) {
+	for(auto it = enemies.begin(); it != enemies.end(); ) {
 		if((*it)->hp <= 0 ) {
 			it = enemies.erase(it);
 		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
 			it = enemies.erase(it);
+		} else {
+			++it;
 		}
+		
 	}
 
 	//Start by spawning:

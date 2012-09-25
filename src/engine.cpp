@@ -75,7 +75,8 @@ namespace Engine {
 
 	void update(float dt) {
 		Sound::update_system();
-		WII->update();
+		if(useWII)
+			WII->update();
 		game->update(dt);	
 	}
 
