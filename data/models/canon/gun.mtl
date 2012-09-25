@@ -1,9 +1,9 @@
 # Blender MTL File: 'kanon8.blend'
 # Material Count: 1
-newmtl kanon_mat_untitled
+newmtl kanon_orig_untitled
 Ns 96.078431
 Ka 0.000000 0.000000 0.000000
-Kd 1.5 1.5 1.5
+Kd 2 2 2
 Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
