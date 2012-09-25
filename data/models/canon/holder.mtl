@@ -1,12 +1,13 @@
-# Blender MTL File: 'kanon6.blend'
+# Blender MTL File: 'kanon8.blend'
 # Material Count: 1
-newmtl None_checkered.png
-Ns 0
+newmtl bareoak_woodbake
+Ns 64.705882
 Ka 0.000000 0.000000 0.000000
-Kd 0.8 0.8 0.8
-Ks 0.8 0.8 0.8
-d 1
+Kd 0.752375 0.546742 0.304821
+Ks 0.010000 0.010000 0.010000
+Ni 1.000000
+d 1.000000
 illum 2
-map_Kd /home/torandi/Dropbox/Grupp1/3d Models/Canon 5/kanon6.blend/checkered.png
+map_Kd holder_col.png
 
 
