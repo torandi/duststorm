@@ -177,7 +177,6 @@ void ParticleSystem::spawn_particles(cl_int count, cl::Event * event) {
 	//TODO: Optimize!
 	err = opencl->queue().enqueueNDRangeKernel(spawn_kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, NULL, event);
 	CL::check_error(err, "[ParticleSystem] Execute spawn_kernel");
-	//opencl->queue().finish();
 }
 
 void ParticleSystem::update(float dt) {
@@ -190,16 +189,19 @@ void ParticleSystem::update(float dt) {
 
 	err = opencl->queue().enqueueAcquireGLObjects((std::vector<cl::Memory>*) &cl_gl_buffers_, NULL, &lock[0]);
 	CL::check_error(err, "[ParticleSystem] acquire gl objects");
-	
+
 	err = spawn_kernel_.setArg(5, (int)(time(0)%UINT_MAX));
 	CL::check_error(err, "[ParticleSystem] spawn: set time");
 
 	opencl->queue().flush();
 	lock[0].wait(); //Wait to aquire gl objects
-	
+	clReleaseEvent(lock[0]());
+
 	bool restore_config = !spawn_list_.empty();
 	
-	// handle spawning
+	/*
+	 * Handle spawning
+	 */
 	while(!spawn_list_.empty()) {
 		spawn_data &sd = spawn_list_.front();
 
@@ -213,36 +215,85 @@ void ParticleSystem::update(float dt) {
 		opencl->queue().flush();
 
 		lock[0].wait();
+		clReleaseEvent(lock[0]());
 	}
-	
+
 	if(restore_config) {
 		update_config();
 	}
-	
+
 	if(auto_spawn) {
 		//Write number of particles to spawn this round:
 		cl_int current_spawn_rate = (cl_int) round((avg_spawn_rate + 2.f*frand()*spawn_rate_var - spawn_rate_var)*dt);
 		spawn_particles(current_spawn_rate, &lock[0]);
 		opencl->queue().flush();
 		lock[0].wait();
+		clReleaseEvent(lock[0]());
 	}
-	
-	
-	
+
+
 	err = run_kernel_.setArg(4, dt);
 	CL::check_error(err, "[ParticleSystem] run: set dt");
 	err = run_kernel_.setArg(5, (int)(time(0)%UINT_MAX));
 	CL::check_error(err, "[ParticleSystem] run: set time");
-	
+
 	err = opencl->queue().enqueueNDRangeKernel(run_kernel_, cl::NullRange, cl::NDRange(max_num_particles_), cl::NullRange, NULL, &lock[0]);
 	CL::check_error(err, "[ParticleSystem] Execute run_kernel");
 	
+	//render_blocking_events_.push_back(e2);
+/*
+	vertex_t * vertices = (vertex_t* ) opencl->queue().enqueueMapBuffer(cl_gl_buffers_[0], CL_TRUE, CL_MAP_READ, 0, sizeof(particle_t)*max_num_particles_, NULL, NULL, &err);
+
+	opencl->queue().finish();
+	for(int i=0; i < max_num_particles_; ++i ) {
+		printf("Dir: (%f, %f, %f), ttl: (%f/%f) speed: (%f) scale(%f->%f) rotation speed: %f\n", particles[i].direction.x, particles[i].direction.y,particles[i].direction.z, particles[i].ttl, particles[i].org_ttl, particles[i].speed, particles[i].initial_scale, particles[i].final_scale, particles[i].rotation_speed);
+	}
+
 	
+*/
+	/*
+	vertex_t * vertices = (vertex_t*) opencl->queue().enqueueMapBuffer(cl_gl_buffers_[0], CL_TRUE, CL_MAP_READ, 0, sizeof(particle_t)*max_num_particles_, NULL, NULL, &err);
+
+	opencl->queue().finish();
+	printf("---\n");
+	for(int i=0;i<max_num_particles_; ++i) {
+		printf("Vertex: pos:(%f, %f, %f, %f), color:(%f, %f, %f, %f) scale: %f, texture_index: %i\n", vertices[i].position.x, vertices[i].position.y, vertices[i].position.z, vertices[i].position.w, vertices[i].color.r, vertices[i].color.g, vertices[i].color.b, vertices[i].color.a, vertices[i].scale, vertices[i].texture_index);
+	}
+	opencl->queue().enqueueUnmapMemObject(cl_gl_buffers_[0], vertices, NULL, NULL); */
+
 	err = opencl->queue().enqueueReleaseGLObjects((std::vector<cl::Memory>*)&cl_gl_buffers_, &lock, NULL);
 	CL::check_error(err, "[ParticleSystem] Release GL objects");
-	
+
 	opencl->queue().flush();
-	
+
+	//render_blocking_events_.push_back(e3);
+
+
+	//BEGIN DEBUG
+
+/*	
+	particle_t * particles = (particle_t*) opencl->queue().enqueueMapBuffer(particles_, CL_TRUE, CL_MAP_READ, 0, sizeof(particle_t)*max_num_particles_, NULL, NULL, &err);
+
+	opencl->queue().finish();
+	for(int i=0; i < max_num_particles_; ++i ) {
+		printf("Dir: (%f, %f, %f), ttl: (%f/%f) speed: (%f) scale(%f->%f) rotation speed: %f\n", particles[i].direction.x, particles[i].direction.y,particles[i].direction.z, particles[i].ttl, particles[i].org_ttl, particles[i].speed, particles[i].initial_scale, particles[i].final_scale, particles[i].rotation_speed);
+	}
+
+	opencl->queue().enqueueUnmapMemObject(particles_, particles, NULL, NULL);
+	*/
+/*
+	cl_int  * spawn_rate = (cl_int*) opencl->queue().enqueueMapBuffer(spawn_rate_, CL_TRUE, CL_MAP_READ, 0, sizeof(cl_int), NULL, NULL, &err);
+
+	opencl->queue().finish();
+
+	printf("Spawn_rate: %d\n", *spawn_rate);
+
+	opencl->queue().enqueueUnmapMemObject(spawn_rate_, spawn_rate, NULL, NULL);
+
+	opencl->queue().finish();*/
+
+	//END DEBUG
+
 	opencl->queue().finish();
 }
 
