@@ -323,6 +323,7 @@ void Game::update(float dt) {
 	dust->update(dt);
 
 	explosions->update(dt);
+	
 /*
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		cur_controll = (cur_controll + 1) % num_controllable;

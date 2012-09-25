@@ -195,6 +195,7 @@ void ParticleSystem::update(float dt) {
 
 	opencl->queue().flush();
 	lock[0].wait(); //Wait to aquire gl objects
+	clReleaseEvent(lock[0]());
 
 	bool restore_config = !spawn_list_.empty();
 	
@@ -214,6 +215,7 @@ void ParticleSystem::update(float dt) {
 		opencl->queue().flush();
 
 		lock[0].wait();
+		clReleaseEvent(lock[0]());
 	}
 
 	if(restore_config) {
@@ -226,6 +228,7 @@ void ParticleSystem::update(float dt) {
 		spawn_particles(current_spawn_rate, &lock[0]);
 		opencl->queue().flush();
 		lock[0].wait();
+		clReleaseEvent(lock[0]());
 	}
 
 
