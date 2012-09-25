@@ -182,6 +182,7 @@ void Rails::render(const glm::mat4 &m) {
 
 glm::vec3 Rails::perpendicular_vector_at(float pos) const {
 	unsigned int index = (int)floor(pos / step);
+	if(index >= perpendicular_vectors.size()) index = 0;
 	const glm::vec3 &prev = perpendicular_vectors[index];
 	unsigned int next_index = index + 1;
 	if(next_index >= perpendicular_vectors.size()) next_index = 0;
