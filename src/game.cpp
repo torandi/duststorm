@@ -282,10 +282,10 @@ void Game::update(float dt) {
 		
 		if (WII->getButtonBPressed()) {
 			shoot();
-			WII->setRumble(true);
+			//WII->setRumble(true);
 		}
 		else {
-			WII->setRumble(false);
+			//WII->setRumble(false);
 		}
 	}
 	else {
