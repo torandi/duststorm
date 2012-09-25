@@ -287,6 +287,7 @@ void Game::update(float dt) {
 		change_particles((particle_type_t) ((current_particle_type + 1) % 3));
 	}
 
+#ifdef WIN32
 	if (useWII) {
 		player.set_canon_pitch(WII->getPitch());
 		player.set_canon_yaw(-1 * WII->getRoll());
@@ -300,9 +301,12 @@ void Game::update(float dt) {
 		}
 	}
 	else {
+#endif
 		player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
 		player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
+#ifdef WIN32
 	}
+#endif
 
 	smoke->update(dt);
 	attack_particles->update(dt, enemies, this);

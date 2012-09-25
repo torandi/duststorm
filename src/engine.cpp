@@ -9,7 +9,6 @@
 
 #include "sound.hpp"
 #include "game.hpp" 
-#include "wii.hpp"
 
 CL * opencl;
 
@@ -51,11 +50,13 @@ namespace Engine {
 	}
 
 	void init(const std::string &level) {
+#ifdef WIN32
 		if (useWII) {
 			WII = new wii();
 			WII->open();
 			WII->connect();
 		}
+#endif
 		Shader::fog_t fog = { glm::vec4(0.584f, 0.698f, 0.698f, 1.f), 0.005f };
 		Shader::upload_fog(fog);
 		srand(util_utime());
@@ -66,17 +67,21 @@ namespace Engine {
 
 	void cleanup() {
 		delete game;
+#ifdef WIN32
 		if (WII != nullptr) {
 			delete WII;
 			WII = nullptr;
 		}
+#endif
 		Texture2D::cleanup();
 	}
 
 	void update(float dt) {
 		Sound::update_system();
+#ifdef WIN32
 		if(useWII)
 			WII->update();
+#endif
 		game->update(dt);	
 	}
 
