@@ -12,12 +12,15 @@
 #include "shader.hpp"
 #include "cl.hpp"
 #include <glm/glm.hpp>
+#include "wii.hpp"
 
 extern FILE* verbose;                    /* stderr if verbose output is enabled or /dev/null if not */
 extern float global_time;                 /* current time */
 extern glm::ivec2 resolution;            /* current resolution */
 extern glm::mat4 screen_ortho;           /* orthographic projection for window */
 extern CL * opencl;
+extern bool useWII;						/* Whether we should use the Wiimote. */
+extern wii* WII;						/* Wiimote */
 
 enum shader_t {
 	SHADER_SIMPLE=0,

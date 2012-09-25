@@ -286,8 +286,23 @@ void Game::update(float dt) {
 		printf("Change partciles!\n");
 		change_particles((particle_type_t) ((current_particle_type + 1) % 3));
 	}
-	player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
-	player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
+
+	if (useWII) {
+		player.set_canon_pitch(WII->getPitch());
+		player.set_canon_yaw(-1 * WII->getRoll());
+		
+		if (WII->getButtonBPressed()) {
+			shoot();
+			//WII->setRumble(true);
+		}
+		else {
+			//WII->setRumble(false);
+		}
+	}
+	else {
+		player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
+		player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
+	}
 
 	smoke->update(dt);
 	attack_particles->update(dt, enemies, this);
@@ -315,12 +330,15 @@ void Game::update(float dt) {
 
 void Game::update_enemies(float dt) {
 	//Despawn old enemies:
-	for(auto it = enemies.begin(); it != enemies.end(); ++it) {
+	for(auto it = enemies.begin(); it != enemies.end(); ) {
 		if((*it)->hp <= 0 ) {
 			it = enemies.erase(it);
 		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
 			it = enemies.erase(it);
+		} else {
+			++it;
 		}
+		
 	}
 
 	//Start by spawning:

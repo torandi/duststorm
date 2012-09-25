@@ -299,6 +299,8 @@ int main(int argc, char* argv[]){
 			fullscreen = 1;
 		else if (strcmp(arg, "-v") == 0)
 			verbose_flag = 1;
+		else if (strcmp(arg, "-w") == 0)
+			useWII = 1;
 		else --next_index;
 	}
 #endif
