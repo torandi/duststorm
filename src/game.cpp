@@ -63,6 +63,7 @@ Game::Game(const std::string &level) :
 	score(0)
 {
 
+	
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 	geometry = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER);
 
@@ -254,6 +255,7 @@ Game::Game(const std::string &level) :
 	kill_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/kill_explosion/avg_spawn_velocity"]->as_vec3(), 0);
 	hit_explosion.spawn_area = particle_config["/particles/hit_explosion/spawn_area"]->as_vec4();
 	hit_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/hit_explosion/avg_spawn_velocity"]->as_vec3(), 0);
+	play_sound(PATH_BASE "ecstacy.mp3",-1);
 }
 
 Game::~Game() {
@@ -326,6 +328,13 @@ void Game::update(float dt) {
 	
 	explosions->update(dt);
 	
+	active_sounds.remove_if([](const Sound * s) {
+	if(s->is_done()) {
+	delete s;
+	return true;
+	};
+	return false;
+	});
 /*
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 		cur_controll = (cur_controll + 1) % num_controllable;
@@ -415,7 +424,7 @@ void Game::render_geometry() {
 void Game::render() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
+	/*lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
 		render_geometry();
 	});
 
@@ -424,7 +433,7 @@ void Game::render() {
 	shaders[SHADER_PASSTHRU]->bind();
 	Shader::upload_camera(camera);
 	render_geometry();
-	geometry->unbind();
+	geometry->unbind();*/
 
 
 	Shader::upload_state(composition->texture_size());
@@ -437,7 +446,7 @@ void Game::render() {
 
 	terrain->render();
 
-	rail_material.bind();
+	/*rail_material.bind();
 	rails->render();
 
 	player.render();
@@ -445,7 +454,7 @@ void Game::render() {
 	shaders[SHADER_NORMAL]->bind();
 	for(Enemy * e : enemies) {
 		e->render();
-	}
+	}*/
 
 	particle_shader->bind();
 	geometry->depth_bind(Shader::TEXTURE_2D_0);
@@ -471,10 +480,10 @@ void Game::render_display() {
 
 	// Here the hud will be! Fun fun fun fun!
 	
-	hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
+	/*hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
 	shaders[SHADER_PASSTHRU]->bind();
 	
-	hud_static_elements->render();
+	hud_static_elements->render();*/
 }
 
 void Game::update_camera() {
@@ -495,6 +504,7 @@ void Game::shoot() {
 	smoke->config.avg_spawn_velocity = glm::vec4(base_speed + player.aim_direction() * smoke_spawn_speed + glm::vec3(0.f, 1.f, 0.f), 1.f);
 	smoke->config.spawn_position = spawn_position;
 	smoke->spawn(smoke_count);
+	play_sound(PATH_BASE "Explosion_Fast.wav",1);
 }
 
 const Player &Game::get_player() const {
@@ -517,4 +527,11 @@ void Game::enemy_impact(const glm::vec3 &position, bool kill) {
 	}
 	explosions->config.spawn_position = glm::vec4(position, 1.f);
 	explosions->spawn(count);
+}
+
+void Game::play_sound(const char* path, int loops)
+{
+	Sound * s = new Sound(path, loops);
+	s->play();
+	active_sounds.push_back(s);
 }

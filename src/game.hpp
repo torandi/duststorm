@@ -120,6 +120,10 @@ class Game {
 		Color sky_color;
 
 		std::list<Enemy*> enemies;
+
+		void Game::play_sound(const char* path, int loops);
+
+		std::list<Sound*> active_sounds;
 };
 
 #endif
