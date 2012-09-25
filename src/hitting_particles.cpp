@@ -56,8 +56,7 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 	for(int i=0; i < max_num_particles_; ++i ) {
 		if(particles[i].extra1 != -1) {
 			Enemy * e = enemy_back_ref_[particles[i].extra1];
-			//e->hp -= particles[i].extra3;
-			e->hp = -1.f;
+			e->hp -= particles[i].extra3;
 			hit[particles[i].extra1] = true;
 		}
 	}

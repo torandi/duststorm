@@ -12,7 +12,7 @@ in BarData {
 out vec4 color;
 
 void main() {
-	float s = 0.3;
+	float s = 0.3 * barData[0].scale;
 	float y = 0.1;
 
 	color = barData[0].color;
