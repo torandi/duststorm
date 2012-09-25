@@ -31,6 +31,8 @@ void EnemyTemplate::init(Config config, const Game * game) {
 	for(ConfigEntry * c : enemies) {
 		templates.push_back(EnemyTemplate(c));
 	}
+
+	Shader::create_shader("health");
 }
 
 EnemyTemplate::EnemyTemplate(const ConfigEntry * config) {
