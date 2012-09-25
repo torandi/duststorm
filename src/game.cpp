@@ -275,8 +275,23 @@ void Game::update(float dt) {
 		printf("Change partciles!\n");
 		change_particles((particle_type_t) ((current_particle_type + 1) % 3));
 	}
-	player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
-	player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
+
+	if (useWII) {
+		player.set_canon_pitch(WII->getPitch());
+		player.set_canon_yaw(-1 * WII->getRoll());
+		
+		if (WII->getButtonBPressed()) {
+			shoot();
+			WII->setRumble(true);
+		}
+		else {
+			WII->setRumble(false);
+		}
+	}
+	else {
+		player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
+		player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
+	}
 
 	smoke->update(dt);
 	attack_particles->update(dt, enemies, this);
