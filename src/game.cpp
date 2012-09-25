@@ -31,6 +31,8 @@
 #include "nanosvg.h"
 #include "config.hpp"
 
+static glm::vec2 hud_scale;
+
 static void read_particle_config(const ConfigEntry * config, ParticleSystem::config_t &particle_config) {
 	particle_config.birth_color = config->find("birth_color", true)->as_vec4();
 	particle_config.death_color = config->find("death_color", true)->as_vec4();
@@ -255,7 +257,7 @@ Game::Game(const std::string &level) :
 	hud_static_elements = new Quad();
 	hud_static_elements->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
 
-	glm::vec2 hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
+	hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
 
 	life_text.set_number(100);
 	life_text.set_scale(20.0 * hud_scale.x);
@@ -265,7 +267,7 @@ Game::Game(const std::string &level) :
 	score_text.set_scale(20.0 * hud_scale.x);
 	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
-	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/game_over.png");
+	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/gameover.png");
 }
 
 Game::~Game() {
@@ -356,7 +358,9 @@ void Game::update(float dt) {
 		}
 	*/
 	} else {
-		
+		score_text.set_number(score);
+		score_text.set_scale(40.0 * hud_scale.x);
+		score_text.set_position(glm::vec3(glm::vec2(565.f, 400.f) * hud_scale, 0.f));
 	}
 }
 
@@ -505,6 +509,8 @@ void Game::render_display() {
 		shaders[SHADER_PASSTHRU]->bind();
 		
 		hud_static_elements->render();
+
+		score_text.render();
 	}
 }
 
