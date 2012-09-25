@@ -73,9 +73,9 @@ class ParticleSystem : public MovableObject {
 		__ALIGNED__(struct vertex_t {
 				glm::vec4 position;
 				glm::vec4 color;
-				cl_float scale;
-				cl_int texture_index;
-				},16);
+				float scale;
+				int texture_index;
+		},16);
 
 		virtual void callback_position(const glm::vec3 &position);
 

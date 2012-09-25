@@ -331,10 +331,10 @@ void ParticleSystem::render(const glm::mat4 * m) {
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), 0);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) sizeof(glm::vec4));
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) (2*sizeof(glm::vec4)));
-	glVertexAttribPointer(3, 1, GL_INT, GL_FALSE, sizeof(vertex_t), (GLvoid*)		(2*sizeof(glm::vec4)+sizeof(float)));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) offsetof(vertex_t, position));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) offsetof(vertex_t, color));
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid*) offsetof(vertex_t, scale));
+	glVertexAttribIPointer(3, 1, GL_INT, sizeof(vertex_t), (GLvoid*) offsetof(vertex_t, texture_index));
 	texture_->texture_bind(Shader::TEXTURE_ARRAY_0);
 
 	glDrawArrays(GL_POINTS, 0, max_num_particles_);
