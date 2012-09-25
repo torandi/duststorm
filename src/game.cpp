@@ -237,7 +237,7 @@ Game::Game(const std::string &level) :
 	dust->spawn(dust->avg_spawn_rate * 5.0);
 
 	//Explosions
-	explosions = new ParticleSystem(max_explosion_particles, particle_textures, true);
+	explosions = new ParticleSystem(max_explosion_particles, particle_textures, false);
 
 	read_particle_config(particle_config["/particles/explosions"], explosions->config);
 
@@ -415,7 +415,6 @@ void Game::render() {
 	Shader::upload_camera(camera);
 	Shader::upload_lights(lights);
 
-
 	terrain->render();
 
 	rail_material.bind();
@@ -434,6 +433,7 @@ void Game::render() {
 	dust->render();
 	smoke->render();
 	attack_particles->render();
+	explosions->render();
 
 	composition->unbind();
 
@@ -488,6 +488,6 @@ void Game::change_particles(Game::particle_type_t new_type) {
 
 void Game::enemy_impact(const glm::vec3 &position) {
 	explosions->config.spawn_position = glm::vec4(position, 1.f);
-	explosions->update_config();
+	//explosions->update_config();
 	explosions->spawn(1000.0);
 }

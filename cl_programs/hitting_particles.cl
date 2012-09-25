@@ -50,7 +50,7 @@ __kernel void run_particles (
 			particles[id].dead = 1;
 		}
 	} else {
-		particles[id].extra1 = 0; //Hit enemy, unset
+		particles[id].extra1 = -1; //Hit enemy, unset
 	}
 
 }
@@ -92,7 +92,7 @@ __kernel void spawn_particles (
 		particles[id].initial_scale = config->avg_scale + random1(config->scale_var, true);
 		particles[id].final_scale = particles[id].initial_scale + config->avg_scale_change + random1(config->scale_change_var, true);
 		particles[id].dead = 0;
-		particles[id].extra1 = 0; //Hit enemy
+		particles[id].extra1 = -1; //Hit enemy
 		particles[id].extra3 = config->extra; //Particle damage
 
 	}

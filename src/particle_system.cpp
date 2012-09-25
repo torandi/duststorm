@@ -54,6 +54,10 @@ ParticleSystem::ParticleSystem(const int max_num_particles, TextureArray* textur
 	particle_t * initial_particles = new particle_t[max_num_particles];
 	for(int i=0; i<max_num_particles; ++i) {
 		initial_particles[i].dead = 1; //mark as dead
+		initial_particles[i].extra1 = -1;
+		initial_particles[i].extra2 = -1;
+		initial_particles[i].extra3 = -1;
+		initial_particles[i].extra4 = -1;
 	}
 
 	//Create cl buffers:
