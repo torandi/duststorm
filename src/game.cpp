@@ -58,7 +58,9 @@ void Game::init() {
 Game::Game(const std::string &level) :
 	camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f),
 	accum_unspawned(0),
-	player_level(1.f)
+	player_level(1.f),
+	life(100),
+	score(0)
 {
 
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
@@ -340,19 +342,28 @@ void Game::update(float dt) {
 */
 }
 
+void Game::evolve() {
+	player_level += 0.01f;
+}
+
 void Game::update_enemies(float dt) {
-	//Despawn old enemies:
 	for(auto it = enemies.begin(); it != enemies.end(); ) {
 		if((*it)->hp <= 0 ) {
 			enemy_impact((*it)->position(), true);
 			it = enemies.erase(it);
+			life += 1;
+			score += (int)player_level;
+			printf("Life: %d\n", life);
+			evolve();
 		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
 			it = enemies.erase(it);
+			life -= 10;
+			printf("Life: %d\n", life);
 		} else {
 			++it;
 		}
-		
 	}
+	life = glm::clamp(life, 0, 100);
 
 	//Start by spawning:
 	accum_unspawned += EnemyTemplate::spawn_rate * player_level * dt * current_movement_speed;

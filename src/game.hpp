@@ -62,6 +62,7 @@ class Game {
 
 		void change_particles(particle_type_t new_type);
 		void shoot();
+		void evolve();
 
 		LightsData lights;
 		Material rail_material;
@@ -111,6 +112,10 @@ class Game {
 		float accum_unspawned;
 
 		float player_level;
+
+		int life;
+
+		int score;
 
 		Color sky_color;
 
