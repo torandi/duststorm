@@ -256,9 +256,14 @@ Game::Game(const std::string &level) :
 	hud_static_elements->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
 
 	glm::vec2 hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
+
 	life_text.set_number(100);
 	life_text.set_scale(20.0 * hud_scale.x);
-	life_text.set_position(glm::vec3(glm::vec2(21.f, 44.5f) * hud_scale, 0.f));
+	life_text.set_position(glm::vec3(glm::vec2(26.f, 44.5f) * hud_scale, 0.f));
+
+	score_text.set_number(0);
+	score_text.set_scale(20.0 * hud_scale.x);
+	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
 	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/game_over.png");
 }
@@ -365,13 +370,11 @@ void Game::update_enemies(float dt) {
 			enemy_impact((*it)->position(), true);
 			it = enemies.erase(it);
 			life += 1;
-			score += (int)player_level;
-			printf("Life: %d\n", life);
+			score += (int) (player_level * 10.f);
 			evolve();
 		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
 			it = enemies.erase(it);
 			life -= 10;
-			printf("Life: %d\n", life);
 		} else {
 			++it;
 		}
@@ -495,6 +498,7 @@ void Game::render_display() {
 		hud_static_elements->render();
 
 		life_text.render();
+		score_text.render();
 	} else {
 
 		game_over_texture->texture_bind(Shader::TEXTURE_2D_0);
