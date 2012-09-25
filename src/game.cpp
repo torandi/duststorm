@@ -354,7 +354,7 @@ void Game::render_geometry() {
 	player.render_geometry();
 
 	for(const Enemy * e : enemies) {
-		e->render();
+		e->render_geometry();
 	}
 }
 

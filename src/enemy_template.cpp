@@ -58,7 +58,7 @@ Enemy * EnemyTemplate::spawn(const glm::vec3 &position, float path_position, flo
 	Enemy * e = new Enemy(position - glm::vec3(0.0, scale, 0.0), model, ai);
 	e->set_scale(scale);
 	e->radius = radius * scale;
-	e->hp = hp_base * level_scaling;
+	e->set_hp(hp_base * level_scaling);
 	e->damage = damage_base * level_scaling;
 	e->random_movement = random_movement;
 	e->random_rotation = random_rotation;

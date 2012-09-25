@@ -6,6 +6,7 @@
 #include "config.hpp"
 #include "render_object.hpp"
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 Enemy::Enemy(const glm::vec3 &position, const RenderObject * model_, const EnemyAI * ai_) : 
 		MovableObject(position)
@@ -13,6 +14,8 @@ Enemy::Enemy(const glm::vec3 &position, const RenderObject * model_, const Enemy
 	, ai(ai_)
 	, fly_in(2.0)
 	{
+		hp_shader = Shader::create_shader("health");
+		enemy_shader = Shader::create_shader("normal");
 }
 
 void Enemy::update(float dt) {
@@ -30,6 +33,34 @@ void Enemy::update(float dt) {
 	ai->run(this, dt);
 }
 
-void Enemy::render() const {
+void Enemy::render_geometry() const {
 	model->render(matrix());
+}
+
+void Enemy::render() const {
+	enemy_shader->bind();
+	render_geometry();
+	hp_shader->bind();
+
+	Shader::upload_model_matrix(matrix());
+
+	float life = glm::clamp(hp/initial_hp, 0.f, 1.f);
+	if(hp < 19.9) printf("hp: %f/%f\n", hp, initial_hp);
+	float scale = life * scale_.x;
+	Shader::push_vertex_attribs(2);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, &life);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, &scale);
+
+	glDisable(GL_CULL_FACE);
+	glDrawArrays(GL_POINTS, 0, 1);
+	glEnable(GL_CULL_FACE);
+
+	Shader::pop_vertex_attribs();
+
+}
+
+void Enemy::set_hp(float _hp) {
+	initial_hp = _hp;
+	hp = _hp;
 }
