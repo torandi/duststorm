@@ -61,6 +61,33 @@ namespace Engine {
 		Shader::upload_fog(fog);
 		srand(util_utime());
 		opencl = new CL();
+
+
+		checkForGLErrors("Frame begin");
+	glClearColor(1, 0, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+
+	
+
+	Shader::upload_state(resolution);
+	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
+	glViewport(0, 0, resolution.x, resolution.y);
+
+	
+
+	// Here the hud will be! Fun fun fun fun!
+	Quad* loadingscreen = new Quad();
+	loadingscreen->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
+	Texture2D* lodingtexture = Texture2D::from_filename(PATH_BASE "/data/textures/loading.png");
+	lodingtexture->texture_bind(Shader::TEXTURE_2D_0);
+	
+	
+	shaders[SHADER_PASSTHRU]->bind();
+	
+	loadingscreen->render();
+	SDL_GL_SwapBuffers();
+	checkForGLErrors("Frame end");
 		Game::init();
 		game = new Game(level);
 	}
