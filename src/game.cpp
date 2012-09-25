@@ -239,13 +239,19 @@ Game::Game(const std::string &level) :
 	//Explosions
 	explosions = new ParticleSystem(max_explosion_particles, particle_textures, false);
 
-	read_particle_config(particle_config["/particles/explosions"], explosions->config);
+	hit_explosion = explosions->config;
+	kill_explosion = explosions->config;
+	read_particle_config(particle_config["/particles/hit_explosion"], hit_explosion);
+	read_particle_config(particle_config["/particles/kill_explosion"], kill_explosion);
 
 	explosions->config.gravity = gravity;
 	explosions->config.wind_velocity = wind_velocity;
-	explosion_count = particle_config["/particles/explosions/count"]->as_int();
-	explosions->config.spawn_area = particle_config["/particles/explosions/spawn_area"]->as_vec4();
-	explosions->config.avg_spawn_velocity = glm::vec4(particle_config["/particles/explosions/avg_spawn_velocity"]->as_vec3(), 0);
+	hit_explosion_count = particle_config["/particles/hit_explosion/count"]->as_int();
+	kill_explosion_count = particle_config["/particles/kill_explosion/count"]->as_int();
+	kill_explosion.spawn_area = particle_config["/particles/kill_explosion/spawn_area"]->as_vec4();
+	kill_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/kill_explosion/avg_spawn_velocity"]->as_vec3(), 0);
+	hit_explosion.spawn_area = particle_config["/particles/hit_explosion/spawn_area"]->as_vec4();
+	hit_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/hit_explosion/avg_spawn_velocity"]->as_vec3(), 0);
 }
 
 Game::~Game() {
@@ -259,6 +265,7 @@ Game::~Game() {
 	delete smoke;
 	delete attack_particles;
 	delete particle_textures;
+	delete explosions;
 }
 
 void Game::update(float dt) {
@@ -336,6 +343,7 @@ void Game::update_enemies(float dt) {
 	//Despawn old enemies:
 	for(auto it = enemies.begin(); it != enemies.end(); ) {
 		if((*it)->hp <= 0 ) {
+			enemy_impact((*it)->position(), true);
 			it = enemies.erase(it);
 		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
 			it = enemies.erase(it);
@@ -486,8 +494,15 @@ void Game::change_particles(Game::particle_type_t new_type) {
 	attack_particles->config = particle_types[new_type].config;
 }
 
-void Game::enemy_impact(const glm::vec3 &position) {
+void Game::enemy_impact(const glm::vec3 &position, bool kill) {
+	int count;
+	if(kill) {
+		count = kill_explosion_count;
+		explosions->config = kill_explosion;
+	} else {
+		count = hit_explosion_count;
+		explosions->config = hit_explosion;
+	}
 	explosions->config.spawn_position = glm::vec4(position, 1.f);
-	//explosions->update_config();
-	explosions->spawn(1000.0);
+	explosions->spawn(count);
 }

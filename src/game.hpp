@@ -39,7 +39,7 @@ class Game {
 
 		const Player &get_player() const;
 
-		void enemy_impact(const glm::vec3 &position);
+		void enemy_impact(const glm::vec3 &position, bool kill = false);
 
 	private:
 		enum particle_type_t {
@@ -71,11 +71,12 @@ class Game {
 		Player player;
 
 		ParticleSystem *dust, *smoke, *explosions;
+		ParticleSystem::config_t hit_explosion, kill_explosion;
 		HittingParticles * attack_particles;
 		particle_config_t particle_types[3];
 		particle_type_t current_particle_type;
 		int smoke_count;
-		int explosion_count;
+		int hit_explosion_count, kill_explosion_count;
 		float smoke_spawn_speed;
 		float dust_spawn_ahead;
 		glm::vec3 half_dust_spawn_area;
