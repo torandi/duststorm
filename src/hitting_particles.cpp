@@ -70,4 +70,6 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 	
 	opencl->queue().enqueueUnmapMemObject(particles_, particles, NULL, NULL);
 	opencl->queue().enqueueUnmapMemObject(cl_gl_buffers_[0], vertices, NULL, NULL);
+
+	opencl->queue().finish();
 }
