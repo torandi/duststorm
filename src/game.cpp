@@ -424,7 +424,7 @@ void Game::render_geometry() {
 void Game::render() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	/*lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
+	lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
 		render_geometry();
 	});
 
@@ -433,7 +433,7 @@ void Game::render() {
 	shaders[SHADER_PASSTHRU]->bind();
 	Shader::upload_camera(camera);
 	render_geometry();
-	geometry->unbind();*/
+	geometry->unbind();
 
 
 	Shader::upload_state(composition->texture_size());
@@ -446,7 +446,7 @@ void Game::render() {
 
 	terrain->render();
 
-	/*rail_material.bind();
+	rail_material.bind();
 	rails->render();
 
 	player.render();
@@ -454,7 +454,7 @@ void Game::render() {
 	shaders[SHADER_NORMAL]->bind();
 	for(Enemy * e : enemies) {
 		e->render();
-	}*/
+	}
 
 	particle_shader->bind();
 	geometry->depth_bind(Shader::TEXTURE_2D_0);
@@ -480,10 +480,10 @@ void Game::render_display() {
 
 	// Here the hud will be! Fun fun fun fun!
 	
-	/*hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
+	hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
 	shaders[SHADER_PASSTHRU]->bind();
 	
-	hud_static_elements->render();*/
+	hud_static_elements->render();
 }
 
 void Game::update_camera() {
