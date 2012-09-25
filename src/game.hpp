@@ -19,6 +19,7 @@
 
 #include "sound.hpp"
 #include "player.hpp"
+#include "text.hpp"
 
 #include <list>
 #include <map>
@@ -92,7 +93,7 @@ class Game {
 		RenderTarget *composition, *geometry;
 
 		Quad *hud_static_elements;
-		Texture2D *hud_static_elements_tex;
+		Texture2D *hud_static_elements_tex, *game_over_texture;
 
 		Shader *particle_shader;
 
@@ -120,6 +121,8 @@ class Game {
 		Color sky_color;
 
 		std::list<Enemy*> enemies;
+
+		Text life_text, score_text;
 };
 
 #endif

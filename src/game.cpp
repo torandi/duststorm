@@ -66,11 +66,6 @@ Game::Game(const std::string &level) :
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 	geometry = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER);
 
-	// hud initialization
-	hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
-	hud_static_elements = new Quad();
-	hud_static_elements->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
-
 
 	printf("Loading level %s\n", level.c_str());
 
@@ -254,6 +249,18 @@ Game::Game(const std::string &level) :
 	kill_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/kill_explosion/avg_spawn_velocity"]->as_vec3(), 0);
 	hit_explosion.spawn_area = particle_config["/particles/hit_explosion/spawn_area"]->as_vec4();
 	hit_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/hit_explosion/avg_spawn_velocity"]->as_vec3(), 0);
+
+	//Setup HUD
+	hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
+	hud_static_elements = new Quad();
+	hud_static_elements->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
+
+	glm::vec2 hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
+	life_text.set_number(100);
+	life_text.set_scale(20.0 * hud_scale.x);
+	life_text.set_position(glm::vec3(glm::vec2(21.f, 44.5f) * hud_scale, 0.f));
+
+	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/game_over.png");
 }
 
 Game::~Game() {
@@ -272,74 +279,80 @@ Game::~Game() {
 
 void Game::update(float dt) {
 
-	player.update_position(path, player.path_position() + current_movement_speed * dt);
-	update_camera();
+	if(life > 0) {
+		player.update_position(path, player.path_position() + current_movement_speed * dt);
+		update_camera();
 
-	update_enemies(dt);
+		update_enemies(dt);
 
-	//input.update_object(*lights.lights[0], dt);
-	//input.update_object(camera, dt);
+		//input.update_object(*lights.lights[0], dt);
+		//input.update_object(camera, dt);
 
-	if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
-		shoot();
-	}
-	if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
-		Input::movement_speed -= 1.f;
-		printf("Decreased movement speed\n");
-	}
-	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
-		Input::movement_speed += 1.f;
-		printf("Increased movement speed\n");
-	}
-	if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
-		printf("Change partciles!\n");
-		change_particles((particle_type_t) ((current_particle_type + 1) % 3));
-	}
+		if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
+			shoot();
+		}
+		if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
+			Input::movement_speed -= 1.f;
+			printf("Decreased movement speed\n");
+		}
+		if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
+			Input::movement_speed += 1.f;
+			printf("Increased movement speed\n");
+		}
+		if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
+			printf("Change partciles!\n");
+			change_particles((particle_type_t) ((current_particle_type + 1) % 3));
+		}
 
 #ifdef WIN32
-	if (useWII) {
-		player.set_canon_pitch(WII->getPitch());
-		player.set_canon_yaw(-1 * WII->getRoll());
-		
-		if (WII->getButtonBPressed()) {
-			shoot();
-			//WII->setRumble(true);
+		if (useWII) {
+			player.set_canon_pitch(WII->getPitch());
+			player.set_canon_yaw(-1 * WII->getRoll());
+			
+			if (WII->getButtonBPressed()) {
+				shoot();
+				//WII->setRumble(true);
+			}
+			else {
+				//WII->setRumble(false);
+			}
 		}
 		else {
-			//WII->setRumble(false);
-		}
-	}
-	else {
 #endif
-		player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
-		player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
+			player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
+			player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
 #ifdef WIN32
-	}
+		}
 #endif
 
-	smoke->update(dt);
-	attack_particles->update(dt, enemies, this);
+		smoke->update(dt);
+		attack_particles->update(dt, enemies, this);
 
-	dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
-	dust->update_config();
-	dust->update(dt);
-	
-	explosions->update(dt);
-	
-/*
-	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
-		cur_controll = (cur_controll + 1) % num_controllable;
-		printf("Switching controll to %s\n", controllable_names[cur_controll]);
-	}
+		dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
+		dust->update_config();
+		dust->update(dt);
+		
+		explosions->update(dt);
 
-	if(input.current_value(Input::ACTION_3) > 0.9f) {
-		path_pos+=dt*Input::movement_speed;
-		glm::vec3 cur = path->at(path_pos);
-		cur.y += 2.f;
-		camera.set_position(cur);
-		camera.look_at(path->at(path_pos + 10.f));
+		life_text.set_number(life);
+		score_text.set_number(score);
+	/*
+		if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
+			cur_controll = (cur_controll + 1) % num_controllable;
+			printf("Switching controll to %s\n", controllable_names[cur_controll]);
+		}
+
+		if(input.current_value(Input::ACTION_3) > 0.9f) {
+			path_pos+=dt*Input::movement_speed;
+			glm::vec3 cur = path->at(path_pos);
+			cur.y += 2.f;
+			camera.set_position(cur);
+			camera.look_at(path->at(path_pos + 10.f));
+		}
+	*/
+	} else {
+		
 	}
-*/
 }
 
 void Game::evolve() {
@@ -413,49 +426,53 @@ void Game::render_geometry() {
 }
 
 void Game::render() {
-	glClear(GL_DEPTH_BUFFER_BIT);
 
-	lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
+	if(life > 0) {
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
+			render_geometry();
+		});
+
+		geometry->bind();
+		geometry->clear(Color::black);
+		shaders[SHADER_PASSTHRU]->bind();
+		Shader::upload_camera(camera);
 		render_geometry();
-	});
-
-	geometry->bind();
-	geometry->clear(Color::black);
-	shaders[SHADER_PASSTHRU]->bind();
-	Shader::upload_camera(camera);
-	render_geometry();
-	geometry->unbind();
+		geometry->unbind();
 
 
-	Shader::upload_state(composition->texture_size());
-	composition->bind();
+		Shader::upload_state(composition->texture_size());
+		composition->bind();
 
-	RenderTarget::clear(sky_color);
+		RenderTarget::clear(sky_color);
 
-	Shader::upload_camera(camera);
-	Shader::upload_lights(lights);
+		Shader::upload_camera(camera);
+		Shader::upload_lights(lights);
 
-	terrain->render();
+		terrain->render();
 
-	rail_material.bind();
-	rails->render();
+		rail_material.bind();
+		rails->render();
 
-	player.render();
+		player.render();
 
-	shaders[SHADER_NORMAL]->bind();
-	for(Enemy * e : enemies) {
-		e->render();
+		shaders[SHADER_NORMAL]->bind();
+		for(Enemy * e : enemies) {
+			e->render();
+		}
+
+		particle_shader->bind();
+		geometry->depth_bind(Shader::TEXTURE_2D_0);
+
+		dust->render();
+		smoke->render();
+		attack_particles->render();
+		explosions->render();
+
+		composition->unbind();
+
 	}
-
-	particle_shader->bind();
-	geometry->depth_bind(Shader::TEXTURE_2D_0);
-
-	dust->render();
-	smoke->render();
-	attack_particles->render();
-	explosions->render();
-
-	composition->unbind();
 
 	render_display();
 }
@@ -467,14 +484,24 @@ void Game::render_display() {
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
 
-	composition->draw(shaders[SHADER_PASSTHRU]);
+	if(life > 0) {
+		composition->draw(shaders[SHADER_PASSTHRU]);
 
-	// Here the hud will be! Fun fun fun fun!
-	
-	hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
-	shaders[SHADER_PASSTHRU]->bind();
-	
-	hud_static_elements->render();
+		// Here the hud will be! Fun fun fun fun!
+		
+		hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
+		shaders[SHADER_PASSTHRU]->bind();
+		
+		hud_static_elements->render();
+
+		life_text.render();
+	} else {
+
+		game_over_texture->texture_bind(Shader::TEXTURE_2D_0);
+		shaders[SHADER_PASSTHRU]->bind();
+		
+		hud_static_elements->render();
+	}
 }
 
 void Game::update_camera() {

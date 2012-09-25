@@ -39,6 +39,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/skybox.cpp src/skybox.hpp \
 								src/terrain.cpp src/terrain.hpp \
 								src/texture.cpp src/texture.hpp \
+								src/text.cpp src/text.hpp \
 								src/utils.cpp src/utils.hpp \
 								src/quad.hpp src/quad.cpp \
 								vendor/src/nanosvg.c
