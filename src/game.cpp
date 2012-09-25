@@ -65,6 +65,7 @@ Game::Game(const std::string &level) :
 	score(0)
 {
 
+	
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 	geometry = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER);
 
@@ -268,6 +269,8 @@ Game::Game(const std::string &level) :
 	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
 	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/gameover.png");
+
+	play_sound(PATH_BASE "ecstacy.mp3",-1);
 }
 
 Game::~Game() {
@@ -343,7 +346,27 @@ void Game::update(float dt) {
 
 		life_text.set_number(life);
 		score_text.set_number(score);
+
+	dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
+	dust->update_config();
+	dust->update(dt);
+	
+	explosions->update(dt);
+	
+	active_sounds.remove_if([](const Sound * s) {
+		if(s->is_done()) {
+		delete s;
+		return true;
+		};
+		return false;
+	});
+
+
 	/*
+	 if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
+		 cur_controll = (cur_controll + 1) % num_controllable;
+		 printf("Switching controll to %s\n", controllable_names[cur_controll]);
+	 }
 		if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
 			cur_controll = (cur_controll + 1) % num_controllable;
 			printf("Switching controll to %s\n", controllable_names[cur_controll]);
@@ -532,6 +555,7 @@ void Game::shoot() {
 	smoke->config.avg_spawn_velocity = glm::vec4(base_speed + player.aim_direction() * smoke_spawn_speed + glm::vec3(0.f, 1.f, 0.f), 1.f);
 	smoke->config.spawn_position = spawn_position;
 	smoke->spawn(smoke_count);
+	play_sound(PATH_BASE "Explosion_Fast.wav",1);
 }
 
 const Player &Game::get_player() const {
@@ -554,4 +578,11 @@ void Game::enemy_impact(const glm::vec3 &position, bool kill) {
 	}
 	explosions->config.spawn_position = glm::vec4(position, 1.f);
 	explosions->spawn(count);
+}
+
+void Game::play_sound(const char* path, int loops)
+{
+	Sound * s = new Sound(path, loops);
+	s->play();
+	active_sounds.push_back(s);
 }

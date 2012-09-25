@@ -123,6 +123,9 @@ class Game {
 		std::list<Enemy*> enemies;
 
 		Text life_text, score_text;
+		void play_sound(const char* path, int loops);
+
+		std::list<Sound*> active_sounds;
 };
 
 #endif
