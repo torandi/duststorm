@@ -1,12 +1,14 @@
-# Blender MTL File: 'kanon6.blend'
+# Blender MTL File: 'kanon8.blend'
 # Material Count: 1
-newmtl None_checkered.png
-Ns 0
+newmtl kanon_mat_untitled
+Ns 96.078431
 Ka 0.000000 0.000000 0.000000
-Kd 0.8 0.8 0.8
-Ks 0.8 0.8 0.8
-d 1
+Kd 1.5 1.5 1.5
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
 illum 2
-map_Kd /home/torandi/Dropbox/Grupp1/3d Models/Canon 5/kanon6.blend/checkered.png
+map_Kd kanon_col.png
+map_Bump kanon_nor.png
 
 
