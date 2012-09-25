@@ -45,7 +45,6 @@ void Enemy::render() const {
 	Shader::upload_model_matrix(matrix());
 
 	float life = glm::clamp(hp/initial_hp, 0.f, 1.f);
-	if(hp < 19.9) printf("hp: %f/%f\n", hp, initial_hp);
 	float scale = life * scale_.x;
 	Shader::push_vertex_attribs(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
