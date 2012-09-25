@@ -26,6 +26,8 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 	cl_int err;
 
 	enemy_list_.clear();
+	enemy_back_ref_.clear();
+
 	for(Enemy * e : enemies) {
 		enemy_data_t d = { e->position(), e->radius };
 		enemy_list_.push_back(d);
@@ -50,10 +52,8 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 
 	for(int i=0; i < max_num_particles_; ++i ) {
 		if(particles[i].extra1 != 0) {
-			printf("HIT! %d\n", particles[i].extra1);
 			Enemy * e = enemy_back_ref_[particles[i].extra1];
-			//e->hp -= particles[i].extra3;
-			e->hp = -1.f;
+			e->hp -= particles[i].extra3;
 		}
 	}
 

@@ -305,7 +305,6 @@ void Game::update_enemies(float dt) {
 	//Despawn old enemies:
 	for(auto it = enemies.begin(); it != enemies.end(); ++it) {
 		if((*it)->hp <= 0 ) {
-			printf("KILL!\n");
 			it = enemies.erase(it);
 		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
 			it = enemies.erase(it);
@@ -323,7 +322,7 @@ void Game::update_enemies(float dt) {
 	spawn_side.y = 0;
 	spawn_side = glm::normalize(spawn_side);
 
-	while(accum_unspawned > EnemyTemplate::min_spawn_cost && fail_count < 3) {
+	while(enemies.size() < EnemyTemplate::max_num_enemies && accum_unspawned > EnemyTemplate::min_spawn_cost && fail_count < 3) {
 		int index = floor(frand() * EnemyTemplate::templates.size());
 		auto it = EnemyTemplate::templates.begin() + index;
 		if(it->spawn_cost <= accum_unspawned && it->min_level <= player_level) {
