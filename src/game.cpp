@@ -321,7 +321,7 @@ void Game::update(float dt) {
 	dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
 	dust->update_config();
 	dust->update(dt);
-
+	
 	explosions->update(dt);
 /*
 	if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
