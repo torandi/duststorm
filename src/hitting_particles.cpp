@@ -27,15 +27,15 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 
 	enemy_list_.clear();
 	enemy_back_ref_.clear();
-	bool * hit = new bool[enemy_back_ref_.size()];
 
 	int j=0;
 	for(Enemy * e : enemies) {
 		enemy_data_t d = { e->position(), e->radius };
 		enemy_list_.push_back(d);
 		enemy_back_ref_.push_back(e);
-		hit[j++] = false;
 	}
+	
+	std::vector<bool> hit(enemy_list_.size(), false);
 
 	if(enemy_list_.size() > 0) {
 		err = opencl->queue().enqueueWriteBuffer(enemies_, CL_TRUE, 0, sizeof(enemy_data_t) * enemy_list_.size(), &(enemy_list_[0]), NULL,NULL);
@@ -70,6 +70,4 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 	
 	opencl->queue().enqueueUnmapMemObject(particles_, particles, NULL, NULL);
 	opencl->queue().enqueueUnmapMemObject(cl_gl_buffers_[0], vertices, NULL, NULL);
-
-	delete[] hit;
 }
