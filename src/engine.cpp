@@ -24,6 +24,28 @@ static const char* shader_programs[NUM_SHADERS] = {
 	"blend"
 };
 
+static void render_loading_scene() {
+	checkForGLErrors("Frame begin");
+	glClearColor(1, 0, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	Shader::upload_state(resolution);
+	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
+	glViewport(0, 0, resolution.x, resolution.y);
+
+	Quad* loadingscreen = new Quad();
+	loadingscreen->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
+	Texture2D* lodingtexture = Texture2D::from_filename(PATH_BASE "/data/textures/loading.png");
+	lodingtexture->texture_bind(Shader::TEXTURE_2D_0);
+
+
+	shaders[SHADER_PASSTHRU]->bind();
+
+	loadingscreen->render();
+	SDL_GL_SwapBuffers();
+	checkForGLErrors("Frame end");
+}
+
 namespace Engine {
 	Game * game;
 
@@ -57,37 +79,14 @@ namespace Engine {
 			WII->connect();
 		}
 #endif
+		render_loading_scene();
+
 		Shader::fog_t fog = { glm::vec4(0.584f, 0.698f, 0.698f, 1.f), 0.005f };
 		Shader::upload_fog(fog);
 		srand(util_utime());
 		opencl = new CL();
 
 
-		checkForGLErrors("Frame begin");
-	glClearColor(1, 0, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-
-	
-
-	Shader::upload_state(resolution);
-	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
-	glViewport(0, 0, resolution.x, resolution.y);
-
-	
-
-	// Here the hud will be! Fun fun fun fun!
-	Quad* loadingscreen = new Quad();
-	loadingscreen->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
-	Texture2D* lodingtexture = Texture2D::from_filename(PATH_BASE "/data/textures/loading.png");
-	lodingtexture->texture_bind(Shader::TEXTURE_2D_0);
-	
-	
-	shaders[SHADER_PASSTHRU]->bind();
-	
-	loadingscreen->render();
-	SDL_GL_SwapBuffers();
-	checkForGLErrors("Frame end");
 		Game::init();
 		game = new Game(level);
 	}
