@@ -396,7 +396,7 @@ void Game::update(float dt) {
 #ifdef WIN32
 		if(useWII) {
 			WII->setRumble(false);
-			if (WII->getButtonAPressed()) {
+			if (WII->getButtonPlusPressed()) {
 				initialize();
 			}
 		}
