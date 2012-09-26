@@ -28,7 +28,6 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 	enemy_list_.clear();
 	enemy_back_ref_.clear();
 
-	int j=0;
 	for(Enemy * e : enemies) {
 		enemy_data_t d = { e->position(), e->radius };
 		enemy_list_.push_back(d);
@@ -61,7 +60,7 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 		}
 	}
 
-	for(int i=0;i<enemy_back_ref_.size(); ++i) {
+	for(unsigned int i=0;i<enemy_back_ref_.size(); ++i) {
 		if(hit[i]) {
 			game->enemy_impact(enemy_back_ref_[i]->position());
 		}
