@@ -542,9 +542,9 @@ void Game::render_display() {
 }
 
 void Game::update_camera() {
-	glm::vec4 rotated_offset = player.rotation_matrix() * glm::vec4(camera_offset, 1.f);
-	camera.set_position(player.position() + glm::vec3(rotated_offset.x, rotated_offset.y, rotated_offset.z));
-	camera.look_at(path->at(player.path_position() + look_at_offset) + camera_offset);
+	glm::vec3 rotated_offset = glm::vec3(player.rotation_matrix() * glm::vec4(camera_offset, 1.f));
+	camera.set_position(player.position() + rotated_offset);
+	camera.look_at(path->at(player.path_position() + look_at_offset) + rotated_offset);
 }
 
 void Game::shoot() {
