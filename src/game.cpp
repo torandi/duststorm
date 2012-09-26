@@ -78,11 +78,12 @@ Game::Game(const std::string &level) :
 	movement_speed = config["/player/speed/normal"]->as_float();
 	brake_movement_speed = config["/player/speed/brake"]->as_float();
 
-	spawn_area_start = config["/environment/spawn_area/start"]->as_float();
-	spawn_area_end = config["/environment/spawn_area/end"]->as_float();
+	spawn_area_start = config["/game/spawn_area/start"]->as_float();
+	spawn_area_end = config["/game/spawn_area/end"]->as_float();
 	spawn_area_size = spawn_area_end - spawn_area_start;
-	spawn_distance = config["/environment/spawn_area/distance"]->as_float();
-	despawn_distance = config["/environment/spawn_area/despawn_distance"]->as_float();
+	spawn_distance = config["/game/spawn_area/distance"]->as_float();
+	despawn_distance = config["/game/spawn_area/despawn_distance"]->as_float();
+	difficulty_increase = config["/game/difficulty_increase"]->as_float();
 
 	static const Shader::fog_t fog = { glm::vec4(sky_color.to_vec3(), 1.f), fog_intensity };
 	Shader::upload_fog(fog);
@@ -381,7 +382,7 @@ void Game::update(float dt) {
 }
 
 void Game::evolve() {
-	player_level += 0.01f;
+	player_level += difficulty_increase;
 }
 
 void Game::draw_selected_weap()

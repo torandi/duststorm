@@ -116,6 +116,7 @@ class Game {
 		float accum_unspawned;
 
 		float player_level;
+		float difficulty_increase;
 
 		int life;
 
