@@ -94,7 +94,7 @@ class Game {
 
 		Quad *hud_static_elements, *hud_choice_quad;
 		Texture2D *hud_static_elements_tex, *game_over_texture, *hud_choice_tex;
-		void Game::draw_selected_weap();
+		void draw_selected_weap();
 		
 		glm::core::type::vec2 hud_lightpos, hud_mediumpos, hud_heavypos; 
 
