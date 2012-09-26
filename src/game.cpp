@@ -309,19 +309,10 @@ void Game::update(float dt) {
 
 		update_enemies(dt);
 
-		//input.update_object(*lights.lights[0], dt);
 		//input.update_object(camera, dt);
 
 		if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
 			shoot();
-		}
-		if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
-			Input::movement_speed -= 1.f;
-			printf("Decreased movement speed\n");
-		}
-		if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
-			Input::movement_speed += 1.f;
-			printf("Increased movement speed\n");
 		}
 		if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
 			printf("Change partciles!\n");
@@ -372,31 +363,12 @@ void Game::update(float dt) {
 	
 	active_sounds.remove_if([](const Sound * s) {
 		if(s->is_done()) {
-		delete s;
-		return true;
+			delete s;
+			return true;
 		};
 		return false;
 	});
 
-
-	/*
-	 if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
-		 cur_controll = (cur_controll + 1) % num_controllable;
-		 printf("Switching controll to %s\n", controllable_names[cur_controll]);
-	 }
-		if(input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f) {
-			cur_controll = (cur_controll + 1) % num_controllable;
-			printf("Switching controll to %s\n", controllable_names[cur_controll]);
-		}
-
-		if(input.current_value(Input::ACTION_3) > 0.9f) {
-			path_pos+=dt*Input::movement_speed;
-			glm::vec3 cur = path->at(path_pos);
-			cur.y += 2.f;
-			camera.set_position(cur);
-			camera.look_at(path->at(path_pos + 10.f));
-		}
-	*/
 	} else {
 		score_text.set_number(score);
 		score_text.set_scale(40.0 * hud_scale.x);
