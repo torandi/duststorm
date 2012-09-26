@@ -18,17 +18,13 @@ __kernel void run_particles (
 
 			particles[id].velocity += config->gravity.xyz * particles[id].gravity_influence * dt;
 			particles[id].velocity -= (particles[id].velocity - config->wind_velocity.xyz) * particles[id].wind_influence * dt;
-			//particles[id].velocity += config->wind_velocity * particles[id].wind_influence * dt;
 
 			vertices[id].position.xyz += (particles[id].velocity + random3(config->motion_rand.xyz, true)) * dt;
 			vertices[id].position.w += particles[id].rotation_speed * dt;
 
-			vertices[id].color = mix(config->birth_color, config->death_color, life_progression);
-			//vertices[id].color = (float4)(particles[id].wind_influence);
+			vertices[id].color = mix(particles[id].birth_color, particles[id].death_color, life_progression);
 			vertices[id].scale = mix(particles[id].initial_scale, particles[id].final_scale, life_progression);
 
-			//TODO: Collision detection (ground and enemies)
-			//bool collision = false;
 		} else {
 			//Dead!
 			vertices[id].color.w = 0.0;
