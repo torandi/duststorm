@@ -6,10 +6,13 @@
 #include "movable_light.hpp"
 #include "globals.hpp"
 
+glm::ivec2 MovableLight::shadowmap_resolution = glm::ivec2(4096, 4096);
+float MovableLight::shadowmap_far_factor = 0.5f;
+
 MovableLight::MovableLight(Light * light) : 
 		MovableObject(light->position)
 	, data(light)
-	, shadow_map(glm::ivec2(2*2048, 2*2048))
+	, shadow_map(shadowmap_resolution)
 	, constant_attenuation(data->constant_attenuation)
 	, linear_attenuation(data->linear_attenuation)
 	, quadratic_attenuation(data->quadratic_attenuation)
@@ -21,7 +24,7 @@ MovableLight::MovableLight(Light * light) :
 
 MovableLight::MovableLight() :
 	  data(new Light())
-	, shadow_map(glm::ivec2(2*2048, 2*2048))
+	, shadow_map(shadowmap_resolution)
 	, constant_attenuation(data->constant_attenuation)
 	, linear_attenuation(data->linear_attenuation)
 	, quadratic_attenuation(data->quadratic_attenuation)
@@ -29,7 +32,7 @@ MovableLight::MovableLight() :
 
 MovableLight::MovableLight(const MovableLight &ml) : MovableObject(ml.position())
 	, data(ml.data)
-	, shadow_map(glm::ivec2(2*2048, 2*2048))
+	, shadow_map(shadowmap_resolution)
 	, constant_attenuation(data->constant_attenuation)
 	, linear_attenuation(data->linear_attenuation)
 	, quadratic_attenuation(data->quadratic_attenuation)
@@ -81,7 +84,7 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 
 	float near, far;
 	near = camera.near();
-	far = 100.f;
+	far = camera.far() * shadowmap_far_factor;
 
 	glm::mat4 view_matrix, projection_matrix;
 

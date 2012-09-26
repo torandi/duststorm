@@ -17,6 +17,10 @@ class MovableLight : public MovableObject {
 		Light * data;
 
 	public:
+
+		static glm::ivec2 shadowmap_resolution;
+		static float shadowmap_far_factor;
+
 		/**
 		 * points shall be [8], filled with corners
 		 * @return frustrum center
