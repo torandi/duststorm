@@ -27,6 +27,7 @@ class Input {
 			ACTION_1,
 			ACTION_2,
 			ACTION_3,
+			START,
 			NUM_ACTIONS
 		};
 

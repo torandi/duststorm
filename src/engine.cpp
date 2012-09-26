@@ -9,6 +9,7 @@
 
 #include "sound.hpp"
 #include "game.hpp" 
+#include "config.hpp"
 
 CL * opencl;
 
@@ -33,15 +34,15 @@ static void render_loading_scene() {
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
 
-	Quad* loadingscreen = new Quad();
-	loadingscreen->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
-	Texture2D* lodingtexture = Texture2D::from_filename(PATH_BASE "/data/textures/loading.png");
-	lodingtexture->texture_bind(Shader::TEXTURE_2D_0);
+	Quad loadingscreen;
+	loadingscreen.set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
+	Texture2D* loadingtexture = Texture2D::from_filename(PATH_BASE "/data/textures/loading.png");
+	loadingtexture->texture_bind(Shader::TEXTURE_2D_0);
 
 
 	shaders[SHADER_PASSTHRU]->bind();
 
-	loadingscreen->render();
+	loadingscreen.render();
 	SDL_GL_SwapBuffers();
 	checkForGLErrors("Frame end");
 }
@@ -86,9 +87,17 @@ namespace Engine {
 		srand(util_utime());
 		opencl = new CL();
 
+		render_loading_scene();
+
+		Config config = Config::parse(PATH_BASE "/data/graphics.cfg");
+
+		MovableLight::shadowmap_resolution = glm::ivec2(config["/shadowmap/resolution"]->as_vec2());
+		MovableLight::shadowmap_far_factor = config["/shadowmap/far_factor"]->as_float();
+		printf("shadowmap_resolution: %d, %d\n", MovableLight::shadowmap_resolution.x,MovableLight::shadowmap_resolution.y); 
+
 
 		Game::init();
-		game = new Game(level);
+		game = new Game(level, config["/camera/near"]->as_float(), config["camera/far"]->as_float(), config["camera/fov"]->as_float());
 	}
 
 	void cleanup() {

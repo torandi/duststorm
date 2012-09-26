@@ -27,7 +27,7 @@
 
 class Game {
 	public:
-		Game(const std::string &level);
+		Game(const std::string &level, float near, float far, float fov);
 		~Game();
 
 		void update(float dt);
@@ -118,6 +118,7 @@ class Game {
 		float player_level;
 		float difficulty_increase;
 
+		bool dead;
 		int life;
 
 		int score;

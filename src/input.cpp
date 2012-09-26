@@ -67,6 +67,9 @@ void Input::parse_event(const SDL_Event &event) {
 				case SDLK_4:
 					sustained_values[ACTION_3] = 1.f;
 					break;
+				case SDLK_SPACE:
+					sustained_values[START] = 1.f;
+					break;
 				default:
 					break;
 			}
@@ -104,6 +107,10 @@ void Input::parse_event(const SDL_Event &event) {
 					break;
 				case SDLK_4:
 					sustained_values[ACTION_3] = 0.f;
+					break;
+				case SDLK_SPACE:
+					sustained_values[START] = 0.f;
+					break;
 				default:
 					break;
 			}
@@ -125,6 +132,9 @@ void Input::parse_event(const SDL_Event &event) {
 				case 3:
 					sustained_values[ACTION_3] = 1.f;
 					break;
+				case 7:
+					sustained_values[START] = 1.f;
+					break;
 			}
 			break;
 		case SDL_JOYBUTTONUP:
@@ -140,6 +150,9 @@ void Input::parse_event(const SDL_Event &event) {
 					break;
 				case 3:
 					sustained_values[ACTION_3] = 0.f;
+					break;
+				case 7:
+					sustained_values[START] = 0.f;
 					break;
 			}
 			break;

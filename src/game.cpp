@@ -57,8 +57,8 @@ static void read_particle_config(const ConfigEntry * config, ParticleSystem::con
 void Game::init() {
 }
 
-Game::Game(const std::string &level) :
-	camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f) {
+Game::Game(const std::string &level, float near, float far, float fov) :
+	camera(fov, resolution.x/(float)resolution.y, near, far) {
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 	geometry = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER);
 
@@ -260,8 +260,6 @@ Game::Game(const std::string &level) :
 	life_text.set_scale(20.0 * hud_scale.x);
 	life_text.set_position(glm::vec3(glm::vec2(26.f, 44.5f) * hud_scale, 0.f));
 
-	score_text.set_scale(20.0 * hud_scale.x);
-	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
 	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/gameover.png");
 
@@ -281,7 +279,7 @@ void Game::initialize() {
 
 	accum_unspawned = 0;
 	player_level = 0.5f;
-	life = 100;
+	life = 10;
 	score = 0;
 
 
@@ -290,6 +288,12 @@ void Game::initialize() {
 
 	life_text.set_number(life);
 	score_text.set_number(score);
+
+	//Reset score position:
+	score_text.set_scale(20.0 * hud_scale.x);
+	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
+
+	dead = false;
 }
 
 Game::~Game() {
@@ -308,7 +312,16 @@ Game::~Game() {
 
 void Game::update(float dt) {
 
-	if(life > 0) {
+	if(!dead) {
+		if(life <= 0) {
+			dead = true;
+
+			score_text.set_number(score);
+			score_text.set_scale(40.0 * hud_scale.x);
+			score_text.set_position(glm::vec3(glm::vec2(565.f, 400.f) * hud_scale, 0.f));
+
+			return;
+		}
 		player.update_position(path, player.path_position() + current_movement_speed * dt);
 		update_camera();
 
@@ -375,9 +388,19 @@ void Game::update(float dt) {
 	});
 
 	} else {
-		score_text.set_number(score);
-		score_text.set_scale(40.0 * hud_scale.x);
-		score_text.set_position(glm::vec3(glm::vec2(565.f, 400.f) * hud_scale, 0.f));
+
+		if(input.has_changed(Input::START, 0.2f) && input.current_value(Input::START) > 0.9f) {
+			initialize();
+		}
+
+#ifdef WIN32
+		if(useWII) {
+			WII->setRumble(false);
+			if (WII->getButtonAPressed()) {
+				initialize();
+			}
+		}
+#endif
 	}
 }
 

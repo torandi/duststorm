@@ -34,7 +34,7 @@
 
 glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
-static const unsigned int framerate = 120;
+static const unsigned int framerate = 60;
 static const uint64_t per_frame = 1000000 / framerate;
 float global_time = 0.f;
 static volatile bool running = true;

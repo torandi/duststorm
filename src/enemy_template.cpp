@@ -18,7 +18,7 @@ std::vector<EnemyTemplate> EnemyTemplate::templates;
 std::map<std::string, EnemyAI*> EnemyTemplate::available_ais;
 float EnemyTemplate::spawn_rate;
 float EnemyTemplate::min_spawn_cost = FLT_MAX;
-int EnemyTemplate::max_num_enemies;
+unsigned int EnemyTemplate::max_num_enemies;
 
 void EnemyTemplate::init(Config config, const Game * game) {
 	available_ais["stare"] = new StaringAI(game);
