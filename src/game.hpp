@@ -121,6 +121,8 @@ class Game {
 
 		int score;
 
+		float start_position;
+
 		Color sky_color;
 
 		std::list<Enemy*> enemies;
@@ -128,7 +130,8 @@ class Game {
 		Text life_text, score_text;
 		void play_sound(const char* path, int loops);
 
-		
+
+		void initialize(); //Also reinitialize
 
 
 		std::list<Sound*> active_sounds;

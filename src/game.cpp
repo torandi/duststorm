@@ -58,17 +58,9 @@ void Game::init() {
 }
 
 Game::Game(const std::string &level) :
-	camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f),
-	accum_unspawned(0),
-	player_level(1.f),
-	life(100),
-	score(0)
-{
-
-	
+	camera(75.f, resolution.x/(float)resolution.y, 0.1f, 400.f) {
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 	geometry = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER);
-
 
 	printf("Loading level %s\n", level.c_str());
 
@@ -77,7 +69,7 @@ Game::Game(const std::string &level) :
 	Config config = Config::parse(base_dir + "/level.cfg");
 
 	//Read config:
-	static const float start_position = config["/player/start_position"]->as_float();
+	start_position = config["/player/start_position"]->as_float();
 	sky_color = config["/environment/sky_color"]->as_color();
 	static const glm::vec2 terrain_scale = config["/environment/terrain/scale"]->as_vec2();
 	static const float fog_intensity = config["/environment/fog_intensity"]->as_float();
@@ -91,8 +83,6 @@ Game::Game(const std::string &level) :
 	spawn_area_size = spawn_area_end - spawn_area_start;
 	spawn_distance = config["/environment/spawn_area/distance"]->as_float();
 	despawn_distance = config["/environment/spawn_area/despawn_distance"]->as_float();
-
-	current_movement_speed = movement_speed;
 
 	static const Shader::fog_t fog = { glm::vec4(sky_color.to_vec3(), 1.f), fog_intensity };
 	Shader::upload_fog(fog);
@@ -136,16 +126,13 @@ Game::Game(const std::string &level) :
 	rail_material.texture = rail_texture;
 
 	//Setup player:
-	player.update_position(path, start_position);
 	player.canon_offset = config["/player/canon_offset"]->as_vec3();
 	player.canon_length = config["/player/canon_length"]->as_float();
-
 	//Configure lights:
 
 	lights.ambient_intensity() = config["/environment/light/ambient"]->as_vec3();
 	lights.num_lights() = 1;
 
-	lights.lights[0]->set_position(glm::normalize(glm::vec3(1.0, -1.f, 0.0f)));
 	lights.lights[0]->intensity = config["/environment/light/sunlight"]->as_vec3();
 	lights.lights[0]->type = MovableLight::DIRECTIONAL_LIGHT;
 
@@ -155,10 +142,6 @@ Game::Game(const std::string &level) :
 //Set up camera:
 
 	update_camera();
-
-
-	
-	
 
 //Create particle systems:
 
@@ -192,6 +175,7 @@ Game::Game(const std::string &level) :
 	for(auto &p : particle_types) {
 		p.config = attack_particles->config; //Get reasonable defaults
 	}
+
 	read_particle_config(particle_config["/particles/light"], particle_types[LIGHT_PARTICLES].config);
 	particle_types[LIGHT_PARTICLES].count = particle_config["/particles/light/count"]->as_int();
 	particle_types[LIGHT_PARTICLES].spawn_speed = particle_config["/particles/light/spawn_speed"]->as_float();
@@ -206,8 +190,6 @@ Game::Game(const std::string &level) :
 	particle_types[HEAVY_PARTICLES].count = particle_config["/particles/heavy/count"]->as_int();
 	particle_types[HEAVY_PARTICLES].spawn_speed = particle_config["/particles/heavy/spawn_speed"]->as_float();
 	particle_types[HEAVY_PARTICLES].damage = particle_config["/particles/heavy/damage"]->as_float();
-
-	change_particles(LIGHT_PARTICLES);
 
 	//Smoke:
 	smoke = new ParticleSystem(max_smoke_particles, particle_textures, false);
@@ -262,7 +244,7 @@ Game::Game(const std::string &level) :
 
 
 	hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
-		hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
+	hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
 	hud_static_elements = new Quad();
 	hud_static_elements->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
 
@@ -274,17 +256,39 @@ Game::Game(const std::string &level) :
 	hud_choice_quad = new Quad();
 	hud_choice_quad->set_scale(glm::core::type::vec3(97,92,0) * glm::core::type::vec3(hud_scale , 0));
 
-	life_text.set_number(100);
 	life_text.set_scale(20.0 * hud_scale.x);
 	life_text.set_position(glm::vec3(glm::vec2(26.f, 44.5f) * hud_scale, 0.f));
 
-	score_text.set_number(0);
 	score_text.set_scale(20.0 * hud_scale.x);
 	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
 	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/gameover.png");
 
+	initialize();
+
 	play_sound(PATH_BASE "ecstacy.mp3",-1);
+}
+
+void Game::initialize() {
+
+	//Reset light:
+	lights.lights[0]->set_position(glm::normalize(glm::vec3(1.0, -1.f, 0.0f)));
+
+	//Set player variables
+	player.update_position(path, start_position);
+	current_movement_speed = movement_speed;
+
+	accum_unspawned = 0;
+	player_level = 0.5f;
+	life = 100;
+	score = 0;
+
+
+	change_particles(MEDIUM_PARTICLES);
+
+
+	life_text.set_number(life);
+	score_text.set_number(score);
 }
 
 Game::~Game() {
@@ -408,7 +412,7 @@ void Game::update_enemies(float dt) {
 			++it;
 		}
 	}
-	life = glm::clamp(life, 0, 100);
+	life = glm::clamp(life, 0, 200);
 
 	//Start by spawning:
 	accum_unspawned += EnemyTemplate::spawn_rate * player_level * dt * current_movement_speed;
