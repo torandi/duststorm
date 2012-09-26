@@ -81,7 +81,7 @@ glm::vec3 Player::direction() const {
 }
 
 glm::vec3 Player::aim_direction() const {
-	return glm::normalize(glm::vec3( aim_matrix() * glm::vec4(1.f, 0.2f, 0.f, 1.f)));
+	return glm::normalize(glm::vec3( aim_matrix() * glm::vec4(1.f, 0.0f, 0.f, 1.f)));
 }
 
 glm::mat4 Player::aim_matrix() const {
