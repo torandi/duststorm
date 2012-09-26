@@ -335,10 +335,13 @@ void Game::update(float dt) {
 			
 			if (WII->getButtonBPressed()) {
 				shoot();
-				//WII->setRumble(true);
+				WII->setRumble(true);
+			}
+			if (WII->getButtonAPressed()) {
+				change_particles((particle_type_t) ((current_particle_type + 1) % 3));
 			}
 			else {
-				//WII->setRumble(false);
+				WII->setRumble(false);
 			}
 		}
 		else {

@@ -301,6 +301,12 @@ int main(int argc, char* argv[]){
 			verbose_flag = 1;
 		else if (strcmp(arg, "-w") == 0)
 			useWII = 1;
+		else if(strcmp(arg, "-r") == 0) {
+			resolution.x = atoi(argv[++i]);
+			resolution.y = atoi(argv[++i]);
+			next_index+=2;
+			resolution_given = true;
+		}
 		else --next_index;
 	}
 #endif
