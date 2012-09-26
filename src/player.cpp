@@ -17,7 +17,7 @@ Player::Player() {
 	holder = new RenderObject("canon/holder.obj");
 	gun = new RenderObject("canon/gun.obj");
 	cart->yaw(-M_PI/2.f);
-	cart->set_position(glm::vec3(0.f, 0.6f, 0.f));
+	cart->set_position(glm::vec3(0.f, 0.7f, 0.f));
 	shader = Shader::create_shader("normal");
 	canon_pitch.set_rotation(glm::vec3(1.0, 0.0, 0.0), 0.f);
 	canon_yaw.set_rotation(glm::vec3(1.0, 0.0, 0.0), 0.f);

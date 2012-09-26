@@ -22,7 +22,7 @@
  */
 static const float height = 0.15f;
 static const float width = 0.10f;
-static const float separation = 0.5f;
+static const float separation = 0.65f;
 static const float uv_offset = 1.f;
 
 static const unsigned int slice_indices = 8;
@@ -51,7 +51,7 @@ Rails::~Rails() { }
  * The vertex structure is for each slice as follows:
  * 1 - 2     6 - 5
  * |   |     |   |
- *	0   3     7   4
+ * 0   3     7   4
  *
  * uv coordinates are (offset = position / uv_offset)
  * (1/3,offset) - (2/3,offset) 
