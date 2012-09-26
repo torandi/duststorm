@@ -254,11 +254,22 @@ Game::Game(const std::string &level) :
 	hit_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/hit_explosion/avg_spawn_velocity"]->as_vec3(), 0);
 
 	//Setup HUD
-	hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
+
+
+
+
+	hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
+		hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
 	hud_static_elements = new Quad();
 	hud_static_elements->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
 
-	hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
+	hud_lightpos =  glm::vec2(594,490) * hud_scale;
+	hud_mediumpos = glm::vec2(644,490) * hud_scale;
+	hud_heavypos =  glm::vec2(700,490) * hud_scale;
+
+	hud_choice_tex = Texture2D::from_filename(PATH_BASE "/data/textures/weap_select.png");
+	hud_choice_quad = new Quad();
+	hud_choice_quad->set_scale(glm::core::type::vec3(97,92,0) * glm::core::type::vec3(hud_scale , 0));
 
 	life_text.set_number(100);
 	life_text.set_scale(20.0 * hud_scale.x);
@@ -389,6 +400,19 @@ void Game::update(float dt) {
 
 void Game::evolve() {
 	player_level += 0.01f;
+}
+
+void Game::draw_selected_weap()
+{
+	if(current_particle_type==0)
+		hud_choice_quad->set_position(glm::vec3(hud_lightpos,0));
+	else if(current_particle_type==1)
+		hud_choice_quad->set_position(glm::vec3(hud_mediumpos,0));
+	else if(current_particle_type==2)
+		hud_choice_quad->set_position(glm::vec3(hud_heavypos,0));
+	hud_choice_tex->texture_bind(Shader::TEXTURE_2D_0);
+	shaders[SHADER_PASSTHRU]->bind();
+	hud_choice_quad->render();
 }
 
 void Game::update_enemies(float dt) {
@@ -526,6 +550,8 @@ void Game::render_display() {
 
 		life_text.render();
 		score_text.render();
+
+		draw_selected_weap();
 	} else {
 
 		game_over_texture->texture_bind(Shader::TEXTURE_2D_0);

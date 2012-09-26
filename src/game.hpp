@@ -92,8 +92,11 @@ class Game {
 		Camera camera;
 		RenderTarget *composition, *geometry;
 
-		Quad *hud_static_elements;
-		Texture2D *hud_static_elements_tex, *game_over_texture;
+		Quad *hud_static_elements, *hud_choice_quad;
+		Texture2D *hud_static_elements_tex, *game_over_texture, *hud_choice_tex;
+		void Game::draw_selected_weap();
+		
+		glm::core::type::vec2 hud_lightpos, hud_mediumpos, hud_heavypos; 
 
 		Shader *particle_shader;
 
@@ -124,6 +127,9 @@ class Game {
 
 		Text life_text, score_text;
 		void play_sound(const char* path, int loops);
+
+		
+
 
 		std::list<Sound*> active_sounds;
 };
