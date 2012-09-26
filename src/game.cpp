@@ -279,7 +279,7 @@ void Game::initialize() {
 
 	accum_unspawned = 0;
 	player_level = 0.5f;
-	life = 10;
+	life = 100;
 	score = 0;
 
 
@@ -342,17 +342,18 @@ void Game::update(float dt) {
 			player.set_canon_pitch(WII->getPitch());
 			player.set_canon_yaw(-1 * WII->getRoll());
 			
-			if (WII->getButtonBPressed()) {
+			if (WII->getButtonAPressed()) {
 				shoot();
 				WII->setRumble(true);
-			}
-			if (WII->getButtonAPressed()) {
-				change_particles((particle_type_t) ((current_particle_type + 1) % 3));
-			}
-			else {
+			} else {
 				WII->setRumble(false);
 			}
+			
+			if (WII->getButtonBPressed()) {
+				change_particles((particle_type_t) ((current_particle_type + 1) % 3));
+			}
 		}
+
 		else {
 #endif
 			player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
