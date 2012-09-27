@@ -169,6 +169,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	gravity = glm::vec4(config["/environment/gravity"]->as_vec3(), 1.f);
 
 	particle_shader = Shader::create_shader("particles");
+	passthru = Shader::create_shader("passthru");
 
 	static const Config particle_config = Config::parse(base_dir + "/particles.cfg");
 
@@ -282,7 +283,6 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/gameover.png");
 	startscreen_texture = Texture2D::from_filename(PATH_BASE "/data/textures/start_screen.png");
-
 }
 
 void Game::initialize() {
@@ -296,7 +296,7 @@ void Game::initialize() {
 
 	accum_unspawned = 0;
 	player_level = 0.5f;
-	life = 100;
+	life = 10;
 	score = 0;
 
 
@@ -309,8 +309,6 @@ void Game::initialize() {
 	//Reset score position:
 	score_text.set_scale(20.0 * hud_scale.x);
 	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
-
-	dead = false;
 
 	if(music != nullptr) delete music;
 	music = new Sound(PATH_BASE "ecstacy.mp3", 1);
@@ -345,11 +343,14 @@ void Game::update(float dt) {
 				if(life <= 0) {
 					music->stop();
 					//delete music;
-					dead = true;
+					current_mode = MODE_HIGHSCORE;
 
 					score_text.set_number(score);
 					score_text.set_scale(40.0 * hud_scale.x);
 					score_text.set_position(glm::vec3(glm::vec2(565.f, 400.f) * hud_scale, 0.f));
+#ifdef WIN32
+					if(useWII) WII->setRumble(false);
+#endif
 
 					return;
 				}
@@ -448,7 +449,7 @@ void Game::draw_selected_weap()
 	else if(current_particle_type==2)
 		hud_choice_quad->set_position(glm::vec3(hud_heavypos,0));
 	hud_choice_tex->texture_bind(Shader::TEXTURE_2D_0);
-	shaders[SHADER_PASSTHRU]->bind();
+	passthru->bind();
 	hud_choice_quad->render();
 }
 
@@ -519,15 +520,13 @@ void Game::render_geometry() {
 void Game::render() {
 
 	if(current_mode == MODE_GAME) {
-		glClear(GL_DEPTH_BUFFER_BIT);
-
 		lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
 			render_geometry();
 		});
 
 		geometry->bind();
 		geometry->clear(Color::black);
-		shaders[SHADER_PASSTHRU]->bind();
+		passthru->bind();
 		Shader::upload_camera(camera);
 		render_geometry();
 		geometry->unbind();
@@ -548,7 +547,7 @@ void Game::render() {
 
 		player.render();
 
-		shaders[SHADER_NORMAL]->bind();
+		passthru->bind();
 		for(Enemy * e : enemies) {
 			e->render();
 		}
@@ -569,7 +568,7 @@ void Game::render() {
 }
 
 void Game::render_display() {
-	RenderTarget::clear(Color::black);
+	RenderTarget::clear(Color::magenta);
 
 	Shader::upload_state(resolution);
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
@@ -578,10 +577,10 @@ void Game::render_display() {
 	switch(current_mode) {
 
 		case MODE_GAME:
-			composition->draw(shaders[SHADER_PASSTHRU]);
+			composition->draw(passthru);
 
 			hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
-			shaders[SHADER_PASSTHRU]->bind();
+			passthru->bind();
 			
 			fullscreen_quad->render();
 
@@ -592,12 +591,12 @@ void Game::render_display() {
 			break;
 		case MODE_READY:
 			startscreen_texture->texture_bind(Shader::TEXTURE_2D_0);
-			shaders[SHADER_PASSTHRU]->bind();
+			passthru->bind();
 			fullscreen_quad->render();
 			break;
 		case MODE_HIGHSCORE:
 			game_over_texture->texture_bind(Shader::TEXTURE_2D_0);
-			shaders[SHADER_PASSTHRU]->bind();
+			passthru->bind();
 			fullscreen_quad->render();
 			score_text.render();
 			break;

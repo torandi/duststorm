@@ -99,7 +99,7 @@ class Game {
 		
 		glm::core::type::vec2 hud_lightpos, hud_mediumpos, hud_heavypos; 
 
-		Shader *particle_shader;
+		Shader *particle_shader, *passthru;
 
 		glm::vec4 wind_velocity;
 		glm::vec4 gravity;
@@ -119,7 +119,6 @@ class Game {
 		float player_level;
 		float difficulty_increase;
 
-		bool dead;
 		int life;
 
 		int score;

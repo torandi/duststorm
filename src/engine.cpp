@@ -93,10 +93,9 @@ namespace Engine {
 
 		MovableLight::shadowmap_resolution = glm::ivec2(config["/shadowmap/resolution"]->as_vec2());
 		MovableLight::shadowmap_far_factor = config["/shadowmap/far_factor"]->as_float();
-		printf("shadowmap_resolution: %d, %d\n", MovableLight::shadowmap_resolution.x,MovableLight::shadowmap_resolution.y); 
-
 
 		Game::init();
+		render_loading_scene();
 		game = new Game(level, config["/camera/near"]->as_float(), config["camera/far"]->as_float(), config["camera/fov"]->as_float());
 	}
 

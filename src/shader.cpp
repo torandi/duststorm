@@ -116,9 +116,8 @@ Shader::Shader(const std::string &name_, GLuint program) :
 	        "  Active attrib: %d\n",
 	        name_.c_str(), program, num_attributes_);
 
-	glUseProgram(program_);
+	bind();
 	init_uniforms();
-	glUseProgram(0);
 }
 
 Shader::~Shader(){
