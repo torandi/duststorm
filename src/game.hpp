@@ -130,13 +130,15 @@ class Game {
 		std::list<Enemy*> enemies;
 
 		Text life_text, score_text;
+		//Stuff about sounds
 		void play_sound(const char* path, int loops);
+		std::list<Sound*> active_sounds;
+		Sound* music;
 
 
 		void initialize(); //Also reinitialize
 
 
-		std::list<Sound*> active_sounds;
 };
 
 #endif

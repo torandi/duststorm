@@ -265,7 +265,8 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 	initialize();
 
-	play_sound(PATH_BASE "ecstacy.mp3",-1);
+	music = new Sound(PATH_BASE "ecstacy.mp3", 1);
+	music->play();
 }
 
 void Game::initialize() {
@@ -402,6 +403,13 @@ void Game::update(float dt) {
 			}
 		}
 #endif
+	}
+	// Really ugly way of looping the music:
+	if(music != nullptr && music->is_done())
+	{
+		delete music;
+		music = new Sound(PATH_BASE "ecstacy.mp3", 5);
+		music->play();
 	}
 }
 
