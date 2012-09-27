@@ -19,10 +19,12 @@ __kernel void run_particles (
 {
 	uint id = get_global_id(0);
 	if(particles[id].dead == 0) {
+		float radius = vertices[id].scale * 0.5f * 0.1f; //All particle scales are scaled down with 0.1
+		float3 center = vertices[id].position.xyz - (float3)(0.5, 0.5, 0.5) * 0.1 * vertices[id].scale;
 		particles[id].ttl -= dt;
 		bool hit = false;
 		for(int e = 0; e < num_enemies; ++e) {
-			if( fast_distance(vertices[id].position.xyz, enemies[e].position) < enemies[e].radius) {
+			if( fast_distance(center, enemies[e].position) < enemies[e].radius + radius) {
 				hit = true;
 				particles[id].extra1 = e;
 				break;
