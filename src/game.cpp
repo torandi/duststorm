@@ -4,7 +4,6 @@
 
 #include "game.hpp"
 
-#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -407,29 +406,14 @@ void Game::update(float dt) {
 				}
 
 				// Change wind direction
-				wind_velocity = glm::rotateY(wind_velocity, 0.8f + sin(global_time));
+				wind_velocity = glm::rotateY(wind_velocity, (float)(0.8f + sin(global_time)));
 				update_wind_velocity();
 				
-				if (WII->getButtonBDown() && global_time - last_break > break_cooldown)
-					last_break = global_time;
-				float speed = current_movement_speed;
-				if (global_time - last_break < break_duration)
-					speed *= break_factor;
-				player.update_position(path, player.path_position() + speed * dt);
-
-				update_camera();
-
-				update_enemies(dt);
-
 				//input.update_object(camera, dt);
 
-				if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
-					shoot();
-				}
-				if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
-					printf("Change partciles!\n");
-					change_particles((particle_type_t) ((current_particle_type + 1) % 3));
-				}
+				bool buttonFirePressed = (input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f);
+				bool buttonSwapPressed = (input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f);
+				bool buttonBreakPressed = (input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f);
 
 #ifdef WIN32
 				if (useWII) {
@@ -440,30 +424,47 @@ void Game::update(float dt) {
 					player.set_canon_pitch(pitch);
 					player.set_canon_yaw(roll);
 
-					bool buttonFirePressed = WII->getButtonAPressed();
-					bool buttonSwapPressed = WII->getArrowDownPressed();
+					buttonFirePressed = WII->getButtonAPressed();
+					buttonSwapPressed = WII->getArrowDownPressed();
+					buttonBreakPressed = WII->getButtonBDown();
 					const bool wiiSwapAB = false;
-					if (wiiSwapAB) std::swap(buttonFirePressed, buttonSwapPressed);
-					
-					if (buttonFirePressed) {
-						shoot();
-						WII->setRumble(true);
-					} else {
-						WII->setRumble(false);
-					}
-					
-					if (buttonSwapPressed) {
-						change_particles((particle_type_t) ((current_particle_type + 1) % 3));
-					}
-				}
-
-				else {
+					if (wiiSwapAB) std::swap(buttonFirePressed, buttonBreakPressed);
+				} else {
 #endif
 					player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
 					player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
 #ifdef WIN32
 				}
 #endif
+				if (buttonFirePressed) {
+					shoot();
+
+#ifdef WIN32
+					if(useWII) WII->setRumble(true);
+				} else {
+					if(useWII) WII->setRumble(false);
+#endif
+
+				}
+				
+				if (buttonSwapPressed) {
+					change_particles((particle_type_t) ((current_particle_type + 1) % 3));
+				}
+
+				if( buttonBreakPressed && global_time - last_break > break_cooldown)
+					last_break = global_time;
+
+				float speed = current_movement_speed;
+				if (global_time - last_break < break_duration)
+					speed *= break_factor;
+
+
+
+				player.update_position(path, player.path_position() + speed * dt);
+
+				update_camera();
+
+				update_enemies(dt);
 
 				smoke->update(dt);
 				attack_particles->update(dt, enemies, this);

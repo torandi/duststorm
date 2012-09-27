@@ -126,7 +126,7 @@ void Input::parse_event(const SDL_Event &event) {
 				case 1:
 					sustained_values[ACTION_1] = 1.f;
 					break;
-				case 2:
+				case 4:
 					sustained_values[ACTION_2] = 1.f;
 					break;
 				case 3:
@@ -145,7 +145,7 @@ void Input::parse_event(const SDL_Event &event) {
 				case 1:
 					sustained_values[ACTION_1] = 0.f;
 					break;
-				case 2:
+				case 4:
 					sustained_values[ACTION_2] = 0.f;
 					break;
 				case 3:
