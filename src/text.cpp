@@ -13,7 +13,7 @@
 #include <string>
 #include <glm/glm.hpp>
 
-Text::Text(Text::alignment_t alignment_) : Mesh(), color(Color::white), alignment(alignment) {
+Text::Text(Text::alignment_t alignment_) : Mesh(), color(Color::white), alignment(alignment_) {
 	shader = Shader::create_shader("text");
 	u_font_offset = shader->uniform_location("font_offset");
 	u_color = shader->uniform_location("color");
