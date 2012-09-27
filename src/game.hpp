@@ -127,6 +127,8 @@ class Game {
 
 		int score;
 
+		float last_break;
+
 		float start_position;
 
 		Color sky_color;

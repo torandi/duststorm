@@ -6,6 +6,7 @@
 
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include <vector>
 #include <SDL/SDL.h>
@@ -320,6 +321,8 @@ void Game::initialize() {
 	life = 100;
 	score = 0;
 
+	last_break = 0;
+
 
 	change_particles(MEDIUM_PARTICLES);
 
@@ -398,6 +401,11 @@ void Game::update(float dt) {
 
 					return;
 				}
+
+				// Change wind direction
+				wind_velocity = glm::rotateY(wind_velocity, 0.8f + sin(global_time));
+				update_wind_velocity();
+
 				player.update_position(path, player.path_position() + current_movement_speed * dt);
 				update_camera();
 
