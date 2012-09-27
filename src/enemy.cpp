@@ -51,9 +51,7 @@ void Enemy::render() const {
 	glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, &life);
 	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, &scale);
 
-	glDisable(GL_CULL_FACE);
 	glDrawArrays(GL_POINTS, 0, 1);
-	glEnable(GL_CULL_FACE);
 
 	Shader::pop_vertex_attribs();
 
