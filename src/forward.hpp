@@ -11,6 +11,7 @@ class Mesh;
 class MovableObject;
 class ParticleSystem;
 class HittingParticles;
+class Highscore;
 class Game;
 class Path;
 class PointTable;

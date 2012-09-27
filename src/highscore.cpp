@@ -1,8 +1,11 @@
 #include "highscore.hpp"
 #include "data.hpp"
 
-Highscore::Highscore(const std::string &file_, unsigned int num_entries) 
-	: file(file_)
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+Highscore::Highscore(const std::string &file_, unsigned int num_entries) : filename(file_)
 {
 	for(unsigned int i = 0; i< num_entries; ++i) {
 		entries.push_back(-1);
@@ -16,7 +19,7 @@ void Highscore::add_entry(int e) {
 		if(*it < e) {
 			entries.insert(it, e);
 			entries.pop_back();
-			return;
+			break;
 		}
 	}
 	write();
@@ -31,7 +34,11 @@ Highscore::~Highscore() {
 } 
 
 void Highscore::write() {
-	FILE * f = fopen(file.c_str(), "w");
+	FILE * f = fopen(filename.c_str(), "w");
+	if(!f) {
+		fprintf(stderr, "Failed to open %s: %s\n", filename.c_str(), strerror(errno));
+		abort();
+	}
 	for(const int &e : entries) {
 		fprintf(f, "%d\n", e);
 	}
@@ -39,15 +46,19 @@ void Highscore::write() {
 }
 
 void Highscore::load() {
-	Data * d = Data::open(file);
+	Data * d = Data::open(filename);
 	if(d != nullptr) {
-		char * line;
+		char * line = nullptr;
 		size_t bytes;
 		for(int &e : entries) {
-			d->getline(&line, &bytes);
-			sscanf(line, "%d", &e);
+			if(d->getline(&line, &bytes) > -1) {
+				sscanf(line, "%d", &e);
+			} else {
+				e = -1;
+			}
 		}
 		delete line;
 		delete d;
 	}
+	printf("HIGHSCORE : %s\n", filename.c_str());
 }

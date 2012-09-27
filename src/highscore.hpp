@@ -13,7 +13,7 @@ class Highscore {
 		void add_entry(int e);
 
 	private:
-		const std::string file;
+		const std::string filename;
 		std::list<int> entries;
 
 		void write();

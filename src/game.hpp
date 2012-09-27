@@ -14,7 +14,6 @@
 #include "hitting_particles.hpp"
 
 #include "path.hpp"
-#include "highscore.hpp"
 
 #include "input.hpp"
 

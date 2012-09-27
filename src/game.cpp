@@ -25,6 +25,7 @@
 #include "hitting_particles.hpp"
 #include "enemy_template.hpp"
 #include "enemy.hpp"
+#include "highscore.hpp"
 
 #include "path.hpp"
 #include "rails.hpp"
@@ -280,8 +281,17 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	life_text.set_scale(20.0 * hud_scale.x);
 	life_text.set_position(glm::vec3(glm::vec2(26.f, 44.5f) * hud_scale, 0.f));
 
+	//Highscore stuff:
 	highscore = new Highscore(base_dir + "/highscore", NUM_HIGHSCORE_ENTRIES);
+	float hs_scale = 10.f;
+	glm::vec2 higscore_base = glm::vec2(600.f, 30.f);
+	for(Text &t : highscore_entries) {
+		t.set_position(glm::vec3( (higscore_base + glm::vec2(0.f, hs_scale)) * hud_scale, 0.f));
+		t.set_scale(hs_scale);
+		t.set_text("");
+	}
 
+	//Textures
 	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/gameover.png");
 	startscreen_texture = Texture2D::from_filename(PATH_BASE "/data/textures/start_screen.png");
 }
@@ -296,8 +306,8 @@ void Game::initialize() {
 	current_movement_speed = movement_speed;
 
 	accum_unspawned = 0;
-	player_level = 0.5f;
-	life = 100;
+	player_level = 2.5f;
+	life = 10;
 	score = 0;
 
 
@@ -346,6 +356,8 @@ void Game::update(float dt) {
 					
 					//delete music;
 					current_mode = MODE_HIGHSCORE;
+
+					highscore->add_entry(score);
 
 					score_text.set_number(score);
 					score_text.set_scale(40.0 * hud_scale.x);
