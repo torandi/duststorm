@@ -292,7 +292,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	hud_break_tex = Texture2D::from_filename(PATH_BASE "/data/textures/breaks_ready.png");
 	hud_break_quad = new Quad();
 	hud_break_quad->set_scale(glm::core::type::vec3(190, 25, 0) * glm::core::type::vec3(hud_scale, 0));
-	hud_break_quad->set_position(glm::vec3(glm::vec2(580, 45) * hud_scale, 0.f));
+	hud_break_quad->set_position(glm::vec3(glm::vec2(30, 530) * hud_scale, 0.f));
 
 	life_text.set_color(hud_font_color);
 	life_text.set_scale(20.0 * hud_scale.x);
@@ -329,7 +329,7 @@ void Game::initialize() {
 	life = 100;
 	score = 0;
 
-	last_break = 0;
+	last_break = -2 * break_cooldown;
 
 
 	change_particles(MEDIUM_PARTICLES);
