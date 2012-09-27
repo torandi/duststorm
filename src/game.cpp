@@ -370,7 +370,7 @@ void Game::update(float dt) {
 					score_text.set_alignment(Text::RIGHT_ALIGNED);
 					score_text.set_number(score);
 					score_text.set_color(highscore_color);
-					score_text.set_scale(55.0 * hud_scale.x);
+					score_text.set_scale(30.0 * hud_scale.x);
 					score_text.set_position(glm::vec3(glm::vec2(150.f, 270.f) * hud_scale, 0.f));
 
 					int i = 0;
