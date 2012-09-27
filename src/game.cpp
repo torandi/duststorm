@@ -296,7 +296,7 @@ void Game::initialize() {
 
 	accum_unspawned = 0;
 	player_level = 0.5f;
-	life = 10;
+	life = 100;
 	score = 0;
 
 
@@ -341,19 +341,6 @@ void Game::update(float dt) {
 		case MODE_GAME:
 			{
 				if(life <= 0) {
-					if(music->is_playing())
-					{
-						float vol = music->get_volume();
-						vol-=0.002f;
-						if(vol<0)
-						{
-							music->stop();
-						}
-						else
-						{
-							music->set_volume(vol);
-						}
-					}
 					
 					//delete music;
 					current_mode = MODE_HIGHSCORE;
@@ -442,6 +429,15 @@ void Game::update(float dt) {
 		}
 		break;
 	case MODE_HIGHSCORE:
+		if(music->is_playing()) {
+			float vol = music->get_volume();
+			vol-= dt;
+			if(vol<0) {
+				music->stop();
+			} else {
+				music->set_volume(vol);
+			}
+		}
 		if(start_pressed()) {
 			current_mode = MODE_READY;
 		}
