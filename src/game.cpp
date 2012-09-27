@@ -641,10 +641,11 @@ void Game::render() {
 		particle_shader->bind();
 		geometry->depth_bind(Shader::TEXTURE_2D_0);
 
-		dust->render();
-		smoke->render();
-		attack_particles->render();
 		explosions->render();
+		attack_particles->render();
+		
+		smoke->render();
+		dust->render();
 
 		composition->unbind();
 
