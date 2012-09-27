@@ -5,7 +5,7 @@
 /* #undef ENABLE_INPUT */
 
 /* Define to 1 if fullscreen is used by default */
-#define FULLSCREEN 0
+#define FULLSCREEN 1
 
 /* Define to 1 if you have the <CL/cl.h> header file. */
 #define HAVE_CL_CL_H 1
