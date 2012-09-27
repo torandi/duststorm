@@ -297,7 +297,7 @@ void Game::initialize() {
 
 	accum_unspawned = 0;
 	player_level = 0.5f;
-	life = 0;
+	life = 100;
 	score = 0;
 
 
