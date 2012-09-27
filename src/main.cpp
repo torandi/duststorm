@@ -296,7 +296,7 @@ int main(int argc, char* argv[]){
 		const char* arg = argv[i];
 		++next_index;
 		if (strcmp(arg, "-f") == 0)
-			fullscreen = 1;
+			fullscreen = !fullscreen;
 		else if (strcmp(arg, "-v") == 0)
 			verbose_flag = 1;
 		else if (strcmp(arg, "-w") == 0)

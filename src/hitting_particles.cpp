@@ -45,7 +45,7 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 
 	ParticleSystem::update(dt);
 
-	vertex_t * vertices = (vertex_t* ) opencl->queue().enqueueMapBuffer(cl_gl_buffers_[0], CL_TRUE, CL_MAP_READ, 0, sizeof(vertex_t)*max_num_particles_, NULL, NULL, &err);
+	//vertex_t * vertices = (vertex_t* ) opencl->queue().enqueueMapBuffer(cl_gl_buffers_[0], CL_TRUE, CL_MAP_READ, 0, sizeof(vertex_t)*max_num_particles_, NULL, NULL, &err);
 	//CL::check_error(err, "[ParticleSystem] map vertices buffer");
 	particle_t * particles = (particle_t* ) opencl->queue().enqueueMapBuffer(particles_, CL_TRUE, CL_MAP_READ, 0, sizeof(particle_t)*max_num_particles_, NULL, NULL, &err);
 
@@ -71,8 +71,8 @@ void HittingParticles::update(float dt, std::list<Enemy*> &enemies, Game * game)
 	
 	opencl->queue().enqueueUnmapMemObject(particles_, particles, NULL, NULL);
 	CL::check_error(err, "[ParticleSystem] unmap particles buffer");
-	opencl->queue().enqueueUnmapMemObject(cl_gl_buffers_[0], vertices, NULL, NULL);
-	CL::check_error(err, "[ParticleSystem] unmap particles buffer");
+	//opencl->queue().enqueueUnmapMemObject(cl_gl_buffers_[0], vertices, NULL, NULL);
+	//CL::check_error(err, "[ParticleSystem] unmap particles buffer");
 
 	opencl->queue().flush();
 	opencl->queue().finish();
