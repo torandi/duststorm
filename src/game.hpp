@@ -143,7 +143,7 @@ class Game {
 
 		mode_t current_mode;
 
-		static const unsigned int NUM_HIGHSCORE_ENTRIES = 10;
+		static const unsigned int NUM_HIGHSCORE_ENTRIES = 12;
 
 		//Highscore stuff:
 		Text highscore_entries[NUM_HIGHSCORE_ENTRIES];

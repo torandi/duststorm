@@ -34,6 +34,9 @@
 
 static glm::vec2 hud_scale;
 
+static const Color hud_font_color(0.f,0.64f,1.f, 1.f);
+static const Color highscore_color(0.4f,0.70f,1.f, 1.f);
+
 static void read_particle_config(const ConfigEntry * config, ParticleSystem::config_t &particle_config) {
 	particle_config.birth_color = config->find("birth_color", true)->as_vec4();
 	particle_config.death_color = config->find("death_color", true)->as_vec4();
@@ -278,17 +281,20 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	hud_choice_quad = new Quad();
 	hud_choice_quad->set_scale(glm::core::type::vec3(97,92,0) * glm::core::type::vec3(hud_scale , 0));
 
+	life_text.set_color(hud_font_color);
 	life_text.set_scale(20.0 * hud_scale.x);
 	life_text.set_position(glm::vec3(glm::vec2(26.f, 44.5f) * hud_scale, 0.f));
 
 	//Highscore stuff:
 	highscore = new Highscore(base_dir + "/highscore", NUM_HIGHSCORE_ENTRIES);
-	float hs_scale = 10.f;
-	glm::vec2 higscore_base = glm::vec2(600.f, 30.f);
+	float hs_scale = 40.f;
+	glm::vec2 higscore_base = glm::vec2(735.f, 85.f);
+	int i=0;
 	for(Text &t : highscore_entries) {
-		t.set_position(glm::vec3( (higscore_base + glm::vec2(0.f, hs_scale)) * hud_scale, 0.f));
+		t.set_position(glm::vec3( (higscore_base + glm::vec2(0.f, (i++)*hs_scale)) * hud_scale, 0.f));
 		t.set_scale(hs_scale);
 		t.set_text("");
+		t.set_alignment(Text::RIGHT_ALIGNED);
 	}
 
 	//Textures
@@ -306,14 +312,16 @@ void Game::initialize() {
 	current_movement_speed = movement_speed;
 
 	accum_unspawned = 0;
-	player_level = 2.5f;
-	life = 10;
+	player_level = 0.7f;
+	life = 100;
 	score = 0;
 
 
 	change_particles(MEDIUM_PARTICLES);
 
 
+	score_text.set_color(hud_font_color);
+	score_text.set_alignment(Text::LEFT_ALIGNED);
 	life_text.set_number(life);
 	score_text.set_number(score);
 
@@ -359,9 +367,27 @@ void Game::update(float dt) {
 
 					highscore->add_entry(score);
 
+					score_text.set_alignment(Text::RIGHT_ALIGNED);
 					score_text.set_number(score);
-					score_text.set_scale(40.0 * hud_scale.x);
-					score_text.set_position(glm::vec3(glm::vec2(72.f, 258.f) * hud_scale, 0.f));
+					score_text.set_color(highscore_color);
+					score_text.set_scale(55.0 * hud_scale.x);
+					score_text.set_position(glm::vec3(glm::vec2(150.f, 270.f) * hud_scale, 0.f));
+
+					int i = 0;
+					bool selected = false;
+					for(int e : highscore->get_entries()) {
+						if(e > 0) {
+							if(!selected && e == score) {
+								highscore_entries[i].set_color(hud_font_color);
+							} else {
+								highscore_entries[i].set_color(highscore_color);
+							}
+							highscore_entries[i].set_number(e);
+						} else {
+							highscore_entries[i].set_text("");
+						}
+						++i;
+					}
 #ifdef WIN32
 					if(useWII) WII->setRumble(false);
 #endif
@@ -622,6 +648,9 @@ void Game::render_display() {
 			passthru->bind();
 			fullscreen_quad->render();
 			score_text.render();
+			for(Text &e : highscore_entries) {
+				e.render();
+			}
 			break;
 	}
 }
