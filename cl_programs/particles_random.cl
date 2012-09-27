@@ -1,7 +1,7 @@
 float random(uint *time, const uint id, __global const float * const rnd, const int max_num_particles) {
 	float r = rnd[(int)((*time)+id) % max_num_particles];
 	//Change time to not get same value next call:
-	*time += (uint)floor(rnd[*time%max_num_particles]*1000.0);
+	(*time)++;
 	return r;
 }
 
