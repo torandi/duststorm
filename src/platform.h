@@ -87,8 +87,7 @@
 	
 	inline bool isblank(char c) { return (c == ' ' || c == '\t'); };
 
-	typedef size_t ssize_t;
-
+	typedef signed int ssize_t;
 #endif
 
 #endif /* PLATFORM_H */
