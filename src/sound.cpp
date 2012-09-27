@@ -173,9 +173,9 @@ void Sound::seek(double t) {
 float Sound::get_volume()
 {
 	if(channel_ == nullptr) return -1;
-	float* vol;
-	channel_->getVolume(vol);
-	return *vol;
+	float vol=0;
+	channel_->getVolume(&vol);
+	return vol;
 }
 
 void Sound::set_volume(float vol)
