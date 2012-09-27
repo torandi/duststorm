@@ -315,6 +315,8 @@ void Game::update(float dt) {
 
 	if(!dead) {
 		if(life <= 0) {
+			music->stop();
+			//delete music;
 			dead = true;
 
 			score_text.set_number(score);
