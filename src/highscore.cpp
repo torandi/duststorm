@@ -60,5 +60,4 @@ void Highscore::load() {
 		delete line;
 		delete d;
 	}
-	printf("HIGHSCORE : %s\n", filename.c_str());
 }
