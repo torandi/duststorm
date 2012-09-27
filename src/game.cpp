@@ -408,7 +408,7 @@ void Game::update(float dt) {
 				if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
 					shoot();
 				}
-				if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
+				if(input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f) {
 					printf("Change partciles!\n");
 					change_particles((particle_type_t) ((current_particle_type + 1) % 3));
 				}
