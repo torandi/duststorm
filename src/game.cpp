@@ -289,6 +289,11 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	hud_choice_quad = new Quad();
 	hud_choice_quad->set_scale(glm::core::type::vec3(97,92,0) * glm::core::type::vec3(hud_scale , 0));
 
+	hud_break_tex = Texture2D::from_filename(PATH_BASE "/data/textures/breaks_ready.png");
+	hud_break_quad = new Quad();
+	hud_break_quad->set_scale(glm::core::type::vec3(190, 25, 0) * glm::core::type::vec3(hud_scale, 0));
+	hud_break_quad->set_position(glm::vec3(glm::vec2(580, 45) * hud_scale, 0.f));
+
 	life_text.set_color(hud_font_color);
 	life_text.set_scale(20.0 * hud_scale.x);
 	life_text.set_position(glm::vec3(glm::vec2(26.f, 44.5f) * hud_scale, 0.f));
@@ -669,6 +674,12 @@ void Game::render_display() {
 			score_text.render();
 
 			draw_selected_weap();
+
+			if (global_time - last_break > break_cooldown) {
+				hud_break_tex->texture_bind(Shader::TEXTURE_2D_0);
+				hud_break_quad->render();
+			}
+
 			break;
 		case MODE_READY:
 			startscreen_texture->texture_bind(Shader::TEXTURE_2D_0);
