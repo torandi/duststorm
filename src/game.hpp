@@ -64,6 +64,7 @@ class Game {
 		void change_particles(particle_type_t new_type);
 		void shoot();
 		void evolve();
+		bool start_pressed() const;
 
 		LightsData lights;
 		Material rail_material;
@@ -92,8 +93,8 @@ class Game {
 		Camera camera;
 		RenderTarget *composition, *geometry;
 
-		Quad *hud_static_elements, *hud_choice_quad;
-		Texture2D *hud_static_elements_tex, *game_over_texture, *hud_choice_tex;
+		Quad *fullscreen_quad, *hud_choice_quad;
+		Texture2D *hud_static_elements_tex, *game_over_texture, *hud_choice_tex, *startscreen_texture;
 		void draw_selected_weap();
 		
 		glm::core::type::vec2 hud_lightpos, hud_mediumpos, hud_heavypos; 
@@ -135,6 +136,18 @@ class Game {
 		std::list<Sound*> active_sounds;
 		Sound* music;
 
+		enum mode_t {
+			MODE_READY,
+			MODE_GAME,
+			MODE_HIGHSCORE
+		};
+
+		mode_t current_mode;
+
+		static const unsigned int NUM_HIGHSCORE_ENTRIES = 10;
+
+		//Highscore stuff:
+		Text highscore_entries[NUM_HIGHSCORE_ENTRIES];
 
 		void initialize(); //Also reinitialize
 

@@ -54,11 +54,30 @@ static void read_particle_config(const ConfigEntry * config, ParticleSystem::con
 	particle_config.num_textures = config->find("num_textures", true)->as_int();
 }
 
+bool Game::start_pressed() const {
+	if(input.has_changed(Input::START, 0.2f) && input.current_value(Input::START) > 0.9f) {
+		return true;
+	}
+
+#ifdef WIN32
+	if(useWII) {
+		WII->setRumble(false);
+		if (WII->getButtonPlusPressed()) {
+			return true;
+		}
+	}
+#endif
+	return false;
+}
+
 void Game::init() {
 }
 
 Game::Game(const std::string &level, float near, float far, float fov) :
-	camera(fov, resolution.x/(float)resolution.y, near, far) {
+	camera(fov, resolution.x/(float)resolution.y, near, far)
+	, music(nullptr)
+	, current_mode(MODE_READY)
+{
 	composition = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER | RenderTarget::DOUBLE_BUFFER);
 	geometry = new RenderTarget(resolution, GL_RGB8, RenderTarget::DEPTH_BUFFER);
 
@@ -246,8 +265,8 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 	hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
 	hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
-	hud_static_elements = new Quad();
-	hud_static_elements->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
+	fullscreen_quad = new Quad();
+	fullscreen_quad->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
 
 	hud_lightpos =  glm::vec2(594,490) * hud_scale;
 	hud_mediumpos = glm::vec2(644,490) * hud_scale;
@@ -262,11 +281,8 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 
 	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/gameover.png");
+	startscreen_texture = Texture2D::from_filename(PATH_BASE "/data/textures/start_screen.png");
 
-	initialize();
-
-	music = new Sound(PATH_BASE "ecstacy.mp3", 1);
-	music->play();
 }
 
 void Game::initialize() {
@@ -295,6 +311,10 @@ void Game::initialize() {
 	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
 	dead = false;
+
+	if(music != nullptr) delete music;
+	music = new Sound(PATH_BASE "ecstacy.mp3", 1);
+	music->play();
 }
 
 Game::~Game() {
@@ -313,105 +333,105 @@ Game::~Game() {
 
 void Game::update(float dt) {
 
-	if(!dead) {
-		if(life <= 0) {
-			music->stop();
-			//delete music;
-			dead = true;
-
-			score_text.set_number(score);
-			score_text.set_scale(40.0 * hud_scale.x);
-			score_text.set_position(glm::vec3(glm::vec2(565.f, 400.f) * hud_scale, 0.f));
-
-			return;
-		}
-		player.update_position(path, player.path_position() + current_movement_speed * dt);
-		update_camera();
-
-		update_enemies(dt);
-
-		//input.update_object(camera, dt);
-
-		if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
-			shoot();
-		}
-		if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
-			printf("Change partciles!\n");
-			change_particles((particle_type_t) ((current_particle_type + 1) % 3));
-		}
-
-#ifdef WIN32
-		if (useWII) {
-			player.set_canon_pitch(WII->getPitch());
-			player.set_canon_yaw(-1 * WII->getRoll());
-			
-			if (WII->getButtonAPressed()) {
-				shoot();
-				WII->setRumble(true);
-			} else {
-				WII->setRumble(false);
-			}
-			
-			if (WII->getButtonBPressed()) {
-				change_particles((particle_type_t) ((current_particle_type + 1) % 3));
-			}
-		}
-
-		else {
-#endif
-			player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
-			player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
-#ifdef WIN32
-		}
-#endif
-
-		smoke->update(dt);
-		attack_particles->update(dt, enemies, this);
-
-		dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
-		dust->update_config();
-		dust->update(dt);
-		
-		explosions->update(dt);
-
-		life_text.set_number(life);
-		score_text.set_number(score);
-
-	dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
-	dust->update_config();
-	dust->update(dt);
-	
-	explosions->update(dt);
-	
-	active_sounds.remove_if([](const Sound * s) {
-		if(s->is_done()) {
-			delete s;
-			return true;
-		};
-		return false;
-	});
-
-	} else {
-
-		if(input.has_changed(Input::START, 0.2f) && input.current_value(Input::START) > 0.9f) {
-			initialize();
-		}
-
-#ifdef WIN32
-		if(useWII) {
-			WII->setRumble(false);
-			if (WII->getButtonPlusPressed()) {
+	switch(current_mode) {
+		case MODE_READY:
+			if(start_pressed()) {
+				current_mode = MODE_GAME;
 				initialize();
 			}
-		}
+			break;
+		case MODE_GAME:
+			{
+				if(life <= 0) {
+					music->stop();
+					//delete music;
+					dead = true;
+
+					score_text.set_number(score);
+					score_text.set_scale(40.0 * hud_scale.x);
+					score_text.set_position(glm::vec3(glm::vec2(565.f, 400.f) * hud_scale, 0.f));
+
+					return;
+				}
+				player.update_position(path, player.path_position() + current_movement_speed * dt);
+				update_camera();
+
+				update_enemies(dt);
+
+				//input.update_object(camera, dt);
+
+				if(input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f) {
+					shoot();
+				}
+				if(input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f) {
+					printf("Change partciles!\n");
+					change_particles((particle_type_t) ((current_particle_type + 1) % 3));
+				}
+
+#ifdef WIN32
+				if (useWII) {
+					player.set_canon_pitch(WII->getPitch());
+					player.set_canon_yaw(-1 * WII->getRoll());
+					
+					if (WII->getButtonAPressed()) {
+						shoot();
+						WII->setRumble(true);
+					} else {
+						WII->setRumble(false);
+					}
+					
+					if (WII->getButtonBPressed()) {
+						change_particles((particle_type_t) ((current_particle_type + 1) % 3));
+					}
+				}
+
+				else {
 #endif
-	}
-	// Really ugly way of looping the music:
-	if(music != nullptr && music->is_done())
-	{
-		delete music;
-		music = new Sound(PATH_BASE "ecstacy.mp3", 5);
-		music->play();
+					player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
+					player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
+#ifdef WIN32
+				}
+#endif
+
+				smoke->update(dt);
+				attack_particles->update(dt, enemies, this);
+
+				dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
+				dust->update_config();
+				dust->update(dt);
+				
+				explosions->update(dt);
+
+				life_text.set_number(life);
+				score_text.set_number(score);
+
+			dust->config.spawn_position = glm::vec4(path->at(player.path_position() + dust_spawn_ahead) - half_dust_spawn_area, 1.f);
+			dust->update_config();
+			dust->update(dt);
+			
+			explosions->update(dt);
+			
+			active_sounds.remove_if([](const Sound * s) {
+				if(s->is_done()) {
+					delete s;
+					return true;
+				};
+				return false;
+			});
+			// Really ugly way of looping the music:
+			if(music != nullptr && music->is_done())
+			{
+				delete music;
+				music = new Sound(PATH_BASE "ecstacy.mp3", 5);
+				music->play();
+			}
+		}
+		break;
+	case MODE_HIGHSCORE:
+		if(start_pressed()) {
+			current_mode = MODE_READY;
+		}
+		break;
 	}
 }
 
@@ -498,7 +518,7 @@ void Game::render_geometry() {
 
 void Game::render() {
 
-	if(life > 0) {
+	if(current_mode == MODE_GAME) {
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		lights.lights[0]->render_shadow_map(camera, [&]() -> void  {
@@ -555,28 +575,32 @@ void Game::render_display() {
 	Shader::upload_projection_view_matrices(screen_ortho, glm::mat4());
 	glViewport(0, 0, resolution.x, resolution.y);
 
-	if(life > 0) {
-		composition->draw(shaders[SHADER_PASSTHRU]);
+	switch(current_mode) {
 
-		// Here the hud will be! Fun fun fun fun!
-		
-		hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
-		shaders[SHADER_PASSTHRU]->bind();
-		
-		hud_static_elements->render();
+		case MODE_GAME:
+			composition->draw(shaders[SHADER_PASSTHRU]);
 
-		life_text.render();
-		score_text.render();
+			hud_static_elements_tex->texture_bind(Shader::TEXTURE_2D_0);
+			shaders[SHADER_PASSTHRU]->bind();
+			
+			fullscreen_quad->render();
 
-		draw_selected_weap();
-	} else {
+			life_text.render();
+			score_text.render();
 
-		game_over_texture->texture_bind(Shader::TEXTURE_2D_0);
-		shaders[SHADER_PASSTHRU]->bind();
-		
-		hud_static_elements->render();
-
-		score_text.render();
+			draw_selected_weap();
+			break;
+		case MODE_READY:
+			startscreen_texture->texture_bind(Shader::TEXTURE_2D_0);
+			shaders[SHADER_PASSTHRU]->bind();
+			fullscreen_quad->render();
+			break;
+		case MODE_HIGHSCORE:
+			game_over_texture->texture_bind(Shader::TEXTURE_2D_0);
+			shaders[SHADER_PASSTHRU]->bind();
+			fullscreen_quad->render();
+			score_text.render();
+			break;
 	}
 }
 
