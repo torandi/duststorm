@@ -66,6 +66,10 @@ class Game {
 		void evolve();
 		bool start_pressed() const;
 
+		glm::vec3 wind_velocity;
+		//Call this function after changing wind_speed.
+		void update_wind_velocity();
+
 		LightsData lights;
 		Material rail_material;
 		Texture2D * rail_texture;
@@ -83,6 +87,7 @@ class Game {
 		float smoke_spawn_speed;
 		float dust_spawn_ahead;
 		glm::vec3 half_dust_spawn_area;
+		std::list<ParticleSystem::config_t*> system_configs;
 
 		TextureArray * particle_textures;
 
@@ -101,7 +106,6 @@ class Game {
 
 		Shader *particle_shader, *passthru;
 
-		glm::vec4 wind_velocity;
 		glm::vec4 gravity;
 
 		glm::vec3 camera_offset;

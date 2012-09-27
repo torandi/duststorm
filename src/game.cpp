@@ -169,7 +169,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 //Create particle systems:
 
-	wind_velocity = glm::vec4(config["/environment/wind_velocity"]->as_vec3(), 1.f);
+	wind_velocity = config["/environment/wind_velocity"]->as_vec3();
 	gravity = glm::vec4(config["/environment/gravity"]->as_vec3(), 1.f);
 
 	particle_shader = Shader::create_shader("particles");
@@ -194,11 +194,12 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 	attack_particles = new HittingParticles(max_attack_particles, particle_textures, EnemyTemplate::max_num_enemies, false);
 	attack_particles->config.gravity = gravity;
-	attack_particles->config.wind_velocity = wind_velocity;
+	system_configs.push_back(&(attack_particles->config));
 	attack_particles->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius);
 
 	for(auto &p : particle_types) {
 		p.config = attack_particles->config; //Get reasonable defaults
+		system_configs.push_back(&(p.config));
 	}
 
 	read_particle_config(particle_config["/particles/light"], particle_types[LIGHT_PARTICLES].config);
@@ -219,7 +220,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	//Smoke:
 	smoke = new ParticleSystem(max_smoke_particles, particle_textures, false);
 	smoke->config.gravity = gravity;
-	smoke->config.wind_velocity = wind_velocity;
+	system_configs.push_back(&(smoke->config));
 	smoke->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius * 2.0);
 
 	read_particle_config(particle_config["/particles/smoke"], smoke->config);
@@ -232,7 +233,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	read_particle_config(particle_config["/particles/dust"], dust->config);
 
 	dust->config.gravity = gravity;
-	dust->config.wind_velocity = wind_velocity;
+	system_configs.push_back(&(dust->config));
 	dust->config.spawn_area = particle_config["/particles/dust/spawn_area"]->as_vec4();
 	dust->config.avg_spawn_velocity = glm::vec4(particle_config["/particles/dust/avg_spawn_velocity"]->as_vec3(), 0);
 	dust->avg_spawn_rate = particle_config["/particles/dust/avg_spawn_rate"]->as_float();
@@ -250,12 +251,14 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	explosions = new ParticleSystem(max_explosion_particles, particle_textures, false);
 
 	hit_explosion = explosions->config;
+	system_configs.push_back(&(hit_explosion));
 	kill_explosion = explosions->config;
+	system_configs.push_back(&(kill_explosion));
 	read_particle_config(particle_config["/particles/hit_explosion"], hit_explosion);
 	read_particle_config(particle_config["/particles/kill_explosion"], kill_explosion);
 
 	explosions->config.gravity = gravity;
-	explosions->config.wind_velocity = wind_velocity;
+	system_configs.push_back(&(explosions->config));
 	hit_explosion_count = particle_config["/particles/hit_explosion/count"]->as_int();
 	kill_explosion_count = particle_config["/particles/kill_explosion/count"]->as_int();
 	kill_explosion.spawn_area = particle_config["/particles/kill_explosion/spawn_area"]->as_vec4();
@@ -263,6 +266,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	hit_explosion.spawn_area = particle_config["/particles/hit_explosion/spawn_area"]->as_vec4();
 	hit_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/hit_explosion/avg_spawn_velocity"]->as_vec3(), 0);
 
+	update_wind_velocity();
 	//Setup HUD
 
 
@@ -674,6 +678,13 @@ void Game::shoot() {
 	smoke->config.spawn_position = spawn_position;
 	smoke->spawn(smoke_count);
 	play_sound(PATH_BASE "Explosion_Fast.wav",1);
+}
+
+void Game::update_wind_velocity() {
+	glm::vec4 v4 = glm::vec4(wind_velocity, 1.f);
+	for(ParticleSystem::config_t * c : system_configs) {
+		c->wind_velocity = v4;
+	}
 }
 
 const Player &Game::get_player() const {
