@@ -415,17 +415,26 @@ void Game::update(float dt) {
 
 #ifdef WIN32
 				if (useWII) {
-					player.set_canon_pitch(WII->getPitch());
-					player.set_canon_yaw(-1 * WII->getRoll());
+					float pitch = WII->getPitch(), roll = -1 * WII->getRoll(); // [-90, 90].
+					pitch = glm::clamp(pitch - 10, -90.0f, 90.0f);
+					//pitch = glm::clamp(-10 + 90 * glm::sign(pitch) * glm::pow(glm::abs(1.0f * pitch / 90), 1.0f), -90.0f, 90.0f);
+					//roll = glm::clamp(90 * glm::sign(roll) * glm::pow(glm::abs(1.0f * roll / 90), 1.0f), -90.0f, 90.0f);
+					player.set_canon_pitch(pitch);
+					player.set_canon_yaw(roll);
+
+					bool buttonFirePressed = WII->getButtonAPressed();
+					bool buttonSwapPressed = WII->getButtonBPressed();
+					const bool wiiSwapAB = false;
+					if (wiiSwapAB) std::swap(buttonFirePressed, buttonSwapPressed);
 					
-					if (WII->getButtonAPressed()) {
+					if (buttonFirePressed) {
 						shoot();
 						WII->setRumble(true);
 					} else {
 						WII->setRumble(false);
 					}
 					
-					if (WII->getButtonBPressed()) {
+					if (buttonSwapPressed) {
 						change_particles((particle_type_t) ((current_particle_type + 1) % 3));
 					}
 				}
