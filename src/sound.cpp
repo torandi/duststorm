@@ -169,3 +169,17 @@ void Sound::seek(double t) {
 	result_ = channel_->setPosition(t*1000.0, FMOD_TIMEUNIT_MS);
 	errcheck("Sound::seek()");
 }
+
+float Sound::get_volume()
+{
+	if(channel_ == nullptr) return -1;
+	float vol=0;
+	channel_->getVolume(&vol);
+	return vol;
+}
+
+void Sound::set_volume(float vol)
+{
+	if(channel_ == nullptr) return;
+	channel_->setVolume(vol);
+}

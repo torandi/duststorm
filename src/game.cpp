@@ -341,7 +341,20 @@ void Game::update(float dt) {
 		case MODE_GAME:
 			{
 				if(life <= 0) {
-					music->stop();
+					if(music->is_playing())
+					{
+						float vol = music->get_volume();
+						vol-=0.002f;
+						if(vol<0)
+						{
+							music->stop();
+						}
+						else
+						{
+							music->set_volume(vol);
+						}
+					}
+					
 					//delete music;
 					current_mode = MODE_HIGHSCORE;
 

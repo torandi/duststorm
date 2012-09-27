@@ -43,6 +43,9 @@ class Sound {
 		 * Seeks to the given time
 		 */
 		void seek(double t);
+		
+		float get_volume();
+		void set_volume(float vol);
 
 	private:
 		static FMOD::System * system_;
