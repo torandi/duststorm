@@ -80,6 +80,8 @@ void wii::update()
 	pressedPlus = tmp && !downPlus;
 	downPlus = tmp;
 
+	pressedArrowDown = wiim->Button.Down();
+
 	// Yaw estimation (broken).
 	if (motionPlus() && wiim->Button.Up()) // Calibrate yaw.
 	{

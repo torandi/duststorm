@@ -38,6 +38,10 @@ static glm::vec2 hud_scale;
 static const Color hud_font_color(0.f,0.64f,1.f, 1.f);
 static const Color highscore_color(0.4f,0.70f,1.f, 1.f);
 
+static const float break_factor = 0.3f;
+static const float break_duration = 3.0f;
+static const float break_cooldown = 10.0f;
+
 static void read_particle_config(const ConfigEntry * config, ParticleSystem::config_t &particle_config) {
 	particle_config.birth_color = config->find("birth_color", true)->as_vec4();
 	particle_config.death_color = config->find("death_color", true)->as_vec4();
@@ -405,8 +409,14 @@ void Game::update(float dt) {
 				// Change wind direction
 				wind_velocity = glm::rotateY(wind_velocity, 0.8f + sin(global_time));
 				update_wind_velocity();
+				
+				if (WII->getButtonBDown() && global_time - last_break > break_cooldown)
+					last_break = global_time;
+				float speed = current_movement_speed;
+				if (global_time - last_break < break_duration)
+					speed *= break_factor;
+				player.update_position(path, player.path_position() + speed * dt);
 
-				player.update_position(path, player.path_position() + current_movement_speed * dt);
 				update_camera();
 
 				update_enemies(dt);
@@ -431,7 +441,7 @@ void Game::update(float dt) {
 					player.set_canon_yaw(roll);
 
 					bool buttonFirePressed = WII->getButtonAPressed();
-					bool buttonSwapPressed = WII->getButtonBPressed();
+					bool buttonSwapPressed = WII->getArrowDownPressed();
 					const bool wiiSwapAB = false;
 					if (wiiSwapAB) std::swap(buttonFirePressed, buttonSwapPressed);
 					
