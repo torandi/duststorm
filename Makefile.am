@@ -21,6 +21,7 @@ fubar_SOURCES =	src/main.cpp \
 								src/game.cpp src/game.hpp \
 								src/globals.cpp src/globals.hpp \
 								src/hitting_particles.cpp src/hitting_particles.hpp \
+								src/highscore.cpp src/highscore.hpp \
 								src/input.cpp src/input.hpp \
 								src/light.cpp src/light.hpp \
 								src/lights_data.cpp src/lights_data.hpp \

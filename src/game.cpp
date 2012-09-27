@@ -280,6 +280,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	life_text.set_scale(20.0 * hud_scale.x);
 	life_text.set_position(glm::vec3(glm::vec2(26.f, 44.5f) * hud_scale, 0.f));
 
+	highscore = new Highscore(base_dir + "/highscore", NUM_HIGHSCORE_ENTRIES);
 
 	game_over_texture = Texture2D::from_filename(PATH_BASE "/data/textures/gameover.png");
 	startscreen_texture = Texture2D::from_filename(PATH_BASE "/data/textures/start_screen.png");
@@ -296,7 +297,7 @@ void Game::initialize() {
 
 	accum_unspawned = 0;
 	player_level = 0.5f;
-	life = 100;
+	life = 0;
 	score = 0;
 
 
@@ -322,6 +323,7 @@ Game::~Game() {
 
 	delete path;
 	delete rails;
+	delete highscore;
 
 	delete smoke;
 	delete attack_particles;
@@ -347,7 +349,7 @@ void Game::update(float dt) {
 
 					score_text.set_number(score);
 					score_text.set_scale(40.0 * hud_scale.x);
-					score_text.set_position(glm::vec3(glm::vec2(565.f, 400.f) * hud_scale, 0.f));
+					score_text.set_position(glm::vec3(glm::vec2(72.f, 258.f) * hud_scale, 0.f));
 #ifdef WIN32
 					if(useWII) WII->setRumble(false);
 #endif

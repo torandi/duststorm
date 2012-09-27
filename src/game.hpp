@@ -14,6 +14,7 @@
 #include "hitting_particles.hpp"
 
 #include "path.hpp"
+#include "highscore.hpp"
 
 #include "input.hpp"
 
@@ -147,6 +148,7 @@ class Game {
 
 		//Highscore stuff:
 		Text highscore_entries[NUM_HIGHSCORE_ENTRIES];
+		Highscore * highscore;
 
 		void initialize(); //Also reinitialize
 
