@@ -140,6 +140,7 @@ class Game {
 		void play_sound(const char* path, int loops);
 		std::list<Sound*> active_sounds;
 		Sound* music;
+		void fade_music(float dt);
 
 		enum mode_t {
 			MODE_READY,

@@ -370,6 +370,7 @@ void Game::update(float dt) {
 
 	switch(current_mode) {
 		case MODE_READY:
+			fade_music(dt);
 			if(start_pressed()) {
 				current_mode = MODE_GAME;
 				initialize();
@@ -421,7 +422,7 @@ void Game::update(float dt) {
 				bool buttonFirePressed = (input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f);
 				bool buttonSwapPressed = (input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f);
 				bool buttonBreakPressed = (input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f);
-				bool buttonMutePressed = false;
+				bool buttonMutePressed = (input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f);
 
 #ifdef WIN32
 				if (useWII) {
@@ -518,15 +519,7 @@ void Game::update(float dt) {
 		}
 		break;
 	case MODE_HIGHSCORE:
-		if(music->is_playing()) {
-			float vol = music->get_volume();
-			vol-= dt*0.2f;
-			if(vol<0) {
-				music->stop();
-			} else {
-				music->set_volume(vol);
-			}
-		}
+		fade_music(dt);
 		if(start_pressed()) {
 			current_mode = MODE_READY;
 		}
@@ -536,6 +529,17 @@ void Game::update(float dt) {
 
 void Game::evolve() {
 	player_level += difficulty_increase;
+}
+void Game::fade_music(float dt){
+	if(music != nullptr && music->is_playing()) {
+			float vol = music->get_volume();
+			vol-= dt*0.2f;
+			if(vol<0) {
+				music->stop();
+			} else {
+				music->set_volume(vol);
+			}
+		}
 }
 
 void Game::draw_selected_weap()
