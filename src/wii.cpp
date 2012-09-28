@@ -89,6 +89,13 @@ void wii::update()
 	pressedUp = tmp && !downUp;
 	downUp = tmp;
 	
+	tmp = wiim->Button.Left();
+	pressedLeft = tmp && !downLeft;
+	downUp = tmp;
+
+	tmp = wiim->Button.Right();
+	pressedRight = tmp && !downRight;
+	downRight = tmp;
 }
 
 void wii::close()

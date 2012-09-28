@@ -420,7 +420,8 @@ void Game::update(float dt) {
 				//input.update_object(camera, dt);
 
 				bool buttonFirePressed = (input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f);
-				bool buttonSwapPressed = (input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f);
+				bool buttonSwapForwPressed = (input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f);
+				bool buttonSwapBackPressed = false;
 				bool buttonBreakPressed = (input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f);
 				bool buttonMutePressed = (input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f);
 
@@ -434,9 +435,11 @@ void Game::update(float dt) {
 					player.set_canon_yaw(roll);
 
 					buttonFirePressed = WII->getButtonAPressed();
-					buttonSwapPressed = WII->getArrowDownPressed();
+					buttonSwapBackPressed = WII->getArrowLeftPressed();
+					
+					buttonSwapForwPressed = WII->getArrowRightPressed();
 					buttonBreakPressed = WII->getButtonBDown();
-					buttonMutePressed = WII->getArrowUpPressed();
+					//buttonMutePressed = WII->getArrowUpPressed();
 					const bool wiiSwapAB = false;
 					if (wiiSwapAB) std::swap(buttonFirePressed, buttonBreakPressed);
 				} else {
@@ -462,11 +465,15 @@ void Game::update(float dt) {
 					if(music_mute) {
 						music ->stop();
 					}
+					//change_particles(-1);
 
 				}
 
-				if (buttonSwapPressed) {
-					change_particles((particle_type_t) ((current_particle_type + 1) % 3));
+				if (buttonSwapForwPressed) {
+					change_particles(1);
+				}
+				if (buttonSwapBackPressed) {
+					change_particles(-1);
 				}
 
 				if( buttonBreakPressed && global_time - last_break > break_cooldown)
@@ -749,9 +756,16 @@ const Player &Game::get_player() const {
 	return player;
 }
 
-void Game::change_particles(Game::particle_type_t new_type) {
-	current_particle_type = new_type;
-	attack_particles->config = particle_types[new_type].config;
+void Game::change_particles(int delta) {
+	int new_type = current_particle_type + delta;
+	if(new_type>2)
+		current_particle_type=LIGHT_PARTICLES;
+	else if(new_type<0)
+		current_particle_type=HEAVY_PARTICLES;
+	else
+		current_particle_type = (particle_type_t)new_type;
+	//current_particle_type = new_type;
+	attack_particles->config = particle_types[current_particle_type].config;
 }
 
 void Game::enemy_impact(const glm::vec3 &position, bool kill) {
