@@ -100,7 +100,7 @@ void wii::update()
 	
 	tmp = wiim->Button.Left();
 	pressedLeft = tmp && !downLeft;
-	downUp = tmp;
+	downLeft = tmp;
 
 	tmp = wiim->Button.Right();
 	pressedRight = tmp && !downRight;

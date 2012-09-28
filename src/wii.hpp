@@ -37,8 +37,8 @@ public:
 	const bool& getButtonPlusPressed() const { return pressedPlus; }
 	const bool& getArrowDownPressed() const { return pressedDown; }
 	const bool& getArrowUpPressed() const { return pressedUp; }
-	const bool& getArrowLeftPressed() const { return pressedUp; }
-	const bool& getArrowRightPressed() const { return pressedUp; }
+	const bool& getArrowLeftPressed() const { return pressedLeft; }
+	const bool& getArrowRightPressed() const { return pressedRight; }
 	const float& getYaw() const { return yaw; }
 	// Setters
 	void setRumble(const bool& rumble);
