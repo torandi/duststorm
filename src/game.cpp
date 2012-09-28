@@ -331,8 +331,8 @@ void Game::initialize() {
 
 	last_break = -2 * break_cooldown;
 
-
-	change_particles(MEDIUM_PARTICLES);
+	current_particle_type = MEDIUM_PARTICLES;
+	change_particles(0);
 
 
 	score_text.set_color(hud_font_color);
