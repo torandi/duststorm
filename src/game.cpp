@@ -344,9 +344,11 @@ void Game::initialize() {
 	score_text.set_scale(20.0 * hud_scale.x);
 	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
+	if(!music_mute) {
 	if(music != nullptr) delete music;
 	music = new Sound(PATH_BASE "ecstacy.mp3", 1);
 	music->play();
+	}
 }
 
 Game::~Game() {
@@ -419,6 +421,7 @@ void Game::update(float dt) {
 				bool buttonFirePressed = (input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f);
 				bool buttonSwapPressed = (input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f);
 				bool buttonBreakPressed = (input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f);
+				bool buttonMutePressed = false;
 
 #ifdef WIN32
 				if (useWII) {
@@ -432,6 +435,7 @@ void Game::update(float dt) {
 					buttonFirePressed = WII->getButtonAPressed();
 					buttonSwapPressed = WII->getArrowDownPressed();
 					buttonBreakPressed = WII->getButtonBDown();
+					buttonMutePressed = WII->getArrowUpPressed();
 					const bool wiiSwapAB = false;
 					if (wiiSwapAB) std::swap(buttonFirePressed, buttonBreakPressed);
 				} else {
@@ -452,6 +456,14 @@ void Game::update(float dt) {
 
 				}
 				
+				if(buttonMutePressed) {
+					music_mute = !music_mute;
+					if(music_mute) {
+						music ->stop();
+					}
+
+				}
+
 				if (buttonSwapPressed) {
 					change_particles((particle_type_t) ((current_particle_type + 1) % 3));
 				}
@@ -497,7 +509,7 @@ void Game::update(float dt) {
 				return false;
 			});
 			// Really ugly way of looping the music:
-			if(music != nullptr && music->is_done())
+			if(music != nullptr && music->is_done() && !music_mute)
 			{
 				delete music;
 				music = new Sound(PATH_BASE "ecstacy.mp3", 5);

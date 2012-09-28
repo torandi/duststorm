@@ -24,6 +24,7 @@ extern glm::ivec2 resolution;            /* current resolution */
 extern glm::mat4 screen_ortho;           /* orthographic projection for window */
 extern CL * opencl;
 extern bool useWII;						/* Whether we should use the Wiimote. */
+extern bool music_mute;
 
 enum shader_t {
 	SHADER_SIMPLE=0,

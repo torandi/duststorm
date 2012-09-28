@@ -35,7 +35,8 @@ public:
 	const bool& getButtonBPressed() const { return pressedB; }
 	const bool& getButtonPlusDown() const { return downPlus; }
 	const bool& getButtonPlusPressed() const { return pressedPlus; }
-	const bool& getArrowDownPressed() const { return pressedArrowDown; }
+	const bool& getArrowDownPressed() const { return pressedDown; }
+	const bool& getArrowUpPressed() const { return pressedUp; }
 	const float& getYaw() const { return yaw; }
 	// Setters
 	void setRumble(const bool& rumble);
@@ -51,7 +52,9 @@ private:
 	// State for '+' button.
 	bool downPlus, pressedPlus;
 	// State for arrow down.
-	bool pressedArrowDown;
+	bool downDown, pressedDown;
+
+	bool downUp, pressedUp;
 	// Yaw estimation values.
 	float yaw;
 	float yawCal;

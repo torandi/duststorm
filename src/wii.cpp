@@ -80,16 +80,15 @@ void wii::update()
 	pressedPlus = tmp && !downPlus;
 	downPlus = tmp;
 
-	pressedArrowDown = wiim->Button.Down();
+	//pressedArrowDown = wiim->Button.Down();
+	tmp = wiim->Button.Down();
+	pressedDown = tmp && !downDown;
+	downDown = tmp;
 
-	// Yaw estimation (broken).
-	if (motionPlus() && wiim->Button.Up()) // Calibrate yaw.
-	{
-		yaw = 0;
-		yawCal = wiim->MotionPlus.Speed.Yaw;
-	}
-	float dYaw = wiim->MotionPlus.Speed.Yaw - yawCal;
-	if (abs(dYaw) > yawThreshold) yaw += dYaw * (1 / 6.0f);
+	tmp = wiim->Button.Up();
+	pressedUp = tmp && !downUp;
+	downUp = tmp;
+	
 }
 
 void wii::close()
