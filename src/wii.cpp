@@ -62,7 +62,7 @@ void wii::update()
 {
 	assert(wiim != nullptr);
 
-	if(!(wiim->IsConnected)){
+	if(!(wiim->IsConnected())){
 		fprintf(verbose, "Wiimote is not connected!\n");
 		fprintf(stderr, "Wiimote is not connected!\n");
 		connect();
