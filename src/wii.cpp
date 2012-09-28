@@ -2,6 +2,7 @@
 #include <wiimote.h>
 #include <cassert>
 #include <cmath>
+#include "globals.hpp"
 using namespace std;
 
 wii::wii()
@@ -60,6 +61,14 @@ bool wii::motionPlus() const
 void wii::update()
 {
 	assert(wiim != nullptr);
+
+	if(!(wiim->IsConnected)){
+		fprintf(verbose, "Wiimote is not connected!\n");
+		fprintf(stderr, "Wiimote is not connected!\n");
+		connect();
+		fprintf(verbose, "Reconnect succesful!\n");
+
+	}
 	// IMPORTANT: the wiimote state needs to be refreshed each pass
 	if (wiim->RefreshState() == NO_CHANGE) return;
 
