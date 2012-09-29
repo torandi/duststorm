@@ -374,6 +374,11 @@ Game::~Game() {
 	delete attack_particles;
 	delete particle_textures;
 	delete explosions;
+	delete dust;
+
+	delete hud_choice_quad;
+	delete fullscreen_quad;
+	delete hud_break_quad;
 }
 
 void Game::update(float dt) {
