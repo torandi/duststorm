@@ -38,22 +38,22 @@ void Input::parse_event(const SDL_Event &event) {
 				case SDLK_UP:
 				case SDLK_w:
 					//UP
-					sustained_values[MOVE_Z] = movement_speed;
+					sustained_values[MOVE_Z] = -movement_speed;
 					break;
 				case SDLK_DOWN:
 				case SDLK_s:
 					//DOWN
-					sustained_values[MOVE_Z] = -movement_speed;
+					sustained_values[MOVE_Z] = movement_speed;
 					break;
 				case SDLK_LEFT:
 				case SDLK_a:
 					//LEFT
-					sustained_values[MOVE_X] = -movement_speed;
+					sustained_values[MOVE_X] = movement_speed;
 					break;
 				case SDLK_RIGHT:
 				case SDLK_d:
 					//RIGHT
-					sustained_values[MOVE_X] = movement_speed;
+					sustained_values[MOVE_X] = -movement_speed;
 					break;
 				case SDLK_1:
 					sustained_values[ACTION_0] = 1.f;
