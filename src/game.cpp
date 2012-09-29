@@ -578,11 +578,13 @@ void Game::update_enemies(float dt) {
 	for(auto it = enemies.begin(); it != enemies.end(); ) {
 		if((*it)->hp <= 0 ) {
 			enemy_impact((*it)->position(), true);
+			delete *it;
 			it = enemies.erase(it);
 			life += 1;
 			score += (int) (player_level * 10.f);
 			evolve();
 		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
+			delete *it;
 			it = enemies.erase(it);
 			life -= 10;
 		} else {
