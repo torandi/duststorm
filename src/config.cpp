@@ -321,7 +321,7 @@ const ConfigEntry * Config::operator[](const std::string &path) const {
 Config::Config(ConfigEntry * entry) : root(entry) { }
 
 Config::~Config() {
-	//delete root; // Deconstructor making a double free atm.
+
 }
 
 void Config::print() const {
