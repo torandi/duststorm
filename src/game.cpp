@@ -346,7 +346,7 @@ void Game::initialize() {
 
 	if(!music_mute) {
 	if(music != nullptr) delete music;
-	music = new Sound(PATH_BASE "ecstacy.mp3", 1);
+	music = new Sound("ecstacy.mp3", 1);
 	music->play();
 	}
 }
@@ -520,7 +520,7 @@ void Game::update(float dt) {
 			if(music != nullptr && music->is_done() && !music_mute)
 			{
 				delete music;
-				music = new Sound(PATH_BASE "ecstacy.mp3", 5);
+				music = new Sound("ecstacy.mp3", 5);
 				music->play();
 			}
 		}
@@ -742,7 +742,7 @@ void Game::shoot() {
 	smoke->config.avg_spawn_velocity = glm::vec4(base_speed + player.aim_direction() * smoke_spawn_speed + glm::vec3(0.f, 1.f, 0.f), 1.f);
 	smoke->config.spawn_position = spawn_position;
 	smoke->spawn(smoke_count);
-	play_sound(PATH_BASE "Explosion_Fast.wav",1);
+	play_sound("Explosion_Fast.wav",1);
 }
 
 void Game::update_wind_velocity() {
