@@ -108,6 +108,8 @@ namespace Engine {
 		}
 #endif
 		Texture2D::cleanup();
+		delete opencl;
+		opencl = nullptr;
 	}
 
 	void update(float dt) {
