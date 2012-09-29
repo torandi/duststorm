@@ -101,8 +101,8 @@ class Game {
 		Quad *fullscreen_quad, *hud_choice_quad, *hud_break_quad;
 		Texture2D *hud_static_elements_tex, *game_over_texture, *hud_choice_tex, *startscreen_texture, *hud_break_tex;
 		void draw_selected_weap();
-		
-		glm::core::type::vec2 hud_lightpos, hud_mediumpos, hud_heavypos; 
+
+		glm::vec2 hud_lightpos, hud_mediumpos, hud_heavypos;
 
 		Shader *particle_shader, *passthru;
 

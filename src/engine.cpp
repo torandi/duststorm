@@ -35,7 +35,7 @@ static void render_loading_scene() {
 	glViewport(0, 0, resolution.x, resolution.y);
 
 	Quad loadingscreen;
-	loadingscreen.set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
+	loadingscreen.set_scale(glm::vec3(resolution.x,resolution.y,0));
 	Texture2D* loadingtexture = Texture2D::from_filename(PATH_BASE "/data/textures/loading.png");
 	loadingtexture->texture_bind(Shader::TEXTURE_2D_0);
 

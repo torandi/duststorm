@@ -279,7 +279,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	hud_scale = glm::vec2(resolution.x / 800.f, resolution.y / 600.f);
 	hud_static_elements_tex = Texture2D::from_filename(PATH_BASE "/data/textures/hudStatic.png");
 	fullscreen_quad = new Quad();
-	fullscreen_quad->set_scale(glm::core::type::vec3(resolution.x,resolution.y,0));
+	fullscreen_quad->set_scale(glm::vec3(resolution.x,resolution.y,0));
 
 	hud_lightpos =  glm::vec2(594,490) * hud_scale;
 	hud_mediumpos = glm::vec2(644,490) * hud_scale;
@@ -287,11 +287,11 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 	hud_choice_tex = Texture2D::from_filename(PATH_BASE "/data/textures/weap_select.png");
 	hud_choice_quad = new Quad();
-	hud_choice_quad->set_scale(glm::core::type::vec3(97,92,0) * glm::core::type::vec3(hud_scale , 0));
+	hud_choice_quad->set_scale(glm::vec3(97,92,0) * glm::vec3(hud_scale , 0));
 
 	hud_break_tex = Texture2D::from_filename(PATH_BASE "/data/textures/breaks_ready.png");
 	hud_break_quad = new Quad();
-	hud_break_quad->set_scale(glm::core::type::vec3(190, 25, 0) * glm::core::type::vec3(hud_scale, 0));
+	hud_break_quad->set_scale(glm::vec3(190, 25, 0) * glm::vec3(hud_scale, 0));
 	hud_break_quad->set_position(glm::vec3(glm::vec2(30, 530) * hud_scale, 0.f));
 
 	life_text.set_color(hud_font_color);
