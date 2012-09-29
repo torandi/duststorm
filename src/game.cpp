@@ -354,6 +354,11 @@ void Game::initialize() {
 }
 
 Game::~Game() {
+	for ( auto ptr: enemies ){
+		delete ptr;
+	}
+	enemies.clear();
+
 	delete music;
 
 	delete composition;
