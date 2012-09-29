@@ -347,13 +347,15 @@ void Game::initialize() {
 	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
 	if(!music_mute) {
-	if(music != nullptr) delete music;
+	delete music;
 	music = new Sound("ecstacy.mp3", 1);
 	music->play();
 	}
 }
 
 Game::~Game() {
+	delete music;
+
 	delete composition;
 	delete geometry;
 	delete terrain;
