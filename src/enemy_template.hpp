@@ -17,6 +17,7 @@ class EnemyTemplate : public MovableObject {
 		~EnemyTemplate();
 
 		static void init(Config config, const Game * game);
+		static void cleanup();
 
 		static std::vector<EnemyTemplate> templates;
 		static float spawn_rate;

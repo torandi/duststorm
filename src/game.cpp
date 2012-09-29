@@ -358,6 +358,7 @@ Game::~Game() {
 		delete ptr;
 	}
 	enemies.clear();
+	EnemyTemplate::cleanup();
 
 	delete music;
 
