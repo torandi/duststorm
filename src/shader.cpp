@@ -105,6 +105,7 @@ void Shader::cleanup(){
 	for ( ShaderPair p: shadercache ){
 		delete p.second;
 	}
+	shadercache.clear();
 }
 
 Shader::Shader(const std::string &name_, GLuint program) :
