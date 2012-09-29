@@ -152,6 +152,7 @@ Config Config::parse(std::string file) {
 		printf("[ConfigEntry] Parse error: End of file reached with unmatch } or ]\n");
 		abort();
 	}
+	delete data;
 	return Config(current);
 }
 
