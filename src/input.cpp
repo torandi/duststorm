@@ -10,6 +10,7 @@ float Input::movement_speed = 1.f;
 float Input::rotation_speed = 1.f;
 float Input::mouse_scale = 0.005f;
 bool Input::current_grab_mode = true;
+bool Input::use_joystick = false;
 
 Input::Input(){
 	SDL_JoystickEventState(SDL_TRUE);
@@ -74,6 +75,7 @@ void Input::parse_event(const SDL_Event &event) {
 					sustained_values[ACTION_3] = 1.f;
 					break;
 				case SDLK_RETURN:
+					use_joystick = false;
 					sustained_values[START] = 1.f;
 					break;
 				default:
@@ -139,6 +141,7 @@ void Input::parse_event(const SDL_Event &event) {
 					sustained_values[ACTION_3] = 1.f;
 					break;
 				case 7:
+					use_joystick = true;
 					sustained_values[START] = 1.f;
 					break;
 			}
@@ -166,10 +169,12 @@ void Input::parse_event(const SDL_Event &event) {
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			sustained_values[MOVE_X] -= event.motion.xrel * mouse_scale;
-			sustained_values[MOVE_Y] += event.motion.yrel * mouse_scale;
-			sustained_values[MOVE_X] = glm::clamp(sustained_values[MOVE_X], -1.f, 1.f);
-			sustained_values[MOVE_Y] = glm::clamp(sustained_values[MOVE_Y], -1.f, 1.f);
+			if(!use_joystick) {
+				sustained_values[MOVE_X] -= event.motion.xrel * mouse_scale;
+				sustained_values[MOVE_Y] -= event.motion.yrel * mouse_scale;
+				sustained_values[MOVE_X] = glm::clamp(sustained_values[MOVE_X], -1.f, 1.f);
+				sustained_values[MOVE_Y] = glm::clamp(sustained_values[MOVE_Y], -1.f, 1.f);
+			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			switch(event.button.button) {
@@ -200,7 +205,7 @@ void Input::parse_event(const SDL_Event &event) {
 			break;
 	}
 
-	if(SDL_JoystickOpen(0)) {
+	if(use_joystick && SDL_JoystickOpen(0)) {
 		sustained_values[MOVE_X] = -normalized_axis_value(0);
 		sustained_values[MOVE_Y] = -normalized_axis_value(1);
 	}

@@ -16,6 +16,8 @@ class Input {
 		static float mouse_scale;
 		static bool current_grab_mode;
 
+		static bool use_joystick; //otherwise mouse
+
 		void parse_event(const SDL_Event &event);
 		
 		enum input_action_t {

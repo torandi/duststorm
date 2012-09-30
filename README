@@ -39,6 +39,9 @@ Break: B-button
 Change particles: Left and right on the D-pad changes particles
 
 === Xbox 360 controller ===
+You must press start (and not enter) to activate the xbox controller (and thus deactivating the mouse).
+Pressing start or enter at any time switches between xbox and mouse
+
 Aim: Left stick
 Fire: A
 Break: LB or B
