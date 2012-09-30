@@ -11,7 +11,7 @@ arch=$(uname -p)
 
 # setup directories
 root=$(dirname $0)
-if [[ $arch =~ "i[3456]86" ]]; then
+if [[ $arch =~ i[3456]86 ]]; then
 		libdir="${root}/i386/libs"
 		bindir="${root}/i386/bin"
 elif [[ $arch == "x86_64" ]]; then

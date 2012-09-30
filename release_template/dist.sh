@@ -7,6 +7,10 @@ build=$(dirname $0)/build
 build=$(dirname $0)/temp
 arch=$(uname -p)
 
+if [[ $arch =~ i[3456]86 ]]; then
+	arch="i386"
+fi
+
 name=""
 binary=""
 mode=""

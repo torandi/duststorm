@@ -42,6 +42,7 @@ AC_DEFINE_UNQUOTED([FULLSCREEN], [$FULLSCREEN], [Define to 1 if fullscreen is us
 platform=$(uname -s)
 arch=$(uname -m)
 AS_IF([test "x${platform}" == "xDarwin"], [arch="osx"])
+AS_IF([test "x${arch}" == "xi686"], [arch="i386"])
 
 dnl Use vendor libs
 VENDOR_CFLAGS=""
@@ -57,11 +58,8 @@ AC_SUBST(VENDOR_LIBS)
 dnl Show config
 echo
 echo "     Platform/arch: $platform $arch (vendor libs: $enable_vendor_libs)"
+echo "         Fullscreen: $FULLSCREEN"
 echo "         Data path: $DATA_PATH"
-echo "    Editor enabled: $enable_editor"
-echo "     Input enabled: $enable_input"
-echo "     Loading scene: $loadingscene"
-echo " Scene autoloading: $enable_autoload"
 echo "          CXXFLAGS: $CXXFLAGS"
 echo "           LDFLAGS: $LDFLAGS"
 echo
