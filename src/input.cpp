@@ -126,10 +126,13 @@ void Input::parse_event(const SDL_Event &event) {
 				case 0:
 					sustained_values[ACTION_0] = 1.f;
 					break;
+				case 4:
+					sustained_values[ACTION_1] = 1.f;
+					break;
 				case 1:
 					sustained_values[ACTION_1] = 1.f;
 					break;
-				case 4:
+				case 2:
 					sustained_values[ACTION_2] = 1.f;
 					break;
 				case 3:
@@ -145,10 +148,13 @@ void Input::parse_event(const SDL_Event &event) {
 				case 0:
 					sustained_values[ACTION_0] = 0.f;
 					break;
+				case 4:
+					sustained_values[ACTION_1] = 0.f;
+					break;
 				case 1:
 					sustained_values[ACTION_1] = 0.f;
 					break;
-				case 4:
+				case 2:
 					sustained_values[ACTION_2] = 0.f;
 					break;
 				case 3:
@@ -161,9 +167,9 @@ void Input::parse_event(const SDL_Event &event) {
 			break;
 		case SDL_MOUSEMOTION:
 			sustained_values[MOVE_X] -= event.motion.xrel * mouse_scale;
-			sustained_values[MOVE_Z] += event.motion.yrel * mouse_scale;
+			sustained_values[MOVE_Y] += event.motion.yrel * mouse_scale;
 			sustained_values[MOVE_X] = glm::clamp(sustained_values[MOVE_X], -1.f, 1.f);
-			sustained_values[MOVE_Z] = glm::clamp(sustained_values[MOVE_Z], -1.f, 1.f);
+			sustained_values[MOVE_Y] = glm::clamp(sustained_values[MOVE_Y], -1.f, 1.f);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			switch(event.button.button) {
@@ -195,12 +201,8 @@ void Input::parse_event(const SDL_Event &event) {
 	}
 
 	if(SDL_JoystickOpen(0)) {
-		temporary_values[MOVE_X] = -normalized_axis_value(0)*movement_speed;
-		temporary_values[MOVE_Y] = get_hat_up_down(0)*movement_speed;
-		temporary_values[MOVE_Z] = -normalized_axis_value(1)*movement_speed;
-		temporary_values[ROTATE_X] = -normalized_axis_value(4)*rotation_speed;
-		temporary_values[ROTATE_Y] = -(normalized_trigger_value(5) - normalized_trigger_value(2))*2.f*rotation_speed;
-		temporary_values[ROTATE_Z] = normalized_axis_value(3)*rotation_speed;
+		sustained_values[MOVE_X] = -normalized_axis_value(0);
+		sustained_values[MOVE_Y] = -normalized_axis_value(1);
 	}
 }
 

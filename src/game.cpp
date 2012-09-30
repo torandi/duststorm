@@ -446,7 +446,7 @@ void Game::update(float dt) {
 					if (wiiSwapAB) std::swap(buttonFirePressed, buttonBreakPressed);
 				} else {
 #endif
-					player.set_canon_pitch(input.current_value(Input::MOVE_Z) * -90.f);
+					player.set_canon_pitch(input.current_value(Input::MOVE_Y) * 90.f);
 					player.set_canon_yaw(input.current_value(Input::MOVE_X) * 90.f);
 #ifdef WIN32
 				}
