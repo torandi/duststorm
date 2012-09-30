@@ -317,6 +317,8 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 void Game::initialize() {
 
+	input.reset();
+
 	//Reset light:
 	lights.lights[0]->set_position(glm::normalize(glm::vec3(1.0, -1.f, 0.0f)));
 
@@ -421,9 +423,9 @@ void Game::update(float dt) {
 
 				bool buttonFirePressed = (input.has_changed(Input::ACTION_0, 0.2f) && input.current_value(Input::ACTION_0) > 0.9f);
 				bool buttonSwapForwPressed = (input.has_changed(Input::ACTION_3, 0.2f) && input.current_value(Input::ACTION_3) > 0.9f);
-				bool buttonSwapBackPressed = false;
-				bool buttonBreakPressed = (input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f);
-				bool buttonMutePressed = (input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f);
+				bool buttonSwapBackPressed = (input.has_changed(Input::ACTION_2, 0.2f) && input.current_value(Input::ACTION_2) > 0.9f);
+				bool buttonBreakPressed = (input.has_changed(Input::ACTION_1, 0.2f) && input.current_value(Input::ACTION_1) > 0.9f);
+				bool buttonMutePressed = false;
 
 #ifdef WIN32
 				if (useWII) {
@@ -532,6 +534,8 @@ void Game::update(float dt) {
 		}
 		break;
 	}
+
+	input.update(dt);
 }
 
 void Game::evolve() {

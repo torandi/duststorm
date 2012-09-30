@@ -87,6 +87,7 @@ static void init(bool fullscreen, bool vsync){
 	SDL_WM_SetCaption(GAME_NAME, NULL);
 
 	SDL_ShowCursor(SDL_DISABLE);
+	SDL_WM_GrabInput(SDL_GRAB_ON);
 
 	int ret;
 	if ( (ret=glewInit()) != GLEW_OK ){

@@ -13,6 +13,8 @@ class Input {
 
 		static float movement_speed;
 		static float rotation_speed;
+		static float mouse_scale;
+		static bool current_grab_mode;
 
 		void parse_event(const SDL_Event &event);
 		
@@ -30,6 +32,9 @@ class Input {
 			START,
 			NUM_ACTIONS
 		};
+
+		void reset();
+		void update(float dt); //Should be called last in every frame. Reset temporary values to 0
 
 		float current_value(input_action_t action) const;
 		
