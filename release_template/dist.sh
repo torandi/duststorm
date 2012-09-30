@@ -84,6 +84,8 @@ function add(){
 		name=$(tar xf $2 .name -O)
 		binary=$(tar xf $2 .binary -O)
 
+		mkdir -p $build
+
 		echo "Building code"
 		pushd $build
 		../$root/configure FULLSCREEN=1 DATA_PATH=.
