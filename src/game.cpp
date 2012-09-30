@@ -671,10 +671,8 @@ void Game::render() {
 		attack_particles->render();
 		
 		smoke->render();
-		dust->render();
-
-		
 		explosions->render();
+		dust->render();
 
 		composition->unbind();
 
