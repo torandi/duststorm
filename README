@@ -1,0 +1,51 @@
+== Dust Storm ==
+http://duststorm.se
+
+This game is written by:
+Andreas Tarandi,
+Eric Nellåker,
+Niklas Bäckström
+
+== Game Play ==
+The goal of the game is to survive as long as possible. You travel along 
+a rail and enemies appear. Use your particle canon to shoot them. For each
+enemy you kill you gain score and life, but for each you miss, you lose health.
+If your health reaches 0 you lose.
+
+=== Firing ===
+There is no limitation on how fast you can fire.
+
+=== Breaking ===
+You only need to tap the break button to break. This will apply the breaks for 3 seconds.
+They will then be unusable for 10 seconds. "Breaks Ready" will appear in the lower left corner when
+they can be use again.
+
+=== Particle Types ===
+You have three particle types:
+
+Light: Great Area of Effect, but very light, and is thus much affected by the wind.
+Medium: Short range weapon.
+Heavy: Long range weapon.
+
+== Controls ==
+We recommend that you play with a wiimote (if you have one). 
+Wiimote support is only implemented under windows, to activate it, specify the flag -w to the program
+If you don't have an wiimote, a xbox 360 controll works rather well, and in worst case, use the mouse.
+
+=== Wiimote ===
+Aim: Roll controls horizontal aim, and pitch vertical aim
+Fire: A-button
+Break: B-button
+Change particles: Left and right on the D-pad changes particles
+
+=== Xbox 360 controller ===
+Aim: Left stick
+Fire: A
+Break: LB or B
+Change particles: X and Y
+
+=== Mouse and keyboard ===
+Aim: Mouse
+Fire: Left mouse button
+Break: Space or right mouse button
+Change particles: Wheel up/down or keys 1 and 2
