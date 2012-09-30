@@ -2,7 +2,7 @@
 	#include "config.h"
 #endif
 
-#define GAME_NAME "FUBAR 3D ENGINE"
+#define GAME_NAME "Dust Storm"
 
 #include "engine.hpp"
 #include "globals.hpp"
@@ -31,6 +31,8 @@
 #include <ctime>
 
 #define LOGFILE PATH_BASE "frob.log"
+
+#define GAME_VERSION "0.3"
 
 glm::mat4 screen_ortho;           /* orthographic projection for primary fbo */
 
@@ -84,7 +86,7 @@ static void init(bool fullscreen, bool vsync){
 	if(vsync) SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	SDL_SetVideoMode(resolution.x, resolution.y, 0, SDL_OPENGL|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
 	SDL_EnableKeyRepeat(0, 0);
-	SDL_WM_SetCaption(GAME_NAME, NULL);
+	SDL_WM_SetCaption(GAME_NAME " " GAME_VERSION, NULL);
 
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_WM_GrabInput(SDL_GRAB_ON);
@@ -193,7 +195,7 @@ static void main_loop(){
 
 void show_usage(){
 #ifndef WIN32
-	printf(GAME_NAME " (" PACKAGE_NAME "-" VERSION ")\n"
+	printf(GAME_NAME " " GAME_VERSION " (based on fubar engine)\n"
 	       "usage: %s [OPTIONS]\n"
 	       "\n"
 	       "  -r, --resolution=SIZE   Set window resultion (default: 800x600 in windowed and\n"
@@ -207,7 +209,15 @@ void show_usage(){
 	       "  -h, --help              This text\n",
 			program_name, FULLSCREEN ? "true" : "false");
 #else
-	printf(PACKAGE_NAME "-" VERSION ": windows doesn't support getopt. Go play with a kitten (or install a better os, your choice).\n");
+	printf(GAME_NAME " " GAME_VERSION " (based on fubar engine)\n"
+			"usage: %s [OPTIONS]\n"
+			"\n"
+			"	-r x y	Set window resolution (default 800x600 in windowed and \n"
+			"																current resolution in fullscreen.\n"
+			"	-f														Toggle fullscreen: (default: %s)\n"
+			" -w														Enable wiimote support\n"
+			" -v														Verbose\n",
+		program_name, FULLSCREEN ? "on" : "off");
 #endif
 }
 
