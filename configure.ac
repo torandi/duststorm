@@ -45,12 +45,12 @@ AS_IF([test "x${platform}" == "xDarwin"], [arch="osx"])
 AS_IF([test "x${arch}" == "xi686"], [arch="i386"])
 
 dnl Use vendor libs
-VENDOR_CFLAGS=""
+VENDOR_CFLAGS="-isystem \${top_srcdir}/vendor/src"
 VENDOR_LIBS=""
 AC_ARG_ENABLE([vendor-libs], [AS_HELP_STRING([--enable-vendor-libs], [Use libraries from vendor folder instead of system. @<:@default=enabled@:>@])], [], [enable_vendor_libs="yes"])
 AS_IF([test "x$enable_vendor_libs" == "xyes"], [
-	VENDOR_CFLAGS="-I \${top_srcdir}/vendor/include"
-	VENDOR_LIBS="-L \${top_srcdir}/vendor/libs/$arch -Wl,--rpath \${top_srcdir}/vendor/libs/$arch"
+	VENDOR_CFLAGS+=" -isystem \${top_srcdir}/vendor/include"
+	VENDOR_LIBS+=" -L \${top_srcdir}/vendor/libs/$arch -Wl,--rpath \${top_srcdir}/vendor/libs/$arch"
 ])
 AC_SUBST(VENDOR_CFLAGS)
 AC_SUBST(VENDOR_LIBS)
