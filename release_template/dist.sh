@@ -105,6 +105,7 @@ function finalize(){
 		echo $2
 		tar vf $2 --delete .name
 		tar vf $2 --delete .binary
+		tar vf $2 --delete test.sh
 		gzip $2
 }
 

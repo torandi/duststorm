@@ -16,6 +16,7 @@ If your health reaches 0 you lose.
 There is no limitation on how fast you can fire.
 
 === Breaking ===
+Breaking reduces the speed of the cart temporary, giving you a moment to breath.
 You only need to tap the break button to break. This will apply the breaks for 3 seconds.
 They will then be unusable for 10 seconds. "Breaks Ready" will appear in the lower left corner when
 they can be use again.
