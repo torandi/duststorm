@@ -34,8 +34,8 @@ while getopts "hcafn:b:" opt; do
 						echo "  -n NAME       Archive name"
 						echo "  -b BINARY     Binary name"
 						echo ""
-						echo "  -a            Add new build to release"
-						echo "  -f            Finalize release"
+						echo "  -a TAR           Add new build to release"
+						echo "  -f TAR           Finalize release"
 						exit
 						;;
 		esac
