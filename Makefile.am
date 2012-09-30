@@ -5,10 +5,10 @@ engine_LIBS = ${VENDOR_LIBS} ${GL_LIBS} ${GLU_LIBS} ${GLEW_LIBS} ${SDL_LIBS} ${C
 AM_CXXFLAGS = -Wall -I${top_srcdir}/src ${engine_CXXFLAGS} ${VENDOR_CFLAGS}
 AM_CFLAGS = -I${top_srcdir}/src ${engine_CXXFLAGS} ${VENDOR_CFLAGS}
 
-bin_PROGRAMS = fubar
+bin_PROGRAMS = duststorm
 
-fubar_LDADD = ${engine_LIBS}
-fubar_SOURCES =	src/main.cpp \
+duststorm_LDADD = ${engine_LIBS}
+duststorm_SOURCES =	src/main.cpp \
 								src/bindable.hpp \
 								src/camera.cpp src/camera.hpp \
 								src/cl.cpp src/cl.hpp \
