@@ -21,6 +21,7 @@ Player::Player() {
 	shader = Shader::create_shader("normal");
 	canon_pitch.set_rotation(glm::vec3(1.0, 0.0, 0.0), 0.f);
 	canon_yaw.set_rotation(glm::vec3(1.0, 0.0, 0.0), 0.f);
+	path_position_ = 0;
 
 	f_canon_pitch = 0.f;
 	f_canon_yaw = 0.f;

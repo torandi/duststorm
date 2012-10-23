@@ -67,7 +67,7 @@ Sound::Sound(const char * file, int loops) : delay(-0.1f) {
 	}
 
 	sound_usage_count_ = new int;
-	++(*sound_usage_count_);
+	*sound_usage_count_ = 1;
 }
 
 Sound::Sound(const Sound &sound, int loops) : 

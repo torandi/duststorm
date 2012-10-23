@@ -57,7 +57,7 @@ void Highscore::load() {
 				e = -1;
 			}
 		}
-		delete line;
+		free(line);
 		delete d;
 	}
 }

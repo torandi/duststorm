@@ -176,6 +176,10 @@ CL::CL() {
 	}
 }
 
+CL::~CL(){
+	cache.clear();
+}
+
 void CL::load_file(const std::string &filename, std::stringstream &data, const std::string &included_from) {
 	Data * file = Data::open(filename);
 	if(file == nullptr) {

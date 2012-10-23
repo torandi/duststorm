@@ -14,6 +14,7 @@
 class CL {
 	public:
 		CL();
+		~CL();
 
 		cl::Program create_program(const std::string &file_name) const;
 

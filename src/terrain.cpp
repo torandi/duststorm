@@ -18,10 +18,8 @@
 #define RENDER_DEBUG 0
 
 Terrain::~Terrain() {
-	if(map_ != NULL)
-		delete map_;
-	if(data_texture_ != NULL)
-		delete data_texture_;
+	delete [] map_;
+	delete data_texture_;
 	free_surface();
 }
 
