@@ -347,13 +347,21 @@ void Game::initialize() {
 	score_text.set_position(glm::vec3(glm::vec2(26.f, 70.5f) * hud_scale, 0.f));
 
 	if(!music_mute) {
-	if(music != nullptr) delete music;
+	delete music;
 	music = new Sound("ecstacy.mp3", 1);
 	music->play();
 	}
 }
 
 Game::~Game() {
+	for ( auto ptr: enemies ){
+		delete ptr;
+	}
+	enemies.clear();
+	EnemyTemplate::cleanup();
+
+	delete music;
+
 	delete composition;
 	delete geometry;
 	delete terrain;
@@ -366,6 +374,11 @@ Game::~Game() {
 	delete attack_particles;
 	delete particle_textures;
 	delete explosions;
+	delete dust;
+
+	delete hud_choice_quad;
+	delete fullscreen_quad;
+	delete hud_break_quad;
 }
 
 void Game::update(float dt) {
@@ -570,11 +583,13 @@ void Game::update_enemies(float dt) {
 	for(auto it = enemies.begin(); it != enemies.end(); ) {
 		if((*it)->hp <= 0 ) {
 			enemy_impact((*it)->position(), true);
+			delete *it;
 			it = enemies.erase(it);
 			life += 1;
 			score += (int) (player_level * 10.f);
 			evolve();
 		} else if(player.path_position() - (*it)->path_position > despawn_distance) {
+			delete *it;
 			it = enemies.erase(it);
 			life -= 10;
 		} else {

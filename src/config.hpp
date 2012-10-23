@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -46,7 +47,7 @@ class ConfigEntry {
 
 class Config {
 	Config(ConfigEntry * entry);
-	ConfigEntry * root;
+	std::shared_ptr<ConfigEntry> root;
 	public:
 		static Config parse(std::string file);
 		~Config();

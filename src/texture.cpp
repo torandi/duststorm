@@ -159,6 +159,7 @@ void Texture2D::cleanup() {
 		texture_cache.erase(it++);
 		delete t;
 	}
+	texture_cache.clear();
 }
 
 Texture2D* Texture2D::default_colormap(){

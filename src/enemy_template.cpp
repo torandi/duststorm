@@ -35,6 +35,13 @@ void EnemyTemplate::init(Config config, const Game * game) {
 	Shader::create_shader("health");
 }
 
+void EnemyTemplate::cleanup(){
+	for ( auto i: templates ){
+		delete i.model;
+	}
+	templates.clear();
+}
+
 EnemyTemplate::EnemyTemplate(const ConfigEntry * config) {
 		model = new RenderObject(config->find("model", true)->as_string(), true);
 		model->set_position(glm::vec3(0.0, 0.0, 0.0));
