@@ -5,6 +5,7 @@
 #include "cl.hpp"
 #include "data.hpp"
 #include "texture.hpp"
+#include "utils.hpp"
 
 #ifdef HAVE_GL_GLX_H
 #include <GL/glx.h>
@@ -24,7 +25,7 @@ CL::CL() {
 	std::vector<cl::Platform> platforms;
 	if(cl::Platform::get(&platforms) == CL_INVALID_VALUE) {
 		fprintf(stderr, "[OpenCL] No platforms available\n");
-		abort();
+		util_abort();
 	}
 
 	platform_ = platforms[0]; //Just select the first platform
@@ -51,7 +52,7 @@ CL::CL() {
 	HDC current_dc = wglGetCurrentDC();
 	if(current_dc == NULL || current_context == NULL) {
 		fprintf(stderr,"[OpenCL] No OpenGL context active\n");
-		abort();
+		util_abort();
 	}
 
 	cl_context_properties properties[] = {
@@ -64,7 +65,7 @@ CL::CL() {
 #else
 	if(glXGetCurrentContext() == NULL) {
 		fprintf(stderr, "[OpenCL] glXGetCurrentContex() return NULL. Make sure to create OpenGL context before create the CL-context\n");
-		abort();
+		util_abort();
 	}
 	cl_context_properties properties[] =
 	{
@@ -95,7 +96,7 @@ CL::CL() {
 
 	if(deviceSize == 0) {
 		fprintf(stderr, "[OpenCL] Interop not possible\n");
-		abort();
+		util_abort();
 	}
 
 	
@@ -150,7 +151,7 @@ CL::CL() {
 
 	if(err != CL_SUCCESS) {
 		fprintf(stderr, "[OpenCL] Failed to create context: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 
 
@@ -158,7 +159,7 @@ CL::CL() {
 	err = clGetGLContextInfoKHR(properties, CL_CURRENT_DEVICE_FOR_GL_CONTEXT_KHR, sizeof(device_id), &device_id, NULL);
 	if(err != CL_SUCCESS) {
 		fprintf(stderr, "[OpenCL] Failed to get current device for context: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 
 	context_device_ = cl::Device(device_id);
@@ -172,7 +173,7 @@ CL::CL() {
 
 	if(err != CL_SUCCESS) {
 		fprintf(stderr, "[OpenCL] Failed to create a command queue: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 }
 
@@ -187,7 +188,7 @@ void CL::load_file(const std::string &filename, std::stringstream &data, const s
 			fprintf(stderr, "[OpenCL] Kernel preprocessor error: File %s not found\n", filename.c_str());
 		else
 			fprintf(stderr, "[OpenCL] Kernel preprocessor error: File %s not found (included from %s)\n", filename.c_str(), included_from.c_str());
-		abort();
+		util_abort();
 	}
 	data << file;
 	delete file;
@@ -203,7 +204,7 @@ std::string CL::parse_file(
 	std::pair<std::set<std::string>::iterator, bool> ret = included_files.insert(filename);
 	if(ret.second == false) {
 		fprintf(stderr, "[OpenCL] Kernel preprocessor error: Found include loop when including %s from %s\n", filename.c_str(), included_from.c_str());
-		abort();
+		util_abort();
 	}
 
 	std::stringstream raw_content, parsed_content;
@@ -224,7 +225,7 @@ std::string CL::parse_file(
 				size_t end_quote = line.find_last_of('"');
 				if(end_quote == std::string::npos || end_quote == first_quote) {
 					fprintf(stderr, "%s\n[OpenCL] Kernel preprocessor error in %s:%d: Missing closing quote for #include command\n", buffer, filename.c_str(),  linenr);
-					abort();
+					util_abort();
 				}
 				//Trim quotes
 				line = line.substr(first_quote+1, (end_quote - first_quote)-1);
@@ -273,7 +274,7 @@ cl::Program CL::create_program(const std::string &source_file) const{
 	if(err != CL_SUCCESS) {
 
 		fprintf(stderr, "[OpenCL] Failed to build program: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 
 	cache[source_file] = program;
@@ -286,7 +287,7 @@ cl::Kernel CL::load_kernel(const cl::Program &program, const char * kernel_name)
 	cl::Kernel kernel = cl::Kernel(program, kernel_name, &err);
 	if(err != CL_SUCCESS) {
 		fprintf(stderr,"[OpenCL] Failed to create kernel %s: %s\n", kernel_name, errorString(err));
-		abort();
+		util_abort();
 	}
 
 	return kernel;
@@ -297,7 +298,7 @@ cl::Buffer CL::create_buffer(cl_mem_flags flags, size_t size) const {
 	cl::Buffer buffer = cl::Buffer(context_, flags, size, NULL, &err);
 	if(err != CL_SUCCESS) {
 		fprintf(stderr,"[OpenCL] Failed to create buffer: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 	return buffer;
 }
@@ -307,7 +308,7 @@ cl::BufferGL CL::create_gl_buffer(cl_mem_flags flags, GLuint gl_buffer) const {
 	cl::BufferGL buffer(context_, flags, gl_buffer, &err);
 	if(err != CL_SUCCESS) {
 		fprintf(stderr,"[OpenCL] Failed to create gl buffer: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 	/*
 	//GET gl info:
@@ -316,7 +317,7 @@ cl::BufferGL CL::create_gl_buffer(cl_mem_flags flags, GLuint gl_buffer) const {
 	err = buffer.getObjectInfo(&type, &gl_object_name);
 	if(err != CL_SUCCESS) {
 		fprintf(stderr,"[OpenCL] Failed to read cl-gl buffer info: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 	if(gl_object_name != gl_buffer) {
 		fprintf(stderr, "[OpenCL] Name of gl buffer in cl buffer not correct: (is %u, should be %u)\n", gl_object_name, gl_buffer);
@@ -331,7 +332,7 @@ cl::Image2DGL CL::create_from_gl_2d_image(cl_mem_flags flags, Texture2D * textur
 	cl::Image2DGL image(context_, flags, texture_target, miplevel, texture->gl_texture(), &err);
 	if(err != CL_SUCCESS) {
 		fprintf(stderr,"[OpenCL] Failed to create 2D image from opengl texture: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 	return image;
 }
@@ -341,7 +342,7 @@ cl::Image3DGL CL::create_from_gl_3d_image(cl_mem_flags flags, Texture3D * textur
 	cl::Image3DGL image(context_, flags, GL_TEXTURE_3D, miplevel, texture->gl_texture(), &err);
 	if(err != CL_SUCCESS) {
 		fprintf(stderr,"[OpenCL] Failed to create 3D image from opengl texture: %s\n", errorString(err));
-		abort();
+		util_abort();
 	}
 	return image;
 }
@@ -357,7 +358,7 @@ void CL::cl_error_callback(const char * errorinfo, const void * private_info_siz
 void CL::check_error(const cl_int &err, const char * context) {
 	if(err != CL_SUCCESS) {
 		fprintf(stderr,"[OpenCL] %s: %s\n", context, errorString(err));
-		abort();
+		util_abort();
 	}
 }
 

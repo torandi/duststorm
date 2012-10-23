@@ -101,7 +101,7 @@ RenderTarget::RenderTarget(const glm::ivec2& size, GLenum format, int flags, GLe
 			fprintf(stderr, "Framebuffer incomplete: %s\n", gluErrorString(status));
 		}
 
-		abort();
+		util_abort();
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -147,7 +147,7 @@ void RenderTarget::init_vbo(){
 void RenderTarget::bind(){
 	if ( stack ){
 		fprintf(stderr, "Nesting problem with RenderTarget, another target already bound.\n");
-		abort();
+		util_abort();
 	}
 
 	glViewport(0, 0, size.x, size.y);
@@ -160,7 +160,7 @@ void RenderTarget::bind(){
 void RenderTarget::unbind(){
 	if ( !stack ){
 		fprintf(stderr, "Nesting problem with RenderTarget, no target is bound\n");
-		abort();
+		util_abort();
 	}
 
 	front = back;

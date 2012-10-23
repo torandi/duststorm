@@ -58,7 +58,8 @@ class AssimpDataStream : public Assimp::IOStream {
 
 		virtual size_t Write (const void *pvBuffer, size_t pSize, size_t pCount) {
 			fprintf(stderr, "Writing of models is not implemented\n");
-			abort();
+			util_abort();
+			return 0;
 		}
 };
 
@@ -174,7 +175,7 @@ void RenderObject::pre_render() {
 
 		if ( !mtl_data.texture ){
 			fprintf(stderr, "RenderObject `%s' texture failed to load.\n", name.c_str());
-			abort();
+			util_abort();
 		}
 
 		//Check for normalmap:

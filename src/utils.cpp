@@ -111,3 +111,11 @@ bool file_exists(const std::string& filename){
 #	error file_exists is not defined for this platform.
 #endif
 }
+
+void util_abort() {
+	fprintf(stderr,"Critical error!\n");
+	fprintf(verbose,"Aborting!\n");
+	fflush(verbose);
+	fflush(stderr);
+	abort();
+}

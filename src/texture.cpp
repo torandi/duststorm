@@ -39,7 +39,7 @@ SDL_Surface* TextureBase::load_image(const std::string &path, glm::ivec2* size) 
 		if ( path != default_texture ){
 			return load_image(default_texture, size);
 		}
-		abort();
+		util_abort();
 	}
 
 	SDL_RWops * rw = SDL_RWFromConstMem(file->data(), file->size());
@@ -48,7 +48,7 @@ SDL_Surface* TextureBase::load_image(const std::string &path, glm::ivec2* size) 
 
 	if ( !surface ){
 		fprintf(stderr, "Failed to load surface from `%s'\n", path.c_str());
-		abort();
+		util_abort();
 	}
 
 	/* To properly support all formats the surface must be copied to a new
@@ -76,7 +76,7 @@ SDL_Surface* TextureBase::load_image(const std::string &path, glm::ivec2* size) 
 
 	if ( !rgba_surface ) {
 		fprintf(stderr, "Failed to create RGBA surface\n");
-		abort();
+		util_abort();
 	}
 
 	/* Save the alpha blending attributes */

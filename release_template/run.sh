@@ -4,10 +4,10 @@
 #
 
 # exit on failures
-set +e
+set -e
 
 # detect arch
-arch=$(uname -p)
+arch=$(uname -m)
 
 # setup directories
 root=$(dirname $0)
@@ -24,4 +24,4 @@ fi
 
 # execute demo
 export LD_LIBRARY_PATH="$libdir"
-exec $bindir/duststorm
+exec $bindir/BINARY "$@"

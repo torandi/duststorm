@@ -10,6 +10,7 @@
 #include "globals.hpp"
 #include "color.hpp"
 #include "data.hpp"
+#include "utils.hpp"
 
 static std::string trim(std::string s) {
 	size_t begin_str = s.find_first_not_of(" \t\n\r");
@@ -50,7 +51,7 @@ static std::vector<std::string> split(std::string str, std::string search, bool 
 
 static void print_error(const char * error, int linenr, const std::string &line) {
 	printf("[ConfigEntry] Parse error in line %d (%s): %s\n", linenr, line.c_str(), error);
-	abort();
+	util_abort();
 }
 
 ConfigEntry::ConfigEntry(ConfigEntry::entry_type_t type_) : type(type_) {};
@@ -150,7 +151,7 @@ Config Config::parse(std::string file) {
 
 	if(!config_stack.empty()) {
 		printf("[ConfigEntry] Parse error: End of file reached with unmatch } or ]\n");
-		abort();
+		util_abort();
 	}
 	delete data;
 	return Config(current);
@@ -183,7 +184,7 @@ void ConfigEntry::print(std::string indent) const {
 const std::string &ConfigEntry::as_string() const {
 	if(type != ENTRY_STRING) {
 		printf("[ConfigEntry] Trying to read a non-string entry as string\n");
-		abort();
+		util_abort();
 	}
 	return entry_string;
 }
@@ -191,7 +192,7 @@ const std::string &ConfigEntry::as_string() const {
 int ConfigEntry::as_int() const {
 	if(type != ENTRY_STRING) {
 		printf("[ConfigEntry] Trying to read a non-string entry as int\n");
-		abort();
+		util_abort();
 	}
 	return atoi(entry_string.c_str());
 }
@@ -199,7 +200,7 @@ int ConfigEntry::as_int() const {
 float ConfigEntry::as_float() const {
 	if(type != ENTRY_STRING) {
 		printf("[ConfigEntry] Trying to read a non-string entry as float\n");
-		abort();
+		util_abort();
 	}
 	return atof(entry_string.c_str());
 }
@@ -207,16 +208,16 @@ float ConfigEntry::as_float() const {
 glm::vec2 ConfigEntry::as_vec2() const {
 	if(type != ENTRY_STRING) {
 		printf("[ConfigEntry] Trying to read a non-string entry as vec2\n");
-		abort();
+		util_abort();
 	}
 	if(entry_string[0] != '(' || entry_string[entry_string.size() - 1] != ')') {
 		printf("[ConfigEntry] A vec2 must start with ( and end with ): %s\n", entry_string.c_str());
-		abort();
+		util_abort();
 	}
 	std::vector<std::string> data = split(entry_string.substr(1, entry_string.size() - 1), ",", false);
 	if(data.size() != 2) {
 		printf("[ConfigEntry] A vec2 must contain exactly one comma (,): %s\n", entry_string.c_str());
-		abort();
+		util_abort();
 	}
 	return glm::vec2(atof(data[0].c_str()), atof(data[1].c_str()));
 }
@@ -224,16 +225,16 @@ glm::vec2 ConfigEntry::as_vec2() const {
 glm::vec3 ConfigEntry::as_vec3() const {
 	if(type != ENTRY_STRING) {
 		printf("[ConfigEntry] Trying to read a non-string entry as vec3\n");
-		abort();
+		util_abort();
 	}
 	if(entry_string[0] != '(' || entry_string[entry_string.size() - 1] != ')') {
 		printf("[ConfigEntry] A vec3 must start with ( and end with ): %s\n", entry_string.c_str());
-		abort();
+		util_abort();
 	}
 	std::vector<std::string> data = split(entry_string.substr(1, entry_string.size() - 1),"," ,false);
 	if(data.size() != 3) {
 		printf("[ConfigEntry] A vec3 must contain exactly two commas (,): %s\n", entry_string.c_str());
-		abort();
+		util_abort();
 	}
 	return glm::vec3(atof(data[0].c_str()), atof(data[1].c_str()), atof(data[2].c_str()));
 }
@@ -241,16 +242,16 @@ glm::vec3 ConfigEntry::as_vec3() const {
 glm::vec4 ConfigEntry::as_vec4() const {
 	if(type != ENTRY_STRING) {
 		printf("[ConfigEntry] Trying to read a non-string entry as vec4\n");
-		abort();
+		util_abort();
 	}
 	if(entry_string[0] != '(' || entry_string[entry_string.size() - 1] != ')') {
 		printf("[ConfigEntry] A vec4 must start with ( and end with ): %s\n", entry_string.c_str());
-		abort();
+		util_abort();
 	}
 	std::vector<std::string> data = split(entry_string.substr(1, entry_string.size() - 1),"," ,false);
 	if(data.size() != 4) {
 		printf("[ConfigEntry] A vec4 must contain exactly three commas (,): %s\n", entry_string.c_str());
-		abort();
+		util_abort();
 	}
 	return glm::vec4(atof(data[0].c_str()), atof(data[1].c_str()), atof(data[2].c_str()), atof(data[3].c_str()));
 }
@@ -258,7 +259,7 @@ glm::vec4 ConfigEntry::as_vec4() const {
 Color ConfigEntry::as_color() const {
 	if(type != ENTRY_STRING) {
 		printf("[ConfigEntry] Trying to read a non-string entry as color\n");
-		abort();
+		util_abort();
 	}
 	size_t len = split(entry_string, ",", false).size();
 	if(len == 3) {
@@ -267,14 +268,15 @@ Color ConfigEntry::as_color() const {
 		return Color(as_vec4());
 	} else {
 		printf("A color must have 3 or 4 components: %s\n", entry_string.c_str());
-		abort();
+		util_abort();
+		return Color();
 	}
 }
 
 const std::vector<ConfigEntry*> ConfigEntry::as_list() const {
 	if(type != ENTRY_LIST) {
 		printf("[ConfigEntry] Trying to read a non-list entry as list\n");
-		abort();
+		util_abort();
 	}
 	return entry_list;
 }
@@ -282,7 +284,7 @@ const std::vector<ConfigEntry*> ConfigEntry::as_list() const {
 const ConfigEntry * ConfigEntry::find(const std::string &path, bool fail_on_not_found) const {
 	if(type != ENTRY_MAP) {
 		printf("[ConfigEntry] Can't search non-map config entry\n");
-		abort();
+		util_abort();
 	}
 
 	std::vector<std::string> data = split(path, "/", false);
@@ -306,7 +308,7 @@ const ConfigEntry * ConfigEntry::find(const std::string &path, bool fail_on_not_
 	}
 	if(current == nullptr && fail_on_not_found) {
 		printf("[ConfigEntry] Entry not found: %s\n", path.c_str());
-		abort();
+		util_abort();
 	}
 	return current;
 }

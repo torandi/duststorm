@@ -43,4 +43,9 @@ glm::vec2 screen_pos(const glm::vec2& v, const glm::vec2& size);
  */
 bool file_exists(const std::string& filename);
 
+/**
+ * Abort with making sure of doing some output and flushing
+ */
+void util_abort();
+
 #endif

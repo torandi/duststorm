@@ -56,7 +56,7 @@ namespace Engine {
 
 static void handle_sigint(int signum){
 	if ( !running ){
-		fprintf(stderr, "\rgot SIGINT again, aborting\n");
+		fprintf(stderr, "\rgot SIGINT again, util_aborting\n");
 		abort();
 	}
 
@@ -76,7 +76,7 @@ static void init(bool fullscreen, bool vsync){
 	}
 
 	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
-	if ( !vi ){ fprintf(stderr, "SDL_GetVideoInfo() failed\n"); abort(); }
+	if ( !vi ){ fprintf(stderr, "SDL_GetVideoInfo() failed\n"); util_abort(); }
 
 	if ( fullscreen && !resolution_given ){
 		resolution.x = vi->current_w;
@@ -297,7 +297,7 @@ int main(int argc, char* argv[]){
 
 		default:
 			fprintf(stderr, "%s: declared but unhandled argument '%c' (0x%02X)\n", program_name, op, op);
-			abort();
+			util_abort();
 		}
 	};
 	next_index = optind;

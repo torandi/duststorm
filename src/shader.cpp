@@ -136,7 +136,7 @@ void Shader::load_file(const std::string &filename, std::stringstream &shaderDat
 			fprintf(stderr, "Shader preprocessor error: File %s not found\n", filename.c_str());
 		else
 			fprintf(stderr, "Shader preprocessor error: File %s not found (included from %s)\n", filename.c_str(), included_from.c_str());
-		abort();
+		util_abort();
 	}
 	shaderData << file;
 	delete file;
@@ -153,7 +153,7 @@ std::string Shader::parse_shader(
 	std::pair<std::set<std::string>::iterator, bool> ret = included_files.insert(filename);
 	if(ret.second == false) {
 		fprintf(stderr, "Shader preprocessor error: Found include loop when including %s from %s\n", filename.c_str(), included_from.c_str());
-		abort();
+		util_abort();
 	}
 
 	std::stringstream raw_content;
@@ -173,7 +173,7 @@ std::string Shader::parse_shader(
 				size_t end_quote = line.find_last_of('"');
 				if(end_quote == std::string::npos || end_quote == first_quote) {
 					fprintf(stderr, "%s\nShader preprocessor error in %s:%d: Missing closing quote for #include command\n", buffer, filename.c_str(),  linenr);
-					abort();
+					util_abort();
 				}
 				//Trim quotes
 				line = line.substr(first_quote+1, (end_quote - first_quote)-1);
@@ -217,7 +217,7 @@ GLuint Shader::load_shader(GLenum eShaderType, const std::string &strFilename) {
 		glGetShaderInfoLog(shader, 2048, NULL, buffer);
 		fprintf(stderr, "Error in shader %s: %s\n",strFilename.c_str(),  buffer);
 		checkForGLErrors("shader");
-		abort();
+		util_abort();
 	}
 	return shader;
 }
@@ -243,7 +243,7 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 		char buffer[2048];
 		glGetProgramInfoLog(program, 2048, NULL, buffer);
 		fprintf(stderr, "Link error in shader %s: %s\n", shader_name.c_str(), buffer);
-		abort();
+		util_abort();
 	}
 
 #ifdef VALIDATE_SHADERS
@@ -255,7 +255,7 @@ GLuint Shader::create_program(const std::string &shader_name, const std::vector<
 		char buffer[2048];
 		glGetProgramInfoLog(program, 2048, NULL, buffer);
 		fprintf(stderr, "Validate error in shader %s: %s\n", shader_name.c_str(), buffer);
-		abort();
+		util_abort();
 	}
 
 #endif
@@ -267,7 +267,7 @@ Shader* Shader::create_shader(const std::string& base_name, bool cache) {
 	/* sanity check */
 	if ( !initialized ){
 		fprintf(stderr, "Shader::create_shader(..) called before Shader::initialize()\n");
-		abort();
+		util_abort();
 	}
 
 	const auto it = shadercache.find(base_name);
@@ -363,7 +363,7 @@ void Shader::bind() {
 void Shader::unbind() {
 	if ( !current ){
 		fprintf(stderr, "Shader nesting problem, no shader is bound.\n");
-		abort();
+		util_abort();
 	}
 
 	glUseProgram(0);

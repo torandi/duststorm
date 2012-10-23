@@ -5,6 +5,7 @@
 
 #include "movable_light.hpp"
 #include "globals.hpp"
+#include "utils.hpp"
 
 glm::ivec2 MovableLight::shadowmap_resolution = glm::ivec2(4096, 4096);
 float MovableLight::shadowmap_far_factor = 0.5f;
@@ -162,7 +163,7 @@ void MovableLight::render_shadow_map(const Camera &camera, std::function<void()>
 			}
 		default:
 			printf("Shadowmaps are only implemented for directional lights at the moment\n");
-			abort();
+			util_abort();
 	}
 
 	shadow_map.matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.5f))

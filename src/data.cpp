@@ -4,6 +4,7 @@
 
 #include "data.hpp"
 #include "globals.hpp"
+#include "utils.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -55,7 +56,7 @@ void * Data::load_from_file(const char * filename, size_t &size) {
 		} else {
 			fprintf(stderr, "Error when reading file `%s': read size was not the expected size (read %lu bytes, expected %lu)\n", filename, read_bytes, size);
 		}
-		abort();
+		util_abort();
 	}
 	fclose(file);
 	

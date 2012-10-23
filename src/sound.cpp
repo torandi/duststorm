@@ -5,6 +5,7 @@
 #include "data.hpp"
 #include "sound.hpp"
 #include "globals.hpp"
+#include "utils.hpp"
 
 #include <fmodex/fmod_errors.h>
 
@@ -26,7 +27,7 @@ void Sound::initialize_fmod() {
 void Sound::errcheck(const char * contex) {
 	if(result_ != FMOD_OK) {
 		printf("[Sound] FMOD error in %s %s(%d))\n", contex, FMOD_ErrorString(result_), result_);
-		abort();
+		util_abort();
 	}
 }
 
@@ -41,12 +42,12 @@ Sound::Sound(const char * file, int loops) : delay(-0.1f) {
 
 	char* real_path = (char*) malloc(sizeof(PATH_BASE) + sizeof(file) + 32);
 	if ( sprintf(real_path, "%s%s", PATH_BASE "/data/sfx/", file) == -1 ){
-		abort();
+		util_abort();
 	}
 	source = Data::open(real_path);
 	if(source == NULL) {
 		printf("[Sound] Couldn't open file %s\n", real_path);
-		abort();
+		util_abort();
 	}
 
 	free(real_path);

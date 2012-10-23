@@ -326,7 +326,7 @@ void ParticleSystem::render(const glm::mat4 * m) {
 
 	if(!glUnmapBuffer(GL_ARRAY_BUFFER)) {
 		printf("glUnmapBuffer returned False\n");
-		abort();
+		util_util_abort();
 	}
 	*/
 
