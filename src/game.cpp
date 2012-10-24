@@ -394,6 +394,12 @@ void Game::update(float dt) {
 		case MODE_GAME:
 			{
 				if(life <= 0) {
+
+					// Delete all enemies.
+					for(auto it = enemies.begin(); it != enemies.end(); ) {
+							delete *it;
+							it = enemies.erase(it);
+					}
 					
 					//delete music;
 					current_mode = MODE_HIGHSCORE;
