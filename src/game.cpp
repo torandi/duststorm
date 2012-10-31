@@ -41,6 +41,8 @@ static const float break_factor = 0.3f;
 static const float break_duration = 3.0f;
 static const float break_cooldown = 10.0f;
 
+static const float particleMult = 100;
+
 static void read_particle_config(const ConfigEntry * config, ParticleSystem::config_t &particle_config) {
 	particle_config.birth_color = config->find("birth_color", true)->as_vec4();
 	particle_config.death_color = config->find("death_color", true)->as_vec4();
@@ -191,10 +193,10 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 																	PATH_BASE "data/textures/fire3.png",
 																	nullptr);
 
-	static const int max_attack_particles = particle_config["/particles/max_attack_particles"]->as_int();
-	static const int max_smoke_particles = particle_config["/particles/max_smoke_particles"]->as_int();
-	static const int max_dust_particles = particle_config["/particles/max_dust_particles"]->as_int();
-	static const int max_explosion_particles = particle_config["/particles/max_explosion_particles"]->as_int();
+	static const int max_attack_particles = particle_config["/particles/max_attack_particles"]->as_int()*particleMult;
+	static const int max_smoke_particles = particle_config["/particles/max_smoke_particles"]->as_int()*particleMult;
+	static const int max_dust_particles = particle_config["/particles/max_dust_particles"]->as_int()*particleMult;
+	static const int max_explosion_particles = particle_config["/particles/max_explosion_particles"]->as_int()*particleMult;
 
 	attack_particles = new HittingParticles(max_attack_particles, particle_textures, EnemyTemplate::max_num_enemies, false);
 	attack_particles->config.gravity = gravity;
@@ -207,19 +209,19 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	}
 
 	read_particle_config(particle_config["/particles/light"], particle_types[LIGHT_PARTICLES].config);
-	particle_types[LIGHT_PARTICLES].count = particle_config["/particles/light/count"]->as_int();
+	particle_types[LIGHT_PARTICLES].count = particle_config["/particles/light/count"]->as_int()*particleMult;
 	particle_types[LIGHT_PARTICLES].spawn_speed = particle_config["/particles/light/spawn_speed"]->as_float();
-	particle_types[LIGHT_PARTICLES].damage = particle_config["/particles/light/damage"]->as_float();
+	particle_types[LIGHT_PARTICLES].damage = particle_config["/particles/light/damage"]->as_float() / particle_types[LIGHT_PARTICLES].count;
 
 	read_particle_config(particle_config["/particles/medium"], particle_types[MEDIUM_PARTICLES].config);
-	particle_types[MEDIUM_PARTICLES].count = particle_config["/particles/medium/count"]->as_int();
+	particle_types[MEDIUM_PARTICLES].count = particle_config["/particles/medium/count"]->as_int()*particleMult;
 	particle_types[MEDIUM_PARTICLES].spawn_speed = particle_config["/particles/medium/spawn_speed"]->as_float();
-	particle_types[MEDIUM_PARTICLES].damage = particle_config["/particles/medium/damage"]->as_float();
+	particle_types[MEDIUM_PARTICLES].damage = particle_config["/particles/medium/damage"]->as_float()/ particle_types[MEDIUM_PARTICLES].count;
 
 	read_particle_config(particle_config["/particles/heavy"], particle_types[HEAVY_PARTICLES].config);
-	particle_types[HEAVY_PARTICLES].count = particle_config["/particles/heavy/count"]->as_int();
+	particle_types[HEAVY_PARTICLES].count = particle_config["/particles/heavy/count"]->as_int()*particleMult;
 	particle_types[HEAVY_PARTICLES].spawn_speed = particle_config["/particles/heavy/spawn_speed"]->as_float();
-	particle_types[HEAVY_PARTICLES].damage = particle_config["/particles/heavy/damage"]->as_float();
+	particle_types[HEAVY_PARTICLES].damage = particle_config["/particles/heavy/damage"]->as_float()/ particle_types[HEAVY_PARTICLES].count;
 
 	//Smoke:
 	smoke = new ParticleSystem(max_smoke_particles, particle_textures, false);
@@ -228,7 +230,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	smoke->config.spawn_area = glm::vec4(0.f, 0.f, 0.f, canon_inner_radius * 2.0);
 
 	read_particle_config(particle_config["/particles/smoke"], smoke->config);
-	smoke_count = particle_config["/particles/smoke/count"]->as_int();
+	smoke_count = particle_config["/particles/smoke/count"]->as_int()*particleMult;
 	smoke_spawn_speed = particle_config["/particles/smoke/spawn_speed"]->as_float();
 
 	//Dust:
@@ -247,9 +249,9 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 
 	dust->config.spawn_position = glm::vec4(player.position() - half_dust_spawn_area, 1.f);
 	dust->update_config();
-	dust->spawn(dust->avg_spawn_rate * 5.0);
+	dust->spawn(dust->avg_spawn_rate * 0.05*particleMult);
 	dust->config.spawn_position += glm::vec4(path->at(player.path_position() + dust_spawn_ahead / 2.f), 0.f);
-	dust->spawn(dust->avg_spawn_rate * 5.0);
+	dust->spawn(dust->avg_spawn_rate * 0.05*particleMult);
 
 	//Explosions
 	explosions = new ParticleSystem(max_explosion_particles, particle_textures, false);
@@ -264,7 +266,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 	explosions->config.gravity = gravity;
 	system_configs.push_back(&(explosions->config));
 	hit_explosion_count = particle_config["/particles/hit_explosion/count"]->as_int();
-	kill_explosion_count = particle_config["/particles/kill_explosion/count"]->as_int();
+	kill_explosion_count = particle_config["/particles/kill_explosion/count"]->as_int()*particleMult;
 	kill_explosion.spawn_area = particle_config["/particles/kill_explosion/spawn_area"]->as_vec4();
 	kill_explosion.avg_spawn_velocity = glm::vec4(particle_config["/particles/kill_explosion/avg_spawn_velocity"]->as_vec3(), 0);
 	hit_explosion.spawn_area = particle_config["/particles/hit_explosion/spawn_area"]->as_vec4();
