@@ -41,7 +41,7 @@ static const float break_factor = 0.3f;
 static const float break_duration = 3.0f;
 static const float break_cooldown = 10.0f;
 
-static const float particleMult = 100;
+
 
 static void read_particle_config(const ConfigEntry * config, ParticleSystem::config_t &particle_config) {
 	particle_config.birth_color = config->find("birth_color", true)->as_vec4();
@@ -192,6 +192,7 @@ Game::Game(const std::string &level, float near, float far, float fov) :
 																	PATH_BASE "data/textures/fire2.png",
 																	PATH_BASE "data/textures/fire3.png",
 																	nullptr);
+	static const int particleMult = particle_config["/particles/particle_mult"]->as_int();
 
 	static const int max_attack_particles = particle_config["/particles/max_attack_particles"]->as_int()*particleMult;
 	static const int max_smoke_particles = particle_config["/particles/max_smoke_particles"]->as_int()*particleMult;
